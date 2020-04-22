@@ -1,0 +1,54 @@
+.article-font {
+  line-height: 22px !important;
+  font: 18px PT Mono;
+}
+
+.article-font-inactive {
+  line-height: 22px !important;
+  font: 18px PT Mono;
+  cursor: default;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.text-font {
+  line-height: 32px !important;
+  font: 22px PT Mono;
+  font-weight: 500;
+}
+
+.text-font-inactive {
+  line-height: 32px !important;
+  font: 22px PT Mono;
+  cursor: default;
+  font-weight: 500;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.title-font {
+  line-height: 40px !important;
+  font: 26px PT Mono;
+  font-weight: bold;
+}
+
+.title-font-inactive {
+  line-height: 40px !important;
+  font: 26px PT Mono;
+  cursor: default;
+  font-weight: bold;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

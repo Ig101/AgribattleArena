@@ -1,0 +1,48 @@
+:host {
+  position: absolute;
+
+  .menu-item {
+    position: relative;
+    width: 39px;
+    left: 0px;
+    height: 39px;
+    padding: 0 8px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    background-color: #000;
+    border: double #999;
+    border-width: 5px;
+    border-radius: 39px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    transition: width 0.2s, left 0.2s;
+  }
+
+  .menu-item-tooltip {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .menu-item-tooltip-left {
+    left: -80%;
+  }
+
+  .menu-item-tooltip-supress {
+    z-index: 2;
+  }
+
+  .active {
+    cursor: pointer;
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .active:hover {
+    cursor: pointer;
+    color: #ff5;
+    border-color: #ff5;
+  }
+}

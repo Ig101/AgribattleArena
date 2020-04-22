@@ -1,0 +1,25 @@
+:host {
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+  button {
+    padding: 8px;
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #fff;
+    transition: color 0.2s;
+  }
+  
+  button:hover {
+    color: #ff4;
+  }
+
+  button:active {
+    color: #aa0;
+  }
+}

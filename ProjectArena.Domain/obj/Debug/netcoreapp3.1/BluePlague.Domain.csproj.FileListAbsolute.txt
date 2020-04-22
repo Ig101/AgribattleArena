@@ -1,0 +1,11 @@
+D:\source\BluePlague\BluePlague.Domain\obj\Debug\netcoreapp3.1\BluePlague.Domain.csprojAssemblyReference.cache
+D:\source\BluePlague\BluePlague.Domain\obj\Debug\netcoreapp3.1\BluePlague.Domain.AssemblyInfoInputs.cache
+D:\source\BluePlague\BluePlague.Domain\obj\Debug\netcoreapp3.1\BluePlague.Domain.AssemblyInfo.cs
+D:\source\BluePlague\BluePlague.Domain\bin\Debug\netcoreapp3.1\BluePlague.Domain.deps.json
+D:\source\BluePlague\BluePlague.Domain\bin\Debug\netcoreapp3.1\BluePlague.Domain.dll
+D:\source\BluePlague\BluePlague.Domain\bin\Debug\netcoreapp3.1\BluePlague.Domain.pdb
+D:\source\BluePlague\BluePlague.Domain\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.dll
+D:\source\BluePlague\BluePlague.Domain\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.pdb
+D:\source\BluePlague\BluePlague.Domain\obj\Debug\netcoreapp3.1\BluePlague.Domain.csproj.CopyComplete
+D:\source\BluePlague\BluePlague.Domain\obj\Debug\netcoreapp3.1\BluePlague.Domain.dll
+D:\source\BluePlague\BluePlague.Domain\obj\Debug\netcoreapp3.1\BluePlague.Domain.pdb
