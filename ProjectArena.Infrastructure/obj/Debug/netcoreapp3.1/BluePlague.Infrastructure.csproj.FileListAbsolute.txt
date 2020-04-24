@@ -1,8 +1,0 @@
-D:\source\BluePlague\BluePlague.Infrastructure\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.deps.json
-D:\source\BluePlague\BluePlague.Infrastructure\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.dll
-D:\source\BluePlague\BluePlague.Infrastructure\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.pdb
-D:\source\BluePlague\BluePlague.Infrastructure\obj\Debug\netcoreapp3.1\BluePlague.Infrastructure.csprojAssemblyReference.cache
-D:\source\BluePlague\BluePlague.Infrastructure\obj\Debug\netcoreapp3.1\BluePlague.Infrastructure.AssemblyInfoInputs.cache
-D:\source\BluePlague\BluePlague.Infrastructure\obj\Debug\netcoreapp3.1\BluePlague.Infrastructure.AssemblyInfo.cs
-D:\source\BluePlague\BluePlague.Infrastructure\obj\Debug\netcoreapp3.1\BluePlague.Infrastructure.dll
-D:\source\BluePlague\BluePlague.Infrastructure\obj\Debug\netcoreapp3.1\BluePlague.Infrastructure.pdb

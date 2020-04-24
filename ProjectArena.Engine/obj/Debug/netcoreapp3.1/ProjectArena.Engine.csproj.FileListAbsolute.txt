@@ -1,9 +1,0 @@
-D:\source\ProjectArena\ProjectArena.Engine\bin\Debug\netcoreapp3.1\ProjectArena.Engine.deps.json
-D:\source\ProjectArena\ProjectArena.Engine\bin\Debug\netcoreapp3.1\ProjectArena.Engine.dll
-D:\source\ProjectArena\ProjectArena.Engine\bin\Debug\netcoreapp3.1\ProjectArena.Engine.pdb
-D:\source\ProjectArena\ProjectArena.Engine\obj\Debug\netcoreapp3.1\ProjectArena.Engine.csprojAssemblyReference.cache
-D:\source\ProjectArena\ProjectArena.Engine\obj\Debug\netcoreapp3.1\ProjectArena.Engine.AssemblyInfoInputs.cache
-D:\source\ProjectArena\ProjectArena.Engine\obj\Debug\netcoreapp3.1\ProjectArena.Engine.AssemblyInfo.cs
-D:\source\ProjectArena\ProjectArena.Engine\obj\Debug\netcoreapp3.1\ProjectArena.Engine.dll
-D:\source\ProjectArena\ProjectArena.Engine\obj\Debug\netcoreapp3.1\ProjectArena.Engine.pdb
-D:\source\ProjectArena\ProjectArena.Engine\obj\Debug\netcoreapp3.1\ProjectArena.Engine.csproj.CoreCompileInputs.cache
