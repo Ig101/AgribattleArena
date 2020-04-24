@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using ProjectArena.Domain.Operations;
 
-namespace ProjectArena.Domain
+namespace ProjectArena.Domain.Mongo
 {
   internal class Repository<T> : IRepository<T>
     {

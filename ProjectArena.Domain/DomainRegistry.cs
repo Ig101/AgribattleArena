@@ -6,6 +6,7 @@ using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Identity;
 using ProjectArena.Domain.Identity.Entities;
+using ProjectArena.Domain.Mongo;
 
 namespace ProjectArena.Domain
 {

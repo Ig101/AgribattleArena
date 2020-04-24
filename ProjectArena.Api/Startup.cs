@@ -12,6 +12,7 @@ using ProjectArena.Application;
 using ProjectArena.Domain;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
+using ProjectArena.Domain.Mongo;
 using ProjectArena.Infrastructure;
 
 namespace ProjectArena.Api

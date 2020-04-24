@@ -489,7 +489,6 @@ namespace ProjectArena.Engine
                         if (RemainedTurnTime <= 0)
                         {
                             IPlayerParentRef player = TempTileObject.Owner;
-                            TileObject previousTempTileObject = TempTileObject;
                             if (player != null)
                             {
                                 player.SkipTurn();

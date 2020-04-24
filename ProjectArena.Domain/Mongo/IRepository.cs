@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace ProjectArena.Domain
+namespace ProjectArena.Domain.Mongo
 {
     public interface IRepository<T>
     {

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ProjectArena.Domain.Operations;
 
-namespace ProjectArena.Domain
+namespace ProjectArena.Domain.Mongo
 {
     public abstract class BaseMongoContext
     {

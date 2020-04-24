@@ -11,7 +11,7 @@ using ProjectArena.Domain.Identity;
 using ProjectArena.Domain.Identity.Entities;
 using ProjectArena.Domain.Identity.EntityConfiguration;
 
-namespace ProjectArena.Domain
+namespace ProjectArena.Domain.Mongo
 {
   public class MongoConnection
   {
