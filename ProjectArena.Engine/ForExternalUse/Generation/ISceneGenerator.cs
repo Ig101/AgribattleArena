@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AgribattleArena.Engine.ForExternalUse.Generation
+namespace ProjectArena.Engine.ForExternalUse.Generation
 {
     public interface ISceneGenerator
     {

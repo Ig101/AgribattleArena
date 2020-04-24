@@ -1,6 +1,6 @@
-﻿using AgribattleArena.Engine.Helpers;
+﻿using ProjectArena.Engine.Helpers;
 
-namespace AgribattleArena.Engine.Natives
+namespace ProjectArena.Engine.Natives
 {
     public class ActorNative : TaggingNative
     {

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects.Abstract;
-using AgribattleArena.Engine.Objects.Immaterial;
-using AgribattleArena.Engine.Objects.Immaterial.Buffs;
-using AgribattleArena.Engine.VarManagers;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects.Abstract;
+using ProjectArena.Engine.Objects.Immaterial;
+using ProjectArena.Engine.Objects.Immaterial.Buffs;
+using ProjectArena.Engine.VarManagers;
 
-namespace AgribattleArena.Engine.Objects
+namespace ProjectArena.Engine.Objects
 {
     public class Actor : TileObject, IActorParentRef, IActorDamageModelRef
     {

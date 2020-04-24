@@ -1,0 +1,14 @@
+D:\source\ProjectArena\ProjectArena.Domain\bin\Debug\netcoreapp3.1\ProjectArena.Domain.deps.json
+D:\source\ProjectArena\ProjectArena.Domain\bin\Debug\netcoreapp3.1\ProjectArena.Domain.dll
+D:\source\ProjectArena\ProjectArena.Domain\bin\Debug\netcoreapp3.1\ProjectArena.Domain.pdb
+D:\source\ProjectArena\ProjectArena.Domain\bin\Debug\netcoreapp3.1\ProjectArena.Engine.dll
+D:\source\ProjectArena\ProjectArena.Domain\bin\Debug\netcoreapp3.1\ProjectArena.Infrastructure.dll
+D:\source\ProjectArena\ProjectArena.Domain\bin\Debug\netcoreapp3.1\ProjectArena.Infrastructure.pdb
+D:\source\ProjectArena\ProjectArena.Domain\bin\Debug\netcoreapp3.1\ProjectArena.Engine.pdb
+D:\source\ProjectArena\ProjectArena.Domain\obj\Debug\netcoreapp3.1\ProjectArena.Domain.csprojAssemblyReference.cache
+D:\source\ProjectArena\ProjectArena.Domain\obj\Debug\netcoreapp3.1\ProjectArena.Domain.AssemblyInfoInputs.cache
+D:\source\ProjectArena\ProjectArena.Domain\obj\Debug\netcoreapp3.1\ProjectArena.Domain.AssemblyInfo.cs
+D:\source\ProjectArena\ProjectArena.Domain\obj\Debug\netcoreapp3.1\ProjectArena.Domain.csproj.CopyComplete
+D:\source\ProjectArena\ProjectArena.Domain\obj\Debug\netcoreapp3.1\ProjectArena.Domain.dll
+D:\source\ProjectArena\ProjectArena.Domain\obj\Debug\netcoreapp3.1\ProjectArena.Domain.pdb
+D:\source\ProjectArena\ProjectArena.Domain\obj\Debug\netcoreapp3.1\ProjectArena.Domain.csproj.CoreCompileInputs.cache

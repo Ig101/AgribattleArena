@@ -58,9 +58,9 @@ D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\System.Security.
 D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.1\System.Security.Cryptography.Pkcs.dll
 D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\ProjectArena.Domain.dll
 D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\ProjectArena.Infrastructure.dll
-D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\ProjectArena.Mediation.dll
+D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\ProjectArena.Application.dll
 D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\ProjectArena.Infrastructure.pdb
-D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\ProjectArena.Mediation.pdb
+D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\ProjectArena.Application.pdb
 D:\source\ProjectArena\ProjectArena.Api\bin\Debug\netcoreapp3.1\ProjectArena.Domain.pdb
 D:\source\ProjectArena\ProjectArena.Api\obj\Debug\netcoreapp3.1\ProjectArena.Api.csprojAssemblyReference.cache
 D:\source\ProjectArena\ProjectArena.Api\obj\Debug\netcoreapp3.1\staticwebassets\ProjectArena.Api.StaticWebAssets.Manifest.cache

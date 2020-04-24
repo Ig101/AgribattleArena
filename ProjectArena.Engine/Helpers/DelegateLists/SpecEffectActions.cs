@@ -1,7 +1,7 @@
-﻿using AgribattleArena.Engine.Objects;
-using AgribattleArena.Engine.Objects.Abstract;
+﻿using ProjectArena.Engine.Objects;
+using ProjectArena.Engine.Objects.Abstract;
 
-namespace AgribattleArena.Engine.Helpers.DelegateLists
+namespace ProjectArena.Engine.Helpers.DelegateLists
 {
     public class SpecEffectActions
     {

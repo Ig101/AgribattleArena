@@ -1,4 +1,4 @@
-﻿namespace AgribattleArena.Engine.VarManagers
+﻿namespace ProjectArena.Engine.VarManagers
 {
     public interface IVarManager
     {

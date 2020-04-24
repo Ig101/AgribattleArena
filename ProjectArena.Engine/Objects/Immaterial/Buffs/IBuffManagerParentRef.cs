@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.Helpers;
+using ProjectArena.Engine.Helpers;
 
-namespace AgribattleArena.Engine.Objects.Immaterial.Buffs
+namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 {
     public interface IBuffManagerParentRef
     {

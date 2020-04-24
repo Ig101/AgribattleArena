@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AgribattleArena.Engine.Helpers
+namespace ProjectArena.Engine.Helpers
 {
     internal class NativeNotFoundException : Exception
     {

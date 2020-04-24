@@ -1,15 +1,12 @@
-﻿using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Objects.Immaterial;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using NUnit.Framework;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Objects.Immaterial;
 
-namespace AgribattleArena.Tests.Engine
+namespace ProjectArena.Tests.Engine
 {
-    class DamageModelShould
-    {
-        DamageModel _damageModel;
+    public class DamageModelShould
+        {
+        private DamageModel _damageModel;
 
         [Test]
         [TestCase(TestName = "Default(Health)")]

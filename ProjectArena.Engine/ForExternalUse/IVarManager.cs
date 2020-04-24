@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AgribattleArena.Engine.ForExternalUse
+namespace ProjectArena.Engine.ForExternalUse
 {
     public interface IVarManager
     {

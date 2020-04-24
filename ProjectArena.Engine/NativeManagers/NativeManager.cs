@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Natives;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Natives;
 
-namespace AgribattleArena.Engine.NativeManagers
+namespace ProjectArena.Engine.NativeManagers
 {
     public class NativeManager : INativeManager, ForExternalUse.INativeManager
     {

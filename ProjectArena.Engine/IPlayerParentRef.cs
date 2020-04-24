@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Objects;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Objects;
 
-namespace AgribattleArena.Engine
+namespace ProjectArena.Engine
 {
     public interface IPlayerParentRef
     {

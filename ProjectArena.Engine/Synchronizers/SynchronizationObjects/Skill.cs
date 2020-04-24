@@ -1,6 +1,6 @@
-﻿using AgribattleArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
+﻿using ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
 
-namespace AgribattleArena.Engine.Synchronizers.SynchronizationObjects
+namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 {
     internal class Skill : ISkill
     {

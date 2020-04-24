@@ -1,6 +1,6 @@
-﻿using AgribattleArena.Engine.NativeManagers;
+﻿using ProjectArena.Engine.NativeManagers;
 
-namespace AgribattleArena.Engine.Natives
+namespace ProjectArena.Engine.Natives
 {
     public class RoleModelNative
     {

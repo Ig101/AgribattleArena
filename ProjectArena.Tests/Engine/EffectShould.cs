@@ -1,26 +1,24 @@
-﻿using AgribattleArena.Engine.ForExternalUse.Synchronization;
-using AgribattleArena.Engine.Objects;
-using AgribattleArena.Tests.Engine.Helpers;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using NUnit.Framework;
+using ProjectArena.Engine.ForExternalUse.Synchronization;
+using ProjectArena.Engine.Objects;
+using ProjectArena.Tests.Engine.Helpers;
 
-namespace AgribattleArena.Tests.Engine
+namespace ProjectArena.Tests.Engine
 {
     [TestFixture]
-    class EffectShould: BasicEngineTester
-    {
-        SpecEffect _effect;
+    public class EffectShould : BasicEngineTester
+        {
+        private SpecEffect _effect;
 
         [SetUp]
         public void Prepare()
         {
-            _syncMessages = new List<ISyncEventArgs>();
-            _scene = SceneSamples.CreateSimpleScene(this.EventHandler, false);
-            _effect = _scene.CreateEffect(_scene.Players.First(), "test_effect", _scene.Tiles[1][2], null, 2, null);
-            _syncMessages.Clear();
+            SyncMessages = new List<ISyncEventArgs>();
+            Scene = SceneSamples.CreateSimpleScene(this.EventHandler, false);
+            _effect = Scene.CreateEffect(Scene.Players.First(), "test_effect", Scene.Tiles[1][2], null, 2, null);
+            SyncMessages.Clear();
         }
 
         [Test]
@@ -32,8 +30,8 @@ namespace AgribattleArena.Tests.Engine
         [Test]
         public void Impact()
         {
-            _scene.ActorWait(_scene.TempTileObject.Id);
-            Assert.That((int)_scene.Actors.Find(x => x.ExternalId == 1).DamageModel.Health, Is.EqualTo(95), "Actor health after impact");
+            Scene.ActorWait(Scene.TempTileObject.Id);
+            Assert.That((int)Scene.Actors.Find(x => x.ExternalId == 1).DamageModel.Health, Is.EqualTo(95), "Actor health after impact");
             Assert.That(_effect.Duration, Is.LessThan(2), "Effect duration");
         }
 
@@ -41,15 +39,16 @@ namespace AgribattleArena.Tests.Engine
         public void Death()
         {
             int i = 0;
-            while(_effect.Duration>0 && i<100)
+            while (_effect.Duration > 0 && i < 100)
             {
-                _scene.ActorWait(_scene.TempTileObject.Id);
+                Scene.ActorWait(Scene.TempTileObject.Id);
             }
+
             Assert.That(i > 400, Is.False, "Cycle error");
-            Assert.That((int)_scene.Actors.Find(x => x.ExternalId == 1).DamageModel.Health, Is.EqualTo(70), "Actor health after impact");
+            Assert.That((int)Scene.Actors.Find(x => x.ExternalId == 1).DamageModel.Health, Is.EqualTo(70), "Actor health after impact");
             Assert.That(_effect.Duration, Is.LessThanOrEqualTo(0), "Effect duration");
             Assert.That(_effect.IsAlive, Is.False, "Is alive");
-            Assert.That(_syncMessages[_syncMessages.Count() - 1].SyncInfo.DeletedEffects.Count(), Is.EqualTo(1), "Count of deleted effects");
+            Assert.That(SyncMessages[SyncMessages.Count() - 1].SyncInfo.DeletedEffects.Count(), Is.EqualTo(1), "Count of deleted effects");
         }
     }
 }

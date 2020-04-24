@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AgribattleArena.Engine.ForExternalUse.Synchronization;
-using AgribattleArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Objects.Abstract;
-using AgribattleArena.Engine.Synchronizers.SynchronizationObjects;
+using ProjectArena.Engine.ForExternalUse.Synchronization;
+using ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Objects.Abstract;
+using ProjectArena.Engine.Synchronizers.SynchronizationObjects;
 
-namespace AgribattleArena.Engine.Synchronizers
+namespace ProjectArena.Engine.Synchronizers
 {
     public class Synchronizer : ISynchronizer
     {

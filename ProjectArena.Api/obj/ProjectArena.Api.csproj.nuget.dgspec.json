@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\source\\ProjectArena\\ProjectArena.Api\\ProjectArena.Api.csproj": {}
+    "D:\\source\\ProjectArena\\ProjectArena.Api\\ProjectArena.Api.csproj": {}
   },
   "projects": {
-    "d:\\source\\ProjectArena\\ProjectArena.Api\\ProjectArena.Api.csproj": {
+    "D:\\source\\ProjectArena\\ProjectArena.Api\\ProjectArena.Api.csproj": {
       "version": "1.1.0.39",
       "restore": {
-        "projectUniqueName": "d:\\source\\ProjectArena\\ProjectArena.Api\\ProjectArena.Api.csproj",
+        "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Api\\ProjectArena.Api.csproj",
         "projectName": "ProjectArena.Api",
-        "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Api\\ProjectArena.Api.csproj",
+        "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Api\\ProjectArena.Api.csproj",
         "packagesPath": "C:\\Users\\Ig101\\.nuget\\packages\\",
-        "outputPath": "d:\\source\\ProjectArena\\ProjectArena.Api\\obj\\",
+        "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Ig101\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -25,11 +25,14 @@
         "frameworks": {
           "netcoreapp3.1": {
             "projectReferences": {
-              "d:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj": {
-                "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj"
+              "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj": {
+                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj"
               },
-              "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
-                "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj"
+              "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj": {
+                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj"
+              },
+              "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
+                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj"
               }
             }
           }
@@ -94,18 +97,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "d:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj": {
+    "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj": {
       "version": "1.1.0.39",
       "restore": {
-        "projectUniqueName": "d:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj",
-        "projectName": "ProjectArena.Domain",
-        "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj",
+        "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj",
+        "projectName": "ProjectArena.Application",
+        "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj",
         "packagesPath": "C:\\Users\\Ig101\\.nuget\\packages\\",
-        "outputPath": "d:\\source\\ProjectArena\\ProjectArena.Domain\\obj\\",
+        "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Ig101\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -119,11 +122,102 @@
         "frameworks": {
           "netcoreapp3.1": {
             "projectReferences": {
-              "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj": {
-                "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj"
+              "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj": {
+                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj"
               },
-              "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
-                "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj"
+              "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
+                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "AsyncUsageAnalyzers": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.0-alpha003, )"
+            },
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[8.6.1, )"
+            },
+            "MediatR": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "MediatR.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.AspNetCore.SignalR": {
+              "target": "Package",
+              "version": "[1.1.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[3.1.2, )"
+            },
+            "StyleCop.Analyzers": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.1.118, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj": {
+      "version": "1.1.0.39",
+      "restore": {
+        "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj",
+        "projectName": "ProjectArena.Domain",
+        "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj",
+        "packagesPath": "C:\\Users\\Ig101\\.nuget\\packages\\",
+        "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Domain\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Ig101\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {
+              "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj": {
+                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj"
+              },
+              "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
+                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj"
               }
             }
           }
@@ -189,18 +283,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj": {
+    "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj": {
       "version": "1.1.0.39",
       "restore": {
-        "projectUniqueName": "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
+        "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
         "projectName": "ProjectArena.Engine",
-        "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
+        "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
         "packagesPath": "C:\\Users\\Ig101\\.nuget\\packages\\",
-        "outputPath": "d:\\source\\ProjectArena\\ProjectArena.Engine\\obj\\",
+        "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Engine\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Ig101\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -253,18 +347,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
+    "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
       "version": "1.1.0.39",
       "restore": {
-        "projectUniqueName": "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj",
+        "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj",
         "projectName": "ProjectArena.Infrastructure",
-        "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj",
+        "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\Ig101\\.nuget\\packages\\",
-        "outputPath": "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\obj\\",
+        "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Ig101\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -325,7 +419,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

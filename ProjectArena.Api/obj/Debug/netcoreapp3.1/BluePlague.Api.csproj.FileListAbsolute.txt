@@ -53,9 +53,9 @@ D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\System.Security.Cryp
 D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.1\System.Security.Cryptography.Pkcs.dll
 D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\BluePlague.Domain.dll
 D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.dll
-D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\BluePlague.Mediation.dll
+D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\BluePlague.Application.dll
 D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.pdb
-D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\BluePlague.Mediation.pdb
+D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\BluePlague.Application.pdb
 D:\source\BluePlague\BluePlague.Api\bin\Debug\netcoreapp3.1\BluePlague.Domain.pdb
 D:\source\BluePlague\BluePlague.Api\obj\Debug\netcoreapp3.1\BluePlague.Api.csprojAssemblyReference.cache
 D:\source\BluePlague\BluePlague.Api\obj\Debug\netcoreapp3.1\staticwebassets\BluePlague.Api.StaticWebAssets.Manifest.cache

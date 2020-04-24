@@ -64,11 +64,11 @@
   "project": {
     "version": "1.1.0.39",
     "restore": {
-      "projectUniqueName": "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
+      "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
       "projectName": "ProjectArena.Engine",
-      "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
+      "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
       "packagesPath": "C:\\Users\\Ig101\\.nuget\\packages\\",
-      "outputPath": "d:\\source\\ProjectArena\\ProjectArena.Engine\\obj\\",
+      "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Engine\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Ig101\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -121,7 +121,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

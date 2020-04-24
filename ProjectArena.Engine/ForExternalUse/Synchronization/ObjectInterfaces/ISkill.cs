@@ -1,4 +1,4 @@
-﻿namespace AgribattleArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
+﻿namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 {
     public interface ISkill
     {

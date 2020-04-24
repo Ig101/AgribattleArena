@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using AgribattleArena.Engine.Objects;
+using ProjectArena.Engine.Objects;
 
-namespace AgribattleArena.Engine.Helpers.DelegateLists
+namespace ProjectArena.Engine.Helpers.DelegateLists
 {
     public class TileActions
     {

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects.Immaterial;
-using AgribattleArena.Engine.Objects.Immaterial.Buffs;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects.Immaterial;
+using ProjectArena.Engine.Objects.Immaterial.Buffs;
 
-namespace AgribattleArena.Engine.Objects
+namespace ProjectArena.Engine.Objects
 {
     public interface IActorParentRef
     {

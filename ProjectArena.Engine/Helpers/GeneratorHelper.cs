@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects;
-using AgribattleArena.Engine.Objects.Immaterial.Buffs;
+using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects;
+using ProjectArena.Engine.Objects.Immaterial.Buffs;
 
-namespace AgribattleArena.Engine.Helpers
+namespace ProjectArena.Engine.Helpers
 {
     public static class GeneratorHelper
     {

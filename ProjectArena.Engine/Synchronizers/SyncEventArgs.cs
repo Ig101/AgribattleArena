@@ -1,8 +1,8 @@
 ﻿using System;
-using AgribattleArena.Engine.ForExternalUse;
-using AgribattleArena.Engine.ForExternalUse.Synchronization;
+using ProjectArena.Engine.ForExternalUse;
+using ProjectArena.Engine.ForExternalUse.Synchronization;
 
-namespace AgribattleArena.Engine.Synchronizers
+namespace ProjectArena.Engine.Synchronizers
 {
     public class SyncEventArgs : EventArgs, ISyncEventArgs
     {

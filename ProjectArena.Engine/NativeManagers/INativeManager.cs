@@ -1,6 +1,6 @@
-﻿using AgribattleArena.Engine.Natives;
+﻿using ProjectArena.Engine.Natives;
 
-namespace AgribattleArena.Engine.NativeManagers
+namespace ProjectArena.Engine.NativeManagers
 {
     public interface INativeManager
     {

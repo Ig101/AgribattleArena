@@ -1,0 +1,13 @@
+D:\source\BluePlague\BluePlague.Application\bin\Debug\netcoreapp3.1\BluePlague.Application.deps.json
+D:\source\BluePlague\BluePlague.Application\bin\Debug\netcoreapp3.1\BluePlague.Application.dll
+D:\source\BluePlague\BluePlague.Application\bin\Debug\netcoreapp3.1\BluePlague.Application.pdb
+D:\source\BluePlague\BluePlague.Application\bin\Debug\netcoreapp3.1\BluePlague.Domain.dll
+D:\source\BluePlague\BluePlague.Application\bin\Debug\netcoreapp3.1\BluePlague.Domain.pdb
+D:\source\BluePlague\BluePlague.Application\obj\Debug\netcoreapp3.1\BluePlague.Application.csprojAssemblyReference.cache
+D:\source\BluePlague\BluePlague.Application\obj\Debug\netcoreapp3.1\BluePlague.Application.AssemblyInfoInputs.cache
+D:\source\BluePlague\BluePlague.Application\obj\Debug\netcoreapp3.1\BluePlague.Application.AssemblyInfo.cs
+D:\source\BluePlague\BluePlague.Application\obj\Debug\netcoreapp3.1\BluePlague.Application.csproj.CopyComplete
+D:\source\BluePlague\BluePlague.Application\obj\Debug\netcoreapp3.1\BluePlague.Application.dll
+D:\source\BluePlague\BluePlague.Application\obj\Debug\netcoreapp3.1\BluePlague.Application.pdb
+D:\source\BluePlague\BluePlague.Application\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.dll
+D:\source\BluePlague\BluePlague.Application\bin\Debug\netcoreapp3.1\BluePlague.Infrastructure.pdb

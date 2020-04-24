@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "dgSpecHash": "rMySIEGM1r3htECIcXAKlfhXUIqeVHmNxuJoOuZL1W99QoY7crJQcSqOYsNxrfHRV5UTy6e3tZze85X+3jE/zg==",
+  "success": true,
+  "projectFilePath": "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Ig101\\.nuget\\packages\\asyncusageanalyzers\\1.0.0-alpha003\\asyncusageanalyzers.1.0.0-alpha003.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.configuration\\3.1.2\\microsoft.extensions.configuration.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\3.1.2\\microsoft.extensions.configuration.abstractions.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.configuration.binder\\3.1.2\\microsoft.extensions.configuration.binder.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\3.1.2\\microsoft.extensions.dependencyinjection.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\3.1.2\\microsoft.extensions.dependencyinjection.abstractions.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.logging\\3.1.2\\microsoft.extensions.logging.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\3.1.2\\microsoft.extensions.logging.abstractions.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.options\\3.1.2\\microsoft.extensions.options.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\microsoft.extensions.primitives\\3.1.2\\microsoft.extensions.primitives.3.1.2.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\stylecop.analyzers\\1.1.118\\stylecop.analyzers.1.1.118.nupkg.sha512"
+  ],
+  "logs": []
+}

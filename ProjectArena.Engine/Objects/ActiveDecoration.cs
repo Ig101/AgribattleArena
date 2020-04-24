@@ -1,9 +1,9 @@
-﻿using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects.Abstract;
-using AgribattleArena.Engine.Objects.Immaterial;
+﻿using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects.Abstract;
+using ProjectArena.Engine.Objects.Immaterial;
 
-namespace AgribattleArena.Engine.Objects
+namespace ProjectArena.Engine.Objects
 {
     public class ActiveDecoration : TileObject
     {

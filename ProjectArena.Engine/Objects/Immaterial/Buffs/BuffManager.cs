@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AgribattleArena.Engine.Helpers;
+using ProjectArena.Engine.Helpers;
 
-namespace AgribattleArena.Engine.Objects.Immaterial.Buffs
+namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 {
     public class BuffManager : IBuffManagerParentRef
     {

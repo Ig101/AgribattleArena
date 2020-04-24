@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.Helpers;
+using ProjectArena.Engine.Helpers;
 
-namespace AgribattleArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
+namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 {
     public interface IActiveDecoration
     {

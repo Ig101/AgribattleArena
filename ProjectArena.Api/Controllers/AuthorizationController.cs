@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ProjectArena.Mediation.Users.Commands.ChangePassword;
-using ProjectArena.Mediation.Users.Commands.SendEmailVerification;
-using ProjectArena.Mediation.Users.Commands.SendPasswordChangeVerification;
-using ProjectArena.Mediation.Users.Commands.SignIn;
-using ProjectArena.Mediation.Users.Commands.SignUp;
-using ProjectArena.Mediation.Users.Commands.VerifyEmail;
+using ProjectArena.Application.Users.Commands.ChangePassword;
+using ProjectArena.Application.Users.Commands.SendEmailVerification;
+using ProjectArena.Application.Users.Commands.SendPasswordChangeVerification;
+using ProjectArena.Application.Users.Commands.SignIn;
+using ProjectArena.Application.Users.Commands.SignUp;
+using ProjectArena.Application.Users.Commands.VerifyEmail;
 
 namespace ProjectArena.Api.Controllers
 {

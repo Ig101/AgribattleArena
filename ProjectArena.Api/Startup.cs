@@ -8,12 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using ProjectArena.Api.Filters;
+using ProjectArena.Application;
 using ProjectArena.Domain;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
-using ProjectArena.Domain.Registry;
 using ProjectArena.Infrastructure;
-using ProjectArena.Mediation;
 
 namespace ProjectArena.Api
 {
@@ -48,7 +47,7 @@ namespace ProjectArena.Api
                 })
                 .AddFluentValidation(options =>
                 {
-                    options.RegisterValidatorsFromAssembly(MediationRegistry.GetAssembly());
+                    options.RegisterValidatorsFromAssembly(ApplicationRegistry.GetAssembly());
                 });
             services.Configure<ServerSettings>(
                 Configuration.GetSection("Server"));
@@ -56,12 +55,10 @@ namespace ProjectArena.Api
                 Configuration.GetSection("MongoConnection"));
             services.Configure<MongoContextSettings<GameContext>>(
                 Configuration.GetSection("MongoConnection:Game"));
-            services.Configure<MongoContextSettings<RegistryContext>>(
-                Configuration.GetSection("MongoConnection:Registry"));
             services.Configure<EmailSenderSettings>(
                 Configuration.GetSection("SmtpServer"));
             services.RegisterDomainLayer($"{Configuration["MongoConnection:ServerName"]}/{Configuration["MongoConnection:Identity:DatabaseName"]}");
-            services.RegisterMediationLayer();
+            services.RegisterApplicationLayer();
         }
 
         private bool IsFrontendRoute(HttpContext context)

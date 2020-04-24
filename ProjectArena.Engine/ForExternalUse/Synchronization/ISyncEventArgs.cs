@@ -1,4 +1,4 @@
-﻿namespace AgribattleArena.Engine.ForExternalUse.Synchronization
+﻿namespace ProjectArena.Engine.ForExternalUse.Synchronization
 {
     public interface ISyncEventArgs
     {

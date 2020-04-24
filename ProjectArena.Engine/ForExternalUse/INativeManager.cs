@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.Helpers;
+using ProjectArena.Engine.Helpers;
 
-namespace AgribattleArena.Engine.ForExternalUse
+namespace ProjectArena.Engine.ForExternalUse
 {
     public interface INativeManager
     {

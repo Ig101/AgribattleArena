@@ -18,7 +18,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.1.0.39")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.1.0-dev")]
 [assembly: System.Reflection.AssemblyProductAttribute("StyleCop.Analyzers")]
-[assembly: System.Reflection.AssemblyTitleAttribute("AgribattleArena.Engine")]
+[assembly: System.Reflection.AssemblyTitleAttribute("ProjectArena.Engine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.1.0.39")]
 [assembly: System.Resources.NeutralResourcesLanguageAttribute("en-US")]
 

@@ -1,6 +1,6 @@
-﻿using AgribattleArena.Engine.Objects.Abstract;
+﻿using ProjectArena.Engine.Objects.Abstract;
 
-namespace AgribattleArena.Engine.Objects
+namespace ProjectArena.Engine.Objects
 {
     public interface ITileParentRef
     {

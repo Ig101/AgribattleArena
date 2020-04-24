@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.ForExternalUse.Synchronization;
+using ProjectArena.Engine.ForExternalUse.Synchronization;
 
-namespace AgribattleArena.Engine.ForExternalUse
+namespace ProjectArena.Engine.ForExternalUse
 {
     public interface IScene
     {

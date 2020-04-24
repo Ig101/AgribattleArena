@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
-using AgribattleArena.Engine.Helpers;
+using ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
+using ProjectArena.Engine.Helpers;
 
-namespace AgribattleArena.Engine.Synchronizers.SynchronizationObjects
+namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 {
     internal class ActiveDecoration : IActiveDecoration
     {

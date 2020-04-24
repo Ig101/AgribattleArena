@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.NativeManagers;
-using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects;
-using AgribattleArena.Engine.Objects.Abstract;
-using AgribattleArena.Engine.VarManagers;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.NativeManagers;
+using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects;
+using ProjectArena.Engine.Objects.Abstract;
+using ProjectArena.Engine.VarManagers;
 
-namespace AgribattleArena.Engine
+namespace ProjectArena.Engine
 {
     public interface ISceneParentRef
     {

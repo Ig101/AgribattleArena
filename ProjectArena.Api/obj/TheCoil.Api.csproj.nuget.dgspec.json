@@ -31,8 +31,8 @@
               "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
                 "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj"
               },
-              "D:\\source\\ProjectArena\\ProjectArena.Mediation\\ProjectArena.Mediation.csproj": {
-                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Mediation\\ProjectArena.Mediation.csproj"
+              "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj": {
+                "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj"
               }
             }
           }
@@ -265,14 +265,14 @@
         }
       }
     },
-    "D:\\source\\ProjectArena\\ProjectArena.Mediation\\ProjectArena.Mediation.csproj": {
+    "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj": {
       "version": "1.1.0.39",
       "restore": {
-        "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Mediation\\ProjectArena.Mediation.csproj",
-        "projectName": "ProjectArena.Mediation",
-        "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Mediation\\ProjectArena.Mediation.csproj",
+        "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj",
+        "projectName": "ProjectArena.Application",
+        "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Application\\ProjectArena.Application.csproj",
         "packagesPath": "C:\\Users\\Ig101\\.nuget\\packages\\",
-        "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Mediation\\obj\\",
+        "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Ig101\\AppData\\Roaming\\NuGet\\NuGet.Config"

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AgribattleArena.Engine.Helpers.DelegateLists;
+using ProjectArena.Engine.Helpers.DelegateLists;
 
-namespace AgribattleArena.Engine.Natives
+namespace ProjectArena.Engine.Natives
 {
     public class BuffNative : TaggingNative
     {

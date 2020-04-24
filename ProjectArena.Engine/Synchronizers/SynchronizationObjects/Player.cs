@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AgribattleArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
-using AgribattleArena.Engine.Helpers;
+using ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
+using ProjectArena.Engine.Helpers;
 
-namespace AgribattleArena.Engine.Synchronizers.SynchronizationObjects
+namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 {
     internal class Player : IPlayer, ForExternalUse.Generation.ObjectInterfaces.IPlayer
     {

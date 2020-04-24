@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AgribattleArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Objects;
+using ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Objects;
 
-namespace AgribattleArena.Engine.SceneGenerators
+namespace ProjectArena.Engine.SceneGenerators
 {
     // TODO Implement
     public class DuelSceneGenerator : ISceneGenerator, ForExternalUse.Generation.ISceneGenerator

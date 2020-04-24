@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "3Q4QX7Vq0Lpc8W2RmZtjd5unonrh89Hn2Yavd9QEVQ6FOEgc/2YZ5Y9q8/CkaUn0848mwGZxO2JzRn/uSlGjYQ==",
+  "success": true,
+  "projectFilePath": "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Ig101\\.nuget\\packages\\asyncusageanalyzers\\1.0.0-alpha003\\asyncusageanalyzers.1.0.0-alpha003.nupkg.sha512",
+    "C:\\Users\\Ig101\\.nuget\\packages\\stylecop.analyzers\\1.1.118\\stylecop.analyzers.1.1.118.nupkg.sha512"
+  ],
+  "logs": []
+}

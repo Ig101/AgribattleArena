@@ -1,7 +1,7 @@
-﻿using AgribattleArena.Engine.Objects;
-using AgribattleArena.Engine.Objects.Immaterial;
+﻿using ProjectArena.Engine.Objects;
+using ProjectArena.Engine.Objects.Immaterial;
 
-namespace AgribattleArena.Engine.Helpers.DelegateLists
+namespace ProjectArena.Engine.Helpers.DelegateLists
 {
     public class SkillActions
     {

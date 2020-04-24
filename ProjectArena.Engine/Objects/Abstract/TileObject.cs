@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects.Immaterial;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects.Immaterial;
 
-namespace AgribattleArena.Engine.Objects.Abstract
+namespace ProjectArena.Engine.Objects.Abstract
 {
     public abstract class TileObject : GameObject
     {

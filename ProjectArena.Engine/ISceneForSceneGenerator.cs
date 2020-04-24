@@ -1,9 +1,9 @@
-﻿using AgribattleArena.Engine.ForExternalUse;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects;
+﻿using ProjectArena.Engine.ForExternalUse;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects;
 
-namespace AgribattleArena.Engine
+namespace ProjectArena.Engine
 {
     public interface ISceneForSceneGenerator
     {

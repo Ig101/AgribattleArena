@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AgribattleArena.Engine.Helpers;
-using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects.Abstract;
+using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects.Abstract;
 
-namespace AgribattleArena.Engine.Objects.Immaterial
+namespace ProjectArena.Engine.Objects.Immaterial
 {
     public class Skill : IdObject
     {

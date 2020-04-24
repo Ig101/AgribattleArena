@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AgribattleArena.Engine.ForExternalUse.Generation;
-using AgribattleArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
-using AgribattleArena.Engine.ForExternalUse.Synchronization;
+using ProjectArena.Engine.ForExternalUse.Generation;
+using ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
+using ProjectArena.Engine.ForExternalUse.Synchronization;
 
-namespace AgribattleArena.Engine.ForExternalUse.EngineHelper
+namespace ProjectArena.Engine.ForExternalUse.EngineHelper
 {
     public static class EngineHelper
     {

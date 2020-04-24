@@ -1,7 +1,7 @@
-﻿using AgribattleArena.Engine.Natives;
-using AgribattleArena.Engine.Objects.Abstract;
+﻿using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects.Abstract;
 
-namespace AgribattleArena.Engine.Objects
+namespace ProjectArena.Engine.Objects
 {
     public class Tile : ITileParentRef
     {

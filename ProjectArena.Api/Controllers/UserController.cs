@@ -2,8 +2,8 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectArena.Mediation.Users.Commands.ChangePassword;
-using ProjectArena.Mediation.Users.Queries.GetActiveUser;
+using ProjectArena.Application.Users.Commands.ChangePassword;
+using ProjectArena.Application.Users.Queries.GetActiveUser;
 
 namespace ProjectArena.Api.Controllers
 {

@@ -1,4 +1,4 @@
-﻿namespace AgribattleArena.Engine.Natives
+﻿namespace ProjectArena.Engine.Natives
 {
     public class TaggingNative
     {

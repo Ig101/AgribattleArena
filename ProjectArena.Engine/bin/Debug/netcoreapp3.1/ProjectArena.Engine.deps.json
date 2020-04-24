@@ -1,0 +1,43 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "ProjectArena.Engine/1.1.0.39": {
+        "dependencies": {
+          "AsyncUsageAnalyzers": "1.0.0-alpha003",
+          "StyleCop.Analyzers": "1.1.118"
+        },
+        "runtime": {
+          "ProjectArena.Engine.dll": {}
+        }
+      },
+      "AsyncUsageAnalyzers/1.0.0-alpha003": {},
+      "StyleCop.Analyzers/1.1.118": {}
+    }
+  },
+  "libraries": {
+    "ProjectArena.Engine/1.1.0.39": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AsyncUsageAnalyzers/1.0.0-alpha003": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rj0BLCPLI0QF6/fDswekUtavjj2g6uA4vsASOZ0g6N/w77XQTQgzSqhiJ/6Py6R5HhdpQ3HfkjUpR+KSvWq3nQ==",
+      "path": "asyncusageanalyzers/1.0.0-alpha003",
+      "hashPath": "asyncusageanalyzers.1.0.0-alpha003.nupkg.sha512"
+    },
+    "StyleCop.Analyzers/1.1.118": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Onx6ovGSqXSK07n/0eM3ZusiNdB6cIlJdabQhWGgJp3Vooy9AaLS/tigeybOJAobqbtggTamoWndz72JscZBvw==",
+      "path": "stylecop.analyzers/1.1.118",
+      "hashPath": "stylecop.analyzers.1.1.118.nupkg.sha512"
+    }
+  }
+}

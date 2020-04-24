@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AgribattleArena.Engine.ForExternalUse.Generation.ObjectInterfaces
+namespace ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces
 {
     public interface IPlayer
     {

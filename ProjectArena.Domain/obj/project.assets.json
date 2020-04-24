@@ -7782,11 +7782,11 @@
   "project": {
     "version": "1.1.0.39",
     "restore": {
-      "projectUniqueName": "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj",
+      "projectUniqueName": "d:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj",
       "projectName": "ProjectArena.Domain",
-      "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj",
+      "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Domain\\ProjectArena.Domain.csproj",
       "packagesPath": "C:\\Users\\Ig101\\.nuget\\packages\\",
-      "outputPath": "D:\\source\\ProjectArena\\ProjectArena.Domain\\obj\\",
+      "outputPath": "d:\\source\\ProjectArena\\ProjectArena.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Ig101\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -7800,11 +7800,11 @@
       "frameworks": {
         "netcoreapp3.1": {
           "projectReferences": {
-            "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj": {
-              "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj"
+            "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj": {
+              "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Engine\\ProjectArena.Engine.csproj"
             },
-            "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
-              "projectPath": "D:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj"
+            "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj": {
+              "projectPath": "d:\\source\\ProjectArena\\ProjectArena.Infrastructure\\ProjectArena.Infrastructure.csproj"
             }
           }
         }
@@ -7870,7 +7870,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

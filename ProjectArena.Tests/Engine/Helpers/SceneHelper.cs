@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using AgribattleArena.Engine;
-using AgribattleArena.Engine.ForExternalUse;
-using AgribattleArena.Engine.ForExternalUse.EngineHelper;
-using AgribattleArena.Engine.ForExternalUse.Generation;
-using AgribattleArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
-using AgribattleArena.Engine.ForExternalUse.Synchronization;
+using ProjectArena.Engine;
+using ProjectArena.Engine.ForExternalUse;
+using ProjectArena.Engine.ForExternalUse.EngineHelper;
+using ProjectArena.Engine.ForExternalUse.Generation;
+using ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
+using ProjectArena.Engine.ForExternalUse.Synchronization;
 
-namespace AgribattleArena.Tests.Engine.Helpers
+namespace ProjectArena.Tests.Engine.Helpers
 {
     public static class SceneHelper
     {
@@ -21,17 +21,30 @@ namespace AgribattleArena.Tests.Engine.Helpers
 
         public static IEnumerable<IPlayer> CreatePlayers(IEnumerable<IActor> firstActors, IEnumerable<IActor> secondActors)
         {
-            List<IPlayer> players = new List<IPlayer>();
-            players.Add(EngineHelper.CreatePlayerForGeneration("1", null, firstActors));
-            players.Add(EngineHelper.CreatePlayerForGeneration("2", null, secondActors));
+            List<IPlayer> players = new List<IPlayer>
+            {
+                EngineHelper.CreatePlayerForGeneration("1", null, firstActors),
+                EngineHelper.CreatePlayerForGeneration("2", null, secondActors)
+            };
             return players;
         }
 
-        public static Scene CreateNewScene (INativeManager nativeManager, string[,] tileSet, bool winConditions, IEnumerable<IActor> firstPlayer, IEnumerable<IActor> secondPlayer, 
+        public static Scene CreateNewScene (
+            INativeManager nativeManager,
+            string[,] tileSet,
+            bool winConditions,
+            IEnumerable<IActor> firstPlayer,
+            IEnumerable<IActor> secondPlayer,
             EventHandler<ISyncEventArgs> eventHandler)
         {
-            Scene scene = (Scene)EngineHelper.CreateNewScene(0, CreatePlayers(firstPlayer, secondPlayer), EngineHelper.CreateTestSceneGenerator(tileSet, winConditions), nativeManager,
-                CreateVarManagerWithDefaultVars(), 0, eventHandler);
+            Scene scene = (Scene)EngineHelper.CreateNewScene(
+                0,
+                CreatePlayers(firstPlayer, secondPlayer),
+                EngineHelper.CreateTestSceneGenerator(tileSet, winConditions),
+                nativeManager,
+                CreateVarManagerWithDefaultVars(),
+                0,
+                eventHandler);
 
             return scene;
         }
