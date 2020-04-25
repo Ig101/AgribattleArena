@@ -19,7 +19,6 @@ export class QueueService {
 
   private timerTick() {
     this.timePassed += 1000;
-    console.log('1');
     if (this.timePassed > 1000 * 60 * 59) {
       this.dequeue();
     }

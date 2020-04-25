@@ -12,6 +12,7 @@ import { ButtonComponent } from './components/button/button.component';
 import { LinkComponent } from './components/link/link.component';
 import { FocusRemoverDirective } from './components/directives/focus-remover.directive';
 import { UserResolverService } from './resolvers/user-resolver.service';
+import { ArenaHubService } from './services/arena-hub.service';
 @NgModule({
   declarations: [ModalShellComponent, TextInputComponent, ButtonComponent, LinkComponent, FocusRemoverDirective],
   imports: [
@@ -25,7 +26,8 @@ import { UserResolverService } from './resolvers/user-resolver.service';
     ModalService,
     ModalComponentFactory,
     UserResolverService,
-    UserService
+    UserService,
+    ArenaHubService
   ],
   exports: [
     CommonModule,

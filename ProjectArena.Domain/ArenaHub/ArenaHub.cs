@@ -28,18 +28,20 @@ namespace ProjectArena.Domain.ArenaHub
 
     public override Task OnConnectedAsync()
     {
-      return base.OnConnectedAsync();
+        _logger.LogDebug($"{Context.UserIdentifier} connected to hub");
+        return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception exception)
     {
-      _queueService.Dequeue(Context.UserIdentifier);
-      return base.OnDisconnectedAsync(exception);
+        _logger.LogDebug($"{Context.UserIdentifier} disconnected from hub");
+        _queueService.Dequeue(Context.UserIdentifier);
+        return base.OnDisconnectedAsync(exception);
     }
 
     public async Task SendSynchronizationErrorAsync(string userId)
     {
-      await this.Clients.User(userId).SendAsync("BattleSynchronizationError");
+        await this.Clients.User(userId).SendAsync("BattleSynchronizationError");
     }
 
     public async Task OrderAttackAsync(int actorId, int targetX, int targetY)

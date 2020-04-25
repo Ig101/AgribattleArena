@@ -34,7 +34,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 {
                     GameMode.Patrol, new SceneModeQueue()
                     {
-                        Queue = new List<UserInQueue>(),
+                        Queue = new HashSet<UserInQueue>(),
                         Mode = new SceneMode()
                         {
                             Generator = EngineHelper.CreateDuelSceneGenerator(),

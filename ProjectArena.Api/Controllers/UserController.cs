@@ -22,7 +22,7 @@ namespace ProjectArena.Api.Controllers
     {
         return Ok(await Mediator.Send(new GetActiveUserQuery()
         {
-            UserName = User.Identity.Name
+            User = User
         }));
     }
 

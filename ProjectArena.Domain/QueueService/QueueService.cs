@@ -16,6 +16,7 @@ namespace ProjectArena.Domain.QueueService
     {
         private readonly IDictionary<GameMode, SceneModeQueue> _queues;
         private readonly IBattleService _battleService;
+        private object _locker = new object();
 
         public QueueService(
             IBattleService battleService)
@@ -68,7 +69,8 @@ namespace ProjectArena.Domain.QueueService
                     user.Time += time;
                 }
 
-                queue.Queue = queue.Queue.Except(complectedActors.SelectMany(x => x).ToList()).ToList();
+                var allComplectedActors = complectedActors.SelectMany(actor => actor).ToList();
+                queue.Queue.RemoveWhere(x => allComplectedActors.Contains(x));
                 foreach (var complect in complectedActors)
                 {
                     await _battleService.StartNewBattleAsync(queue.Mode, complect);
@@ -76,28 +78,47 @@ namespace ProjectArena.Domain.QueueService
             }
         }
 
-        public void Enqueue(UserToEnqueueDto user)
+        private void DequeueInternal(string userId, GameMode? modeToIgnore = null)
+        {
+            foreach (var queue in _queues)
+            {
+                if (queue.Key == modeToIgnore)
+                {
+                    continue;
+                }
+
+                queue.Value.Queue.RemoveWhere(x => x.UserId == userId);
+            }
+        }
+
+        public bool Enqueue(UserToEnqueueDto user)
         {
             var targetQueue = _queues[user.Mode];
-            targetQueue.Queue.Add(new UserInQueue()
+            if (targetQueue.Queue.Any(x => x.UserId == user.UserId))
             {
-                UserId = user.UserId
-            });
+                return false;
+            }
+
+            lock (_locker)
+            {
+                DequeueInternal(user.UserId, user.Mode);
+                targetQueue.Queue.Add(new UserInQueue()
+                {
+                    UserId = user.UserId
+                });
+                return true;
+            }
         }
 
         public void Dequeue(string userId)
         {
-            foreach (var queue in _queues.Values)
+            lock (_locker)
             {
-                UserInQueue user;
-                if ((user = queue.Queue.FirstOrDefault(x => x.UserId == userId)) != null)
-                {
-                    queue.Queue.Remove(user);
-                }
+                DequeueInternal(userId);
             }
         }
 
-        public IEnumerable<UserInQueueDto> IsUserInQueue(string userId)
+        public UserInQueueDto IsUserInQueue(string userId)
         {
             return _queues
                 .Select(
@@ -108,7 +129,7 @@ namespace ProjectArena.Domain.QueueService
                     })
                 .Where(
                     x => x != null)
-                .ToList();
+                .FirstOrDefault();
         }
     }
 }

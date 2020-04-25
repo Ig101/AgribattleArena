@@ -15,11 +15,14 @@ using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Mongo;
 using ProjectArena.Infrastructure;
+using Serilog.Events;
 
 namespace ProjectArena.Api
 {
   public class Startup
     {
+        public static LogEventLevel LogEventLevel { get; set; }
+
         public Startup(IWebHostEnvironment environment)
         {
             Configuration = new ConfigurationBuilder()
@@ -28,6 +31,7 @@ namespace ProjectArena.Api
                 .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", true, true)
                 .AddEnvironmentVariables()
                 .Build();
+            LogEventLevel = (LogEventLevel)Enum.Parse(LogEventLevel.GetType(), Configuration["Logging:Level"]);
         }
 
         public IConfiguration Configuration { get; }

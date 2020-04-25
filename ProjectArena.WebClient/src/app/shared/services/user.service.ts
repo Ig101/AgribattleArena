@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { WebCommunicationService } from './web-communication.service';
 import { map, tap } from 'rxjs/operators';
 import { ExternalResponse } from '../models/external-response.model';
+import { ArenaHubService } from './arena-hub.service';
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,8 @@ export class UserService {
   email: string;
 
   constructor(
-    private webCommunicationService: WebCommunicationService
+    private webCommunicationService: WebCommunicationService,
+    private arenaHub: ArenaHubService
   ) { }
 
   getActiveUser() {
@@ -28,6 +30,7 @@ export class UserService {
     .pipe(tap(result => {
       this.user = result.result;
       if (this.user) {
+        this.arenaHub.connect().subscribe(res => console.log(res));
         this.email = this.user.email;
       } else {
         this.unauthorized = true;

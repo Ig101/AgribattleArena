@@ -2,6 +2,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 
 namespace ProjectArena.Api
 {
@@ -24,6 +25,7 @@ namespace ProjectArena.Api
                     loggerConfiguration
                         .Enrich.FromLogContext()
                         .WriteTo.Console();
+                    loggerConfiguration.MinimumLevel.Is(Startup.LogEventLevel);
                 });
     }
 }

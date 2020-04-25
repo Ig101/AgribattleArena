@@ -8,10 +8,10 @@ namespace ProjectArena.Domain.QueueService
     {
         Task QueueProcessingAsync(double time);
 
-        void Enqueue(UserToEnqueueDto user);
+        bool Enqueue(UserToEnqueueDto user);
 
         void Dequeue(string userId);
 
-        IEnumerable<UserInQueueDto> IsUserInQueue(string userId);
+        UserInQueueDto IsUserInQueue(string userId);
     }
 }

@@ -34,7 +34,7 @@ namespace ProjectArena.Domain.ArenaHub
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _timer = new Timer(BackgroundProcessing, 5, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-            _logger.LogInformation("Arena hosted service running.");
+            _logger.LogInformation("Arena hosted service is running.");
             return Task.CompletedTask;
         }
 
