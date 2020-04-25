@@ -5,13 +5,13 @@ import { LoadingService } from './services/loading.service';
 import { ModalShellComponent } from './modal/modal-shell/modal-shell.component';
 import { ModalService } from './services/modal.service';
 import { ModalComponentFactory } from './modal/modal-component-factory';
-import { UserResolverService } from './resolvers/user-resolver.service';
 import { UserService } from './services/user.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TextInputComponent } from './components/text-input/text-input.component';
 import { ButtonComponent } from './components/button/button.component';
 import { LinkComponent } from './components/link/link.component';
 import { FocusRemoverDirective } from './components/directives/focus-remover.directive';
+import { UserResolverService } from './resolvers/user-resolver.service';
 @NgModule({
   declarations: [ModalShellComponent, TextInputComponent, ButtonComponent, LinkComponent, FocusRemoverDirective],
   imports: [

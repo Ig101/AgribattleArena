@@ -18,14 +18,23 @@ namespace ProjectArena.Domain.BattleService
     public class BattleService : IBattleService
     {
         private readonly IServiceProvider _serviceProvider;
-        private INativeManager _nativeManager;
-        private IList<IScene> _scenes;
-        private Random _random;
+        private readonly INativeManager _nativeManager;
+        private readonly IList<IScene> _scenes;
+        private readonly Random _random;
         private long _sceneEnumerator;
 
         public BattleService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
+            _nativeManager = SetupNativeManager();
+            _scenes = new List<IScene>();
+            _sceneEnumerator = 0;
+            _random = new Random();
+        }
+
+        private INativeManager SetupNativeManager()
+        {
+            return null;
         }
 
         public async Task StartNewBattleAsync(SceneMode mode, IEnumerable<UserInQueue> users)

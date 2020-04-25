@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using ProjectArena.Domain.BattleService;
+using ProjectArena.Domain.BattleService.Helpers;
 using ProjectArena.Domain.QueueService.Models;
 using ProjectArena.Infrastructure.Enums;
 using ProjectArena.Infrastructure.Models.Queue;
@@ -20,6 +21,7 @@ namespace ProjectArena.Domain.QueueService
             IBattleService battleService)
         {
             _battleService = battleService;
+            _queues = BattleHelper.GetNewModeQueue();
         }
 
         public async Task QueueProcessingAsync(double time)
@@ -31,7 +33,20 @@ namespace ProjectArena.Domain.QueueService
                 foreach (var user in queue.Queue)
                 {
                     bool added = false;
-                    for (int j = 0; j < complectingActors.Count; j++)
+                    if (complectedActors.Count > 0)
+                    {
+                        added = true;
+                        var complect = complectingActors[0];
+                        complect.Add(user);
+                        if (complect.Count >= queue.Mode.MaxPlayers)
+                        {
+                            complectedActors.Add(complect);
+                            complectingActors.RemoveAt(0);
+                        }
+                    }
+
+                    // TODO When there will be logic
+                    /*for (int j = 0; j < complectingActors.Count; j++)
                     {
                         var complect = complectingActors[j];
                         complect.Add(user);
@@ -43,7 +58,7 @@ namespace ProjectArena.Domain.QueueService
 
                         added = true;
                         break;
-                    }
+                    }*/
 
                     if (!added)
                     {

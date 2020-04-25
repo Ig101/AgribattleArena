@@ -6,6 +6,7 @@ import { UserService } from 'src/app/shared/services/user.service';
 export class QueueService {
 
   inQueue = false;
+  exiting = false;
   processingQueueRequest = false;
   timePassed = 0;
 
@@ -28,8 +29,9 @@ export class QueueService {
       this.inQueue = inQueue;
       clearInterval(this.tickingTimer);
       if (this.inQueue) {
-          this.timePassed = 0;
-          this.tickingTimer = setInterval(() => this.timerTick(), 1000);
+        this.exiting = false;
+        this.timePassed = 0;
+        this.tickingTimer = setInterval(() => this.timerTick(), 1000);
       }
   }
 

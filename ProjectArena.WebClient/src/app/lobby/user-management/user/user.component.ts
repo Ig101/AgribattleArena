@@ -30,6 +30,10 @@ export class UserComponent implements OnInit, OnDestroy {
     return this.queueService.timePassed;
   }
 
+  get exitingFromQueue() {
+    return this.queueService.exiting;
+  }
+
   componentSizeEnum = ComponentSizeEnum;
   userStateEnum = UserStateEnum;
 

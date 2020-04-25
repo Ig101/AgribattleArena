@@ -74,7 +74,7 @@ namespace ProjectArena.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.ApplicationServices.GetRequiredService<MongoConnection>();
+            app.ApplicationServices.GetRequiredService<IMongoConnection>();
 
             if (env.IsDevelopment())
             {

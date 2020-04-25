@@ -1,5 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
+using ProjectArena.Domain.BattleService.Models;
+using ProjectArena.Domain.QueueService.Models;
 using ProjectArena.Engine.ForExternalUse;
+using ProjectArena.Engine.ForExternalUse.EngineHelper;
 using ProjectArena.Engine.ForExternalUse.Synchronization;
 using ProjectArena.Infrastructure.Enums;
 using ProjectArena.Infrastructure.Models.Battle.Synchronization;
@@ -20,6 +24,26 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 SelfTag = model.SelfTag,
                 TargetTag = model.TargetTag,
                 Mod = model.Mod
+            };
+        }
+
+        public static IDictionary<GameMode, SceneModeQueue> GetNewModeQueue()
+        {
+            return new Dictionary<GameMode, SceneModeQueue>()
+            {
+                {
+                    GameMode.Patrol, new SceneModeQueue()
+                    {
+                        Queue = new List<UserInQueue>(),
+                        Mode = new SceneMode()
+                        {
+                            Generator = EngineHelper.CreateDuelSceneGenerator(),
+                            VarManager = EngineHelper.CreateVarManager(80, 20, 3, 8, 5, 0.1f, 0.1f, 0.1f),
+                            BattleResultProcessor = BattleResultProcessors.ProcessMainDuelBattleResult,
+                            MaxPlayers = 2
+                        }
+                    }
+                }
             };
         }
 

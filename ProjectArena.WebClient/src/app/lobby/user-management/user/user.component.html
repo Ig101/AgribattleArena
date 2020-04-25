@@ -6,7 +6,8 @@
   <div *ngIf="inQueue" class="queue-screen">
     <p class="form-text text-font">Patrolling</p>
     <p class="form-text title-font">{{ queueTimePassed | date: 'm:ss' }}</p>
-    <app-button class="form-info form-button" type="button" [size]="componentSizeEnum.Medium" (buttonClick)="cancelSearch()">Cancel</app-button>
+    <app-button *ngIf="!exitingFromQueue" class="form-info form-button" type="button" [size]="componentSizeEnum.Medium" (buttonClick)="cancelSearch()">Cancel</app-button>
+    <p *ngIf="exitingFromQueue" class="form-text text-font">Cancel</p>
   </div>
   <div class="filler"></div>
   <app-button class="form-info form-button" type="button" [size]="componentSizeEnum.Small" (buttonClick)="toUserSettings()">Settings</app-button>
