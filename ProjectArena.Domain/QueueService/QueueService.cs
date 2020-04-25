@@ -34,7 +34,7 @@ namespace ProjectArena.Domain.QueueService
                 foreach (var user in queue.Queue)
                 {
                     bool added = false;
-                    if (complectedActors.Count > 0)
+                    if (complectingActors.Count > 0)
                     {
                         added = true;
                         var complect = complectingActors[0];

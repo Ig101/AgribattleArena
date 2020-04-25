@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
+import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
 
 @Injectable()
 export class UserManagementService {
 
   loadingInternal = false;
   errors = new BehaviorSubject<string[]>(undefined);
+  showOk = true;
 
   passwordWasChanged = false;
   emailWasConfirmed = false;
@@ -53,8 +55,9 @@ export class UserManagementService {
     clearTimeout(this.timer);
   }
 
-  loadingError(errors: string[]) {
+  loadingError(errors: string[], showOk = true) {
     this.loadingInternal = true;
+    this.showOk = showOk;
     this.errors.next(errors);
   }
 }

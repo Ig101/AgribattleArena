@@ -14,6 +14,10 @@ export class UserManagementLoadingComponent implements OnInit, OnDestroy {
 
   errorsSub: Subscription;
 
+  get showOk() {
+    return this.userManagementService.showOk;
+  }
+
   @ViewChild('loadingOk') loadingOk: ButtonComponent;
 
   constructor(private userManagementService: UserManagementService) { }

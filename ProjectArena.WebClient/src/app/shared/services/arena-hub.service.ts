@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 import { Observable, Subject } from 'rxjs';
 import { ExternalResponse } from '../models/external-response.model';
@@ -24,6 +24,10 @@ type BattleHubReturnMethod = typeof BATTLE_PREPARE | typeof BATTLE_ATTACK | type
 @Injectable()
 export class ArenaHubService {
 
+  onClose = new EventEmitter();
+
+  connected: boolean;
+
   private hubConnection: signalR.HubConnection;
 
   constructor() {
@@ -31,6 +35,12 @@ export class ArenaHubService {
     .withUrl('hub')
     .build();
     this.addBattleListeners();
+    this.hubConnection.onclose(() => {
+        if (this.connected)
+        {
+            this.onClose.emit();
+        }
+    });
   }
 
   connect(): Observable<ExternalResponse<any>> {
@@ -38,6 +48,7 @@ export class ArenaHubService {
     this.hubConnection
         .start()
         .then(() => {
+            this.connected = true;
             subject.next({
                 statusCode: 200
             } as ExternalResponse<any>);
@@ -49,12 +60,14 @@ export class ArenaHubService {
                 errors: ['Unexpected connection error. Try again later...']
             } as ExternalResponse<any>);
             subject.complete();
+            this.onClose.emit();
         });
     return subject;
   }
 
   disconnect(): any {
-      this.hubConnection.stop();
+    this.connected = false;
+    this.hubConnection.stop();
   }
 
   private catchHubError(error: any, errorScreenOpaque: number) {

@@ -6,6 +6,7 @@ import { WebCommunicationService } from 'src/app/shared/services/web-communicati
 import { Router } from '@angular/router';
 import { UserStateEnum } from 'src/app/shared/models/enum/user-state.enum';
 import { QueueService } from '../../services/queue.service';
+import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
 
 @Component({
   selector: 'app-user',
@@ -42,11 +43,14 @@ export class UserComponent implements OnInit, OnDestroy {
     private queueService: QueueService,
     private userService: UserService,
     private webCommunicationService: WebCommunicationService,
-    private router: Router
+    private router: Router,
+    private arenaHubService: ArenaHubService
   ) { }
 
   ngOnDestroy(): void {
-    this.queueService.dequeue();
+    if (!this.userService.unauthorized) {
+      this.queueService.dequeue(true);
+    }
   }
 
   ngOnInit(): void {
@@ -73,6 +77,7 @@ export class UserComponent implements OnInit, OnDestroy {
         this.userService.unauthorized = true;
         this.userService.user = undefined;
         this.router.navigate(['lobby/signin']);
+        this.arenaHubService.disconnect();
       } else {
         this.userManagementService.loadingError(result.errors);
       }

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { UserManagementService } from './user-management.service';
 import { UserService } from 'src/app/shared/services/user.service';
+import { WebCommunicationService } from 'src/app/shared/services/web-communication.service';
+import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
 
 @Injectable()
 export class QueueService {
@@ -14,7 +16,8 @@ export class QueueService {
 
   constructor(
     private userManagementService: UserManagementService,
-    private userService: UserService
+    private userService: UserService,
+    private webCommunicationService: WebCommunicationService
   ) { }
 
   private timerTick() {
@@ -25,23 +28,36 @@ export class QueueService {
   }
 
   private setQueue(inQueue: boolean) {
-      this.inQueue = inQueue;
-      clearInterval(this.tickingTimer);
-      if (this.inQueue) {
-        this.exiting = false;
-        this.timePassed = 0;
-        this.tickingTimer = setInterval(() => this.timerTick(), 1000);
-      }
+    this.inQueue = inQueue;
+    clearInterval(this.tickingTimer);
+    if (this.inQueue) {
+      this.exiting = false;
+      this.timePassed = 0;
+      this.tickingTimer = setInterval(() => this.timerTick(), 1000);
+    }
   }
 
   enqueue() {
       this.processingQueueRequest = true;
       this.setQueue(true);
-      // TODO Connect on server side
+      this.webCommunicationService.post('api/queue', null)
+        .subscribe(result => {
+            if (!result.success) {
+              this.userManagementService.loadingError(result.errors);
+            }
+          }
+        );
   }
 
-  dequeue(): any {
-      this.setQueue(false);
-      // TODO Dequeue on client side
+  dequeue(silent = false): any {
+    this.exiting = true;
+    this.webCommunicationService.delete('api/queue')
+      .subscribe(result => {
+          if (!result.success && !silent) {
+            this.userManagementService.loadingError(result.errors);
+          }
+          this.setQueue(false);
+        }
+      );
   }
 }
