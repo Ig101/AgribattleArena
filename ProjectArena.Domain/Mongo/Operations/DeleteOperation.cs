@@ -5,26 +5,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace ProjectArena.Domain.Operations
+namespace ProjectArena.Domain.Mongo.Operations
 {
-    public class UpdateOperation<T> : IOperation
+    public class DeleteOperation<T> : IOperation
     {
         private readonly IMongoCollection<T> _mongoCollection;
 
         private readonly Expression<Func<T, bool>> _filter;
 
-        private readonly UpdateDefinition<T> _update;
-
-        public UpdateOperation(IMongoCollection<T> mongoCollection, Expression<Func<T, bool>> filter, UpdateDefinition<T> update)
+        public DeleteOperation(IMongoCollection<T> mongoCollection, Expression<Func<T, bool>> filter)
         {
             _mongoCollection = mongoCollection;
             _filter = filter;
-            _update = update;
         }
 
         public async Task ProcessAsync(IClientSessionHandle session, CancellationToken token)
         {
-            await _mongoCollection.UpdateManyAsync(session, _filter, _update, null, token);
+            await _mongoCollection.DeleteManyAsync(session, _filter, null, token);
         }
     }
 }

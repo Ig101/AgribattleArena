@@ -2,6 +2,7 @@ using AspNetCore.Identity.Mongo;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using ProjectArena.Domain.ArenaHub;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Identity;
@@ -40,9 +41,13 @@ namespace ProjectArena.Domain
                 options.LoginPath = "/api/Account/Login";
                 options.AccessDeniedPath = "/api/Account/AccessDenied";
             });
-            services.AddSingleton<MongoConnection>();
+            services.AddSingleton<IMongoConnection, MongoConnection>();
             services.AddTransient<GameContext>();
             services.AddTransient<EmailSender>();
+            services.AddSignalR();
+            services.AddSingleton<BattleService.IBattleService, BattleService.BattleService>();
+            services.AddSingleton<QueueService.IQueueService, QueueService.QueueService>();
+            services.AddHostedService<ArenaHostedService>();
             return services;
         }
     }

@@ -1,9 +1,7 @@
 namespace ProjectArena.Infrastructure.Enums
 {
-    public enum UserState
+    public enum GameMode
     {
-        Lobby,
-
-        Battle
+        Patrol
     }
 }

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using ProjectArena.Domain.Operations;
+using ProjectArena.Domain.Mongo.Operations;
 
 namespace ProjectArena.Domain.Mongo
 {
@@ -13,7 +13,7 @@ namespace ProjectArena.Domain.Mongo
         private readonly IMongoCollection<T> _collection;
         private readonly Queue<IOperation> _operations;
 
-        public Repository(MongoConnection connection, Queue<IOperation> operationsCollection)
+        public Repository(IMongoConnection connection, Queue<IOperation> operationsCollection)
         {
             _collection = connection.GetCollection<T>();
             _operations = operationsCollection;

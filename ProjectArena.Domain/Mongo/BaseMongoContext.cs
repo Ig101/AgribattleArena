@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ProjectArena.Domain.Operations;
+using ProjectArena.Domain.Mongo.Operations;
 
 namespace ProjectArena.Domain.Mongo
 {
     public abstract class BaseMongoContext
     {
-        private readonly MongoConnection _connection;
+        private readonly IMongoConnection _connection;
         private readonly Queue<IOperation> _operations;
 
-        public BaseMongoContext(MongoConnection connection)
+        public BaseMongoContext(IMongoConnection connection)
         {
             _connection = connection;
             _operations = new Queue<IOperation>();

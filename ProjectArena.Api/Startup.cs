@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using ProjectArena.Api.Filters;
 using ProjectArena.Application;
 using ProjectArena.Domain;
+using ProjectArena.Domain.ArenaHub;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Mongo;
@@ -66,7 +67,8 @@ namespace ProjectArena.Api
         {
             var path = context.Request.Path;
             return path.HasValue &&
-                !path.Value.StartsWith("/api", StringComparison.OrdinalIgnoreCase);
+                !path.Value.StartsWith("/api", StringComparison.OrdinalIgnoreCase) &&
+                !path.Value.StartsWith("/hub", StringComparison.OrdinalIgnoreCase);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -86,6 +88,7 @@ namespace ProjectArena.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ArenaHub>("/hub");
             });
         }
     }

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace ProjectArena.Domain.Operations
+namespace ProjectArena.Domain.Mongo.Operations
 {
     public class ReplaceOneOperation<T> : IOperation
     {

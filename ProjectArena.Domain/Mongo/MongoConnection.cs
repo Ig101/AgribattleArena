@@ -13,7 +13,7 @@ using ProjectArena.Domain.Identity.EntityConfiguration;
 
 namespace ProjectArena.Domain.Mongo
 {
-  public class MongoConnection
+  public class MongoConnection : IMongoConnection
   {
         private readonly IMongoClient _client;
         private readonly IDictionary<Type, object> _collections = new Dictionary<Type, object>();

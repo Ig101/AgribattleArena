@@ -3,23 +3,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace ProjectArena.Domain.Operations
+namespace ProjectArena.Domain.Mongo.Operations
 {
-    public class InsertOneOperation<T> : IOperation
+    public class InsertOperation<T> : IOperation
     {
         private readonly IMongoCollection<T> _mongoCollection;
 
-        private readonly T _object;
+        private readonly IEnumerable<T> _objects;
 
-        public InsertOneOperation(IMongoCollection<T> mongoCollection, T obj)
+        public InsertOperation(IMongoCollection<T> mongoCollection, IEnumerable<T> objects)
         {
             _mongoCollection = mongoCollection;
-            _object = obj;
+            _objects = objects;
         }
 
         public async Task ProcessAsync(IClientSessionHandle session, CancellationToken token)
         {
-            await _mongoCollection.InsertOneAsync(session, _object, null, token);
+            await _mongoCollection.InsertManyAsync(session, _objects, null, token);
         }
     }
 }

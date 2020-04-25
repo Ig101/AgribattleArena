@@ -4,7 +4,7 @@ namespace ProjectArena.Domain.Game
 {
     public class GameContext : BaseMongoContext
     {
-        public GameContext(MongoConnection connection)
+        public GameContext(IMongoConnection connection)
             : base(connection)
         {
         }
