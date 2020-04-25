@@ -1,8 +1,10 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Identity;
@@ -20,14 +22,17 @@ namespace ProjectArena.Application.Users.Commands.SendPasswordChangeVerification
         {
             private readonly IdentityUserManager _userManager;
             private readonly EmailSender _emailSender;
+            private readonly ILogger<SendPasswordChangeVerificationCommand> _logger;
             private readonly ServerSettings _serverSettings;
 
             public Handler(
                 IdentityUserManager userManager,
                 EmailSender emailSender,
-                IOptions<ServerSettings> serverSettings)
+                IOptions<ServerSettings> serverSettings,
+                ILogger<SendPasswordChangeVerificationCommand> logger)
             {
                 _emailSender = emailSender;
+                _logger = logger;
                 _serverSettings = serverSettings.Value;
                 _userManager = userManager;
             }
@@ -51,12 +56,25 @@ namespace ProjectArena.Application.Users.Commands.SendPasswordChangeVerification
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                await _emailSender.SendAsync(new EmailMessage()
+                try
                 {
-                    ToAdresses = new[] { request.Email },
-                    Subject = "Change password request",
-                    Body = $"<p>Hello!</p><p>If you want to change you password in Blue Plague, follow the link <a href=\"{_serverSettings.Site}/lobby/signin/new-password/{user.Id}/{HttpUtility.UrlEncode(token)}\">link</a>.</p><p>If you didn't request this message, just ignore it.</p>"
-                });
+                    await _emailSender.SendAsync(new EmailMessage()
+                    {
+                        ToAdresses = new[] { request.Email },
+                        Subject = "Change password request",
+                        Body = $"<p>Hello!</p><p>If you want to change you password in Blue Plague, follow the link <a href=\"{_serverSettings.Site}/lobby/signin/new-password/{user.Id}/{HttpUtility.UrlEncode(token)}\">link</a>.</p><p>If you didn't request this message, just ignore it.</p>"
+                    });
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Email exception");
+                    throw new HttpException()
+                    {
+                        StatusCode = 503,
+                        Error = "Cannot send email. Try again later..."
+                    };
+                }
+
                 return Unit.Value;
             }
         }

@@ -25,7 +25,6 @@ namespace ProjectArena.Api.Filters
                 {
                     StatusCode = httpException.StatusCode
                 };
-                context.Result = new StatusCodeResult(httpException.StatusCode);
             }
             else if (context.Exception is ValidationErrorsException validationException)
             {

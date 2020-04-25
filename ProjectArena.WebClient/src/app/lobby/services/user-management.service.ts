@@ -40,7 +40,7 @@ export class UserManagementService {
     this.loadingInternal = true;
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
-      this.errors.next([$localize`:@@errors.timeout:Loading timeout. Try again after few time.`]);
+      this.errors.next([$localize`:@@errors.timeout:Loading timeout. Try again after few time...`]);
     }, 240000);
   }
 
