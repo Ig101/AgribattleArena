@@ -8,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using ProjectArena.Domain.BattleService.Helpers;
 using ProjectArena.Domain.BattleService.Models;
 using ProjectArena.Domain.QueueService.Models;
+using ProjectArena.Domain.Registry;
 using ProjectArena.Engine.ForExternalUse;
+using ProjectArena.Engine.ForExternalUse.EngineHelper;
 using ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
 using ProjectArena.Engine.ForExternalUse.Synchronization;
 using ProjectArena.Infrastructure.Models.Battle.Synchronization;
@@ -26,15 +28,111 @@ namespace ProjectArena.Domain.BattleService
         public BattleService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _nativeManager = SetupNativeManager();
+            _nativeManager = SetupNewNativeManagerAsync().Result;
             _scenes = new List<IScene>();
             _sceneEnumerator = 0;
             _random = new Random();
         }
 
-        private INativeManager SetupNativeManager()
+        public async Task<INativeManager> SetupNewNativeManagerAsync()
         {
-            return null;
+            var nativeManager = EngineHelper.CreateNativeManager();
+            var registryContext = _serviceProvider.GetRequiredService<RegistryContext>();
+            var actors = await registryContext.ActorNatives.GetAsync(x => true);
+            foreach (var actor in actors)
+            {
+                nativeManager.AddActorNative(
+                    actor.Id,
+                    actor.Tags.ToArray(),
+                    actor.DefaultZ,
+                    actor.Armor.Select(x => new ProjectArena.Engine.Helpers.TagSynergy(x.SelfTag, x.TargetTag, x.Mod)).ToArray());
+            }
+
+            var decorations = await registryContext.DecorationNatives.GetAsync(x => true);
+            foreach (var decoration in decorations)
+            {
+                nativeManager.AddDecorationNative(
+                    decoration.Id,
+                    decoration.Tags.ToArray(),
+                    decoration.DefaultArmor.Select(x => new ProjectArena.Engine.Helpers.TagSynergy(x.SelfTag, x.TargetTag, x.Mod)).ToArray(),
+                    decoration.DefaultHealth,
+                    decoration.DefaultZ,
+                    decoration.DefaultMod,
+                    decoration.Actions,
+                    decoration.OnDeathActions);
+            }
+
+            var effects = await registryContext.EffectNatives.GetAsync(x => true);
+            foreach (var effect in effects)
+            {
+                nativeManager.AddEffectNative(
+                    effect.Id,
+                    effect.Tags.ToArray(),
+                    effect.DefaultZ,
+                    effect.DefaultDuration,
+                    effect.DefaultMod,
+                    effect.Actions,
+                    effect.OnDeathActions);
+            }
+
+            var buffs = await registryContext.BuffNatives.GetAsync(x => true);
+            foreach (var buff in buffs)
+            {
+                nativeManager.AddBuffNative(
+                    buff.Id,
+                    buff.Tags.ToArray(),
+                    buff.Eternal,
+                    buff.Repeatable,
+                    buff.SummarizeLength,
+                    buff.DefaultDuration,
+                    buff.DefaultMod,
+                    buff.Actions,
+                    buff.Appliers,
+                    buff.OnPurgeActions);
+            }
+
+            var roleModels = await registryContext.RoleModelNatives.GetAsync(x => true);
+            foreach (var roleModel in roleModels)
+            {
+                nativeManager.AddRoleModelNative(
+                    roleModel.Id,
+                    roleModel.DefaultStrength,
+                    roleModel.DefaultWillpower,
+                    roleModel.DefaultConstitution,
+                    roleModel.DefaultSpeed,
+                    roleModel.DefaultActionPointsIncome,
+                    roleModel.AttackingSkill,
+                    roleModel.Skills.ToArray());
+            }
+
+            var skills = await registryContext.SkillNatives.GetAsync(x => true);
+            foreach (var skill in skills)
+            {
+                nativeManager.AddSkillNative(
+                    skill.Id,
+                    skill.Tags.ToArray(),
+                    skill.DefaultRange,
+                    skill.DefaultCost,
+                    skill.DefaultCd,
+                    skill.DefaultMod,
+                    skill.Actions);
+            }
+
+            var tiles = await registryContext.TileNatives.GetAsync(x => true);
+            foreach (var tile in tiles)
+            {
+                nativeManager.AddTileNative(
+                    tile.Id,
+                    tile.Tags.ToArray(),
+                    tile.Flat,
+                    tile.DefaultHeight,
+                    tile.Unbearable,
+                    tile.DefaultMod,
+                    tile.Actions,
+                    tile.OnStepActions);
+            }
+
+            return nativeManager;
         }
 
         public async Task StartNewBattleAsync(SceneMode mode, IEnumerable<UserInQueue> users)

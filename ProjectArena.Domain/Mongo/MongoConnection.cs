@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using ProjectArena.Domain.Game;
-using ProjectArena.Domain.Identity;
 using ProjectArena.Domain.Identity.Entities;
 using ProjectArena.Domain.Identity.EntityConfiguration;
 

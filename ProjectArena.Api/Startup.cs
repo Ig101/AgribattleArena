@@ -11,9 +11,11 @@ using ProjectArena.Api.Filters;
 using ProjectArena.Application;
 using ProjectArena.Domain;
 using ProjectArena.Domain.ArenaHub;
+using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.Email;
-using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Mongo;
+using ProjectArena.Domain.QueueService;
+using ProjectArena.Domain.Registry;
 using ProjectArena.Infrastructure;
 using Serilog.Events;
 
@@ -59,8 +61,8 @@ namespace ProjectArena.Api
                 Configuration.GetSection("Server"));
             services.Configure<MongoConnectionSettings>(
                 Configuration.GetSection("MongoConnection"));
-            services.Configure<MongoContextSettings<GameContext>>(
-                Configuration.GetSection("MongoConnection:Game"));
+            services.Configure<MongoContextSettings<RegistryContext>>(
+                Configuration.GetSection("MongoConnection:Registry"));
             services.Configure<EmailSenderSettings>(
                 Configuration.GetSection("SmtpServer"));
             services.RegisterDomainLayer($"{Configuration["MongoConnection:ServerName"]}/{Configuration["MongoConnection:Identity:DatabaseName"]}");
@@ -79,6 +81,12 @@ namespace ProjectArena.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.ApplicationServices.GetRequiredService<IMongoConnection>();
+
+            var registry = app.ApplicationServices.GetRequiredService<RegistryContext>();
+            registry.LoadMigrations();
+
+            app.ApplicationServices.GetRequiredService<IBattleService>();
+            app.ApplicationServices.GetRequiredService<IQueueService>();
 
             if (env.IsDevelopment())
             {
