@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using ProjectArena.Domain.Identity;
+using ProjectArena.Infrastructure.Enums;
 using ProjectArena.Infrastructure.Models.User;
 
 namespace ProjectArena.Application.Users.Queries.GetActiveUser
@@ -27,7 +28,8 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                 {
                     Name = user.ViewName,
                     UniqueId = user.UserName,
-                    Email = user.Email
+                    Email = user.Email,
+                    State = UserState.Lobby
                 };
             }
         }

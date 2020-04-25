@@ -8,7 +8,6 @@ import { SignInComponent } from './user-management/sign-in/sign-in.component';
 import { SignUpComponent } from './user-management/sign-up/sign-up.component';
 import { EmailConfirmationComponent } from './user-management/email-confirmation/email-confirmation.component';
 import { ForgotPasswordComponent } from './user-management/forgot-password/forgot-password.component';
-import { NewGameStartComponent } from './user-management/new-game-start/new-game-start.component';
 import { NewPasswordComponent } from './user-management/new-password/new-password.component';
 import { UserComponent } from './user-management/user/user.component';
 import { UserSettingsComponent } from './user-management/user-settings/user-settings.component';
@@ -45,11 +44,6 @@ const loginRoutes: Routes = [
   {
     path: '',
     component: UserComponent,
-    resolve: { UserMenuResolverService }
-  },
-  {
-    path: 'new',
-    component: NewGameStartComponent,
     resolve: { UserMenuResolverService }
   },
   {

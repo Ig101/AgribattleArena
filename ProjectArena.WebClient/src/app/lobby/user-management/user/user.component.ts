@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserManagementService } from '../../services/user-management.service';
 import { UserService } from 'src/app/shared/services/user.service';
 import { ComponentSizeEnum } from 'src/app/shared/models/enum/component-size.enum';
 import { WebCommunicationService } from 'src/app/shared/services/web-communication.service';
 import { Router } from '@angular/router';
+import { UserStateEnum } from 'src/app/shared/models/enum/user-state.enum';
+import { QueueService } from '../../services/queue.service';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss']
 })
-export class UserComponent implements OnInit {
+export class UserComponent implements OnInit, OnDestroy {
 
   get userName() {
     return this.userService.user.name;
@@ -20,29 +22,39 @@ export class UserComponent implements OnInit {
     return this.userService.user.uniqueId;
   }
 
-  get savedGame() {
-    return this.userService.user.savedGame;
+  get inQueue() {
+    return this.queueService.inQueue;
+  }
+
+  get queueTimePassed() {
+    return this.queueService.timePassed;
   }
 
   componentSizeEnum = ComponentSizeEnum;
+  userStateEnum = UserStateEnum;
 
   constructor(
     private userManagementService: UserManagementService,
+    private queueService: QueueService,
     private userService: UserService,
     private webCommunicationService: WebCommunicationService,
     private router: Router
   ) { }
 
+  ngOnDestroy(): void {
+    this.queueService.dequeue();
+  }
+
   ngOnInit(): void {
     setTimeout(() => this.userManagementService.loadingEnd());
   }
 
-  newGame() {
-
+  searchMatch() {
+    this.queueService.enqueue();
   }
 
-  loadGame() {
-
+  cancelSearch() {
+    this.queueService.dequeue();
   }
 
   toUserSettings() {

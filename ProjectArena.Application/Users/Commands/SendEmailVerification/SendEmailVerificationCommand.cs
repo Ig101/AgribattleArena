@@ -1,8 +1,10 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Identity;
@@ -21,14 +23,17 @@ namespace ProjectArena.Application.Users.Commands.SendEmailVerification
         {
             private readonly IdentityUserManager _userManager;
             private readonly EmailSender _emailSender;
+            private readonly ILogger<SendEmailVerificationCommand> _logger;
             private readonly ServerSettings _serverSettings;
 
             public Handler(
                 IdentityUserManager userManager,
                 EmailSender emailSender,
-                IOptions<ServerSettings> serverSettings)
+                IOptions<ServerSettings> serverSettings,
+                ILogger<SendEmailVerificationCommand> logger)
             {
                 _emailSender = emailSender;
+                _logger = logger;
                 _serverSettings = serverSettings.Value;
                 _userManager = userManager;
             }
@@ -36,12 +41,25 @@ namespace ProjectArena.Application.Users.Commands.SendEmailVerification
             public async Task<Unit> Handle(SendEmailVerificationCommand request, CancellationToken cancellationToken)
             {
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(request.User);
-                await _emailSender.SendAsync(new EmailMessage()
+                try
                 {
-                    ToAdresses = new[] { request.User.Email },
-                    Subject = "Email verification required",
-                    Body = $"<p>Hello!</p><p>To confirm your account in Blue Plague follow the <a href=\"{_serverSettings.Site}/lobby/signup/confirmation/{request.User.Id}/{HttpUtility.UrlEncode(token)}\">link</a>.</p><p>If you didn't request this message, just ignore it.</p>"
-                });
+                    await _emailSender.SendAsync(new EmailMessage()
+                    {
+                        ToAdresses = new[] { request.User.Email },
+                        Subject = "Email verification required",
+                        Body = $"<p>Hello!</p><p>To confirm your account in Blue Plague follow the <a href=\"{_serverSettings.Site}/lobby/signup/confirmation/{request.User.Id}/{HttpUtility.UrlEncode(token)}\">link</a>.</p><p>If you didn't request this message, just ignore it.</p>"
+                    });
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, e.Message);
+                    throw new HttpException()
+                    {
+                        StatusCode = 503,
+                        Error = "Cannot send email, try again later."
+                    };
+                }
+
                 return Unit.Value;
             }
         }

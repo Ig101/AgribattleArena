@@ -12,11 +12,11 @@ import { UserManagementLoadingComponent } from './user-management/user-managemen
 import { ForgotPasswordComponent } from './user-management/forgot-password/forgot-password.component';
 import { NewPasswordComponent } from './user-management/new-password/new-password.component';
 import { UserSettingsComponent } from './user-management/user-settings/user-settings.component';
-import { NewGameStartComponent } from './user-management/new-game-start/new-game-start.component';
 import { UserManagementService } from './services/user-management.service';
 import { UserMenuResolverService } from './resolvers/user-menu-resolver.service';
 import { EmailMenuResolverService } from './resolvers/email-menu-resolver.service';
 import { AuthorizationMenuResolverService } from './resolvers/authorization-menu-resolver.service';
+import { QueueService } from './services/queue.service';
 
 
 @NgModule({
@@ -31,7 +31,6 @@ import { AuthorizationMenuResolverService } from './resolvers/authorization-menu
     ForgotPasswordComponent,
     NewPasswordComponent,
     UserSettingsComponent,
-    NewGameStartComponent
   ],
   imports: [
     SharedModule,
@@ -42,7 +41,8 @@ import { AuthorizationMenuResolverService } from './resolvers/authorization-menu
     UserManagementService,
     AuthorizationMenuResolverService,
     EmailMenuResolverService,
-    UserMenuResolverService
+    UserMenuResolverService,
+    QueueService
   ]
 })
 export class LobbyModule { }

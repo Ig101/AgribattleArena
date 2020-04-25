@@ -88,7 +88,13 @@ export class SignUpComponent implements OnInit {
         } else {
           this.form.controls.password.setValue('');
           this.form.controls.confirmPassword.setValue('');
-          this.userManagementService.loadingError(result.errors);
+          if (result.statusCode === 503) {
+            this.userManagementService.loadingError([`You were registered, but we cannot send you confirmation email.
+              Try login later with your login and password.`]);
+            this.router.navigate(['lobby/signin']);
+          } else {
+            this.userManagementService.loadingError(result.errors);
+          }
         }
       });
     }
