@@ -85,9 +85,6 @@ namespace ProjectArena.Api
             var registry = app.ApplicationServices.GetRequiredService<RegistryContext>();
             registry.LoadMigrations();
 
-            app.ApplicationServices.GetRequiredService<IBattleService>();
-            app.ApplicationServices.GetRequiredService<IQueueService>();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

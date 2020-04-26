@@ -15,6 +15,8 @@ namespace ProjectArena.Domain.BattleService
 
         IScene GetUserScene(string userId);
 
-        SynchronizerDto IsUserInBattle(string userId);
+        bool IsUserInBattle(string userId);
+
+        SynchronizerDto GetUserSynchronizationInfo(string userId);
     }
 }

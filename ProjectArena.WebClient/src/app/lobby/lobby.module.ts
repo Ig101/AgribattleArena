@@ -17,6 +17,7 @@ import { UserMenuResolverService } from './resolvers/user-menu-resolver.service'
 import { EmailMenuResolverService } from './resolvers/email-menu-resolver.service';
 import { AuthorizationMenuResolverService } from './resolvers/authorization-menu-resolver.service';
 import { QueueService } from './services/queue.service';
+import { LobbyResolverService } from './resolvers/lobby-resolver.service';
 
 
 @NgModule({
@@ -42,7 +43,8 @@ import { QueueService } from './services/queue.service';
     AuthorizationMenuResolverService,
     EmailMenuResolverService,
     UserMenuResolverService,
-    QueueService
+    QueueService,
+    LobbyResolverService
   ]
 })
 export class LobbyModule { }

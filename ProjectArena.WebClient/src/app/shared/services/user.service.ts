@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { ActiveUser } from '../models/active-user.model';
 import { Observable, of } from 'rxjs';
 import { WebCommunicationService } from './web-communication.service';
-import { map, tap } from 'rxjs/operators';
+import { map, tap, switchMap } from 'rxjs/operators';
 import { ExternalResponse } from '../models/external-response.model';
 import { ArenaHubService } from './arena-hub.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UserService {
 
   unauthorized = false;
@@ -27,13 +29,14 @@ export class UserService {
       } as ExternalResponse<ActiveUser>);
     }
     return this.webCommunicationService.get<ActiveUser>('api/user')
-    .pipe(tap(result => {
+    .pipe(switchMap(result => {
       this.user = result.result;
       if (this.user) {
-        this.arenaHub.connect().subscribe(res => console.log(res));
         this.email = this.user.email;
+        return this.arenaHub.connect().pipe(map(connect => result));
       } else {
         this.unauthorized = true;
+        return of(result);
       }
     }));
   }

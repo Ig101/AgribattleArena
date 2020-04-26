@@ -21,6 +21,12 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
             manager.AdditionStrength += buff.Mod;
         }
 
+        public static void Stun(IBuffManagerParentRef manager, Buff buff)
+        {
+            manager.CanMove = false;
+            manager.CanAct = false;
+        }
+
         public static void DamageSelf(ISceneParentRef scene, IActorParentRef actor, Buff buff, float time)
         {
             if (time > 0)

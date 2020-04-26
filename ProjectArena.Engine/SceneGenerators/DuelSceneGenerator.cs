@@ -46,7 +46,7 @@ namespace ProjectArena.Engine.SceneGenerators
             {
                 for (int y = 0; y < sceneTiles[x].Length; y++)
                 {
-                    scene.CreateTile("tile_grass", x, y, null);
+                    scene.CreateTile("grass", x, y, null);
                 }
             }
 

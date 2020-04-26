@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/shared/services/user.service';
+import { UserStateEnum } from 'src/app/shared/models/enum/user-state.enum';
 
 @Component({
   selector: 'app-user-management',
@@ -18,7 +19,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   userManagementWindowEnum = UserManagementWindowEnum;
   userState: UserManagementWindowEnum = this.userManagementWindowEnum.SignIn;
 
-  hubSubscription: Subscription;
+  hubCloseSubscription: Subscription;
+  hubBattleSubscription: Subscription;
+  hubErrorSubscription: Subscription;
 
   get loading() {
     return this.userManagementService.loading;
@@ -32,17 +35,35 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     ) { }
 
   ngOnDestroy(): void {
-    if (this.hubSubscription) {
-      this.hubSubscription.unsubscribe();
+    if (this.hubCloseSubscription) {
+      this.hubCloseSubscription.unsubscribe();
+    }
+    if (this.hubBattleSubscription) {
+      this.hubBattleSubscription.unsubscribe();
+    }
+    if (this.hubErrorSubscription) {
+      this.hubErrorSubscription.unsubscribe();
     }
   }
 
   ngOnInit(): void {
-    this.hubSubscription = this.arenaHubService.onClose.subscribe(() => {
+    this.hubCloseSubscription = this.arenaHubService.onClose.subscribe(() => {
       this.userManagementService.loadingError(['Disconnected from server. Try to refresh the page.'], false);
       this.userService.unauthorized = true;
       this.userService.user = undefined;
       this.router.navigate(['lobby/signin']);
+    });
+    this.hubBattleSubscription = this.arenaHubService.prepareForBattleNotifier.subscribe((value) => {
+      if (value) {
+        this.userService.user.state = UserStateEnum.Battle;
+        this.router.navigate(['battle']);
+      }
+    });
+    this.hubErrorSubscription = this.arenaHubService.synchronizationErrorState.subscribe((value) => {
+      if (value) {
+        // TODO Error death screen
+        console.log('Synchronization error.');
+      }
     });
   }
 }

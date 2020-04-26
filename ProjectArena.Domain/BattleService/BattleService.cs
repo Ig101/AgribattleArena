@@ -150,14 +150,19 @@ namespace ProjectArena.Domain.BattleService
 
             var players = new List<IPlayer>(users.Count());
 
-            // TODO DefaultScene
-            /*
+            var externalIdIncrementor = 100;
             foreach (string id in userIds)
             {
-                players.Add(EngineHelper.CreatePlayerForGeneration(id, null, profile.Actors.Select(
-                    x => EngineHelper.CreateActorForGeneration(x.Id, x.ActorNative, x.AttackingSkillNative, x.Strength, x.Willpower, x.Constitution, x.Speed,
-                    x.Skills.Select(k => k.Native), x.ActionPointsIncome, null))));
-            }*/
+                var playerActors = new List<IActor>(5);
+                for (int i = 0; i < 5; i++)
+                {
+                    playerActors.Add(EngineHelper.CreateActorForGeneration(externalIdIncrementor, "apprentice", "slash", 15, 15, 15, 10, new[] { "explosion" }, 4, null));
+                    externalIdIncrementor++;
+                }
+
+                players.Add(EngineHelper.CreatePlayerForGeneration(id, null, playerActors));
+            }
+
             _scenes.Add(Engine.ForExternalUse.EngineHelper.EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), SynchronizationInfoEventHandler));
         }
 
@@ -170,25 +175,41 @@ namespace ProjectArena.Domain.BattleService
             battleHub.Clients.Users(e.Scene.ShortPlayers.Select(x => x.Id).ToList())?.SendAsync(actionName, synchronizer);
             if (e.Action == Engine.Helpers.Action.EndGame)
             {
-                _scenes.Remove(e.Scene);
-
                 // TODO Rewards
             }
         }
 
         public void EngineTimeProcessing(double seconds)
         {
-            foreach (var scene in _scenes)
+            for (int i = 0; i < _scenes.Count; i++)
             {
-                scene.UpdateTime((int)(seconds * 1000));
+                _scenes[i].UpdateTime((float)seconds);
+                if (!_scenes[i].IsActive)
+                {
+                    _scenes.RemoveAt(i);
+                    i--;
+                }
             }
         }
 
-        public SynchronizerDto IsUserInBattle(string userId)
+        public bool IsUserInBattle(string userId)
         {
             foreach (var scene in _scenes)
             {
-                if (scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
+                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public SynchronizerDto GetUserSynchronizationInfo(string userId)
+        {
+            foreach (var scene in _scenes)
+            {
+                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
                 {
                     return BattleHelper.GetFullSynchronizationData(scene);
                 }
@@ -201,7 +222,7 @@ namespace ProjectArena.Domain.BattleService
         {
             foreach (var scene in _scenes)
             {
-                if (scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
+                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
                 {
                     return scene;
                 }

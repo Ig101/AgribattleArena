@@ -4,8 +4,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { UserResolverService } from './shared/resolvers/user-resolver.service';
 
 const routes: Routes = [
-  // {path: 'game', loadChildren: () => import('./game/game.module').then(x => x.GameModule) },
-  {path: 'lobby', loadChildren: () => import('./lobby/lobby.module').then(x => x.LobbyModule) },
+  {path: 'battle', loadChildren: () => import('./battle/battle.module').then(x => x.BattleModule), resolve: { user: UserResolverService } },
+  {path: 'lobby', loadChildren: () => import('./lobby/lobby.module').then(x => x.LobbyModule), resolve: { user: UserResolverService } },
   {path: '**', redirectTo: 'lobby'}
 ];
 

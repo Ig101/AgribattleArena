@@ -4,7 +4,9 @@ import { catchError, map } from 'rxjs/operators';
 import { ExternalResponse } from '../models/external-response.model';
 import { of } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class WebCommunicationService {
 
   constructor(private httpClient: HttpClient) { }

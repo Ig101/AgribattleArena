@@ -349,7 +349,7 @@ namespace ProjectArena.Engine
         // Updates methods
         public void StartGame()
         {
-            this.ReturnAction(this, new SyncEventArgs(this, Version++, Helpers.Action.StartGame, GetFullSynchronizationData(true), null, null, null, null));
+            this.ReturnAction(this, new SyncEventArgs(this, ++Version, Helpers.Action.StartGame, GetFullSynchronizationData(true), null, null, null, null));
             EndTurn();
         }
 
@@ -496,6 +496,10 @@ namespace ProjectArena.Engine
                                 {
                                     EndTurn();
                                 }
+                                else
+                                {
+                                    IsActive = false;
+                                }
                             }
                             else
                             {
@@ -510,7 +514,7 @@ namespace ProjectArena.Engine
         public bool AfterUpdateSynchronization(Helpers.Action action, TileObject actor, int? actionId, int? targetX, int? targetY)
         {
             AfterActionUpdate();
-            this.ReturnAction?.Invoke(this, new SyncEventArgs(this, Version++, action, GetSynchronizationData(true), actor?.Id, actionId, targetX, targetY));
+            this.ReturnAction?.Invoke(this, new SyncEventArgs(this, ++Version, action, GetSynchronizationData(true), actor?.Id, actionId, targetX, targetY));
             if (WinCondition(this))
             {
                 foreach (Player player in players)
@@ -521,7 +525,7 @@ namespace ProjectArena.Engine
                     }
                 }
 
-                this.ReturnAction?.Invoke(this, new SyncEventArgs(this, Version++, Helpers.Action.EndGame, GetSynchronizationDataPlayersOnly(), null, null, null, null));
+                this.ReturnAction?.Invoke(this, new SyncEventArgs(this, ++Version, Helpers.Action.EndGame, GetSynchronizationDataPlayersOnly(), null, null, null, null));
                 return false;
             }
 

@@ -6,7 +6,9 @@ import { UserService } from '../services/user.service';
 import { ActiveUser } from '../models/active-user.model';
 import { map } from 'rxjs/operators';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UserResolverService implements Resolve<ActiveUser> {
   constructor(
     private userService: UserService

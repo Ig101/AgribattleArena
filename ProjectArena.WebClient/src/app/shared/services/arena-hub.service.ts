@@ -1,8 +1,9 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { ExternalResponse } from '../models/external-response.model';
 import { Synchronizer } from '../models/battle/synchronizer.model';
+import { BattleSynchronizationActionEnum } from '../models/enum/battle-synchronization-action.enum';
 
 const BATTLE_PREPARE = 'BattlePrepare';
 const BATTLE_SYNC_ERROR = 'BattleSynchronizationError';
@@ -21,10 +22,19 @@ type BattleHubReturnMethod = typeof BATTLE_PREPARE | typeof BATTLE_ATTACK | type
     typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_NO_ACTORS_DRAW |
     typeof BATTLE_SKIP_TURN | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT;
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ArenaHubService {
 
   onClose = new EventEmitter();
+
+  battleSynchronizationActionsList: { action: BattleSynchronizationActionEnum, sync: Synchronizer }[] = [];
+  battleSynchronizationActionsNotifier = new Subject<any>();
+
+  prepareForBattleNotifier = new BehaviorSubject<boolean>(false);
+
+  synchronizationErrorState = new BehaviorSubject<boolean>(false);
 
   connected: boolean;
 
@@ -36,8 +46,7 @@ export class ArenaHubService {
     .build();
     this.addBattleListeners();
     this.hubConnection.onclose(() => {
-        if (this.connected)
-        {
+        if (this.connected) {
             this.onClose.emit();
         }
     });
@@ -98,66 +107,54 @@ export class ArenaHubService {
       .invoke('OrderWaitAsync', actorId).catch(err => this.catchHubError(err, errorScreenOpaque));
   }
 
-  private prepareListener() {
-    console.log('BattlePrepare');
+  pickBattleSynchronizationAction(currentVersion: number) {
+    if (this.battleSynchronizationActionsList.length === 0) {
+      return undefined;
+    }
+    const synchronizationObject = this.battleSynchronizationActionsList[0];
+    while (this.battleSynchronizationActionsList[0].sync.version <= currentVersion) {
+      this.battleSynchronizationActionsList.shift();
+    }
+    if (this.battleSynchronizationActionsList[0].sync.version === currentVersion + 1) {
+      return undefined;
+    }
+    this.battleSynchronizationActionsList.shift();
+    if (!this.prepareForBattleNotifier.value) {
+      this.prepareForBattleNotifier.next(false);
+    }
+    return synchronizationObject;
   }
 
-  private syncErrorListener() {
-    console.log('SynchronizationError');
-  }
-
-  private startGameListener(synchronizer: Synchronizer) {
-    console.log({action: 'StartGame', sync: synchronizer});
-  }
-
-  private moveListener(synchronizer: Synchronizer) {
-    console.log({action: 'Move', sync: synchronizer});
-  }
-
-  private attackListener(synchronizer: Synchronizer) {
-    console.log({action: 'Attack', sync: synchronizer});
-  }
-
-  private castListener(synchronizer: Synchronizer) {
-    console.log({action: 'Cast', sync: synchronizer});
-  }
-
-  private waitListener(synchronizer: Synchronizer) {
-    console.log({action: 'Wait', sync: synchronizer});
-  }
-
-  private decorationListener(synchronizer: Synchronizer) {
-    console.log({action: 'Decoration', sync: synchronizer});
-  }
-
-  private endTurnListener(synchronizer: Synchronizer) {
-    console.log({action: 'EndTurn', sync: synchronizer});
-  }
-
-  private endGameListener(synchronizer: Synchronizer) {
-    console.log({action: 'EndGame', sync: synchronizer});
-  }
-
-  private skipTurnListener(synchronizer: Synchronizer) {
-    console.log({action: 'SkipTurn', sync: synchronizer});
-  }
-
-  private noActorsDrawListener(synchronizer: Synchronizer) {
-    console.log({action: 'NoActorsDraw', sync: synchronizer});
+  private registerBattleSynchronizationAction(action: BattleSynchronizationActionEnum, sync: Synchronizer) {
+    const synchronizationObject = { action, sync };
+    console.log(synchronizationObject);
+    this.battleSynchronizationActionsList.push(synchronizationObject);
+    this.battleSynchronizationActionsList.sort((a, b) => a.sync.version - b.sync.version);
+    this.battleSynchronizationActionsNotifier.next();
   }
 
   private  addBattleListeners() {
-    this.addNewListener(BATTLE_PREPARE, () => this.prepareListener());
-    this.addNewListener(BATTLE_SYNC_ERROR, () => this.syncErrorListener());
-    this.addNewListener(BATTLE_START_GAME, (synchronizer: Synchronizer) => this.startGameListener(synchronizer));
-    this.addNewListener(BATTLE_MOVE, (synchronizer: Synchronizer) => this.moveListener(synchronizer));
-    this.addNewListener(BATTLE_ATTACK, (synchronizer: Synchronizer) => this.attackListener(synchronizer));
-    this.addNewListener(BATTLE_CAST, (synchronizer: Synchronizer) => this.castListener(synchronizer));
-    this.addNewListener(BATTLE_WAIT, (synchronizer: Synchronizer) => this.waitListener(synchronizer));
-    this.addNewListener(BATTLE_DECORATION, (synchronizer: Synchronizer) => this.decorationListener(synchronizer));
-    this.addNewListener(BATTLE_END_TURN, (synchronizer: Synchronizer) => this.endTurnListener(synchronizer));
-    this.addNewListener(BATTLE_END_GAME, (synchronizer: Synchronizer) => this.endGameListener(synchronizer));
-    this.addNewListener(BATTLE_SKIP_TURN, (synchronizer: Synchronizer) => this.skipTurnListener(synchronizer));
-    this.addNewListener(BATTLE_NO_ACTORS_DRAW, (synchronizer: Synchronizer) => this.noActorsDrawListener(synchronizer));
+    this.addNewListener(BATTLE_PREPARE, () => this.prepareForBattleNotifier.next(true) );
+    this.addNewListener(BATTLE_SYNC_ERROR, () => this.synchronizationErrorState.next(true) );
+    this.addNewListener(BATTLE_START_GAME, (synchronizer: Synchronizer) =>
+      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.StartGame, synchronizer));
+    this.addNewListener(BATTLE_MOVE, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Move, synchronizer));
+    this.addNewListener(BATTLE_ATTACK, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Attack, synchronizer));
+    this.addNewListener(BATTLE_CAST, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Cast, synchronizer));
+    this.addNewListener(BATTLE_WAIT, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Wait, synchronizer));
+    this.addNewListener(BATTLE_DECORATION, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Decoration, synchronizer));
+    this.addNewListener(BATTLE_END_TURN, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndTurn, synchronizer));
+    this.addNewListener(BATTLE_END_GAME, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndGame, synchronizer));
+    this.addNewListener(BATTLE_SKIP_TURN, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.SkipTurn, synchronizer));
+    this.addNewListener(BATTLE_NO_ACTORS_DRAW, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.NoActorsDraw, synchronizer));
   }
 }

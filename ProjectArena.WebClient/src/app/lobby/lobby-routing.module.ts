@@ -13,7 +13,7 @@ import { UserSettingsComponent } from './user-management/user-settings/user-sett
 import { UserMenuResolverService } from './resolvers/user-menu-resolver.service';
 import { AuthorizationMenuResolverService } from './resolvers/authorization-menu-resolver.service';
 import { EmailMenuResolverService } from './resolvers/email-menu-resolver.service';
-import { UserResolverService } from '../shared/resolvers/user-resolver.service';
+import { LobbyResolverService } from './resolvers/lobby-resolver.service';
 
 const loginRoutes: Routes = [
   {
@@ -62,7 +62,7 @@ const routes: Routes = [
   {
     path: '',
     component: LobbyComponent,
-    resolve: { user: UserResolverService },
+    resolve: { lobby: LobbyResolverService },
     children: loginRoutes
   },
   {
