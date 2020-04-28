@@ -9,7 +9,9 @@ import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
 import { map } from 'rxjs/operators';
 
 @Injectable()
-export class BattleResolverService implements Resolve<Synchronizer> {
+export class BattleResolverService implements Resolve<boolean> {
+
+  private battleSnapshot: Synchronizer;
 
   constructor(
     private userService: UserService,
@@ -18,13 +20,20 @@ export class BattleResolverService implements Resolve<Synchronizer> {
     private webCommunicationService: WebCommunicationService
     ) { }
 
+  popBattleSnapshot() {
+    const snapshot = this.battleSnapshot;
+    this.battleSnapshot = undefined;
+    return snapshot;
+  }
+
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (!this.userService.user || this.userService.user.state === UserStateEnum.Lobby) {
       this.router.navigate(['lobby']);
       return EMPTY;
     }
     if (this.arenaHubService.prepareForBattleNotifier.value) {
-      return undefined;
+      this.battleSnapshot = undefined;
+      return false;
     }
     return this.webCommunicationService.get<Synchronizer>('api/battle')
       .pipe(map(result => {
@@ -32,7 +41,9 @@ export class BattleResolverService implements Resolve<Synchronizer> {
           // TODO Add loading screen with one end
           console.log('Battle resolver error');
         }
-        return result.result;
+        this.battleSnapshot = result.result;
+        console.log(this.battleSnapshot)
+        return true;
       }));
   }
 }

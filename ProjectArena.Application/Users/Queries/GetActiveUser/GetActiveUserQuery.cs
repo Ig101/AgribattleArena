@@ -34,6 +34,7 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                 {
                     Name = user.ViewName,
                     UniqueId = user.UserName,
+                    Id = user.Id,
                     Email = user.Email,
                     State = statusInBattle ? UserState.Battle : UserState.Lobby
                 };

@@ -38,7 +38,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Mode = new SceneMode()
                         {
                             Generator = EngineHelper.CreateDuelSceneGenerator(),
-                            VarManager = EngineHelper.CreateVarManager(80, 20, 3, 8, 5, 0.1f, 0.1f, 0.1f),
+                            VarManager = EngineHelper.CreateVarManager(8000000, 20, 3, 8, 5, 0.1f, 0.1f, 0.1f),
                             BattleResultProcessor = BattleResultProcessors.ProcessMainDuelBattleResult,
                             MaxPlayers = 2
                         }
