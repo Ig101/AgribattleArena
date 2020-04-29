@@ -47,8 +47,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     this.onCloseSubscription = arenaHub.onClose.subscribe(() => {
       console.log('Connection error');
     });
-    this.synchronizationErrorSubscription = arenaHub.synchronizationErrorState.subscribe(() => {
-      console.log('Synchronization error');
+    this.synchronizationErrorSubscription = arenaHub.synchronizationErrorState.subscribe((value) => {
+      if (value) {
+        console.log('Synchronization error');
+      }
     });
     this.arenaActionsSubscription = arenaHub.battleSynchronizationActionsNotifier.subscribe(() => {
       if (this.receivingMessagesFromHubAllowed) {
