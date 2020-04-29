@@ -18,5 +18,7 @@ namespace ProjectArena.Domain.BattleService
         bool IsUserInBattle(string userId);
 
         SynchronizerDto GetUserSynchronizationInfo(string userId);
+
+        void Init();
     }
 }

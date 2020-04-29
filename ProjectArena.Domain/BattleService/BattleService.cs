@@ -20,21 +20,20 @@ namespace ProjectArena.Domain.BattleService
     public class BattleService : IBattleService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly INativeManager _nativeManager;
         private readonly IList<IScene> _scenes;
         private readonly Random _random;
+        private INativeManager _nativeManager;
         private long _sceneEnumerator;
 
         public BattleService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _nativeManager = SetupNewNativeManagerAsync().Result;
             _scenes = new List<IScene>();
             _sceneEnumerator = 0;
             _random = new Random();
         }
 
-        public async Task<INativeManager> SetupNewNativeManagerAsync()
+        private async Task SetupNewNativeManagerAsync()
         {
             var nativeManager = EngineHelper.CreateNativeManager();
             var registryContext = _serviceProvider.GetRequiredService<RegistryContext>();
@@ -132,7 +131,12 @@ namespace ProjectArena.Domain.BattleService
                     tile.OnStepActions);
             }
 
-            return nativeManager;
+            _nativeManager = nativeManager;
+        }
+
+        public void Init()
+        {
+            SetupNewNativeManagerAsync().Wait();
         }
 
         public async Task StartNewBattleAsync(SceneMode mode, IEnumerable<UserInQueue> users)
@@ -156,7 +160,7 @@ namespace ProjectArena.Domain.BattleService
                 var playerActors = new List<IActor>(5);
                 for (int i = 0; i < 5; i++)
                 {
-                    playerActors.Add(EngineHelper.CreateActorForGeneration(externalIdIncrementor, "apprentice", "slash", 15, 15, 15, 10, new[] { "explosion" }, 4, null));
+                    playerActors.Add(EngineHelper.CreateActorForGeneration(externalIdIncrementor, "adventurer", "slash", 15, 15, 15, 10, new[] { "explosion" }, 4, null));
                     externalIdIncrementor++;
                 }
 

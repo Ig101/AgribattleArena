@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Scene } from '../models/scene/scene.model';
 import { Actor } from '../models/scene/actor.model';
-import { ActivaDecoration } from '../models/scene/active-decoration.model';
+import { ActiveDecoration } from '../models/scene/active-decoration.model';
 import { Player } from '../models/player.model';
 
 @Injectable()
@@ -9,11 +9,15 @@ export class AsciiBattleStorageService {
 
   scene: Scene;
   currentActor: Actor;
-  currentDecoration: ActivaDecoration;
+  currentDecoration: ActiveDecoration;
   players: Player[];
 
   version: number;
   turnTime: number;
+
+  get isValidScene() {
+    return !!this.scene;
+  }
 
   constructor() { }
 

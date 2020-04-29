@@ -8,7 +8,7 @@ namespace ProjectArena.Domain.Registry.Migrations
         {
             context.ActorNatives.InsertOneAtomicallyAsync(new Entities.ActorNative()
             {
-                Id = "apprentice",
+                Id = "adventurer",
                 Tags = new[] { "organic", "intelligent" },
                 DefaultZ = 0,
                 Armor = new TagSynergy[0]

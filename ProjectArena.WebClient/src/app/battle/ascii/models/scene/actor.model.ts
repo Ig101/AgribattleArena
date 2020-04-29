@@ -3,6 +3,7 @@ import { Buff } from './buff.model';
 import { Skill } from './skill.model';
 import { Visualization } from '../visualization.model';
 import { Player } from '../player.model';
+import { TwoPhaseActionAnimation } from '../two-phase-action-animation.model';
 
 export interface Actor {
   id: number;
@@ -10,7 +11,9 @@ export interface Actor {
   name: string;
   description: string;
   defaultVisualization: Visualization;
+  defaultMoveAction: TwoPhaseActionAnimation;
   visualization: Visualization;
+  moveAction: TwoPhaseActionAnimation;
 
   externalId?: number;
   attackingSkill: Skill;

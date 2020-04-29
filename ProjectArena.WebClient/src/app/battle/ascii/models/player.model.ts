@@ -4,7 +4,8 @@ import { Actor } from './scene/actor.model';
 export interface Player {
   id: string;
   team?: number;
-  keyActors: Actor[];
+  name: string;
+  keyActors: number[];
   turnsSkipped: number;
   status: BattlePlayerStatusEnum;
 }

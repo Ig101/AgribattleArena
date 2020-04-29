@@ -1,11 +1,11 @@
-import { Color } from 'src/app/shared/models/color.model';
+import { TwoPhaseActionAnimation } from '../two-phase-action-animation.model';
 
 export interface Skill {
   id: number;
 
   name: string;
   description: string;
-  action: Animation;
+  action: TwoPhaseActionAnimation;
 
   range: number;
   cd: number;

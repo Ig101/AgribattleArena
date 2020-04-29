@@ -29,6 +29,7 @@ export class ArenaHubService {
 
   onClose = new EventEmitter();
 
+  firstActionVersion: number;
   battleSynchronizationActionsList: { action: BattleSynchronizationActionEnum, sync: Synchronizer }[] = [];
   battleSynchronizationActionsNotifier = new Subject<any>();
 
@@ -119,6 +120,9 @@ export class ArenaHubService {
       return undefined;
     }
     this.battleSynchronizationActionsList.shift();
+    if (this.battleSynchronizationActionsList.length > 0) {
+      this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;
+    }
     if (!this.prepareForBattleNotifier.value) {
       this.prepareForBattleNotifier.next(false);
     }
@@ -130,6 +134,7 @@ export class ArenaHubService {
     console.log(synchronizationObject);
     this.battleSynchronizationActionsList.push(synchronizationObject);
     this.battleSynchronizationActionsList.sort((a, b) => a.sync.version - b.sync.version);
+    this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;
     this.battleSynchronizationActionsNotifier.next();
   }
 

@@ -42,7 +42,7 @@ export class BattleResolverService implements Resolve<boolean> {
           console.log('Battle resolver error');
         }
         this.battleSnapshot = result.result;
-        console.log(this.battleSnapshot)
+        console.log(this.battleSnapshot);
         return true;
       }));
   }

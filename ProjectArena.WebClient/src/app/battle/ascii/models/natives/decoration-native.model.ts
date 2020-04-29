@@ -1,10 +1,17 @@
 import { Visualization } from '../visualization.model';
+import { ActionAnimation } from '../action-animation.model';
 
 export interface DecorationNative {
-  nativeId: string;
   name: string;
   description: string;
   visualization: Visualization;
-  action: Animation;
-  onDeathAction: Animation;
+  action: ActionAnimation;
+  onDeathAction: ActionAnimation;
+
+  alternativeForm: boolean;
+  enemyName?: string;
+  enemyDescription?: string;
+  enemyVisualization?: Visualization;
+  enemyAction?: ActionAnimation;
+  enemyOnDeathAction?: ActionAnimation;
 }

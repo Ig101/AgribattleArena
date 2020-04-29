@@ -80,15 +80,12 @@ namespace ProjectArena.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.ApplicationServices.GetRequiredService<IMongoConnection>();
-
-            var registry = app.ApplicationServices.GetRequiredService<RegistryContext>();
-            registry.LoadMigrations();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseDomainLayer();
 
             app.UseHttpsRedirection();
             app.UseRouting();

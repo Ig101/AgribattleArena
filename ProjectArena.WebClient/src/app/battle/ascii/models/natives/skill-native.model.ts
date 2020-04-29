@@ -1,6 +1,11 @@
+import { ActionAnimation } from '../action-animation.model';
+
 export interface SkillNative {
-  nativeId: string;
   name: string;
   description: string;
-  action: Animation;
+  action: ActionAnimation;
+
+  alternativeForm: boolean;
+  enemyName?: string;
+  enemyAction?: ActionAnimation;
 }

@@ -1,5 +1,7 @@
 import { Actor } from './actor.model';
 import { Color } from 'src/app/shared/models/color.model';
+import { ActionAnimation } from '../action-animation.model';
+import { BuffAnimation } from '../buff-animation.model';
 
 export interface Buff {
   id: number;
@@ -8,12 +10,11 @@ export interface Buff {
   color: Color;
   name: string;
   description: string;
-  onApplyAnimation: Animation;
-  effectAnimation: Animation;
-  onPurgeAnimation: Animation;
+  onApplyAnimation: ActionAnimation;
+  effectAnimation: ActionAnimation;
+  onPurgeAnimation: ActionAnimation;
 
-  onApplyEffect: (actor: Actor) => void;
-  onRemoveEffect: (actor: Actor) => void;
+  passiveAnimation: BuffAnimation;
 
   mod: number;
   duration?: number;

@@ -1,5 +1,6 @@
 import { Player } from '../player.model';
 import { Visualization } from '../visualization.model';
+import { ActionAnimation } from '../action-animation.model';
 
 export interface SpecEffect {
   id: number;
@@ -7,8 +8,8 @@ export interface SpecEffect {
   name: string;
   description: string;
   visualization: Visualization;
-  action: Animation;
-  onDeathAction: Animation;
+  action: ActionAnimation;
+  onDeathAction: ActionAnimation;
 
   owner: Player;
   isAlive: boolean;
