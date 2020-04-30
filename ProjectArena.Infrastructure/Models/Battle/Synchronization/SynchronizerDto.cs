@@ -16,9 +16,9 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public float TurnTime { get; set; }
 
-        public ActorDto TempActor { get; set; }
+        public int? TempActor { get; set; }
 
-        public ActiveDecorationDto TempDecoration { get; set; }
+        public int? TempDecoration { get; set; }
 
         public IEnumerable<PlayerDto> Players { get; set; }
 
@@ -28,11 +28,11 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public IEnumerable<SpecEffectDto> ChangedEffects { get; set; }
 
-        public IEnumerable<ActorDto> DeletedActors { get; set; }
+        public IEnumerable<int> DeletedActors { get; set; }
 
-        public IEnumerable<ActiveDecorationDto> DeletedDecorations { get; set; }
+        public IEnumerable<int> DeletedDecorations { get; set; }
 
-        public IEnumerable<SpecEffectDto> DeletedEffects { get; set; }
+        public IEnumerable<int> DeletedEffects { get; set; }
 
         public IEnumerable<TileDto> ChangedTiles { get; set; }
 

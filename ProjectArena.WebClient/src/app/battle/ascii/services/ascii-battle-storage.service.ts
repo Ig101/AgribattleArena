@@ -21,6 +21,10 @@ export class AsciiBattleStorageService {
 
   constructor() { }
 
+  setTurnTime(time: number) {
+    this.turnTime = time - 2;
+  }
+
   clear() {
     this.scene = undefined;
     this.currentActor = undefined;

@@ -116,7 +116,7 @@ export class ArenaHubService {
     while (this.battleSynchronizationActionsList[0].sync.version <= currentVersion) {
       this.battleSynchronizationActionsList.shift();
     }
-    if (this.battleSynchronizationActionsList[0].sync.version === currentVersion + 1) {
+    if (this.battleSynchronizationActionsList[0].sync.version !== currentVersion + 1) {
       return undefined;
     }
     this.battleSynchronizationActionsList.shift();
@@ -131,7 +131,6 @@ export class ArenaHubService {
 
   private registerBattleSynchronizationAction(action: BattleSynchronizationActionEnum, sync: Synchronizer) {
     const synchronizationObject = { action, sync };
-    console.log(synchronizationObject);
     this.battleSynchronizationActionsList.push(synchronizationObject);
     this.battleSynchronizationActionsList.sort((a, b) => a.sync.version - b.sync.version);
     this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;

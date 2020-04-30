@@ -157,11 +157,11 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return new SynchronizerDto()
             {
                 ChangedActors = oldSynchronizer.ChangedActors.Select(x => MapActor(x)),
-                DeletedActors = oldSynchronizer.DeletedActors.Select(x => MapActor(x)),
+                DeletedActors = oldSynchronizer.DeletedActors,
                 ChangedDecorations = oldSynchronizer.ChangedDecorations.Select(x => MapDecoration(x)),
-                DeletedDecorations = oldSynchronizer.DeletedDecorations.Select(x => MapDecoration(x)),
+                DeletedDecorations = oldSynchronizer.DeletedDecorations,
                 ChangedEffects = oldSynchronizer.ChangedEffects.Select(x => MapEffect(x)),
-                DeletedEffects = oldSynchronizer.DeletedEffects.Select(x => MapEffect(x)),
+                DeletedEffects = oldSynchronizer.DeletedEffects,
                 Players = oldSynchronizer.Players.Select(x => new PlayerDto()
                 {
                     Id = x.Id,
@@ -171,8 +171,8 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     TurnsSkipped = x.TurnsSkipped
                 }),
                 ChangedTiles = oldSynchronizer.ChangedTiles.Select(x => MapTile(x)),
-                TempActor = oldSynchronizer.TempActor == null ? null : MapActor(oldSynchronizer.TempActor),
-                TempDecoration = oldSynchronizer.TempDecoration == null ? null : MapDecoration(oldSynchronizer.TempDecoration),
+                TempActor = oldSynchronizer.TempActor,
+                TempDecoration = oldSynchronizer.TempDecoration,
                 TilesetHeight = tileSet.GetLength(1),
                 TilesetWidth = tileSet.GetLength(0)
             };

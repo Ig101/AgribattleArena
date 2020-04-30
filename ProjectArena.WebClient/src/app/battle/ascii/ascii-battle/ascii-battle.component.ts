@@ -13,10 +13,13 @@ import { newArray } from '@angular/compiler/src/util';
 import { Tile } from '../models/scene/tile.model';
 import { tileNatives, actorNatives, skillNatives, buffNatives } from '../natives';
 import { Player } from '../models/player.model';
-import { convertTile, convertActor, convertDecoration, convertEffect } from '../helpers/scene.helper';
+import { convertTile, convertActor, convertDecoration, convertEffect } from '../helpers/scene-create.helper';
 import { Actor } from '../models/scene/actor.model';
 import { ActiveDecoration } from '../models/scene/active-decoration.model';
 import { SpecEffect } from '../models/scene/spec-effect.model';
+import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
+import { synchronizeActor, synchronizeTile, synchronizeDecoration, synchronizeEffect } from '../helpers/scene-update.helper';
+import { AsciiBattleSynchronizerService } from '../services/ascii-battle-synchronizer.service';
 
 // TODO Error instead of console.logs
 
@@ -41,6 +44,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private battleResolver: BattleResolverService,
     private battleStorageService: AsciiBattleStorageService,
+    private battleSynchronizerService: AsciiBattleSynchronizerService,
     private arenaHub: ArenaHubService,
     private userService: UserService
   ) {
@@ -72,7 +76,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     if (loadBattle) {
       console.log('Restore game');
       const snapshot = this.battleResolver.popBattleSnapshot();
-      this.restoreSceneFromSnapshot(snapshot);
+      this.battleSynchronizerService.restoreSceneFromSnapshot(snapshot);
       this.battleStorageService.version = snapshot.version;
     }
     this.processActionsFromQueue();
@@ -90,12 +94,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       if (this.specificActionResponseForWait &&
         (action.action !== this.specificActionResponseForWait.action ||
         !action.sync.tempActor ||
-        action.sync.tempActor.id !== this.specificActionResponseForWait.actorId)) {
+        action.sync.tempActor !== this.specificActionResponseForWait.actorId)) {
         console.log('Awaiting action version issue');
         return;
       }
       this.specificActionResponseForWait = undefined;
-      const currentPlayer = this.battleStorageService.players.find(x => x.id === this.userService.user.id);
+      const currentPlayer = action.sync.players.find(x => x.id === this.userService.user.id);
       if (currentPlayer.status === BattlePlayerStatusEnum.Defeated) {
         console.log('DEFEAT');
         return;
@@ -104,37 +108,45 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         case BattleSynchronizationActionEnum.StartGame:
           console.log('Start game');
           // TODO Add some introducing animations
-          this.restoreSceneFromSnapshot(action.sync);
+          this.battleSynchronizerService.restoreSceneFromSnapshot(action.sync);
           break;
         case BattleSynchronizationActionEnum.EndGame:
           if (currentPlayer.status === BattlePlayerStatusEnum.Victorious) {
             console.log('VICTORY');
           }
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           return;
-          break;
         case BattleSynchronizationActionEnum.NoActorsDraw:
           console.log('DRAW');
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           break;
         case BattleSynchronizationActionEnum.SkipTurn:
           console.log('Skip turn');
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           break;
         case BattleSynchronizationActionEnum.EndTurn:
           console.log('End turn');
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           break;
         case BattleSynchronizationActionEnum.Attack:
           console.log('Attack');
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           break;
         case BattleSynchronizationActionEnum.Cast:
           console.log('Cast');
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           break;
         case BattleSynchronizationActionEnum.Decoration:
           console.log('Decoration acts');
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           break;
         case BattleSynchronizationActionEnum.Move:
           console.log('Move');
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           break;
         case BattleSynchronizationActionEnum.Wait:
           console.log('Wait');
+          this.battleSynchronizerService.synchronizeScene(action.sync);
           break;
       }
       this.battleStorageService.version = action.sync.version;
@@ -145,84 +157,4 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     }
     this.receivingMessagesFromHubAllowed = true;
   }
-
-  private restoreSceneFromSnapshot(synchronizer: Synchronizer) {
-    // Players
-    let currentPlayer: Player;
-    this.battleStorageService.players = synchronizer.players.map(player => {
-      const isCurrentPlayer = player.id === this.userService.user.id;
-      const newPlayer = {
-        id: player.id,
-        team: player.team,
-        name: isCurrentPlayer ? this.userService.user.name : 'Demonspawn gang',
-        keyActors: player.keyActorsSync,
-        turnsSkipped: player.turnsSkipped,
-        status: player.status
-      };
-      if (isCurrentPlayer) {
-        currentPlayer = newPlayer;
-      }
-      return newPlayer;
-    });
-    this.battleStorageService.turnTime = synchronizer.turnTime;
-
-    // Tiles
-    const tiles = new Array<Tile[]>(synchronizer.tilesetWidth);
-    for (let x = 0; x < synchronizer.tilesetWidth; x++) {
-      tiles[x] = new Array<Tile>(synchronizer.tilesetHeight);
-    }
-    for (const tile of synchronizer.changedTiles) {
-      const owner = this.battleStorageService.players.find(x => x.id === tile.ownerId);
-      tiles[tile.x][tile.y] = convertTile(tile, owner);
-    }
-
-    // Actors
-    const actors: Actor[] = [];
-    for (const actor of synchronizer.changedActors) {
-      const owner = this.battleStorageService.players.find(x => x.id === actor.ownerId);
-      const newActor = convertActor(actor, owner, owner && currentPlayer.team === owner.team);
-      tiles[newActor.x][newActor.y].actor = newActor;
-      actors.push(newActor);
-    }
-
-    // Decorations
-    const decorations: ActiveDecoration[] = [];
-    for (const decoration of synchronizer.changedDecorations) {
-      const owner = this.battleStorageService.players.find(x => x.id === decoration.ownerId);
-      const newDecoration = convertDecoration(decoration, owner, owner && currentPlayer.team === owner.team);
-      tiles[newDecoration.x][newDecoration.y].decoration = newDecoration;
-      decorations.push(newDecoration);
-    }
-
-    // SpecEffects
-    const effects: SpecEffect[] = [];
-    for (const specEffect of synchronizer.changedEffects) {
-      const owner = this.battleStorageService.players.find(x => x.id === specEffect.ownerId);
-      const newEffect = convertEffect(specEffect, owner, owner && currentPlayer.team === owner.team);
-      tiles[newEffect.x][newEffect.y].specEffects.push(newEffect);
-      effects.push(newEffect);
-    }
-
-    // TempValues
-    this.battleStorageService.currentActor = synchronizer.tempActor ?
-      actors.find(x => x.id === synchronizer.tempActor.id) :
-      undefined;
-    this.battleStorageService.currentDecoration = synchronizer.tempDecoration ?
-      decorations.find(x => x.id === synchronizer.tempDecoration.id) :
-      undefined;
-
-    this.battleStorageService.scene = {
-      actors,
-      decorations,
-      effects,
-      tiles,
-      width: synchronizer.tilesetWidth,
-      height: synchronizer.tilesetHeight
-    } as Scene;
-  }
-
-  private applySynchronizationInfo(synchronizer: Synchronizer, onlyForIds?: number[]) {
-
-  }
-
 }

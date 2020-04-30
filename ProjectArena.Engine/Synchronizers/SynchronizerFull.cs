@@ -11,9 +11,9 @@ namespace ProjectArena.Engine.Synchronizers
     {
         public int RandomCounter { get; }
 
-        public IActiveDecoration TempDecoration { get; }
+        public int? TempDecoration { get; }
 
-        public IActor TempActor { get; }
+        public int? TempActor { get; }
 
         public IEnumerable<IPlayer> Players { get; }
 
@@ -23,11 +23,11 @@ namespace ProjectArena.Engine.Synchronizers
 
         public IEnumerable<ISpecEffect> ChangedEffects { get; }
 
-        public IEnumerable<IActor> DeletedActors => new List<IActor>();
+        public IEnumerable<int> DeletedActors => new List<int>();
 
-        public IEnumerable<IActiveDecoration> DeletedDecorations => new List<IActiveDecoration>();
+        public IEnumerable<int> DeletedDecorations => new List<int>();
 
-        public IEnumerable<ISpecEffect> DeletedEffects => new List<ISpecEffect>();
+        public IEnumerable<int> DeletedEffects => new List<int>();
 
         public IEnumerable<ITile> ChangedTiles => TileSet.Cast<ITile>().ToList();
 
@@ -44,12 +44,12 @@ namespace ProjectArena.Engine.Synchronizers
         {
             if (tempObject is Objects.Actor actor)
             {
-                this.TempActor = new Actor(actor);
+                this.TempActor = actor.Id;
             }
 
             if (tempObject is Objects.ActiveDecoration decoration)
             {
-                this.TempDecoration = new ActiveDecoration(decoration);
+                this.TempDecoration = decoration.Id;
             }
 
             this.RandomCounter = randomCounter;

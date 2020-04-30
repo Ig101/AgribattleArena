@@ -10,11 +10,11 @@ namespace ProjectArena.Engine.Synchronizers
 {
     public class Synchronizer : ISynchronizer
     {
-        private Point tileLength;
+        private readonly Point tileLength;
 
-        public IActiveDecoration TempDecoration { get; }
+        public int? TempDecoration { get; }
 
-        public IActor TempActor { get; }
+        public int? TempActor { get; }
 
         public int RandomCounter { get; }
 
@@ -26,11 +26,11 @@ namespace ProjectArena.Engine.Synchronizers
 
         public IEnumerable<ISpecEffect> ChangedEffects { get; }
 
-        public IEnumerable<IActor> DeletedActors { get; }
+        public IEnumerable<int> DeletedActors { get; }
 
-        public IEnumerable<IActiveDecoration> DeletedDecorations { get; }
+        public IEnumerable<int> DeletedDecorations { get; }
 
-        public IEnumerable<ISpecEffect> DeletedEffects { get; }
+        public IEnumerable<int> DeletedEffects { get; }
 
         public IEnumerable<ITile> ChangedTiles { get; }
 
@@ -63,12 +63,12 @@ namespace ProjectArena.Engine.Synchronizers
         {
             if (tempObject is Objects.Actor actor)
             {
-                this.TempActor = new Actor(actor);
+                this.TempActor = actor.Id;
             }
 
             if (tempObject is Objects.ActiveDecoration decoration)
             {
-                this.TempDecoration = new ActiveDecoration(decoration);
+                this.TempDecoration = decoration.Id;
             }
 
             this.RandomCounter = randomCounter;
@@ -79,9 +79,9 @@ namespace ProjectArena.Engine.Synchronizers
             this.ChangedEffects = changedEffects.Select(x => new SpecEffect(x));
             List<ITile> tempChangedTiles = new List<ITile>();
             this.ChangedTiles = changedTiles.Select(x => new Tile(x));
-            this.DeletedActors = deletedActors.Select(x => new Actor(x));
-            this.DeletedDecorations = deletedDecorations.Select(x => new ActiveDecoration(x));
-            this.DeletedEffects = deletedEffects.Select(x => new SpecEffect(x));
+            this.DeletedActors = deletedActors.Select(x => x.Id);
+            this.DeletedDecorations = deletedDecorations.Select(x => x.Id);
+            this.DeletedEffects = deletedEffects.Select(x => x.Id);
         }
     }
 }

@@ -16,19 +16,19 @@ import { ActiveDecoration } from '../models/scene/active-decoration.model';
 import { SyncSpecEffect } from 'src/app/shared/models/battle/synchronization/sync-spec-effect.model';
 import { SpecEffect } from '../models/scene/spec-effect.model';
 
-function cloneActionAnimation(animation: ActionAnimation): ActionAnimation {
+export function cloneActionAnimation(animation: ActionAnimation): ActionAnimation {
   return {
 
   };
 }
 
-function cloneTwoPhaseActionAnimation(animation: TwoPhaseActionAnimation): TwoPhaseActionAnimation {
+export function cloneTwoPhaseActionAnimation(animation: TwoPhaseActionAnimation): TwoPhaseActionAnimation {
   return {
 
   };
 }
 
-function cloneBuffAnimation(animation: BuffAnimation): BuffAnimation {
+export function cloneBuffAnimation(animation: BuffAnimation): BuffAnimation {
   return {
 
   };
@@ -50,6 +50,7 @@ export function convertTile(tile: SyncTile, owner: Player): Tile {
     action: cloneActionAnimation(native.action),
     onStepAction: cloneActionAnimation(native.onStepAction),
     height: tile.height,
+    nativeId: tile.nativeId,
     owner,
     actor: undefined,
     decoration: undefined,
@@ -69,8 +70,8 @@ export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Sk
       skillNative.enemyName,
     description: skillNative.description,
     action: !skillNative.alternativeForm || isCurrentPlayerTeam ?
-      cloneActionAnimation(skillNative.enemyAction) :
-      cloneActionAnimation(skillNative.enemyAction),
+      cloneTwoPhaseActionAnimation(skillNative.enemyAction) :
+      cloneTwoPhaseActionAnimation(skillNative.enemyAction),
     range: skill.range,
     cd: skill.cd,
     mod: skill.mod,
@@ -116,7 +117,7 @@ export function convertActor(actor: SyncActor, owner: Player, isCurrentPlayerTea
       char: visualization.char,
       color: { r: visualization.color.r, g: visualization.color.g, b: visualization.color. b, a: visualization.color.a }
     },
-    moveAction: cloneActionAnimation(moveAction),
+    moveAction: cloneTwoPhaseActionAnimation(moveAction),
     externalId: actor.externalId,
     attackingSkill: convertSkill(actor.attackingSkill, isCurrentPlayerTeam),
     strength: actor.strength,

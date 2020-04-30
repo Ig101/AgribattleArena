@@ -3,7 +3,7 @@ import { ActorNative } from '../models/natives/actor-native.model';
 export const actorNatives: {[id: string]: ActorNative} = {
   adventurer: {
     name: 'Adventurer',
-    description: 'Human warrior',
+    description: undefined,
     visualization: {
       char: '@',
       color: { r: 255, g: 55, b: 0, a: 1 }
@@ -11,10 +11,10 @@ export const actorNatives: {[id: string]: ActorNative} = {
     moveAction: {
 
     },
-    enemyName: 'Demonspawn',
-    enemyDescription: 'Blue plague warrior',
+    enemyName: 'Mistspawn',
+    enemyDescription: undefined,
     enemyVisualization: {
-      char: 'D',
+      char: 'S',
       color: { r: 55, g: 55, b: 255, a: 1 }
     },
     enemyMoveAction: {

@@ -62,7 +62,7 @@ namespace ProjectArena.Tests.Engine
             Assert.That(i > 400, Is.False, "Cycle error");
             Assert.That(SyncMessages[^2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Decoration), "Decoration action");
             Assert.That(SyncMessages[^2].SyncInfo.DeletedDecorations.Count(), Is.EqualTo(1), "Decoration killed");
-            Assert.That(SyncMessages[^2].SyncInfo.DeletedDecorations.ToArray()[0].Id, Is.EqualTo(_decoration.Id), "Decoration killed id");
+            Assert.That(SyncMessages[^2].SyncInfo.DeletedDecorations.ToArray()[0], Is.EqualTo(_decoration.Id), "Decoration killed id");
         }
     }
 }

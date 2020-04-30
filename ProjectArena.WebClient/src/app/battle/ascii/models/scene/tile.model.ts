@@ -11,6 +11,7 @@ export interface Tile {
   y: number;
 
   name: string;
+  nativeId: string;
   description: string;
   visualization: Visualization;
   backgroundColor: Color;

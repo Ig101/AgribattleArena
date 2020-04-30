@@ -7,9 +7,9 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization
     {
         int RandomCounter { get; }
 
-        IActor TempActor { get; }
+        int? TempActor { get; }
 
-        IActiveDecoration TempDecoration { get; }
+        int? TempDecoration { get; }
 
         IEnumerable<IPlayer> Players { get; }
 
@@ -19,11 +19,11 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization
 
         IEnumerable<ISpecEffect> ChangedEffects { get; }
 
-        IEnumerable<IActor> DeletedActors { get; }
+        IEnumerable<int> DeletedActors { get; }
 
-        IEnumerable<IActiveDecoration> DeletedDecorations { get; }
+        IEnumerable<int> DeletedDecorations { get; }
 
-        IEnumerable<ISpecEffect> DeletedEffects { get; }
+        IEnumerable<int> DeletedEffects { get; }
 
         IEnumerable<ITile> ChangedTiles { get; }
 

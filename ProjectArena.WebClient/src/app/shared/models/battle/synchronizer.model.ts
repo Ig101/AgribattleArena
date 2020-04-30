@@ -13,14 +13,14 @@ export interface Synchronizer {
   tilesetWidth: number;
   tilesetHeight: number;
   turnTime: number;
-  tempActor?: SyncActor;
-  tempDecoration?: SyncDecoration;
+  tempActor?: number;
+  tempDecoration?: number;
   players: SyncPlayer[];
   changedActors: SyncActor[];
   changedDecorations: SyncDecoration[];
   changedEffects: SyncSpecEffect[];
-  deletedActors: SyncActor[];
-  deletedDecorations: SyncDecoration[];
-  deletedEffects: SyncSpecEffect[];
+  deletedActors: number[];
+  deletedDecorations: number[];
+  deletedEffects: number[];
   changedTiles: SyncTile[];
 }
