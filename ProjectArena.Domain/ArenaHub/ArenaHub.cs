@@ -51,7 +51,7 @@ namespace ProjectArena.Domain.ArenaHub
         bool result = false;
         if (scene.GetPlayerActors(userId).Contains(actorId))
         {
-            scene.ActorAttack(actorId, targetX, targetY);
+            result = scene.ActorAttack(actorId, targetX, targetY);
         }
 
         if (!result)
@@ -67,7 +67,7 @@ namespace ProjectArena.Domain.ArenaHub
         bool result = false;
         if (scene.GetPlayerActors(userId).Contains(actorId))
         {
-            scene.ActorMove(actorId, targetX, targetY);
+            result = scene.ActorMove(actorId, targetX, targetY);
         }
 
         if (!result)
@@ -83,7 +83,7 @@ namespace ProjectArena.Domain.ArenaHub
         bool result = false;
         if (scene.GetPlayerActors(userId).Contains(actorId))
         {
-            scene.ActorCast(actorId, skillId, targetX, targetY);
+            result = scene.ActorCast(actorId, skillId, targetX, targetY);
         }
 
         if (!result)
@@ -99,7 +99,7 @@ namespace ProjectArena.Domain.ArenaHub
         bool result = false;
         if (scene.GetPlayerActors(userId).Contains(actorId))
         {
-            scene.ActorWait(actorId);
+            result = scene.ActorWait(actorId);
         }
 
         if (!result)

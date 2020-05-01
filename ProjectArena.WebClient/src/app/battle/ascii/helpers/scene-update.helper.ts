@@ -28,6 +28,7 @@ export function synchronizeTile(tile: Tile, syncTile: SyncTile, owner?: Player) 
     tile.action = cloneActionAnimation(native.action);
     tile.onStepAction = cloneActionAnimation(native.onStepAction);
     tile.nativeId = syncTile.nativeId;
+    tile.unbearable = syncTile.unbearable;
   }
   if (owner) {
     tile.owner = owner;
@@ -41,6 +42,7 @@ export function synchronizeSkill(skill: Skill, syncSkill: SyncSkill) {
   skill.mod = syncSkill.mod;
   skill.preparationTime = syncSkill.preparationTime;
   skill.range = syncSkill.range;
+  skill.meleeOnly = syncSkill.meleeOnly;
 }
 
 export function synchronizeBuff(buff: Buff, syncBuff: SyncBuff) {
@@ -109,6 +111,8 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
   actor.initiative = syncActor.initiative;
   actor.armor = syncActor.armor;
   actor.attackModifiers = syncActor.attackModifiers;
+  actor.canAct = syncActor.canAct;
+  actor.canMove = syncActor.canMove;
 }
 
 export function synchronizeDecoration(decoration: ActiveDecoration, syncDecoration: SyncDecoration, owner?: Player) {

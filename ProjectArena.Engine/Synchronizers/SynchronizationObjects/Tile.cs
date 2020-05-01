@@ -16,6 +16,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string NativeId { get; }
 
+        public bool Unbearable { get; }
+
         public Tile(Objects.Tile tile)
         {
             this.X = tile.X;
@@ -24,6 +26,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.TempActorId = tile.TempObject?.Id;
             this.Height = tile.Height;
             this.NativeId = tile.Native.Id;
+            this.Unbearable = tile.Native.Unbearable;
         }
     }
 }

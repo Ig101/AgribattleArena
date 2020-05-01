@@ -5,14 +5,17 @@ import { AsciiRoutingModule } from './ascii-routing.module';
 import { AsciiBattleComponent } from './ascii-battle/ascii-battle.component';
 import { AsciiBattleStorageService } from './services/ascii-battle-storage.service';
 import { AsciiBattleSynchronizerService } from './services/ascii-battle-synchronizer.service';
+import { AsciiBattlePathCreatorService } from './services/ascii-battle-path-creator.service';
+import { InitiativeBlockComponent } from './ascii-battle/initiative-block/initiative-block.component';
 
 
 
 @NgModule({
-  declarations: [AsciiBattleComponent],
+  declarations: [AsciiBattleComponent, InitiativeBlockComponent],
   providers: [
     AsciiBattleStorageService,
-    AsciiBattleSynchronizerService
+    AsciiBattleSynchronizerService,
+    AsciiBattlePathCreatorService
   ],
   imports: [
     SharedModule,

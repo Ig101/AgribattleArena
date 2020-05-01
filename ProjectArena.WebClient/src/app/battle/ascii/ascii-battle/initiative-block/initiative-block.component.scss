@@ -1,0 +1,39 @@
+:host {
+  display: flex;
+  flex-direction: row;
+
+  .portrait {
+    box-sizing: border-box;
+    border: double;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .big-portrait {
+    width: 90px;
+    height: 90px;
+    border-width: 6px;
+    font-size: 45px;
+  }
+
+  .small-portrait {
+    width: 50px;
+    height: 50px;
+    border-width: 4px;
+  }
+
+  .right-side {
+    display: flex;
+    flex-direction: column;
+
+    .portraits-container {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .timer {
+      padding: 6px 0 2px 12px;
+    }
+  }
+}

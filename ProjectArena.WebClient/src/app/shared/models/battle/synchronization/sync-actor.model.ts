@@ -28,4 +28,6 @@ export interface SyncActor {
   initiative: number;
   armor: TagSynergy[];
   attackModifiers: TagSynergy[];
+  canMove: boolean;
+  canAct: boolean;
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ProjectArena.Engine.Helpers;
 using ProjectArena.Engine.Natives;
@@ -48,8 +49,8 @@ namespace ProjectArena.Engine.Objects.Immaterial
 
         public bool Cast(Tile target)
         {
-            if (parent.ActionPoints >= cost && PreparationTime <= 0 && parent.BuffManager.CanAct &&
-                Misc.RangeBetween(parent.X, parent.Y, parent.TempTile.Height, target.X, target.Y, target.Height) <= range)
+            if (parent.ActionPoints >= cost && PreparationTime <= 0 && parent.BuffManager.CanAct && (!Native.MeleeOnly || Math.Abs(parent.TempTile.Height - target.Height) < 10) &&
+                Misc.RangeBetween(parent.X, parent.Y, target.X, target.Y) <= range)
             {
                 Native.Action(parent.Parent, parent, target, this);
                 PreparationTime = cd;

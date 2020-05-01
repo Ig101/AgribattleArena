@@ -1,0 +1,15 @@
+<div *ngIf="firstActor" class="portrait big-portrait title-font-inactive" [style.borderColor]="firstActor.color" [style.color]="firstActor.color"
+  (mouseenter)="enterActorCard(firstActor)" (mouseleave)="leaveActorCard(firstActor)">
+  {{firstActor.char}}
+</div>
+<div *ngIf="otherActors" class="right-side">
+  <div class="portraits-container">
+    <div class="portrait small-portrait text-font-inactive" *ngFor="let item of otherActors" [style.borderColor]="item.color" [style.color]="item.color"
+    (mouseenter)="enterActorCard(item)" (mouseleave)="leaveActorCard(item)">
+      {{item.char}}
+    </div>
+  </div>
+  <div *ngIf="timer && timer <= 15" class="timer text-font-inactive">
+    {{timer > 0 ? timer : 'Ending...'}}
+  </div>
+</div>

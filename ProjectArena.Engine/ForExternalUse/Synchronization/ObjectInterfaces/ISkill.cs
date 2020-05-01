@@ -15,5 +15,7 @@
         int Cost { get; }
 
         float PreparationTime { get; }
+
+        bool MeleeOnly { get; set; }
     }
 }

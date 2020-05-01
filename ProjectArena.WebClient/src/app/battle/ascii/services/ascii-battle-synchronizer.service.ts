@@ -11,12 +11,15 @@ import { Scene } from '../models/scene/scene.model';
 import { synchronizeTile, synchronizeActor, synchronizeDecoration, synchronizeEffect } from '../helpers/scene-update.helper';
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 import { UserService } from 'src/app/shared/services/user.service';
+import { tileNatives } from '../natives';
+import { AsciiBattlePathCreatorService } from './ascii-battle-path-creator.service';
 
 @Injectable()
 export class AsciiBattleSynchronizerService {
 
   constructor(
     private battleStorageService: AsciiBattleStorageService,
+    private battlePathCreator: AsciiBattlePathCreatorService,
     private userService: UserService
   ) { }
 
@@ -54,7 +57,7 @@ export class AsciiBattleSynchronizerService {
     const actors: Actor[] = [];
     for (const actor of synchronizer.changedActors) {
       const owner = this.battleStorageService.players.find(x => x.id === actor.ownerId);
-      const newActor = convertActor(actor, owner, owner && currentPlayer.team === owner.team);
+      const newActor = convertActor(actor, owner, owner && currentPlayer.team === owner?.team);
       tiles[newActor.x][newActor.y].actor = newActor;
       actors.push(newActor);
     }
@@ -63,7 +66,7 @@ export class AsciiBattleSynchronizerService {
     const decorations: ActiveDecoration[] = [];
     for (const decoration of synchronizer.changedDecorations) {
       const owner = this.battleStorageService.players.find(x => x.id === decoration.ownerId);
-      const newDecoration = convertDecoration(decoration, owner, owner && currentPlayer.team === owner.team);
+      const newDecoration = convertDecoration(decoration, owner, owner && currentPlayer.team === owner?.team);
       tiles[newDecoration.x][newDecoration.y].decoration = newDecoration;
       decorations.push(newDecoration);
     }
@@ -72,8 +75,9 @@ export class AsciiBattleSynchronizerService {
     const effects: SpecEffect[] = [];
     for (const specEffect of synchronizer.changedEffects) {
       const owner = this.battleStorageService.players.find(x => x.id === specEffect.ownerId);
-      const newEffect = convertEffect(specEffect, owner, owner && currentPlayer.team === owner.team);
+      const newEffect = convertEffect(specEffect, owner, owner && currentPlayer.team === owner?.team);
       tiles[newEffect.x][newEffect.y].specEffects.push(newEffect);
+      tiles[newEffect.x][newEffect.y].specEffects.sort((a, b) => b.z - a.z);
       effects.push(newEffect);
     }
 
@@ -93,6 +97,13 @@ export class AsciiBattleSynchronizerService {
       width: synchronizer.tilesetWidth,
       height: synchronizer.tilesetHeight
     } as Scene;
+    this.battleStorageService.cameraX = this.battleStorageService.scene.width / 2;
+    this.battleStorageService.cameraY = this.battleStorageService.scene.height / 2;
+    this.battleStorageService.zoom = 1.5;
+    this.battleStorageService.defaultActionSquares = this.battleStorageService.currentActor?.owner === currentPlayer ?
+    this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) :
+    undefined;
+    this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
   }
 
   synchronizeScene(synchronizer: Synchronizer) {
@@ -111,7 +122,7 @@ export class AsciiBattleSynchronizerService {
     for (const syncTile of synchronizer.changedTiles) {
       const tile = this.battleStorageService.scene.tiles[syncTile.x][syncTile.y];
       let owner: Player;
-      if (syncTile.ownerId !== tile.owner.id) {
+      if (syncTile.ownerId !== tile.owner?.id) {
         owner = this.battleStorageService.players.find(x => x.id === syncTile.ownerId);
       }
       synchronizeTile(tile, syncTile, owner);
@@ -121,7 +132,7 @@ export class AsciiBattleSynchronizerService {
       const actor = this.battleStorageService.scene.actors.find(x => x.id === syncActor.id);
       if (!actor) {
         owner = this.battleStorageService.players.find(x => x.id === syncActor.ownerId);
-        const newActor = convertActor(syncActor, owner, owner && currentPlayer.team === owner.team);
+        const newActor = convertActor(syncActor, owner, owner && currentPlayer.team === owner?.team);
         this.battleStorageService.scene.tiles[newActor.x][newActor.y].actor = newActor;
         this.battleStorageService.scene.actors.push(newActor);
         continue;
@@ -132,17 +143,17 @@ export class AsciiBattleSynchronizerService {
         }
         this.battleStorageService.scene.tiles[syncActor.x][syncActor.y].actor = actor;
       }
-      if (syncActor.ownerId !== actor.owner.id) {
+      if (syncActor.ownerId !== actor.owner?.id) {
         owner = this.battleStorageService.players.find(x => x.id === syncActor.ownerId);
       }
-      synchronizeActor(actor, syncActor, currentPlayer.team === (owner ? owner.team : actor.owner.team));
+      synchronizeActor(actor, syncActor, currentPlayer.team === (owner ? owner?.team : actor.owner?.team));
     }
     for (const syncDecoration of synchronizer.changedDecorations) {
       let owner: Player;
       const decoration = this.battleStorageService.scene.decorations.find(x => x.id === syncDecoration.id);
       if (!decoration) {
         owner = this.battleStorageService.players.find(x => x.id === syncDecoration.ownerId);
-        const newDecoration = convertDecoration(syncDecoration, owner, owner && currentPlayer.team === owner.team);
+        const newDecoration = convertDecoration(syncDecoration, owner, owner && currentPlayer.team === owner?.team);
         this.battleStorageService.scene.tiles[newDecoration.x][newDecoration.y].decoration = newDecoration;
         this.battleStorageService.scene.decorations.push(newDecoration);
         continue;
@@ -153,7 +164,7 @@ export class AsciiBattleSynchronizerService {
         }
         this.battleStorageService.scene.tiles[syncDecoration.x][syncDecoration.y].decoration = decoration;
       }
-      if (syncDecoration.ownerId !== decoration.owner.id) {
+      if (syncDecoration.ownerId !== decoration.owner?.id) {
         owner = this.battleStorageService.players.find(x => x.id === syncDecoration.ownerId);
       }
       synchronizeDecoration(decoration, syncDecoration, owner);
@@ -163,16 +174,18 @@ export class AsciiBattleSynchronizerService {
       const effect = this.battleStorageService.scene.effects.find(x => x.id === syncEffect.id);
       if (!effect) {
         owner = this.battleStorageService.players.find(x => x.id === syncEffect.ownerId);
-        const newEffect = convertEffect(syncEffect, owner, owner && currentPlayer.team === owner.team);
+        const newEffect = convertEffect(syncEffect, owner, owner && currentPlayer.team === owner?.team);
         this.battleStorageService.scene.tiles[newEffect.x][newEffect.y].specEffects.push(newEffect);
+        this.battleStorageService.scene.tiles[newEffect.x][newEffect.y].specEffects.sort((a, b) => b.z - a.z);
         this.battleStorageService.scene.effects.push(newEffect);
         continue;
       }
       if (effect.x !== syncEffect.x || effect.y !== syncEffect.y) {
         removeFromArray(this.battleStorageService.scene.tiles[effect.x][effect.y].specEffects, effect);
         this.battleStorageService.scene.tiles[syncEffect.x][syncEffect.y].specEffects.push(effect);
+        this.battleStorageService.scene.tiles[syncEffect.x][syncEffect.y].specEffects.sort((a, b) => b.z - a.z);
       }
-      if (syncEffect.ownerId !== effect.owner.id) {
+      if (syncEffect.ownerId !== effect.owner?.id) {
         owner = this.battleStorageService.players.find(x => x.id === syncEffect.ownerId);
       }
       synchronizeEffect(effect, syncEffect, owner);
@@ -197,6 +210,7 @@ export class AsciiBattleSynchronizerService {
       const effect = this.battleStorageService.scene.effects.find(x => x.id === syncEffect);
       removeFromArray(this.battleStorageService.scene.effects, effect);
       removeFromArray(this.battleStorageService.scene.tiles[effect.x][effect.y].specEffects, effect);
+      this.battleStorageService.scene.tiles[effect.x][effect.y].specEffects.sort((a, b) => b.z - a.z);
     }
 
     // Change turn
@@ -210,6 +224,9 @@ export class AsciiBattleSynchronizerService {
         undefined;
       this.battleStorageService.setTurnTime(synchronizer.turnTime);
     }
-    console.log(this.battleStorageService);
+    this.battleStorageService.defaultActionSquares = this.battleStorageService.currentActor?.owner === currentPlayer ?
+      this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) :
+      undefined;
+    this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
   }
 }

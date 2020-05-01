@@ -32,7 +32,8 @@ namespace ProjectArena.Domain.Registry.Migrations
                 DefaultCost = 2,
                 DefaultCd = 0,
                 DefaultMod = 20,
-                Actions = new[] { "DoDamageAttack" }
+                Actions = new[] { "DoDamageAttack" },
+                MeleeOnly = true
             }).Wait();
             context.SkillNatives.InsertOneAtomicallyAsync(new Entities.SkillNative()
             {
@@ -42,7 +43,8 @@ namespace ProjectArena.Domain.Registry.Migrations
                 DefaultCost = 4,
                 DefaultCd = 2,
                 DefaultMod = 25,
-                Actions = new[] { "DoSmallAoeDamageSkill", "DoSmallAoeOneTurnStun" }
+                Actions = new[] { "DoSmallAoeDamageSkill", "DoSmallAoeOneTurnStun" },
+                MeleeOnly = false
             }).Wait();
             context.BuffNatives.InsertOneAtomicallyAsync(new Entities.BuffNative()
             {

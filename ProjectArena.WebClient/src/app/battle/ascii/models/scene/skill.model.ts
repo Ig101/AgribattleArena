@@ -12,4 +12,5 @@ export interface Skill {
   mod: number;
   cost: number;
   preparationTime: number;
+  meleeOnly: boolean;
 }

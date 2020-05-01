@@ -18,6 +18,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public float PreparationTime { get; }
 
+        public bool MeleeOnly { get; set; }
+
         public Skill(Objects.Immaterial.Skill skill)
         {
             this.Id = skill.Id;
@@ -27,6 +29,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Mod = skill.Mod;
             this.Cost = skill.Cost;
             this.PreparationTime = skill.PreparationTime;
+            this.MeleeOnly = skill.Native.MeleeOnly;
         }
     }
 }

@@ -21,6 +21,10 @@ namespace ProjectArena.Engine.Objects
         public override void Update(float time)
         {
             this.InitiativePosition -= time;
+            if (time > 0)
+            {
+                this.Affected = true;
+            }
         }
 
         public void Cast()

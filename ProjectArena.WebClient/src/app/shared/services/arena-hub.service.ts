@@ -80,7 +80,7 @@ export class ArenaHubService {
     this.hubConnection.stop();
   }
 
-  private catchHubError(error: any, errorScreenOpaque: number) {
+  private catchHubError(error: any) {
       console.log(error);
   }
 
@@ -88,24 +88,24 @@ export class ArenaHubService {
       this.hubConnection.on(methodName, listener);
   }
 
-  orderAttack(actorId: number, targetX: number, targetY: number, errorScreenOpaque: number = 0.5) {
+  orderAttack(actorId: number, targetX: number, targetY: number) {
     this.hubConnection
-      .invoke('OrderAttackAsync', actorId, targetX, targetY).catch(err => this.catchHubError(err, errorScreenOpaque));
+      .invoke('OrderAttackAsync', actorId, targetX, targetY).catch(err => this.catchHubError(err));
   }
 
-  orderMove(actorId: number, targetX: number, targetY: number, errorScreenOpaque: number = 0.5) {
+  orderMove(actorId: number, targetX: number, targetY: number) {
     this.hubConnection
-      .invoke('OrderMoveAsync', actorId, targetX, targetY).catch(err => this.catchHubError(err, errorScreenOpaque));
+      .invoke('OrderMoveAsync', actorId, targetX, targetY).catch(err => this.catchHubError(err));
   }
 
-  orderCast(actorId: number, skillId: number, targetX: number, targetY: number, errorScreenOpaque: number = 0.5) {
+  orderCast(actorId: number, skillId: number, targetX: number, targetY: number) {
     this.hubConnection
-      .invoke('OrderCastAsync', actorId, skillId, targetX, targetY).catch(err => this.catchHubError(err, errorScreenOpaque));
+      .invoke('OrderCastAsync', actorId, skillId, targetX, targetY).catch(err => this.catchHubError(err));
   }
 
-  orderWait(actorId: number, errorScreenOpaque: number = 0.5) {
+  orderWait(actorId: number) {
     this.hubConnection
-      .invoke('OrderWaitAsync', actorId).catch(err => this.catchHubError(err, errorScreenOpaque));
+      .invoke('OrderWaitAsync', actorId).catch(err => this.catchHubError(err));
   }
 
   pickBattleSynchronizationAction(currentVersion: number) {

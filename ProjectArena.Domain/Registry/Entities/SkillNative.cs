@@ -23,6 +23,9 @@ namespace ProjectArena.Domain.Registry.Entities
         [BsonElement("m")]
         public float DefaultMod { get; set; }
 
+        [BsonElement("o")]
+        public bool MeleeOnly { get; set; }
+
         [BsonElement("a")]
         public IEnumerable<string> Actions { get; set; }
     }

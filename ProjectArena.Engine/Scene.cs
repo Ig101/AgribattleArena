@@ -100,7 +100,7 @@ namespace ProjectArena.Engine
             this.WinCondition = tempGenerator.WinCondition;
             this.DefeatCondition = tempGenerator.DefeatCondition;
             this.EnemyActorsPrefix = string.Empty;
-            this.IdsCounter = 0;
+            this.IdsCounter = 1;
             this.players = new List<Player>();
             this.Actors = new List<Actor>();
             this.Decorations = new List<ActiveDecoration>();
@@ -382,14 +382,12 @@ namespace ProjectArena.Engine
                 if (newObject != null)
                 {
                     this.RemainedTurnTime = newObject.Owner == null || newObject.Owner.TurnsSkipped <= 0 ? VarManager.TurnTimeLimit : VarManager.TurnTimeLimitAfterSkip;
-                    TileObject previousTempTileObject = this.TempTileObject;
                     this.TempTileObject = newObject;
                     Update(minInitiativePosition);
                     turnStarted = this.TempTileObject.StartTurn();
-                    if (!AfterUpdateSynchronization(Helpers.Action.EndTurn, previousTempTileObject, null, null, null))
+                    if (!AfterUpdateSynchronization(Helpers.Action.EndTurn, TempTileObject, null, null, null))
                     {
                         turnStarted = true;
-                        IsActive = false;
                     }
                     else if (this.TempTileObject is ActiveDecoration decoration)
                     {
@@ -399,7 +397,6 @@ namespace ProjectArena.Engine
                 else
                 {
                     turnStarted = true;
-                    IsActive = false;
                     AfterUpdateSynchronization(Helpers.Action.NoActorsDraw, null, null, null, null);
                 }
             }
@@ -496,10 +493,6 @@ namespace ProjectArena.Engine
                                 {
                                     EndTurn();
                                 }
-                                else
-                                {
-                                    IsActive = false;
-                                }
                             }
                             else
                             {
@@ -526,6 +519,7 @@ namespace ProjectArena.Engine
                 }
 
                 this.ReturnAction?.Invoke(this, new SyncEventArgs(this, ++Version, Helpers.Action.EndGame, GetSynchronizationDataPlayersOnly(), null, null, null, null));
+                IsActive = false;
                 return false;
             }
 

@@ -31,6 +31,11 @@ namespace ProjectArena.Engine.Objects
             {
                 IsAlive = false;
             }
+
+            if (time > 0)
+            {
+                this.Affected = true;
+            }
         }
 
         public override void OnDeathAction()

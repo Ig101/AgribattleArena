@@ -24,4 +24,5 @@ export interface Tile {
   specEffects: SpecEffect[];
   height: number;
   owner: Player;
+  unbearable: boolean;
 }

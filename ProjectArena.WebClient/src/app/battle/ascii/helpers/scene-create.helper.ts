@@ -54,7 +54,8 @@ export function convertTile(tile: SyncTile, owner: Player): Tile {
     owner,
     actor: undefined,
     decoration: undefined,
-    specEffects: []
+    specEffects: [],
+    unbearable: tile.unbearable
   };
 }
 
@@ -76,7 +77,8 @@ export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Sk
     cd: skill.cd,
     mod: skill.mod,
     cost: skill.cost,
-    preparationTime: skill.preparationTime
+    preparationTime: skill.preparationTime,
+    meleeOnly: skill.meleeOnly
   };
 }
 
@@ -140,7 +142,9 @@ export function convertActor(actor: SyncActor, owner: Player, isCurrentPlayerTea
     attackPower: actor.attackPower,
     initiative: actor.initiative,
     armor: actor.armor,
-    attackModifiers: actor.attackModifiers
+    attackModifiers: actor.attackModifiers,
+    canAct: actor.canAct,
+    canMove: actor.canMove
   };
 }
 

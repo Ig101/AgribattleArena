@@ -1,7 +1,7 @@
-import { AlphaColor } from 'src/app/shared/models/alpha-color.model';
+import { Color } from 'src/app/shared/models/color.model';
 
 
 export interface Visualization {
   char: string;
-  color: AlphaColor;
+  color: Color;
 }

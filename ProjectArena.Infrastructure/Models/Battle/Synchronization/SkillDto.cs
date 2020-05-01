@@ -15,5 +15,7 @@
         public int Cost { get; set; }
 
         public float PreparationTime { get; set; }
+
+        public bool MeleeOnly { get; set; }
     }
 }

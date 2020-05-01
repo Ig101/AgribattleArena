@@ -6,4 +6,5 @@ export interface SyncSkill {
   mod: number;
   cost: number;
   preparationTime: number;
+  meleeOnly: boolean;
 }

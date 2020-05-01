@@ -5,4 +5,5 @@ export interface SyncTile {
   height: number;
   nativeId: string;
   ownerId?: string;
+  unbearable: boolean;
 }

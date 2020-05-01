@@ -63,6 +63,10 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public List<TagSynergy> AttackModifiers { get; }
 
+        public bool CanMove { get; }
+
+        public bool CanAct { get; }
+
         public Actor(Objects.Actor actor)
         {
             this.Id = actor.Id;
@@ -92,6 +96,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Armor.AddRange(actor.Armor);
             this.AttackModifiers = new List<TagSynergy>();
             this.AttackModifiers.AddRange(actor.AttackModifiers);
+            this.CanMove = actor.BuffManager.CanMove;
+            this.CanAct = actor.BuffManager.CanAct;
         }
 
         public Actor(

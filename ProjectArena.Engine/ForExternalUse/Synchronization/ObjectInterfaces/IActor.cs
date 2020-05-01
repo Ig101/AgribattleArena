@@ -54,5 +54,9 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
         List<TagSynergy> Armor { get; }
 
         List<TagSynergy> AttackModifiers { get; }
+
+        bool CanMove { get; }
+
+        bool CanAct { get; }
     }
 }

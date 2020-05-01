@@ -114,6 +114,7 @@ namespace ProjectArena.Domain.BattleService
                     skill.DefaultCost,
                     skill.DefaultCd,
                     skill.DefaultMod,
+                    skill.MeleeOnly,
                     skill.Actions);
             }
 
@@ -160,7 +161,7 @@ namespace ProjectArena.Domain.BattleService
                 var playerActors = new List<IActor>(5);
                 for (int i = 0; i < 5; i++)
                 {
-                    playerActors.Add(EngineHelper.CreateActorForGeneration(externalIdIncrementor, "adventurer", "slash", 15, 15, 15, 10, new[] { "explosion" }, 4, null));
+                    playerActors.Add(EngineHelper.CreateActorForGeneration(externalIdIncrementor, "adventurer", "slash", 15, 15, 15, 10, new[] { "explosion" }, 6, null));
                     externalIdIncrementor++;
                 }
 

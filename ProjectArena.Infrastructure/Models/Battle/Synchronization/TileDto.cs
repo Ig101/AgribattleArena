@@ -13,5 +13,7 @@
         public string NativeId { get; set; }
 
         public string OwnerId { get; set; }
+
+        public bool Unbearable { get; set; }
     }
 }

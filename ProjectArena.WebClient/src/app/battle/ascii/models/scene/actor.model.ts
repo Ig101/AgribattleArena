@@ -38,4 +38,6 @@ export interface Actor {
   initiative: number;
   armor: TagSynergy[];
   attackModifiers: TagSynergy[];
+  canMove: boolean;
+  canAct: boolean;
 }

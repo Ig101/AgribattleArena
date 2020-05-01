@@ -88,7 +88,7 @@ namespace ProjectArena.Engine.Objects
                 Skills.Add(new Skill(this, skill, null, null, null, null));
             }
 
-            this.AttackingSkill = new Skill(this, roleModelNative.AttackingSkill, 0, null, 1, null);
+            this.AttackingSkill = new Skill(this, roleModelNative.AttackingSkill, 0, null, null, null);
             this.BuffManager = new BuffManager(this);
             this.InitiativePosition += 1f / this.Initiative;
             this.DamageModel.SetupRoleModel(this);
@@ -97,6 +97,11 @@ namespace ProjectArena.Engine.Objects
         public override void Update(float time)
         {
             this.InitiativePosition -= time;
+            if (time > 0)
+            {
+                this.Affected = true;
+            }
+
             BuffManager.Update(time);
             foreach (Skill skill in Skills)
             {
@@ -146,6 +151,7 @@ namespace ProjectArena.Engine.Objects
         {
             if (Parent.TempTileObject == this)
             {
+                this.Affected = true;
                 this.ActionPoints += ActionPointsIncome;
                 return CheckActionAvailability();
             }

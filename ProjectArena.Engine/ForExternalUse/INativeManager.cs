@@ -15,7 +15,7 @@ namespace ProjectArena.Engine.ForExternalUse
 
         void AddRoleModelNative(string id, int defaultStrength, int defaultWillpower, int defaultConstitution, int defaultSpeed, int defaultActionPointsIncome, string attackingSkill, string[] skills);
 
-        void AddSkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, IEnumerable<string> actions);
+        void AddSkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, bool meleeOnly, IEnumerable<string> actions);
 
         void AddTileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, IEnumerable<string> actions, IEnumerable<string> onStepActions);
     }

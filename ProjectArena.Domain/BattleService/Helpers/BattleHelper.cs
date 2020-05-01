@@ -62,7 +62,8 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     Mod = actor.AttackingSkill.Mod,
                     NativeId = actor.AttackingSkill.NativeId,
                     PreparationTime = actor.AttackingSkill.PreparationTime,
-                    Range = actor.AttackingSkill.Range
+                    Range = actor.AttackingSkill.Range,
+                    MeleeOnly = actor.AttackingSkill.MeleeOnly
                 },
                 AttackModifiers = actor.AttackModifiers.Select(x => MapTagSynergy(x)),
                 AttackPower = actor.AttackPower,
@@ -92,14 +93,17 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     Mod = k.Mod,
                     NativeId = k.NativeId,
                     PreparationTime = k.PreparationTime,
-                    Range = k.Range
+                    Range = k.Range,
+                    MeleeOnly = k.MeleeOnly
                 }),
                 Speed = actor.Speed,
                 Strength = actor.Strength,
                 Willpower = actor.Willpower,
                 X = actor.X,
                 Y = actor.Y,
-                Z = actor.Z
+                Z = actor.Z,
+                CanMove = actor.CanMove,
+                CanAct = actor.CanAct
             };
         }
 
@@ -147,7 +151,8 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 OwnerId = tile.OwnerId,
                 TempActorId = tile.TempActorId,
                 X = tile.X,
-                Y = tile.Y
+                Y = tile.Y,
+                Unbearable = tile.Unbearable
             };
         }
 

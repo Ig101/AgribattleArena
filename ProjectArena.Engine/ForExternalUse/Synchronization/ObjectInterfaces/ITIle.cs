@@ -17,5 +17,7 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
         string NativeId { get; }
 
         string OwnerId { get; }
+
+        bool Unbearable { get; }
     }
 }

@@ -53,5 +53,9 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
         public IEnumerable<TagSynergyDto> Armor { get; set; }
 
         public IEnumerable<TagSynergyDto> AttackModifiers { get; set; }
+
+        public bool CanMove { get; set; }
+
+        public bool CanAct { get; set; }
     }
 }
