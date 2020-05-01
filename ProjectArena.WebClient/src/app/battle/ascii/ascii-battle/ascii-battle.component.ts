@@ -70,7 +70,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   animationsQueue: any[] = [];
   animationReplacements: any[];
 
-  selectedTile: { x: number, y: number };
+  selectedTile: { x: number, y: number, duration: number, forced: boolean };
 
   tickingFrequency = 2;
   tickState = 0;
@@ -219,7 +219,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   }
 
   onPositionSelect(x: number, y: number) {
-    this.selectedTile = x && y ? {x, y} : undefined;
+    if (!x || !y) {
+      this.selectedTile = undefined;
+    }
+    if ((!this.selectedTile || this.selectedTile.x !== x || this.selectedTile.y !== y)) {
+      this.selectedTile = {x, y, duration: 0, forced: true};
+    }
   }
 
   onMouseDown(event: MouseEvent) {
@@ -351,7 +356,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       const mouseY = Math.floor(this.mouseState.y);
       if (this.battleStorageService.scene && mouseX >= 0 && mouseY >= 0 &&
         mouseX < this.battleStorageService.scene.width && mouseY < this.battleStorageService.scene.height) {
-        this.selectedTile = {x: mouseX, y: mouseY};
+        if ((!this.selectedTile || this.selectedTile.x !== mouseX || this.selectedTile.y !== mouseY)) {
+          this.selectedTile = {x: mouseX, y: mouseY, duration: 0, forced: false};
+        }
+      } else if (this.selectedTile && !this.selectedTile.forced) {
+        this.selectedTile = undefined;
       }
       this.changed = true;
     }
@@ -393,7 +402,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         this.canvasContext.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
         this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
       }
-      const selected = this.selectedTile && this.selectedTile.x === x && this.selectedTile.y === y;
+      const selected = this.selectedTile && this.selectedTile.duration > 500 && this.selectedTile.x === x && this.selectedTile.y === y;
       if (drawChar) {
         const color = this.brightImpact(tile.bright, drawChar.color);
         this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
@@ -705,6 +714,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       const time = performance.now();
       const shift = time - this.lastChange;
       this.lastChange = time;
+      if (this.selectedTile) {
+        this.selectedTile.duration += shift;
+      }
       this.battleStorageService.turnTime -= shift / 1000;
       this.tick(shift);
     }

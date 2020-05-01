@@ -46,7 +46,7 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
         this.firstActor = dummy;
         this.otherActors = new Array<InitiativePortrait>(5);
         for (let i = 0; i < 5; i++) {
-          this.otherActors.push(dummy);
+          this.otherActors[i] = dummy;
         }
       }
     });
