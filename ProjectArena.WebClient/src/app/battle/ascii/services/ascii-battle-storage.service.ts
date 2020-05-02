@@ -27,6 +27,19 @@ export class AsciiBattleStorageService {
 
   currentInitiativeList: BehaviorSubject<InitiativePortrait[]>;
 
+  skillHotkeys = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '0'
+  ];
+
   get isValidScene() {
     return !!this.scene;
   }

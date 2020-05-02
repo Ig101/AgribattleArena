@@ -41,7 +41,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                 Tags = new[] { "area", "magic", "fire", "range" },
                 DefaultRange = 3,
                 DefaultCost = 4,
-                DefaultCd = 2,
+                DefaultCd = 3,
                 DefaultMod = 25,
                 Actions = new[] { "DoSmallAoeDamageSkill", "DoSmallAoeOneTurnStun" },
                 MeleeOnly = false

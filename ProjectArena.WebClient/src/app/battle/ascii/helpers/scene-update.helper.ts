@@ -40,7 +40,7 @@ export function synchronizeSkill(skill: Skill, syncSkill: SyncSkill) {
   skill.cd = syncSkill.cd;
   skill.cost = syncSkill.cost;
   skill.mod = syncSkill.mod;
-  skill.preparationTime = syncSkill.preparationTime;
+  skill.preparationTime = Math.ceil(syncSkill.preparationTime);
   skill.range = syncSkill.range;
   skill.meleeOnly = syncSkill.meleeOnly;
 }
@@ -50,12 +50,26 @@ export function synchronizeBuff(buff: Buff, syncBuff: SyncBuff) {
   buff.duration = syncBuff.duration;
 }
 
-function compareIdArrays(array: { id: number }[], syncArray: { id: number }[]) {
+function compareSkillIdArrays(array: Skill[], syncArray: SyncSkill[]) {
   if (syncArray.length !== array.length) {
     return false;
   }
   for (let i = 0; i < array.length; i++) {
-    if (array[i].id !== syncArray[i].id) {
+    if (array[i].id !== syncArray[i].id ||
+      array[i].preparationTime !== syncArray[i].preparationTime ||
+      array[i].cost !== syncArray[i].cost) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function compareBuffIdArrays(array: Buff[], syncArray: SyncBuff[]) {
+  if (syncArray.length !== array.length) {
+    return false;
+  }
+  for (let i = 0; i < array.length; i++) {
+    if (array[i].id !== syncArray[i].id || array[i].duration !== syncArray[i].duration) {
       return false;
     }
   }
@@ -68,7 +82,7 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
   } else if (actor.attackingSkill) {
     synchronizeSkill(actor.attackingSkill, syncActor.attackingSkill);
   }
-  if (!compareIdArrays(actor.skills, syncActor.skills)) {
+  if (!compareSkillIdArrays(actor.skills, syncActor.skills)) {
     actor.skills = syncActor.skills.map(x => {
       const skill = actor.skills.find(s => s.id === x.id);
       if (skill) {
@@ -84,7 +98,7 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
   actor.constitution = syncActor.constitution;
   actor.speed = syncActor.speed;
   actor.actionPointsIncome = syncActor.actionPointsIncome;
-  if (!compareIdArrays(actor.buffs, syncActor.buffs)) {
+  if (!compareBuffIdArrays(actor.buffs, syncActor.buffs)) {
     actor.buffs = syncActor.buffs.map(x => {
       const buff = actor.buffs.find(s => s.id === x.id);
       if (buff) {

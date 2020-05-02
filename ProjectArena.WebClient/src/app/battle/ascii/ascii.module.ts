@@ -7,11 +7,13 @@ import { AsciiBattleStorageService } from './services/ascii-battle-storage.servi
 import { AsciiBattleSynchronizerService } from './services/ascii-battle-synchronizer.service';
 import { AsciiBattlePathCreatorService } from './services/ascii-battle-path-creator.service';
 import { InitiativeBlockComponent } from './ascii-battle/initiative-block/initiative-block.component';
+import { ActionPointsBlockComponent } from './ascii-battle/action-points-block/action-points-block.component';
+import { HotkeyedButtonComponent } from './ascii-battle/hotkeyed-button/hotkeyed-button.component';
 
 
 
 @NgModule({
-  declarations: [AsciiBattleComponent, InitiativeBlockComponent],
+  declarations: [AsciiBattleComponent, InitiativeBlockComponent, ActionPointsBlockComponent, HotkeyedButtonComponent],
   providers: [
     AsciiBattleStorageService,
     AsciiBattleSynchronizerService,

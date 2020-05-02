@@ -6,19 +6,13 @@ export const actorNatives: {[id: string]: ActorNative} = {
     description: undefined,
     visualization: {
       char: '@',
-      color: { r: 255, g: 55, b: 0, a: 1 }
-    },
-    moveAction: {
-
+      color: { r: 255, g: 255, b: 255, a: 1 }
     },
     enemyName: 'Mistspawn',
     enemyDescription: undefined,
     enemyVisualization: {
       char: 'S',
       color: { r: 55, g: 55, b: 255, a: 1 }
-    },
-    enemyMoveAction: {
-
     }
   }
 };

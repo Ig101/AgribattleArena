@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ActivationEnd } from '@angular/router';
 import { BattleResolverService } from '../../resolvers/battle-resolver.service';
 import { AsciiBattleStorageService } from '../services/ascii-battle-storage.service';
 import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
@@ -27,6 +27,8 @@ import { ActionSquare } from '../models/actions/action-square.model';
 import { Visualization } from '../models/visualization.model';
 import { ActionSquareTypeEnum } from '../models/enum/action-square-type.enum';
 import { InitiativePortrait } from '../models/gui/initiativePortrait.model';
+import { SmartActionTypeEnum } from '../models/enum/smart-action-type.enum';
+import { AsciiBattlePathCreatorService } from '../services/ascii-battle-path-creator.service';
 
 // TODO Error instead of console.logs
 
@@ -91,6 +93,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     action: BattleSynchronizationActionEnum
   }[] = [];
 
+  skillList: SmartAction[] = [];
+  endTurn: SmartAction;
+  currentSkillId: number;
+  pressedKey: string;
+
   zoom = 0;
 
   get canAct() {
@@ -141,14 +148,54 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     return this.tileHeightInternal * this.battleZoom;
   }
 
+  get isMyTurn() {
+    return this.battleStorageService?.currentActor?.owner?.id === this.userService?.user.id;
+  }
+
+  get currentActorColor() {
+    return this.battleStorageService.currentActor?.visualization.color;
+  }
+
+  get maxActionPoints() {
+    return 8;
+  }
+
+  get currentActionPoints() {
+    return this.battleStorageService.currentActor?.actionPoints;
+  }
+
+  get actionPointsAfterSpend() {
+    const mouseX = Math.floor(this.mouseState.x);
+    const mouseY = Math.floor(this.mouseState.y);
+    const currentActionSquare = this.battleStorageService.availableActionSquares
+      ?.find(s => s.x === mouseX && s.y === mouseY && s.type !== ActionSquareTypeEnum.Actor);
+    return ((currentActionSquare?.remainedPoints + 1) || (this.battleStorageService.currentActor?.actionPoints + 1)) - 1;
+  }
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private battleResolver: BattleResolverService,
     private battleStorageService: AsciiBattleStorageService,
     private battleSynchronizerService: AsciiBattleSynchronizerService,
+    private battlePathCreator: AsciiBattlePathCreatorService,
     private arenaHub: ArenaHubService,
     private userService: UserService
   ) {
+    this.endTurn = {
+      hotKey: ' ',
+      type: SmartActionTypeEnum.Hold,
+      smartValue: 0,
+      pressed: false,
+      actions: [() => {
+        this.specificActionResponseForWait = {
+          actorId: this.battleStorageService.currentActor.id,
+          action: BattleSynchronizationActionEnum.Wait
+        };
+        this.arenaHub.orderWait(this.battleStorageService.currentActor.id);
+      }],
+      title: 'End turn',
+      disabled: undefined
+    };
     this.mouseState.buttonsInfo[0] = {
       pressed: false,
       timeStamp: 0
@@ -193,6 +240,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       this.lastChange = performance.now();
       this.changed = true;
       this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
+      this.recalculateSkillActions();
     }
     this.drawingTimer = setInterval(this.updateCycle, this.updatingFrequency, this);
     this.processNextActionFromQueue();
@@ -246,24 +294,35 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         ?.find(s => s.x === x && s.y === y && s.type !== ActionSquareTypeEnum.Actor);
         if (currentActionSquare) {
           // TODO cast spells
-          this.actionsQueue = [
-            ...currentActionSquare.parentSquares.filter(s => s.type !== ActionSquareTypeEnum.Actor)
-              .reverse().map(s => {
-                return {
-                actorId: this.battleStorageService.currentActor.id,
-                x: s.x,
-                y: s.y,
-                action: s.type === ActionSquareTypeEnum.Move ? BattleSynchronizationActionEnum.Move : BattleSynchronizationActionEnum.Attack
-                };
-              }), {
-                actorId: this.battleStorageService.currentActor.id,
-                x: currentActionSquare.x,
-                y: currentActionSquare.y,
-                action: currentActionSquare.type === ActionSquareTypeEnum.Move ?
-                  BattleSynchronizationActionEnum.Move :
-                  BattleSynchronizationActionEnum.Attack
-              }];
-          this.sendActionFromQueue();
+          if (this.currentSkillId) {
+            this.arenaHub.orderCast(
+              this.battleStorageService.currentActor.id,
+              this.currentSkillId,
+              currentActionSquare.x,
+              currentActionSquare.y);
+            this.resetSkillActions();
+          } else {
+            this.actionsQueue = [
+              ...currentActionSquare.parentSquares.filter(s => s.type !== ActionSquareTypeEnum.Actor)
+                .reverse().map(s => {
+                  return {
+                  actorId: this.battleStorageService.currentActor.id,
+                  x: s.x,
+                  y: s.y,
+                  action: s.type === ActionSquareTypeEnum.Move ?
+                    BattleSynchronizationActionEnum.Move :
+                    BattleSynchronizationActionEnum.Attack
+                  };
+                }), {
+                  actorId: this.battleStorageService.currentActor.id,
+                  x: currentActionSquare.x,
+                  y: currentActionSquare.y,
+                  action: currentActionSquare.type === ActionSquareTypeEnum.Move ?
+                    BattleSynchronizationActionEnum.Move :
+                    BattleSynchronizationActionEnum.Attack
+                }];
+            this.sendActionFromQueue();
+          }
         }
       }
     }
@@ -284,49 +343,46 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     }
   }
 
-  onKeyPress(event: KeyboardEvent) {
-
+  onKeyDown(event: KeyboardEvent) {
+    this.pressedKey = event.key;
+    this.endTurn.pressed = false;
+    for (const skill of this.skillList) {
+      skill.pressed = false;
+    }
+    const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
+    if (action && this.canAct && !action?.disabled) {
+      action.pressed = true;
+    } else if (event.key !== 'Escape') {
+      this.pressedKey = undefined;
+    }
   }
 
-  onKeyDown(event: KeyboardEvent) {
-    /*const action = this.gameSettingsService.smartActionsKeyBindings[event.key];
-    if (action && !this.blocked) {
-      const thisAction = this.pressedKey && this.pressedKey.action === action;
-      if (thisAction && this.pressedKey.pressedTime > 0) {
-        return;
-      }
-      if (!thisAction) {
-        this.pressedKey = {
-          pressedTime: 120,
-          action,
-          key: event.key
-        };
-      } else {
-        this.pressedKey.pressedTime = 120;
-      }
-      const x = this.pressedKey.action.xShift + this.gameStateService.playerX;
-      const y = this.pressedKey.action.yShift + this.gameStateService.playerY;
-      const validation = this.engineFacadeService.validateSmartAction(x, y);
-      if (validation.success) {
-        this.doSmartAction(x, y);
-      } else if (validation.reason) {
-        for (const logItem of this.log) {
-          logItem.expiring = true;
-        }
-        this.drawAnimationMessage({
-          level: ReactionMessageLevelEnum.Information,
-          message: validation.reason
-        });
+  private resetSkillActions() {
+    for (const action of this.skillList) {
+      if  (action.smartValue > 0) {
+        action.actions[action.smartValue]();
+        this.changed = true;
       }
     }
-    if (action) {
-    }*/
   }
 
   onKeyUp(event: KeyboardEvent) {
-    /*if (this.pressedKey && this.pressedKey.key === event.key) {
+    if (this.pressedKey === event.key && event.key === 'Escape') {
+      this.resetSkillActions();
+    }
+    if (this.pressedKey === event.key && this.canAct) {
+      const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
+      if (action?.pressed && !action?.disabled) {
+        if (action.type === SmartActionTypeEnum.Toggle) {
+          action.actions[action.smartValue]();
+        } else if (action.type !== SmartActionTypeEnum.Hold || action.smartValue >= 1) {
+          action.actions[0]();
+        }
+        action.pressed = false;
+        this.changed = true;
+      }
       this.pressedKey = undefined;
-    }*/
+    }
   }
 
   @HostListener('contextmenu', ['$event'])
@@ -442,6 +498,33 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           ${color.b}, ${color.a})`;
         this.canvasContext.fillText(tile.visualization.char, canvasX, symbolY);
       }
+      if (tile.actor || tile.decoration) {
+        const healthObject = tile.actor || tile.decoration;
+        const percentOfHealth = Math.max(0, Math.min(healthObject.health / healthObject.maxHealth, 1));
+        let color: Color;
+        if (percentOfHealth > 0.65) {
+          color = {r: 0, g: 255, b: 0};
+        } else if (percentOfHealth > 0.25) {
+          color = {r: 255, g: 255, b: 0};
+        } else {
+          color = {r: 255, g: 0, b: 0};
+        }
+        color = this.brightImpact(tile.bright, color);
+        const zoomMultiplier = Math.floor(this.battleZoom);
+        this.canvasContext.lineWidth = zoomMultiplier * 2;
+        /*this.canvasContext.strokeStyle = `#000818`;
+        const backgroundPath = new Path2D();
+        backgroundPath.moveTo(canvasX + 1 + zoomMultiplier, canvasY + 1 + zoomMultiplier);
+        backgroundPath.lineTo(canvasX + this.tileWidth - 1 - zoomMultiplier, canvasY + 1 + zoomMultiplier);
+        this.canvasContext.stroke(backgroundPath);*/
+        this.canvasContext.strokeStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+        const path = new Path2D();
+        path.moveTo(canvasX + 1 + zoomMultiplier, canvasY + 1 + zoomMultiplier);
+        path.lineTo(
+          canvasX + percentOfHealth * (this.tileWidth - 2 * 1 - zoomMultiplier) + 1 + zoomMultiplier,
+          canvasY + 1 + zoomMultiplier);
+        this.canvasContext.stroke(path);
+      }
     }
   }
 
@@ -514,14 +597,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           this.drawPoint(scene, x, y, cameraLeft, cameraTop, drawChar);
         }
       }
-      /*if (currentTile) {
-        this.canvasContext.strokeStyle = `rgba(${255}, ${0}, ${0}, 0.4)`;
-        this.canvasContext.lineWidth = 2;
-        this.canvasContext.strokeRect(currentTile.canvasX + 2, currentTile.canvasY + 2, this.tileWidth - 4, this.tileHeight - 4);
-      }*/
       if (this.battleStorageService.availableActionSquares?.length > 0) {
         const path = this.generateActionSquareGrid(cameraLeft, cameraTop);
-        this.canvasContext.strokeStyle = `rgba(${255}, ${255}, ${0}, 0.8)`;
+        this.canvasContext.strokeStyle = this.currentSkillId ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 255, 0, 0.8)';
         this.canvasContext.lineWidth = 2;
         this.canvasContext.stroke(path);
       }
@@ -615,6 +693,65 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     return portraits;
   }
 
+  private recalculateSkillActions() {
+    if (this.isMyTurn) {
+      this.skillList.length = this.battleStorageService.currentActor.skills.length;
+      for (let i = 0; i < this.skillList.length; i++) {
+        if (!this.skillList[i]) {
+          this.skillList[i] = {
+            hotKey: this.battleStorageService.skillHotkeys[i],
+            type: SmartActionTypeEnum.Toggle,
+            pressed: this.pressedKey === this.battleStorageService.skillHotkeys[i],
+            title: this.battleStorageService.currentActor.skills[i].name,
+            smartValue: this.battleStorageService.currentActor.skills[i].id === this.currentSkillId ? 1 : 0,
+            actions: [
+              () => {
+                const skill = this.battleStorageService.currentActor.skills[i];
+                const actor = this.battleStorageService.currentActor;
+                this.currentSkillId = skill.id;
+                this.battleStorageService.availableActionSquares =
+                  this.battlePathCreator.calculateActiveSquares(actor, this.currentSkillId);
+                for (const action of this.skillList) {
+                  action.smartValue = 0;
+                }
+                this.skillList[i].smartValue = 1;
+              },
+              () => {
+                this.currentSkillId = undefined;
+                this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
+                this.skillList[i].smartValue = 0;
+              }],
+            smartObject: this.battleStorageService.currentActor.skills[i],
+            disabled:
+              this.battleStorageService.currentActor.skills[i].cost > this.battleStorageService.currentActor.actionPoints ?
+              `Not enough action points. Need ${this.battleStorageService.currentActor.skills[i].cost}` :
+              this.battleStorageService.currentActor.skills[i].preparationTime > 0 ?
+              `Skill will be available after ${Math.floor(this.battleStorageService.currentActor.skills[i].preparationTime)} turns` :
+              !this.battleStorageService.currentActor.canAct ?
+              `Characted cannot act this time` :
+              undefined
+          };
+        } else {
+          if (this.skillList[i].smartObject !== this.battleStorageService.currentActor.skills[i]) {
+            this.skillList[i].title = this.battleStorageService.currentActor.skills[i].name;
+            this.skillList[i].smartValue = this.battleStorageService.currentActor.skills[i].id === this.currentSkillId ? 1 : 0;
+            this.skillList[i].smartObject = this.battleStorageService.currentActor.skills[i];
+          }
+          this.skillList[i].disabled =
+            this.battleStorageService.currentActor.skills[i].cost > this.battleStorageService.currentActor.actionPoints ?
+            `Not enough action points. Need ${this.battleStorageService.currentActor.skills[i].cost}` :
+            this.battleStorageService.currentActor.skills[i].preparationTime > 0 ?
+            `Skill will be available after ${Math.floor(this.battleStorageService.currentActor.skills[i].preparationTime)} turns` :
+            !this.battleStorageService.currentActor.canAct ?
+            `Characted cannot act this time` :
+            undefined;
+        }
+      }
+    } else {
+      this.skillList.length = 0;
+    }
+  }
+
   private processNextActionFromQueue() {
     this.receivingMessagesFromHubAllowed = false;
     if (this.battleStorageService.version + 1 < this.arenaHub.firstActionVersion) {
@@ -692,6 +829,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         this.specificActionResponseForWait = undefined;
       }
     }
+    this.recalculateSkillActions();
     if (!this.specificActionResponseForWait) {
       this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
     }

@@ -77,7 +77,7 @@ export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Sk
     cd: skill.cd,
     mod: skill.mod,
     cost: skill.cost,
-    preparationTime: skill.preparationTime,
+    preparationTime: Math.ceil(skill.preparationTime),
     meleeOnly: skill.meleeOnly
   };
 }
@@ -108,18 +108,15 @@ export function convertActor(actor: SyncActor, owner: Player, isCurrentPlayerTea
     console.log(`Native error id: ${actor.nativeId}`);
   }
   const visualization = isCurrentPlayerTeam ? native.visualization : native.enemyVisualization;
-  const moveAction = isCurrentPlayerTeam ? native.moveAction : native.enemyMoveAction;
   return {
     id: actor.id,
     name: isCurrentPlayerTeam ? native.name : native.enemyName,
     description: isCurrentPlayerTeam ? native.description : native.enemyDescription,
     defaultVisualization: visualization,
-    defaultMoveAction: moveAction,
     visualization: {
       char: visualization.char,
       color: { r: visualization.color.r, g: visualization.color.g, b: visualization.color. b, a: visualization.color.a }
     },
-    moveAction: cloneTwoPhaseActionAnimation(moveAction),
     externalId: actor.externalId,
     attackingSkill: convertSkill(actor.attackingSkill, isCurrentPlayerTeam),
     strength: actor.strength,

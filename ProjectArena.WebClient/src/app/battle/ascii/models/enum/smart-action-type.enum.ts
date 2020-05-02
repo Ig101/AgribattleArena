@@ -1,4 +1,5 @@
 export enum SmartActionTypeEnum {
-  CastSwitch,
-  Wait
+  Click,
+  Hold,
+  Toggle
 }

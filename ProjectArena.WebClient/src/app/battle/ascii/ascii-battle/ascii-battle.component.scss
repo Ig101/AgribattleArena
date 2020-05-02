@@ -23,4 +23,110 @@
   app-initiative-block {
     margin: 5px;
   }
+  .control-block {
+    display: flex;
+    flex-direction: column;
+    .casting-block {
+      display: flex;
+      flex-direction: row;
+      app-action-points-block {
+        margin: 5px;
+      }
+      .skills {
+        margin: 5px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        flex: 1;
+        app-hotkeyed-button {
+          margin: 2px;
+          cursor: pointer;
+          padding: 2px;
+          flex-direction: column;
+
+          div {
+            cursor: inherit !important;
+            overflow: hidden;
+            display: block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+        app-hotkeyed-button:hover {
+          color: #ff4;
+        }
+      
+        app-hotkeyed-button:active {
+          color: #aa0;
+        }
+
+        .active
+        {
+          color: #aa0 !important;
+        }
+
+        .toggled
+        {
+          color: #f00;
+        }
+
+        .toggled:hover {
+          color: #a00;
+        }
+
+        .toggled:active {
+          color: #800;
+        }
+
+        .active-toggled
+        {
+          color: #800 !important;
+        }
+
+        .disabled
+        {
+          cursor: default;
+          color: #ccc !important;
+        }
+      }
+    }
+    .end-turn {
+      cursor: pointer;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin: 5px;
+      display: flex;
+      background-clip: text !important;
+      color: transparent;
+      background-color: #fff !important;
+      .button-content {
+        display: flex;
+        flex-direction: column;
+      }
+      .medium {
+        cursor: inherit !important;
+        display: flex;
+        justify-content: center;
+        font-weight: 800;
+        margin: 0 2px;
+      }
+      .small {
+        cursor: inherit !important;
+        display: flex;
+        justify-content: center;
+        font-weight: 600;
+        margin: 0 2px;
+      }
+    }
+    .end-turn:hover {
+      background-color: #ff4 !important;
+    }
+  }
+  .non-control-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 394px;
+  }
 }

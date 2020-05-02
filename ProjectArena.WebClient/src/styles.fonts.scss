@@ -1,11 +1,13 @@
 .article-font {
   line-height: 22px !important;
+  font-weight: normal;
   font: 18px PT Mono;
 }
 
 .article-font-inactive {
   line-height: 22px !important;
   font: 18px PT Mono;
+  font-weight: normal;
   cursor: default;
   -webkit-touch-callout: none;
   -webkit-user-select: none;

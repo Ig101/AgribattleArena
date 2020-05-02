@@ -11,9 +11,7 @@ export interface Actor {
   name: string;
   description: string;
   defaultVisualization: Visualization;
-  defaultMoveAction: TwoPhaseActionAnimation;
   visualization: Visualization;
-  moveAction: TwoPhaseActionAnimation;
 
   externalId?: number;
   attackingSkill: Skill;
