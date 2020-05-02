@@ -281,7 +281,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
 
   onMouseUp(event: MouseEvent) {
     this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
-    if (!this.blocked) {
+    if (!this.blocked && !this.skillList.find(x => x.pressed) && !this.endTurn.pressed) {
       this.recalculateMouseMove(event.x, event.y, event.timeStamp);
       if (event.button === 2) {
         // Context
@@ -326,6 +326,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         }
       }
     }
+    this.resetButtonsPressedState();
   }
 
   onMouseLeave() {
@@ -343,12 +344,16 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     }
   }
 
-  onKeyDown(event: KeyboardEvent) {
-    this.pressedKey = event.key;
+  resetButtonsPressedState() {
     this.endTurn.pressed = false;
     for (const skill of this.skillList) {
       skill.pressed = false;
     }
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    this.pressedKey = event.key;
+    this.resetButtonsPressedState();
     const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
     if (action && this.canAct && !action?.disabled) {
       action.pressed = true;
@@ -375,7 +380,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       if (action?.pressed && !action?.disabled) {
         if (action.type === SmartActionTypeEnum.Toggle) {
           action.actions[action.smartValue]();
-        } else if (action.type !== SmartActionTypeEnum.Hold || action.smartValue >= 1) {
+        } else if (action.type !== SmartActionTypeEnum.Hold || action.smartValue >= 0.95) {
           action.actions[0]();
         }
         action.pressed = false;

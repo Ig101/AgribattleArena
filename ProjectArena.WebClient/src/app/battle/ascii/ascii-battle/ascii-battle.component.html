@@ -16,7 +16,7 @@
         [actionPointsAfterSpendCount]="actionPointsAfterSpend"
         [actorColor]="currentActorColor"></app-action-points-block>
       <div class="skills">
-        <app-hotkeyed-button *ngFor="let item of skillList" [ngClass]="{
+        <app-hotkeyed-button (mouseDown)="resetButtonsPressedState()" (mouseUp)="changed = true;" *ngFor="let item of skillList" [pressedKey]="pressedKey" [ngClass]="{
           active: item.pressed && item.smartValue === 0,
           toggled: item.smartValue === 1,
           disabled: !canAct || item.disabled,
@@ -28,7 +28,7 @@
         </app-hotkeyed-button>
       </div>
     </div>
-    <app-hotkeyed-button [smartAction]="endTurn" class="end-turn" 
+    <app-hotkeyed-button (mouseDown)="resetButtonsPressedState()" (mouseUp)="changed = true;" [smartAction]="endTurn" [pressedKey]="pressedKey" class="end-turn" 
       [style.background]="endTurn.pressed ?
         'linear-gradient(to right, #aa0 ' + (endTurn.smartValue * 100) + '%, #ff4 ' + (endTurn.smartValue * 100) + '%)' :
         '#fff'">
