@@ -36,7 +36,7 @@ namespace ProjectArena.Tests.Engine
             Assert.That(SyncMessages[1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndTurn), "Check EndTurn message action");
             Assert.That(SyncMessages[1].Version, Is.EqualTo(2), "Check version of EndTurn message");
             Assert.That(SyncMessages[1].SyncInfo.TempActor, Is.Not.Null, "Check tempActor in EndTurn message");
-            Assert.That(SyncMessages[1].SyncInfo.ChangedActors.Count(), Is.EqualTo(0), "Check changedActors count in EndTurn message");
+            Assert.That(SyncMessages[1].SyncInfo.ChangedActors.Count(), Is.EqualTo(2), "Check changedActors count in EndTurn message");
             Assert.That(SyncMessages[1].SyncInfo.ChangedTiles.Count(), Is.EqualTo(0), "Check changedTiles count in EndTurn message");
             Assert.That(SyncMessages[1].SyncInfo.DeletedActors.Count(), Is.EqualTo(0), "Check deletedActors count in EndTurn message");
         }

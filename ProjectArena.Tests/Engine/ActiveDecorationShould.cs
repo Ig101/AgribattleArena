@@ -43,7 +43,7 @@ namespace ProjectArena.Tests.Engine
             Assert.That(SyncMessages[4].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Decoration), "Decoration action");
             for (int i = 0; i < 6; i++)
             {
-                Assert.That(SyncMessages[i].SyncInfo.ChangedDecorations.Count(), Is.EqualTo(i == 4 || i == 0 ? 1 : 0), "Check message decorations " + i);
+                Assert.That(SyncMessages[i].SyncInfo.ChangedDecorations.Count(), Is.EqualTo(i == 2 ? 0 : 1), "Check message decorations " + i);
             }
 
             Assert.That(Scene.TempTileObject, Is.EqualTo(Scene.Actors[0]), "Temp tile object at last");

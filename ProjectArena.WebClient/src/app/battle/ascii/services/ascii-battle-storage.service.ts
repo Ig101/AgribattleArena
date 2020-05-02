@@ -6,6 +6,8 @@ import { Player } from '../models/player.model';
 import { ActionSquare } from '../models/actions/action-square.model';
 import { InitiativePortrait } from '../models/gui/initiativePortrait.model';
 import { BehaviorSubject } from 'rxjs';
+import { AnimationDeclaration } from '../models/animations/animation-declaration.model';
+import { AnimationTile } from '../models/animations/animation-tile.model';
 
 @Injectable()
 export class AsciiBattleStorageService {
@@ -24,6 +26,8 @@ export class AsciiBattleStorageService {
 
   availableActionSquares: ActionSquare[];
   defaultActionSquares: ActionSquare[];
+
+  currentAnimations: AnimationTile[][];
 
   currentInitiativeList: BehaviorSubject<InitiativePortrait[]>;
 

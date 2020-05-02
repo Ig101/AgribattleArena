@@ -18,19 +18,23 @@ import { SpecEffect } from '../models/scene/spec-effect.model';
 
 export function cloneActionAnimation(animation: ActionAnimation): ActionAnimation {
   return {
-
+    generateDeclarations: animation.generateDeclarations
   };
 }
 
 export function cloneTwoPhaseActionAnimation(animation: TwoPhaseActionAnimation): TwoPhaseActionAnimation {
   return {
-
+    generateIssueDeclarations: animation.generateIssueDeclarations,
+    generateSyncDeclarations: animation.generateSyncDeclarations
   };
 }
 
 export function cloneBuffAnimation(animation: BuffAnimation): BuffAnimation {
   return {
-
+    doSomethingWithBearer: animation.doSomethingWithBearer,
+    resetEffect: animation.resetEffect,
+    colorDifference: { r: 0, g: 0, b: 0, a: 0 },
+    changedChar: false
   };
 }
 

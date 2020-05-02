@@ -9,6 +9,7 @@ import { AsciiBattlePathCreatorService } from './services/ascii-battle-path-crea
 import { InitiativeBlockComponent } from './ascii-battle/initiative-block/initiative-block.component';
 import { ActionPointsBlockComponent } from './ascii-battle/action-points-block/action-points-block.component';
 import { HotkeyedButtonComponent } from './ascii-battle/hotkeyed-button/hotkeyed-button.component';
+import { AsciiBattleAnimationsService } from './services/ascii-battle-animations.service';
 
 
 
@@ -17,7 +18,8 @@ import { HotkeyedButtonComponent } from './ascii-battle/hotkeyed-button/hotkeyed
   providers: [
     AsciiBattleStorageService,
     AsciiBattleSynchronizerService,
-    AsciiBattlePathCreatorService
+    AsciiBattlePathCreatorService,
+    AsciiBattleAnimationsService
   ],
   imports: [
     SharedModule,

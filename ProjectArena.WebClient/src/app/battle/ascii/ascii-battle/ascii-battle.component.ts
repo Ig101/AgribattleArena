@@ -29,6 +29,7 @@ import { ActionSquareTypeEnum } from '../models/enum/action-square-type.enum';
 import { InitiativePortrait } from '../models/gui/initiativePortrait.model';
 import { SmartActionTypeEnum } from '../models/enum/smart-action-type.enum';
 import { AsciiBattlePathCreatorService } from '../services/ascii-battle-path-creator.service';
+import { AsciiBattleAnimationsService } from '../services/ascii-battle-animations.service';
 
 // TODO Error instead of console.logs
 
@@ -65,13 +66,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     realY: -1
   };
 
-  firstAnimation = false;
-  animationsLoaded = false;
-  animationTimer;
-  animationFrequency = 30;
-  animationsQueue: any[] = [];
-  animationReplacements: any[];
-
   selectedTile: { x: number, y: number, duration: number, forced: boolean };
 
   tickingFrequency = 2;
@@ -80,6 +74,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   onCloseSubscription: Subscription;
   arenaActionsSubscription: Subscription;
   synchronizationErrorSubscription: Subscription;
+  animationSubscription: Subscription;
 
   receivingMessagesFromHubAllowed = false;
   specificActionResponseForWait: {
@@ -100,10 +95,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
 
   zoom = 0;
 
+  animationTicker = false;
+
   get canAct() {
     return !this.blocked && !this.specificActionResponseForWait && this.actionsQueue.length === 0 &&
       this.battleStorageService.turnTime > 0 &&
-      this.battleStorageService.currentActor?.owner?.id === this.userService.user.id;
+      this.battleStorageService.currentActor?.owner?.id === this.userService.user.id &&
+      this.receivingMessagesFromHubAllowed;
   }
 
   get canvasWidth() {
@@ -179,7 +177,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     private battleSynchronizerService: AsciiBattleSynchronizerService,
     private battlePathCreator: AsciiBattlePathCreatorService,
     private arenaHub: ArenaHubService,
-    private userService: UserService
+    private userService: UserService,
+    private battleAnimationsService: AsciiBattleAnimationsService
   ) {
     this.endTurn = {
       hotKey: ' ',
@@ -192,6 +191,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           action: BattleSynchronizationActionEnum.Wait
         };
         this.arenaHub.orderWait(this.battleStorageService.currentActor.id);
+        if (this.battleAnimationsService
+          .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Wait, this.battleStorageService.currentActor)) {
+          this.receivingMessagesFromHubAllowed = false;
+        }
       }],
       title: 'End turn',
       disabled: undefined
@@ -212,6 +215,21 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         console.log('Synchronization error');
       }
     });
+    this.animationSubscription = battleAnimationsService.generationConclusion.subscribe(() => {
+      console.log('generation ended');
+      if (this.specificActionResponseForWait) {
+        if (this.actionsQueue.length > 0) {
+          this.sendActionFromQueue();
+        } else {
+          this.specificActionResponseForWait = undefined;
+        }
+      }
+      this.recalculateSkillActions();
+      if (!this.specificActionResponseForWait) {
+        this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
+      }
+      this.processNextActionFromQueue();
+    });
     this.arenaActionsSubscription = arenaHub.battleSynchronizationActionsNotifier.subscribe(() => {
       if (this.receivingMessagesFromHubAllowed) {
         this.processNextActionFromQueue();
@@ -224,6 +242,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     this.onCloseSubscription.unsubscribe();
     this.arenaActionsSubscription.unsubscribe();
     this.synchronizationErrorSubscription.unsubscribe();
+    this.animationSubscription.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -235,12 +254,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     if (loadBattle) {
       console.log('Restore game');
       const snapshot = this.battleResolver.popBattleSnapshot();
-      this.battleSynchronizerService.restoreSceneFromSnapshot(snapshot);
-      this.battleStorageService.version = snapshot.version;
-      this.lastChange = performance.now();
-      this.changed = true;
-      this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
-      this.recalculateSkillActions();
+      this.restoreScene(snapshot);
     }
     this.drawingTimer = setInterval(this.updateCycle, this.updatingFrequency, this);
     this.processNextActionFromQueue();
@@ -280,16 +294,17 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   }
 
   onMouseUp(event: MouseEvent) {
-    this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
     if (!this.blocked && !this.skillList.find(x => x.pressed) && !this.endTurn.pressed) {
+      this.recalculateMouseMove(event.x, event.y, event.timeStamp);
+      this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
+      const x = Math.floor(this.mouseState.x);
+      const y = Math.floor(this.mouseState.y);
       this.recalculateMouseMove(event.x, event.y, event.timeStamp);
       if (event.button === 2) {
         // Context
       }
-      if (event.button === 0 && this.canAct) {
+      if (event.button === 0 && this.canAct && Math.floor(this.mouseState.x) === x && Math.floor(this.mouseState.y) === y) {
         // Action
-        const x = Math.floor(this.mouseState.x);
-        const y = Math.floor(this.mouseState.y);
         const currentActionSquare = this.battleStorageService.availableActionSquares
         ?.find(s => s.x === x && s.y === y && s.type !== ActionSquareTypeEnum.Actor);
         if (currentActionSquare) {
@@ -301,6 +316,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
               currentActionSquare.x,
               currentActionSquare.y);
             this.resetSkillActions();
+            if (this.battleAnimationsService
+              .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Cast, this.battleStorageService.currentActor,
+              currentActionSquare.x, currentActionSquare.y, this.currentSkillId)) {
+              this.receivingMessagesFromHubAllowed = false;
+            }
           } else {
             this.actionsQueue = [
               ...currentActionSquare.parentSquares.filter(s => s.type !== ActionSquareTypeEnum.Actor)
@@ -325,6 +345,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           }
         }
       }
+    } else {
+      this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
     }
     this.resetButtonsPressedState();
   }
@@ -634,6 +656,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           !tile.unbearable && !tile.actor && !tile.decoration &&
           Math.abs(tile.height - initialTile.height) < 10) {
           this.arenaHub.orderMove(newAction.actorId, newAction.x, newAction.y);
+          if (this.battleAnimationsService
+            .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
+            newAction.x, newAction.y)) {
+            this.receivingMessagesFromHubAllowed = false;
+          }
         } else {
           console.log('cannot move');
           this.specificActionResponseForWait = undefined;
@@ -645,6 +672,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           (!this.battleStorageService.currentActor.attackingSkill.meleeOnly || Math.abs(tile.height - initialTile.height) < 10) &&
           (tile.actor || tile.decoration) && tile.actor !== this.battleStorageService.currentActor) {
           this.arenaHub.orderAttack(newAction.actorId, newAction.x, newAction.y);
+          if (this.battleAnimationsService
+            .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Attack, this.battleStorageService.currentActor,
+            newAction.x, newAction.y)) {
+            this.receivingMessagesFromHubAllowed = false;
+          }
         } else {
           console.log('cannot attack');
           this.specificActionResponseForWait = undefined;
@@ -769,6 +801,15 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       this.receivingMessagesFromHubAllowed = true;
       return;
     }
+    let onlySecondPart = false;
+    if (this.specificActionResponseForWait) {
+      if (!action.sync.actorId ||
+        action.sync.actorId !== this.specificActionResponseForWait.actorId) {
+        console.log('Awaiting action version issue');
+        return;
+      }
+      onlySecondPart = true;
+    }
     const currentPlayer = action.sync.players.find(x => x.id === this.userService.user.id);
     if (currentPlayer.status === BattlePlayerStatusEnum.Defeated) {
       console.log('DEFEAT');
@@ -778,67 +819,26 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       case BattleSynchronizationActionEnum.StartGame:
         console.log('Start game');
         // TODO Add some introducing animations
-        this.battleSynchronizerService.restoreSceneFromSnapshot(action.sync);
-        this.lastChange = performance.now();
-        break;
+        this.restoreScene(action.sync);
+        return;
       case BattleSynchronizationActionEnum.EndGame:
         if (currentPlayer.status === BattlePlayerStatusEnum.Victorious) {
           console.log('VICTORY');
         }
-        this.battleSynchronizerService.synchronizeScene(action.sync);
-        return;
-      case BattleSynchronizationActionEnum.NoActorsDraw:
-        console.log('DRAW');
-        this.battleSynchronizerService.synchronizeScene(action.sync);
-        break;
-      case BattleSynchronizationActionEnum.SkipTurn:
-        console.log('Skip turn');
-        this.battleSynchronizerService.synchronizeScene(action.sync);
-        break;
-      case BattleSynchronizationActionEnum.EndTurn:
-        console.log('End turn');
-        this.battleSynchronizerService.synchronizeScene(action.sync);
-        break;
-      case BattleSynchronizationActionEnum.Attack:
-        console.log('Attack');
-        this.battleSynchronizerService.synchronizeScene(action.sync);
-        break;
-      case BattleSynchronizationActionEnum.Cast:
-        console.log('Cast');
-        this.battleSynchronizerService.synchronizeScene(action.sync);
-        break;
-      case BattleSynchronizationActionEnum.Decoration:
-        console.log('Decoration acts');
-        this.battleSynchronizerService.synchronizeScene(action.sync);
-        break;
-      case BattleSynchronizationActionEnum.Move:
-        console.log('Move');
-        this.battleSynchronizerService.synchronizeScene(action.sync);
-        break;
-      case BattleSynchronizationActionEnum.Wait:
-        console.log('Wait');
-        this.battleSynchronizerService.synchronizeScene(action.sync);
         break;
     }
+    if (!this.battleAnimationsService.generateAnimationsFromSynchronizer(action, onlySecondPart)) {
+      this.processNextActionFromQueue();
+    }
+  }
+
+  private restoreScene(snapshot: Synchronizer) {
+    this.battleSynchronizerService.restoreSceneFromSnapshot(snapshot);
+    this.battleStorageService.version = snapshot.version;
+    this.lastChange = performance.now();
     this.changed = true;
-    this.battleStorageService.version = action.sync.version;
-    if (this.specificActionResponseForWait) {
-      if (!action.sync.tempActor ||
-        action.sync.tempActor !== this.specificActionResponseForWait.actorId) {
-        console.log('Awaiting action version issue');
-        return;
-      }
-      if (this.actionsQueue.length > 0) {
-        this.sendActionFromQueue();
-      } else {
-        this.specificActionResponseForWait = undefined;
-      }
-    }
+    this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
     this.recalculateSkillActions();
-    if (!this.specificActionResponseForWait) {
-      this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
-    }
-    setTimeout(() => this.processNextActionFromQueue());
   }
 
   private tick(time: number) {
@@ -861,6 +861,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         this.selectedTile.duration += shift;
       }
       this.battleStorageService.turnTime -= shift / 1000;
+      if (this.animationTicker && this.battleAnimationsService.processNextAnimationFromQueue()) {
+        this.changed = true;
+      }
+      this.animationTicker = !this.animationTicker;
       this.tick(shift);
     }
   }

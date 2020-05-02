@@ -4,6 +4,7 @@ import { Skill } from './skill.model';
 import { Visualization } from '../visualization.model';
 import { Player } from '../player.model';
 import { TwoPhaseActionAnimation } from '../two-phase-action-animation.model';
+import { Color } from 'src/app/shared/models/color.model';
 
 export interface Actor {
   id: number;

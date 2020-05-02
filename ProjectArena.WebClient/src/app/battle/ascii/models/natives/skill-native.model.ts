@@ -1,11 +1,11 @@
-import { ActionAnimation } from '../action-animation.model';
+import { TwoPhaseActionAnimation } from '../two-phase-action-animation.model';
 
 export interface SkillNative {
   name: string;
   description: string;
-  action: ActionAnimation;
+  action: TwoPhaseActionAnimation;
 
   alternativeForm: boolean;
   enemyName?: string;
-  enemyAction?: ActionAnimation;
+  enemyAction?: TwoPhaseActionAnimation;
 }
