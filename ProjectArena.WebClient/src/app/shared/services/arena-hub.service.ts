@@ -112,13 +112,13 @@ export class ArenaHubService {
     if (this.battleSynchronizationActionsList.length === 0) {
       return undefined;
     }
-    const synchronizationObject = this.battleSynchronizationActionsList[0];
     while (this.battleSynchronizationActionsList[0].sync.version <= currentVersion) {
       this.battleSynchronizationActionsList.shift();
     }
     if (this.battleSynchronizationActionsList[0].sync.version !== currentVersion + 1) {
       return undefined;
     }
+    const synchronizationObject = this.battleSynchronizationActionsList[0];
     this.battleSynchronizationActionsList.shift();
     if (this.battleSynchronizationActionsList.length > 0) {
       this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;

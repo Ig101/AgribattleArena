@@ -5,8 +5,10 @@ export interface AnimationTile {
   y: number;
   char: string;
   color: Color;
-  unitColorMultiplier?: number;
-  overflowHealth?: boolean;
+  unitAlpha: boolean;
+  unitColorMultiplier: number;
+  overflowHealth: boolean;
   priority: number;
-  ignoreHeight?: boolean;
+  ignoreHeight: boolean;
+  workingOnSpecEffects: boolean;
 }

@@ -17,7 +17,9 @@ export class AsciiBattleAnimationsService {
 
   animationsLoaded: boolean;
 
-  generationConclusion = new Subject<any>();
+  generationConclusion = new Subject<boolean>();
+
+  private pending = false;
 
   constructor(
     private battleSynchronizationService: AsciiBattleSynchronizerService,
@@ -26,6 +28,7 @@ export class AsciiBattleAnimationsService {
 
   private synchronizeFromSynchronizer(synchronizer: { action: BattleSynchronizationActionEnum, sync: Synchronizer}) {
     this.battleSynchronizationService.synchronizeScene(synchronizer.sync);
+    this.battleStorageService.version = synchronizer.sync.version;
   }
 
   private mergeFramesToDeclarations(
@@ -53,13 +56,6 @@ export class AsciiBattleAnimationsService {
     for (let i = 0; i < frames.length; i++) {
       frames[0].unshift(...new Array<AnimationFrame>(animationsTilSync - syncIndexes[i]));
     }
-    console.log('MERGE');
-    console.log(syncIndexes);
-    console.log(animationsTilSync);
-    console.log(lengths);
-    console.log(maxLength);
-    console.log(frames);
-    console.log('END MERGE');
     const declarations = new Array<AnimationDeclaration>(maxLength);
     for (let i = 0; i < maxLength; i++) {
       const tiles = new Array<AnimationTile[]>(this.battleStorageService.scene.width);
@@ -69,9 +65,13 @@ export class AsciiBattleAnimationsService {
       for (const frameContainer of frames) {
         if (frameContainer[i]) {
           for (const tile of frameContainer[i].animationTiles) {
-            const compareTile = tiles[tile.x][tile.y];
-            if (!compareTile || compareTile.priority < tile.priority) {
-              tiles[tile.x][tile.y] = tile;
+            if (tile.x >= 0 && tile.y >= 0 &&
+              tile.x < this.battleStorageService.scene.width &&
+              tile.y < this.battleStorageService.scene.height) {
+              const compareTile = tiles[tile.x][tile.y];
+              if (!compareTile || compareTile.priority < tile.priority) {
+                tiles[tile.x][tile.y] = tile;
+              }
             }
           }
         }
@@ -82,7 +82,6 @@ export class AsciiBattleAnimationsService {
         animationTiles: tiles
       };
     }
-    console.log(declarations);
     return declarations;
   }
 
@@ -93,7 +92,7 @@ export class AsciiBattleAnimationsService {
     let notUploadSynchronizer = false;
     if (onlySecondPart) {
       const action = this.animationsQueue.find(x => x.waitingForSynchronizer);
-      if (action.waitingForSynchronizer === synchronizer.action) {
+      if (action && action.waitingForSynchronizer === synchronizer.action) {
         action.waitingForSynchronizer = undefined;
         action.updateSynchronizer = synchronizer;
         notUploadSynchronizer = true;
@@ -107,7 +106,7 @@ export class AsciiBattleAnimationsService {
       case BattleSynchronizationActionEnum.Attack:
         if (issuer) {
           frames.push([]);
-          if (!onlySecondPart && issuer.attackingSkill.action.generateIssueDeclarations) {
+          if (!onlySecondPart && issuer.attackingSkill.action?.generateIssueDeclarations) {
             frames[0].push(...issuer.attackingSkill.action
               .generateIssueDeclarations(
                 issuer.x,
@@ -116,7 +115,7 @@ export class AsciiBattleAnimationsService {
                 synchronizer.sync.targetY,
                 issuer.attackingSkill.action));
           }
-          if (issuer.attackingSkill.action.generateSyncDeclarations) {
+          if (issuer.attackingSkill.action?.generateSyncDeclarations) {
             frames[0].push(...issuer.attackingSkill.action
               .generateSyncDeclarations(
                 issuer.x,
@@ -189,7 +188,7 @@ export class AsciiBattleAnimationsService {
     const declarations = this.mergeFramesToDeclarations(synchronizer.action, synchronizer, notUploadSynchronizer, ...frames);
     this.animationsQueue.push(...declarations);
     this.animationsLoaded = true;
-    console.log(declarations);
+    this.pending = false;
     return true;
   }
 
@@ -204,7 +203,7 @@ export class AsciiBattleAnimationsService {
     const declarations = skill.action.generateIssueDeclarations(actor.x, actor.y, x, y, skill.action);
     this.animationsQueue.push(...this.mergeFramesToDeclarations(action, undefined, false, declarations));
     this.animationsLoaded = true;
-    console.log(declarations);
+    this.pending = true;
     return true;
   }
 
@@ -213,7 +212,7 @@ export class AsciiBattleAnimationsService {
       this.battleStorageService.currentAnimations = undefined;
       if (this.animationsLoaded) {
         this.animationsLoaded = false;
-        this.generationConclusion.next();
+        this.generationConclusion.next(this.pending);
       }
       return false;
     }
@@ -225,7 +224,7 @@ export class AsciiBattleAnimationsService {
     if (this.animationsQueue.length === 0) {
       this.animationsLoaded = false;
       this.battleStorageService.currentAnimations = undefined;
-      this.generationConclusion.next();
+      this.generationConclusion.next(this.pending);
     }
     return true;
   }

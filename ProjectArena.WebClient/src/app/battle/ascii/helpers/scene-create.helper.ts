@@ -17,25 +17,25 @@ import { SyncSpecEffect } from 'src/app/shared/models/battle/synchronization/syn
 import { SpecEffect } from '../models/scene/spec-effect.model';
 
 export function cloneActionAnimation(animation: ActionAnimation): ActionAnimation {
-  return {
+  return animation ? {
     generateDeclarations: animation.generateDeclarations
-  };
+  } : undefined;
 }
 
 export function cloneTwoPhaseActionAnimation(animation: TwoPhaseActionAnimation): TwoPhaseActionAnimation {
-  return {
+  return animation ? {
     generateIssueDeclarations: animation.generateIssueDeclarations,
     generateSyncDeclarations: animation.generateSyncDeclarations
-  };
+  } : undefined;
 }
 
 export function cloneBuffAnimation(animation: BuffAnimation): BuffAnimation {
-  return {
+  return animation ? {
     doSomethingWithBearer: animation.doSomethingWithBearer,
     resetEffect: animation.resetEffect,
     colorDifference: { r: 0, g: 0, b: 0, a: 0 },
     changedChar: false
-  };
+  } : undefined;
 }
 
 export function convertTile(tile: SyncTile, owner: Player): Tile {
@@ -75,7 +75,7 @@ export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Sk
       skillNative.enemyName,
     description: skillNative.description,
     action: !skillNative.alternativeForm || isCurrentPlayerTeam ?
-      cloneTwoPhaseActionAnimation(skillNative.enemyAction) :
+      cloneTwoPhaseActionAnimation(skillNative.action) :
       cloneTwoPhaseActionAnimation(skillNative.enemyAction),
     range: skill.range,
     cd: skill.cd,

@@ -7,23 +7,27 @@ import { AnimationTile } from '../models/animations/animation-tile.model';
 function explosionIssueDeclaration(targetX, targetY, color: Color) {
   const colors = new Array<Color>(4);
   for (let i = 0; i < 4; i++) {
-    colors[i] = {r: (Math.random() + 9) * color.r, g: (Math.random() + 9) * color.g, b: (Math.random() + 9) * color.b, a: 1};
+    colors[i] = {r: (Math.random() + 9) / 10 * color.r, g: (Math.random() + 9) / 10 * color.g, b: (Math.random() + 9) / 10 * color.b, a: 1};
   }
   const frames: AnimationFrame[] = [];
   frames.push({
     updateSynchronizer: false,
-    animationTiles: [{x: targetX, y: targetY, char: '*', color: colors[0],
-      overflowHealth: true, priority: 10}]
+    animationTiles: [{x: targetX, y: targetY, char: '*', color: colors[0], unitColorMultiplier: 0,
+      unitAlpha: false, ignoreHeight: false, overflowHealth: true, priority: 10, workingOnSpecEffects: true}]
   });
   for (let i = 0; i < 4; i++) {
     let tiles = new Array<AnimationTile>(4);
     for (let t = 0; t < 4; t++) {
       tiles[t] = {
-        x: targetX + t === 0 ? 1 : t === 2 ? -1 : 0,
-        y: targetY + t === 1 ? 1 : t === 3 ? -1 : 0,
+        x: targetX + (t === 0 ? 1 : t === 2 ? -1 : 0),
+        y: targetY + (t === 1 ? 1 : t === 3 ? -1 : 0),
+        unitColorMultiplier: 0,
         char: '*',
         color: colors[i + t >= 4 ? (i + t - 4) : (i + t)],
         overflowHealth: true,
+        workingOnSpecEffects: true,
+        unitAlpha: false,
+        ignoreHeight: false,
         priority: 10
       };
     }
@@ -34,11 +38,15 @@ function explosionIssueDeclaration(targetX, targetY, color: Color) {
     tiles = new Array<AnimationTile>(4);
     for (let t = 0; t < 4; t++) {
       tiles[t] = {
-        x: targetX + t === 0 || t === 1 ? 1 : -1,
-        y: targetY + t === 0 || t === 2 ? 1 : -1,
+        x: targetX + (t === 0 || t === 1 ? 1 : -1),
+        y: targetY + (t === 0 || t === 2 ? 1 : -1),
+        unitColorMultiplier: 0,
         char: '*',
+        workingOnSpecEffects: true,
         color: colors[i + t >= 4 ? (i + t - 4) : (i + t)],
         overflowHealth: true,
+        unitAlpha: false,
+        ignoreHeight: false,
         priority: 10
       };
     }
@@ -54,8 +62,12 @@ function explosionIssueDeclaration(targetX, targetY, color: Color) {
         x: targetX + x,
         y: targetY + y,
         char: '*',
-        color: {r: (Math.random() + 9) * color.r, g: (Math.random() + 9) * color.g, b: (Math.random() + 9) * color.b, a: 1},
+        unitColorMultiplier: 0,
+        color: {r: (Math.random() + 9) / 10 * color.r, g: (Math.random() + 9) / 10 * color.g, b: (Math.random() + 9) / 10 * color.b, a: 1},
+        workingOnSpecEffects: true,
         overflowHealth: true,
+        unitAlpha: false,
+        ignoreHeight: false,
         priority: 10
       };
     }
@@ -83,8 +95,8 @@ export const skillNatives: { [id: string]: SkillNative } = {
         for (let i = 0; i < 5; i++) {
           frames.push({
             updateSynchronizer: i === 4 ? true : false,
-            animationTiles: [{x: targetX, y: targetY, char: undefined, color: {r: 255, g: 255, b: 255, a: 1},
-              unitColorMultiplier: 0.2 * i, priority: 10, ignoreHeight: true}]
+            animationTiles: [{x: targetX, y: targetY, char: undefined, color: {r: 255, g: 255, b: 255, a: 1}, unitAlpha: true,
+              unitColorMultiplier: 0.2 * i, priority: 10, ignoreHeight: true, overflowHealth: false, workingOnSpecEffects: false}]
           });
         }
         return frames;

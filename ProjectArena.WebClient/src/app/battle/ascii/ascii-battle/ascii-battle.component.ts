@@ -30,6 +30,7 @@ import { InitiativePortrait } from '../models/gui/initiativePortrait.model';
 import { SmartActionTypeEnum } from '../models/enum/smart-action-type.enum';
 import { AsciiBattlePathCreatorService } from '../services/ascii-battle-path-creator.service';
 import { AsciiBattleAnimationsService } from '../services/ascii-battle-animations.service';
+import { AnimationTile } from '../models/animations/animation-tile.model';
 
 // TODO Error instead of console.logs
 
@@ -101,7 +102,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     return !this.blocked && !this.specificActionResponseForWait && this.actionsQueue.length === 0 &&
       this.battleStorageService.turnTime > 0 &&
       this.battleStorageService.currentActor?.owner?.id === this.userService.user.id &&
-      this.receivingMessagesFromHubAllowed;
+      this.receivingMessagesFromHubAllowed &&
+      !this.specificActionResponseForWait;
   }
 
   get canvasWidth() {
@@ -191,10 +193,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           action: BattleSynchronizationActionEnum.Wait
         };
         this.arenaHub.orderWait(this.battleStorageService.currentActor.id);
-        if (this.battleAnimationsService
-          .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Wait, this.battleStorageService.currentActor)) {
-          this.receivingMessagesFromHubAllowed = false;
-        }
+        this.battleAnimationsService
+          .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Wait, this.battleStorageService.currentActor);
       }],
       title: 'End turn',
       disabled: undefined
@@ -215,18 +215,19 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         console.log('Synchronization error');
       }
     });
-    this.animationSubscription = battleAnimationsService.generationConclusion.subscribe(() => {
-      console.log('generation ended');
-      if (this.specificActionResponseForWait) {
-        if (this.actionsQueue.length > 0) {
-          this.sendActionFromQueue();
-        } else {
-          this.specificActionResponseForWait = undefined;
+    this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
+      if (!pending) {
+        if (this.specificActionResponseForWait) {
+          if (this.actionsQueue.length > 0) {
+            this.sendActionFromQueue();
+          } else {
+            this.specificActionResponseForWait = undefined;
+          }
         }
-      }
-      this.recalculateSkillActions();
-      if (!this.specificActionResponseForWait) {
-        this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
+        this.recalculateSkillActions();
+        if (!this.specificActionResponseForWait) {
+          this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
+        }
       }
       this.processNextActionFromQueue();
     });
@@ -315,12 +316,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
               this.currentSkillId,
               currentActionSquare.x,
               currentActionSquare.y);
-            this.resetSkillActions();
-            if (this.battleAnimationsService
+            this.specificActionResponseForWait = {
+              actorId: this.battleStorageService.currentActor.id,
+              action: BattleSynchronizationActionEnum.Cast
+            };
+            this.battleAnimationsService
               .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Cast, this.battleStorageService.currentActor,
-              currentActionSquare.x, currentActionSquare.y, this.currentSkillId)) {
-              this.receivingMessagesFromHubAllowed = false;
-            }
+              currentActionSquare.x, currentActionSquare.y, this.currentSkillId);
+            this.resetSkillActions();
           } else {
             this.actionsQueue = [
               ...currentActionSquare.parentSquares.filter(s => s.type !== ActionSquareTypeEnum.Actor)
@@ -437,14 +440,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       this.mouseState.y = newY;
       const mouseX = Math.floor(this.mouseState.x);
       const mouseY = Math.floor(this.mouseState.y);
-      if (this.battleStorageService.scene && mouseX >= 0 && mouseY >= 0 &&
+      /*if (this.battleStorageService.scene && mouseX >= 0 && mouseY >= 0 &&
         mouseX < this.battleStorageService.scene.width && mouseY < this.battleStorageService.scene.height) {
         if ((!this.selectedTile || this.selectedTile.x !== mouseX || this.selectedTile.y !== mouseY)) {
           this.selectedTile = {x: mouseX, y: mouseY, duration: 0, forced: false};
         }
       } else if (this.selectedTile && !this.selectedTile.forced) {
         this.selectedTile = undefined;
-      }
+      }*/
       this.changed = true;
     }
   }
@@ -474,6 +477,32 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     return color;
   }
 
+  private mixColorWithReplacement(color: Color, replacement: AnimationTile, z: number): Color {
+    const newColor = { r: color.r, g: color.g, b: color.b, a: color.a };
+    let mainColor: Color = replacement ?
+    { r : replacement.color.r * (1 - replacement.unitColorMultiplier),
+      g : replacement.color.g * (1 - replacement.unitColorMultiplier),
+      b : replacement.color.b * (1 - replacement.unitColorMultiplier),
+      a : replacement.unitAlpha ? 0 : replacement.color.a }
+    : { r: 0, g: 0, b: 0, a: 0 };
+    if (!(replacement?.ignoreHeight)) {
+      mainColor = this.heightImpact(z, mainColor);
+    }
+    if (replacement && replacement.unitColorMultiplier < 1) {
+      newColor.r *= replacement.unitColorMultiplier;
+      newColor.g *= replacement.unitColorMultiplier;
+      newColor.b *= replacement.unitColorMultiplier;
+    }
+    if (replacement && !replacement.unitAlpha) {
+      newColor.a = 0;
+    }
+    newColor.r += mainColor.r;
+    newColor.g += mainColor.g;
+    newColor.b += mainColor.b;
+    newColor.a += mainColor.a;
+    return newColor;
+  }
+
   private drawPoint(scene: Scene, x: number, y: number, cameraLeft: number, cameraTop: number, drawChar: Visualization) {
     const tile = scene.tiles[x][y];
     if (tile) {
@@ -486,46 +515,46 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
       }
       const selected = this.selectedTile && this.selectedTile.duration > 500 && this.selectedTile.x === x && this.selectedTile.y === y;
+      const replacement = this.battleStorageService.currentAnimations ? this.battleStorageService.currentAnimations[x][y] : undefined;
       if (drawChar) {
         const color = this.brightImpact(tile.bright, drawChar.color);
         this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
         this.canvasContext.fillText(drawChar.char, canvasX, symbolY);
       } else
-      /*let replacement;
-      if (this.animationReplacements) {
-        replacement = this.animationReplacements.find(o => o.x === x && o.y === y);
-      }
-      if (replacement) {
-        const color = this.brightImpact(tile.bright, replacement.color);
-        this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-        this.canvasContext.fillText(replacement.character, canvasX, symbolY);
-      } else*/
       if ((tile.actor || tile.decoration) && ((tile.specEffects.length === 0 && !selected) || Math.floor(this.tickState) % 2 === 1)) {
         if (tile.actor) {
-          const color = this.heightImpact(tile.actor.z, this.brightImpact(tile.bright,
-            tile.actor === this.battleStorageService.currentActor &&
+          let color = this.heightImpact(tile.actor.z, tile.actor === this.battleStorageService.currentActor &&
             this.battleStorageService.currentActor.owner?.id === this.userService.user.id ?
             {r: 255, g: 255, b: 0, a: tile.actor.visualization.color.a} :
-            tile.actor.visualization.color));
+            tile.actor.visualization.color);
+          color = this.brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.actor.z) : color);
           this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-          this.canvasContext.fillText(tile.actor.visualization.char, canvasX, symbolY);
+          this.canvasContext.fillText(replacement?.char ? replacement.char : tile.actor.visualization.char, canvasX, symbolY);
         } else if (tile.decoration) {
-          const color = this.heightImpact(tile.actor.z, this.brightImpact(tile.bright, tile.actor.visualization.color));
+          let color = this.heightImpact(tile.actor.z, tile.decoration.visualization.color);
+          color = this.brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.decoration.z) : color);
           this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-          this.canvasContext.fillText(tile.actor.visualization.char, canvasX, symbolY);
+          this.canvasContext.fillText(replacement?.char ? replacement.char : tile.decoration.visualization.char, canvasX, symbolY);
         }
-      } else if (tile.specEffects.length > 0 && selected) {
+      } else if (tile.specEffects.length > 0 && !selected) {
         const firstEffect = tile.specEffects[0];
-        const color = this.heightImpact(tile.actor.z, this.brightImpact(tile.bright, firstEffect.visualization.color));
+        let color = this.heightImpact(tile.actor.z, firstEffect.visualization.color);
+        color =  this.brightImpact(tile.bright, replacement?.workingOnSpecEffects ?
+          this.mixColorWithReplacement(color, replacement, tile.actor.z) :
+          color);
         this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-        this.canvasContext.fillText(firstEffect.visualization.char, canvasX, symbolY);
+        this.canvasContext.fillText( replacement?.workingOnSpecEffects ?
+          replacement.char :
+          firstEffect.visualization.char, canvasX, symbolY);
       } else {
-        const color = this.heightImpact(tile.height, tile.visualization.color);
+        const color =  replacement?.workingOnSpecEffects && replacement?.char ?
+          this.brightImpact(tile.bright, replacement.color) :
+          this.heightImpact(tile.height, tile.visualization.color);
         this.canvasContext.fillStyle = `rgba(${color.r}, ${color.g},
           ${color.b}, ${color.a})`;
-        this.canvasContext.fillText(tile.visualization.char, canvasX, symbolY);
+        this.canvasContext.fillText(replacement?.char ? replacement.char : tile.visualization.char, canvasX, symbolY);
       }
-      if (tile.actor || tile.decoration) {
+      if ((tile.actor || tile.decoration) && !(replacement?.overflowHealth)) {
         const healthObject = tile.actor || tile.decoration;
         const percentOfHealth = Math.max(0, Math.min(healthObject.health / healthObject.maxHealth, 1));
         let color: Color;
@@ -539,11 +568,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         color = this.brightImpact(tile.bright, color);
         const zoomMultiplier = Math.floor(this.battleZoom);
         this.canvasContext.lineWidth = zoomMultiplier * 2;
-        /*this.canvasContext.strokeStyle = `#000818`;
-        const backgroundPath = new Path2D();
-        backgroundPath.moveTo(canvasX + 1 + zoomMultiplier, canvasY + 1 + zoomMultiplier);
-        backgroundPath.lineTo(canvasX + this.tileWidth - 1 - zoomMultiplier, canvasY + 1 + zoomMultiplier);
-        this.canvasContext.stroke(backgroundPath);*/
         this.canvasContext.strokeStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
         const path = new Path2D();
         path.moveTo(canvasX + 1 + zoomMultiplier, canvasY + 1 + zoomMultiplier);
@@ -598,8 +622,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
 
       const mouseX = Math.floor(this.mouseState.x);
       const mouseY = Math.floor(this.mouseState.y);
-      const currentActionSquare = this.battleStorageService.availableActionSquares
-        ?.find(s => s.x === mouseX && s.y === mouseY && s.type !== ActionSquareTypeEnum.Actor);
+      const currentActionSquare = this.canAct ? this.battleStorageService.availableActionSquares
+        ?.find(s => s.x === mouseX && s.y === mouseY && s.type !== ActionSquareTypeEnum.Actor) : undefined;
       for (let x = left; x <= right; x++) {
         for (let y = top; y <= bottom; y++ ) {
           let drawChar;
@@ -655,12 +679,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           (sX === 1 && sY === 0 || sX === 0 && sY === 1) && this.battleStorageService.currentActor.canMove &&
           !tile.unbearable && !tile.actor && !tile.decoration &&
           Math.abs(tile.height - initialTile.height) < 10) {
-          this.arenaHub.orderMove(newAction.actorId, newAction.x, newAction.y);
-          if (this.battleAnimationsService
-            .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
-            newAction.x, newAction.y)) {
-            this.receivingMessagesFromHubAllowed = false;
-          }
+            this.arenaHub.orderMove(newAction.actorId, newAction.x, newAction.y);
+            this.battleAnimationsService
+              .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
+              newAction.x, newAction.y);
         } else {
           console.log('cannot move');
           this.specificActionResponseForWait = undefined;
@@ -672,11 +694,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           (!this.battleStorageService.currentActor.attackingSkill.meleeOnly || Math.abs(tile.height - initialTile.height) < 10) &&
           (tile.actor || tile.decoration) && tile.actor !== this.battleStorageService.currentActor) {
           this.arenaHub.orderAttack(newAction.actorId, newAction.x, newAction.y);
-          if (this.battleAnimationsService
+          this.battleAnimationsService
             .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Attack, this.battleStorageService.currentActor,
-            newAction.x, newAction.y)) {
-            this.receivingMessagesFromHubAllowed = false;
-          }
+            newAction.x, newAction.y);
         } else {
           console.log('cannot attack');
           this.specificActionResponseForWait = undefined;
@@ -820,6 +840,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         console.log('Start game');
         // TODO Add some introducing animations
         this.restoreScene(action.sync);
+        this.processNextActionFromQueue();
         return;
       case BattleSynchronizationActionEnum.EndGame:
         if (currentPlayer.status === BattlePlayerStatusEnum.Victorious) {
