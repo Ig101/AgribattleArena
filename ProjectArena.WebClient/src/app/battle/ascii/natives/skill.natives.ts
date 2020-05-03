@@ -13,7 +13,8 @@ function explosionIssueDeclaration(targetX, targetY, color: Color) {
   frames.push({
     updateSynchronizer: false,
     animationTiles: [{x: targetX, y: targetY, char: '*', color: colors[0], unitColorMultiplier: 0,
-      unitAlpha: false, ignoreHeight: false, overflowHealth: true, priority: 10, workingOnSpecEffects: true}]
+      unitAlpha: false, ignoreHeight: false, overflowHealth: true, priority: 10, workingOnSpecEffects: true}],
+    specificAction: undefined
   });
   for (let i = 0; i < 4; i++) {
     let tiles = new Array<AnimationTile>(4);
@@ -33,7 +34,8 @@ function explosionIssueDeclaration(targetX, targetY, color: Color) {
     }
     frames.push({
       updateSynchronizer: false,
-      animationTiles: tiles
+      animationTiles: tiles,
+      specificAction: undefined
     });
     tiles = new Array<AnimationTile>(4);
     for (let t = 0; t < 4; t++) {
@@ -52,7 +54,8 @@ function explosionIssueDeclaration(targetX, targetY, color: Color) {
     }
     frames.push({
       updateSynchronizer: false,
-      animationTiles: tiles
+      animationTiles: tiles,
+      specificAction: undefined
     });
   }
   const newTiles = new Array<AnimationTile>(9);
@@ -74,7 +77,8 @@ function explosionIssueDeclaration(targetX, targetY, color: Color) {
   }
   frames.push({
     updateSynchronizer: true,
-    animationTiles: newTiles
+    animationTiles: newTiles,
+    specificAction: undefined
   });
   return frames;
 }
@@ -89,14 +93,16 @@ export const skillNatives: { [id: string]: SkillNative } = {
         for (let i = 0; i < 3; i++) {
           frames.push({
             updateSynchronizer: false,
-            animationTiles: []
+            animationTiles: [],
+            specificAction: undefined
           });
         }
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 4; i++) {
           frames.push({
-            updateSynchronizer: i === 4 ? true : false,
+            updateSynchronizer: i === 3 ? true : false,
             animationTiles: [{x: targetX, y: targetY, char: undefined, color: {r: 255, g: 255, b: 255, a: 1}, unitAlpha: true,
-              unitColorMultiplier: 0.2 * i, priority: 10, ignoreHeight: true, overflowHealth: false, workingOnSpecEffects: false}]
+              unitColorMultiplier: i % 2, priority: 10, ignoreHeight: true, overflowHealth: false, workingOnSpecEffects: false}],
+            specificAction: undefined
           });
         }
         return frames;
@@ -118,7 +124,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
     enemyName: 'Explosion',
     enemyAction: {
       generateIssueDeclarations: (x, y, targetX, targetY) => {
-        return explosionIssueDeclaration(targetX, targetY, {r: 0, g: 55, b: 255});
+        return explosionIssueDeclaration(targetX, targetY, {r: 105, g: 105, b: 255});
       },
       generateSyncDeclarations: undefined
     }

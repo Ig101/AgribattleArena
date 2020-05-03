@@ -53,6 +53,7 @@ export function convertTile(tile: SyncTile, owner: Player): Tile {
     bright: native.bright,
     action: cloneActionAnimation(native.action),
     onStepAction: cloneActionAnimation(native.onStepAction),
+    onActionEffectAnimation: cloneActionAnimation(native.onActionEffectAnimation),
     height: tile.height,
     nativeId: tile.nativeId,
     owner,
@@ -101,6 +102,7 @@ export function convertBuff(buff: SyncBuff): Buff {
     effectAnimation: cloneActionAnimation(buffNative.effectAnimation),
     onPurgeAnimation: cloneActionAnimation(buffNative.onPurgeAnimation),
     passiveAnimation: cloneBuffAnimation(buffNative.passiveAnimation),
+    onActionEffectAnimation: cloneActionAnimation(buffNative.onActionEffectAnimation),
     mod: buff.mod,
     duration: buff.duration
   };
@@ -194,6 +196,9 @@ export function convertEffect(effect: SyncSpecEffect, owner: Player, isCurrentPl
     onDeathAction: !native.alternativeForm || isCurrentPlayerTeam ?
       cloneActionAnimation(native.onDeathAction) :
       cloneActionAnimation(native.enemyOnDeathAction),
+    onActionEffectAnimation: !native.alternativeForm || isCurrentPlayerTeam ?
+      cloneActionAnimation(native.onActionEffectAnimation) :
+      cloneActionAnimation(native.enemyOnActionEffectAnimation),
     owner,
     isAlive: effect.isAlive,
     x: effect.x,

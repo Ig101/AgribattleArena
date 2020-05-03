@@ -13,6 +13,7 @@ import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 import { UserService } from 'src/app/shared/services/user.service';
 import { tileNatives } from '../natives';
 import { AsciiBattlePathCreatorService } from './ascii-battle-path-creator.service';
+import { SynchronizationDifference } from '../models/synchronization-differences/synchronization-differences.model';
 
 @Injectable()
 export class AsciiBattleSynchronizerService {
@@ -58,6 +59,9 @@ export class AsciiBattleSynchronizerService {
     for (const actor of synchronizer.changedActors) {
       const owner = this.battleStorageService.players.find(x => x.id === actor.ownerId);
       const newActor = convertActor(actor, owner, owner && currentPlayer.team === owner?.team);
+      for (const buff of newActor.buffs) {
+        buff.passiveAnimation?.doSomethingWithBearer(buff.passiveAnimation, newActor);
+      }
       tiles[newActor.x][newActor.y].actor = newActor;
       actors.push(newActor);
     }
@@ -106,7 +110,17 @@ export class AsciiBattleSynchronizerService {
     this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
   }
 
-  synchronizeScene(synchronizer: Synchronizer) {
+  synchronizeScene(synchronizer: Synchronizer): SynchronizationDifference {
+    if (!synchronizer.tempActor) {
+      synchronizer.tempActor = undefined;
+    }
+    if (!synchronizer.tempDecoration) {
+      synchronizer.tempDecoration = undefined;
+    }
+    const differences = {
+      actors: [],
+      decorations: []
+    } as SynchronizationDifference;
     // Players
     let currentPlayer: Player;
     for (const syncPlayer of synchronizer.players) {
@@ -146,7 +160,10 @@ export class AsciiBattleSynchronizerService {
       if (syncActor.ownerId !== actor.owner?.id) {
         owner = this.battleStorageService.players.find(x => x.id === syncActor.ownerId);
       }
-      synchronizeActor(actor, syncActor, currentPlayer.team === (owner ? owner?.team : actor.owner?.team));
+      const difference = synchronizeActor(actor, syncActor, currentPlayer.team === (owner ? owner?.team : actor.owner?.team));
+      if (difference) {
+        differences.actors.push(difference);
+      }
     }
     for (const syncDecoration of synchronizer.changedDecorations) {
       let owner: Player;
@@ -167,7 +184,10 @@ export class AsciiBattleSynchronizerService {
       if (syncDecoration.ownerId !== decoration.owner?.id) {
         owner = this.battleStorageService.players.find(x => x.id === syncDecoration.ownerId);
       }
-      synchronizeDecoration(decoration, syncDecoration, owner);
+      const difference = synchronizeDecoration(decoration, syncDecoration, owner);
+      if (difference) {
+        differences.decorations.push(difference);
+      }
     }
     for (const syncEffect of synchronizer.changedEffects) {
       let owner: Player;
@@ -194,6 +214,16 @@ export class AsciiBattleSynchronizerService {
     // Deletions
     for (const syncActor of synchronizer.deletedActors) {
       const actor = this.battleStorageService.scene.actors.find(x => x.id === syncActor);
+      differences.actors.push({
+        x: actor.x,
+        y: actor.y,
+        actor: undefined,
+        healthChange: -Math.ceil(actor.health),
+        newBuffs: [],
+        removedBuffs: [],
+        endedTurn: false,
+        changedPosition: false
+      });
       removeFromArray(this.battleStorageService.scene.actors, actor);
       if (this.battleStorageService.scene.tiles[actor.x][actor.y].actor === actor) {
         this.battleStorageService.scene.tiles[actor.x][actor.y].actor = undefined;
@@ -201,6 +231,13 @@ export class AsciiBattleSynchronizerService {
     }
     for (const syncDecoration of synchronizer.deletedDecorations) {
       const decoration = this.battleStorageService.scene.decorations.find(x => x.id === syncDecoration);
+      differences.decorations.push({
+        x: decoration.x,
+        y: decoration.y,
+        decoration: undefined,
+        healthChange: -Math.ceil(decoration.health),
+        changedPosition: false
+      });
       removeFromArray(this.battleStorageService.scene.decorations, decoration);
       if (this.battleStorageService.scene.tiles[decoration.x][decoration.y].decoration === decoration) {
         this.battleStorageService.scene.tiles[decoration.x][decoration.y].decoration = undefined;
@@ -216,6 +253,24 @@ export class AsciiBattleSynchronizerService {
     // Change turn
     if (synchronizer.tempActor !== this.battleStorageService.currentActor?.id ||
         synchronizer.tempDecoration !== this.battleStorageService.currentDecoration?.id) {
+      if (this.battleStorageService.currentActor) {
+        let difference = differences.actors.find(x => x.actor.id === this.battleStorageService.currentActor.id);
+        if (!difference) {
+          difference = {
+            x: this.battleStorageService.currentActor.x,
+            y: this.battleStorageService.currentActor.y,
+            actor: this.battleStorageService.currentActor,
+            healthChange: 0,
+            newBuffs: [],
+            removedBuffs: [],
+            endedTurn: true,
+            changedPosition: false
+          };
+          differences.actors.push(difference);
+        } else {
+          difference.endedTurn = true;
+        }
+      }
       this.battleStorageService.currentActor = synchronizer.tempActor ?
         this.battleStorageService.scene.actors.find(x => x.id === synchronizer.tempActor) :
         undefined;
@@ -228,5 +283,6 @@ export class AsciiBattleSynchronizerService {
       this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) :
       undefined;
     this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
+    return differences;
   }
 }

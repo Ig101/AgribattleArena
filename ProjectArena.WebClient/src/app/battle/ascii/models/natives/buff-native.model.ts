@@ -10,6 +10,7 @@ export interface BuffNative {
   description: string;
   onApplyAnimation: ActionAnimation;
   effectAnimation: ActionAnimation;
+  onActionEffectAnimation: ActionAnimation;
   onPurgeAnimation: ActionAnimation;
   passiveAnimation: BuffAnimation;
 }

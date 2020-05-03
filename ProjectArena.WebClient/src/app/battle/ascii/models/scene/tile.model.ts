@@ -18,6 +18,7 @@ export interface Tile {
   bright: boolean;
   action: ActionAnimation;
   onStepAction: ActionAnimation;
+  onActionEffectAnimation: ActionAnimation;
 
   actor: Actor;
   decoration: ActiveDecoration;

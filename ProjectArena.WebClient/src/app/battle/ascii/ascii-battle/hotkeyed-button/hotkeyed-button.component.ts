@@ -28,7 +28,7 @@ export class HotkeyedButtonComponent implements OnInit, OnDestroy {
     if (this.smartAction?.type === SmartActionTypeEnum.Hold) {
       this.timer = setInterval(() => {
         if (this.smartAction.pressed) {
-          this.smartAction.smartValue += 0.03;
+          this.smartAction.smartValue += 0.05;
         } else {
           this.smartAction.smartValue = 0;
         }

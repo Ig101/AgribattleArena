@@ -9,6 +9,7 @@ import { AsciiBattleSynchronizerService } from './ascii-battle-synchronizer.serv
 import { AsciiBattleStorageService } from './ascii-battle-storage.service';
 import { AnimationTile } from '../models/animations/animation-tile.model';
 import { AnimationFrame } from '../models/animations/animation-frame.model';
+import { FloatingText } from '../models/animations/floating-text.model';
 
 @Injectable()
 export class AsciiBattleAnimationsService {
@@ -26,16 +27,119 @@ export class AsciiBattleAnimationsService {
     private battleStorageService: AsciiBattleStorageService,
     ) { }
 
-  private synchronizeFromSynchronizer(synchronizer: { action: BattleSynchronizationActionEnum, sync: Synchronizer}) {
-    this.battleSynchronizationService.synchronizeScene(synchronizer.sync);
+  private synchronizeFromSynchronizer(synchronizer: { action: BattleSynchronizationActionEnum, sync: Synchronizer}): boolean {
+    const frames: AnimationFrame[][] = [];
+    const floatingTexts: FloatingText[] = [];
+    const difference = this.battleSynchronizationService.synchronizeScene(synchronizer.sync);
+    for (const actor of difference.actors) {
+      const actorFloats = [];
+      if (actor.endedTurn) {
+        actorFloats.push({
+          text: `*end*`,
+          color: { r: 255, g: 255, b: 0, a: 1 },
+          time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
+          x: actor.x,
+          y: actor.y,
+          height: 0
+        });
+      }
+      if (actor.healthChange) {
+        actorFloats.push({
+          text: actor.healthChange.toString(),
+          color: { r: 255, g: 0, b: 0, a: 1 },
+          time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
+          x: actor.x,
+          y: actor.y,
+          height: 0
+        });
+      }
+      for (const buff of actor.newBuffs) {
+        actorFloats.push({
+          text: `+${buff.char}`,
+          color: { r: buff.color.r, g: buff.color.g, b: buff.color.b, a: 1 },
+          time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
+          x: actor.x,
+          y: actor.y,
+          height: 0
+        });
+        const buffFrames = buff.onApplyAnimation?.generateDeclarations(actor.x, actor.y, buff.onApplyAnimation);
+        if (buffFrames) {
+          buffFrames[buffFrames.length - 1].specificAction = () => {
+            buff.passiveAnimation.doSomethingWithBearer(buff.passiveAnimation, actor.actor);
+          };
+          frames.push(buffFrames);
+        } else {
+          buff.passiveAnimation.doSomethingWithBearer(buff.passiveAnimation, actor.actor);
+        }
+      }
+      for (const buff of actor.removedBuffs) {
+        const buffFrames = buff.onPurgeAnimation?.generateDeclarations(actor.x, actor.y, buff.onApplyAnimation);
+        actorFloats.push({
+          text: `-${buff.char}`,
+          color: { r: buff.color.r, g: buff.color.g, b: buff.color.b, a: 1 },
+          time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
+          x: actor.x,
+          y: actor.y,
+          height: 0
+        });
+        if (buffFrames) {
+          buffFrames[buffFrames.length - 1].specificAction = () => {
+            buff.passiveAnimation.resetEffect(buff.passiveAnimation, actor.actor);
+          };
+          frames.push(buffFrames);
+        } else {
+          buff.passiveAnimation.resetEffect(buff.passiveAnimation, actor.actor);
+        }
+      }
+      if (actor.changedPosition) {
+        const tile = this.battleStorageService.scene.tiles[actor.x][actor.y];
+        const tileFrames = tile.onStepAction?.generateDeclarations(actor.x, actor.y, tile.onStepAction);
+        if (tileFrames) {
+          frames.push(tileFrames);
+        }
+      }
+      floatingTexts.push(...actorFloats);
+    }
+    for (const decoration of difference.decorations) {
+      const decorationFloats = [];
+      if (decoration.healthChange) {
+        decorationFloats.push({
+          text: decoration.healthChange.toString(),
+          color: { r: 255, g: 0, b: 0, a: 1 },
+          time: decorationFloats.length * -this.battleStorageService.floatingTextDelay,
+          x: decoration.x,
+          y: decoration.y,
+          height: 0
+        });
+      }
+      if (decoration.changedPosition) {
+        const tile = this.battleStorageService.scene.tiles[decoration.x][decoration.y];
+        const tileFrames = tile.onStepAction?.generateDeclarations(decoration.x, decoration.y, tile.onStepAction);
+        if (tileFrames) {
+          frames.push(tileFrames);
+        }
+      }
+      floatingTexts.push(...decorationFloats);
+    }
+    if (floatingTexts.length > 0 && frames.length === 0) {
+      frames.push([]);
+    }
+
     this.battleStorageService.version = synchronizer.sync.version;
+    if (frames.length > 0) {
+      const declarations = this.mergeFramesToDeclarations(undefined, undefined, true, frames);
+      declarations[0].floatingTexts = floatingTexts;
+      this.animationsQueue.push(...declarations);
+      return true;
+    }
+    return false;
   }
 
   private mergeFramesToDeclarations(
     action: BattleSynchronizationActionEnum,
     synchronizer: { action: BattleSynchronizationActionEnum, sync: Synchronizer},
     ignoreSynchronizer: boolean,
-    ...frames: AnimationFrame[][]): AnimationDeclaration[] {
+    frames: AnimationFrame[][]): AnimationDeclaration[] {
     const syncIndexes = frames.map(f => {
       let index = f.findIndex(x => x.updateSynchronizer);
       if (index === -1) {
@@ -50,7 +154,7 @@ export class AsciiBattleAnimationsService {
     });
     const animationsTilSync = Math.max(...syncIndexes);
     const lengths = frames.map((f, index) => {
-      return f.length + animationsTilSync - syncIndexes[index];
+      return Math.max(1, f.length + animationsTilSync - syncIndexes[index]);
     });
     const maxLength = Math.max(...lengths);
     for (let i = 0; i < frames.length; i++) {
@@ -59,6 +163,7 @@ export class AsciiBattleAnimationsService {
     const declarations = new Array<AnimationDeclaration>(maxLength);
     for (let i = 0; i < maxLength; i++) {
       const tiles = new Array<AnimationTile[]>(this.battleStorageService.scene.width);
+      const actions = new Array<() => void>(this.battleStorageService.scene.width);
       for (let t = 0; t < this.battleStorageService.scene.width; t++) {
         tiles[t] = new Array<AnimationTile>(this.battleStorageService.scene.height);
       }
@@ -74,15 +179,54 @@ export class AsciiBattleAnimationsService {
               }
             }
           }
+          if (frameContainer[i].specificAction) {
+            actions.push(frameContainer[i].specificAction);
+          }
         }
       }
       declarations[i] = {
         waitingForSynchronizer: !ignoreSynchronizer && animationsTilSync === i && !synchronizer ? action : undefined,
         updateSynchronizer: !ignoreSynchronizer && animationsTilSync === i && synchronizer ? synchronizer : undefined,
-        animationTiles: tiles
+        animationTiles: tiles,
+        specificActions: actions,
+        floatingTexts: undefined
       };
     }
     return declarations;
+  }
+
+  private getFramesFromAction(actor: Actor, frames: AnimationFrame[][]): AnimationFrame[][] {
+    for (const buff of actor.buffs) {
+      buff.onActionEffectAnimation?.generateDeclarations(actor.x, actor.y, buff.onActionEffectAnimation);
+    }
+    for (const effect of this.battleStorageService.scene.effects) {
+      effect.onActionEffectAnimation?.generateDeclarations(effect.x, effect.y, effect.onActionEffectAnimation);
+    }
+    for (let x = 0; x < this.battleStorageService.scene.width; x++) {
+      for (let y = 0; y < this.battleStorageService.scene.height; y++) {
+        this.battleStorageService.scene.tiles[x][y].onActionEffectAnimation?.generateDeclarations(x, y,
+          this.battleStorageService.scene.tiles[x][y].onActionEffectAnimation);
+      }
+    }
+    return frames;
+  }
+
+  private getFramesFromEndTurn(frames: AnimationFrame[][]): AnimationFrame[][] {
+    for (const actor of this.battleStorageService.scene.actors) {
+      for (const buff of actor.buffs) {
+        buff.effectAnimation?.generateDeclarations(actor.x, actor.y, buff.effectAnimation);
+      }
+    }
+    for (const effect of this.battleStorageService.scene.effects) {
+      effect.action?.generateDeclarations(effect.x, effect.y, effect.action);
+    }
+    for (let x = 0; x < this.battleStorageService.scene.width; x++) {
+      for (let y = 0; y < this.battleStorageService.scene.height; y++) {
+        this.battleStorageService.scene.tiles[x][y].action?.generateDeclarations(x, y,
+          this.battleStorageService.scene.tiles[x][y].action);
+      }
+    }
+    return frames;
   }
 
   generateAnimationsFromSynchronizer(
@@ -102,6 +246,7 @@ export class AsciiBattleAnimationsService {
       this.battleStorageService.scene.actors.find(x => x.id === synchronizer.sync.actorId) :
       undefined;
     const frames: AnimationFrame[][] = [];
+    this.pending = false;
     switch (synchronizer.action) {
       case BattleSynchronizationActionEnum.Attack:
         if (issuer) {
@@ -114,6 +259,7 @@ export class AsciiBattleAnimationsService {
                 synchronizer.sync.targetX,
                 synchronizer.sync.targetY,
                 issuer.attackingSkill.action));
+            this.getFramesFromAction(issuer, frames);
           }
           if (issuer.attackingSkill.action?.generateSyncDeclarations) {
             frames[0].push(...issuer.attackingSkill.action
@@ -128,13 +274,17 @@ export class AsciiBattleAnimationsService {
         break;
       case BattleSynchronizationActionEnum.Move:
         frames.push([]);
+        if (!onlySecondPart) {
+          this.getFramesFromAction(issuer, frames);
+        }
         break;
       case BattleSynchronizationActionEnum.Cast:
         if (issuer) {
           frames.push([]);
           const skill = issuer.skills.find(x => x.id === synchronizer.sync.skillActionId);
           if (skill) {
-            if (!onlySecondPart && skill.action.generateIssueDeclarations) {
+            if (!onlySecondPart) {
+              if (skill.action.generateIssueDeclarations) {
               frames[0].push(...skill.action
                 .generateIssueDeclarations(
                   issuer.x,
@@ -142,6 +292,8 @@ export class AsciiBattleAnimationsService {
                   synchronizer.sync.targetX,
                   synchronizer.sync.targetY,
                   issuer.attackingSkill.action));
+              }
+              this.getFramesFromAction(issuer, frames);
             }
             if (skill.action.generateSyncDeclarations) {
               frames[0].push(...skill.action
@@ -156,52 +308,51 @@ export class AsciiBattleAnimationsService {
         }
         break;
       case BattleSynchronizationActionEnum.Wait:
-        frames.push([]);
-        break;
+        return this.synchronizeFromSynchronizer(synchronizer);
       case BattleSynchronizationActionEnum.Decoration:
         const decoration = this.battleStorageService.scene.decorations.find(x => x.id === synchronizer.sync.actorId);
         if (decoration && decoration.action) {
           frames.push([]);
           frames[0].push(...decoration.action
             .generateDeclarations(
-              issuer.x,
-              issuer.y,
-              synchronizer.sync.targetX,
-              synchronizer.sync.targetY,
+              decoration.x,
+              decoration.y,
               decoration.action));
         }
         break;
       case BattleSynchronizationActionEnum.EndTurn:
         frames.push([]);
-        console.log('EndTurn');
+        this.getFramesFromEndTurn(frames);
         break;
       case BattleSynchronizationActionEnum.StartGame:
         return false;
       case BattleSynchronizationActionEnum.EndGame:
         console.log('EndGame');
-        frames.push([]);
-        break;
+        return this.synchronizeFromSynchronizer(synchronizer);
       case BattleSynchronizationActionEnum.SkipTurn:
         console.log('SkipTurn');
-        return false;
+        return this.synchronizeFromSynchronizer(synchronizer);
     }
-    const declarations = this.mergeFramesToDeclarations(synchronizer.action, synchronizer, notUploadSynchronizer, ...frames);
+    const declarations = this.mergeFramesToDeclarations(synchronizer.action, synchronizer, notUploadSynchronizer, frames);
     this.animationsQueue.push(...declarations);
     this.animationsLoaded = true;
-    this.pending = false;
     return true;
   }
 
   generateAnimationsFromIssue(action: BattleSynchronizationActionEnum, actor: Actor, x?: number, y?: number, skillId?: number): boolean {
-    if (action === BattleSynchronizationActionEnum.Move || action === BattleSynchronizationActionEnum.Wait) {
+    if (action === BattleSynchronizationActionEnum.Wait) {
       return false;
     }
-    const skill = action === BattleSynchronizationActionEnum.Attack ? actor.attackingSkill : actor.skills.find(s => s.id === skillId);
-    if (!skill.action?.generateIssueDeclarations) {
-      return false;
+    const skill = action === BattleSynchronizationActionEnum.Move ? undefined :
+      action === BattleSynchronizationActionEnum.Attack ? actor.attackingSkill : actor.skills.find(s => s.id === skillId);
+    const frames = [];
+    if (skill?.action?.generateIssueDeclarations) {
+      frames.push(skill.action.generateIssueDeclarations(actor.x, actor.y, x, y, skill.action));
+    } else {
+      frames.push([]);
     }
-    const declarations = skill.action.generateIssueDeclarations(actor.x, actor.y, x, y, skill.action);
-    this.animationsQueue.push(...this.mergeFramesToDeclarations(action, undefined, false, declarations));
+    this.getFramesFromAction(actor, frames);
+    this.animationsQueue.push(...this.mergeFramesToDeclarations(action, undefined, false, frames));
     this.animationsLoaded = true;
     this.pending = true;
     return true;
@@ -220,6 +371,9 @@ export class AsciiBattleAnimationsService {
     this.battleStorageService.currentAnimations = animation.animationTiles;
     if (animation.updateSynchronizer) {
       this.synchronizeFromSynchronizer(animation.updateSynchronizer);
+    }
+    if (animation.floatingTexts) {
+      this.battleStorageService.floatingTexts.push(...animation.floatingTexts);
     }
     if (this.animationsQueue.length === 0) {
       this.animationsLoaded = false;

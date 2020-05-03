@@ -8,14 +8,15 @@ export const buffNatives: { [id: string]: BuffNative } = {
     description: 'Character cannot do anything',
     onApplyAnimation: undefined,
     effectAnimation: undefined,
+    onActionEffectAnimation: undefined,
     onPurgeAnimation: undefined,
     passiveAnimation: {
       doSomethingWithBearer: (action, bearer) => {
-        const colorChangeR = Math.min(bearer.defaultVisualization.color.r * 0.2,
+        const colorChangeR = Math.min(bearer.defaultVisualization.color.r * 0.4,
           bearer.visualization.color.r - bearer.defaultVisualization.color.r * 0.1);
-        const colorChangeG = Math.min(bearer.defaultVisualization.color.g * 0.2,
+        const colorChangeG = Math.min(bearer.defaultVisualization.color.g * 0.4,
           bearer.visualization.color.g - bearer.defaultVisualization.color.g * 0.1);
-        const colorChangeB = Math.min(bearer.defaultVisualization.color.b * 0.2,
+        const colorChangeB = Math.min(bearer.defaultVisualization.color.b * 0.4,
           bearer.visualization.color.b - bearer.defaultVisualization.color.b * 0.1);
         bearer.visualization.color.r -= colorChangeR;
         bearer.visualization.color.g -= colorChangeG;

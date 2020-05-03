@@ -13,6 +13,7 @@ export interface Buff {
   onApplyAnimation: ActionAnimation;
   effectAnimation: ActionAnimation;
   onPurgeAnimation: ActionAnimation;
+  onActionEffectAnimation: ActionAnimation;
 
   passiveAnimation: BuffAnimation;
 

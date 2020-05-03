@@ -13,6 +13,8 @@ import { ActiveDecoration } from '../models/scene/active-decoration.model';
 import { SyncSpecEffect } from 'src/app/shared/models/battle/synchronization/sync-spec-effect.model';
 import { SpecEffect } from '../models/scene/spec-effect.model';
 import { cloneActionAnimation, convertSkill, convertBuff } from './scene-create.helper';
+import { ActorDifference } from '../models/synchronization-differences/actor-difference.model';
+import { DecorationDifference } from '../models/synchronization-differences/decoration-difference.model';
 
 export function synchronizeTile(tile: Tile, syncTile: SyncTile, owner?: Player) {
   if (syncTile.nativeId !== tile.nativeId) {
@@ -76,7 +78,24 @@ function compareBuffIdArrays(array: Buff[], syncArray: SyncBuff[]) {
   return true;
 }
 
-export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPlayerTeam: boolean, owner?: Player) {
+function getActorDifference(actor: Actor, syncActor: SyncActor, difference: ActorDifference): ActorDifference {
+  if (!difference) {
+    difference = {
+      x: syncActor.x,
+      y: syncActor.y,
+      actor,
+      healthChange: 0,
+      newBuffs: [],
+      removedBuffs: [],
+      endedTurn: false,
+      changedPosition: false
+    };
+  }
+  return difference;
+}
+
+export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPlayerTeam: boolean, owner?: Player): ActorDifference {
+  let difference: ActorDifference;
   if (actor.attackingSkill?.id !== syncActor.attackingSkill?.id) {
     actor.attackingSkill = convertSkill(syncActor.attackingSkill, isCurrentPlayerTeam);
   } else if (actor.attackingSkill) {
@@ -99,22 +118,40 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
   actor.speed = syncActor.speed;
   actor.actionPointsIncome = syncActor.actionPointsIncome;
   if (!compareBuffIdArrays(actor.buffs, syncActor.buffs)) {
+    const deletedBuffs = actor.buffs.filter(x => !syncActor.buffs.some(b => b.id === x.id));
+    if (deletedBuffs.length > 0) {
+      difference = getActorDifference(actor, syncActor, difference);
+      difference.removedBuffs.push(...deletedBuffs);
+    }
     actor.buffs = syncActor.buffs.map(x => {
-      const buff = actor.buffs.find(s => s.id === x.id);
+      let buff = actor.buffs.find(s => s.id === x.id);
       if (buff) {
         synchronizeBuff(buff, x);
         return buff;
       } else {
-        return convertBuff(x);
+        buff = convertBuff(x);
+        difference = getActorDifference(actor, syncActor, difference);
+        difference.newBuffs.push(buff);
+        return buff;
       }
     });
   }
   actor.initiativePosition = syncActor.initiativePosition;
+  const iniHealth = Math.floor(actor.health);
+  const newHealth = Math.floor(syncActor.health);
+  if (newHealth !== iniHealth) {
+    difference = getActorDifference(actor, syncActor, difference);
+    difference.healthChange = newHealth - iniHealth;
+  }
   actor.health = syncActor.health;
   if (owner) {
     actor.owner = owner;
   }
   actor.isAlive = syncActor.isAlive;
+  if (actor.x !== syncActor.x || actor.y !== syncActor.y) {
+    difference = getActorDifference(actor, syncActor, difference);
+    difference.changedPosition = true;
+  }
   actor.x = syncActor.x;
   actor.y = syncActor.y;
   actor.z = syncActor.z;
@@ -127,21 +164,48 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
   actor.attackModifiers = syncActor.attackModifiers;
   actor.canAct = syncActor.canAct;
   actor.canMove = syncActor.canMove;
+  return difference;
 }
 
-export function synchronizeDecoration(decoration: ActiveDecoration, syncDecoration: SyncDecoration, owner?: Player) {
+function getDecorationDifference(decoration: ActiveDecoration, syncDecoration: SyncDecoration,
+                                 difference: DecorationDifference): DecorationDifference {
+  if (!difference) {
+    difference = {
+      x: syncDecoration.x,
+      y: syncDecoration.y,
+      decoration,
+      healthChange: 0,
+      changedPosition: false
+    };
+  }
+  return difference;
+}
+
+export function synchronizeDecoration(decoration: ActiveDecoration, syncDecoration: SyncDecoration, owner?: Player): DecorationDifference {
+  let difference: DecorationDifference;
   if (owner) {
     decoration.owner = owner;
   }
   decoration.mod = syncDecoration.mod;
   decoration.initiativePosition = syncDecoration.initiativePosition;
+  const iniHealth = Math.floor(decoration.health);
+  const newHealth = Math.floor(syncDecoration.health);
+  if (newHealth !== iniHealth) {
+    difference = getDecorationDifference(decoration, syncDecoration, difference);
+    difference.healthChange = newHealth - iniHealth;
+  }
   decoration.health = syncDecoration.health;
   decoration.isAlive = syncDecoration.isAlive;
+  if (decoration.x !== syncDecoration.x || decoration.y !== syncDecoration.y) {
+    difference = getDecorationDifference(decoration, syncDecoration, difference);
+    difference.changedPosition = true;
+  }
   decoration.x = syncDecoration.x;
   decoration.y = syncDecoration.y;
   decoration.z = syncDecoration.z;
   decoration.maxHealth = syncDecoration.maxHealth;
   decoration.armor = syncDecoration.armor;
+  return difference;
 }
 
 export function synchronizeEffect(effect: SpecEffect, syncEffect: SyncSpecEffect, owner?: Player) {

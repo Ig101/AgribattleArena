@@ -8,5 +8,6 @@ export interface TileNative {
   backgroundColor: { r: number, g: number, b: number };
   bright: boolean;
   action: ActionAnimation;
+  onActionEffectAnimation: ActionAnimation;
   onStepAction: ActionAnimation;
 }

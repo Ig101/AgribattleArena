@@ -6,6 +6,7 @@ export interface EffectNative {
   description: string;
   visualization: Visualization;
   action: ActionAnimation;
+  onActionEffectAnimation: ActionAnimation;
   onDeathAction: ActionAnimation;
 
   alternativeForm: boolean;
@@ -13,5 +14,6 @@ export interface EffectNative {
   enemyDescription?: string;
   enemyVisualization?: Visualization;
   enemyAction?: ActionAnimation;
+  enemyOnActionEffectAnimation: ActionAnimation;
   enemyOnDeathAction?: ActionAnimation;
 }

@@ -11,6 +11,7 @@ export const tileNatives: { [id: string]: TileNative } = {
     backgroundColor: { r: 0, g: 20, b: 0 },
     bright: false,
     action: undefined,
+    onActionEffectAnimation: undefined,
     onStepAction: undefined
   }
 };

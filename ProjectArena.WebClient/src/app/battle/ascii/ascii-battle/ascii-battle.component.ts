@@ -216,20 +216,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       }
     });
     this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
-      if (!pending) {
-        if (this.specificActionResponseForWait) {
-          if (this.actionsQueue.length > 0) {
-            this.sendActionFromQueue();
-          } else {
-            this.specificActionResponseForWait = undefined;
-          }
-        }
-        this.recalculateSkillActions();
-        if (!this.specificActionResponseForWait) {
-          this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
-        }
-      }
-      this.processNextActionFromQueue();
+      this.processNextActionFromQueueWithChecks(pending);
     });
     this.arenaActionsSubscription = arenaHub.battleSynchronizationActionsNotifier.subscribe(() => {
       if (this.receivingMessagesFromHubAllowed) {
@@ -615,6 +602,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight + 0.5;
       this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvasContext.font = `${this.tileHeight}px PT Mono`;
+      this.canvasContext.textAlign = 'left';
       const left = Math.max(0, Math.floor(cameraLeft));
       const right = Math.min(scene.width - 1, Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)));
       const top = Math.max(0, Math.floor(cameraTop));
@@ -653,6 +641,20 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         this.canvasContext.strokeStyle = this.currentSkillId ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 255, 0, 0.8)';
         this.canvasContext.lineWidth = 2;
         this.canvasContext.stroke(path);
+      }
+      for (const text of this.battleStorageService.floatingTexts) {
+        if (text.time >= 0) {
+          const x = (text.x - cameraLeft + 0.5) * this.tileWidth;
+          const y = (text.y - cameraTop + 0.5) * this.tileHeight - text.height;
+          this.canvasContext.font = `${26}px PT Mono`;
+          this.canvasContext.textAlign = 'center';
+          this.canvasContext.fillStyle = `rgba(${text.color.r}, ${text.color.g},
+            ${text.color.b}, ${text.color.a})`;
+          this.canvasContext.fillText(text.text, x, y);
+          this.canvasContext.lineWidth = 1;
+          this.canvasContext.strokeStyle = `rgba(0, 8, 24, ${text.color.a})`;
+          this.canvasContext.strokeText(text.text, x, y);
+        }
       }
     }
   }
@@ -849,8 +851,25 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         break;
     }
     if (!this.battleAnimationsService.generateAnimationsFromSynchronizer(action, onlySecondPart)) {
-      this.processNextActionFromQueue();
+      this.processNextActionFromQueueWithChecks();
     }
+  }
+
+  private processNextActionFromQueueWithChecks(pending: boolean = false) {
+    if (!pending) {
+      if (this.specificActionResponseForWait) {
+        if (this.actionsQueue.length > 0) {
+          this.sendActionFromQueue();
+        } else {
+          this.specificActionResponseForWait = undefined;
+        }
+      }
+      this.recalculateSkillActions();
+      if (!this.specificActionResponseForWait) {
+        this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
+      }
+    }
+    this.processNextActionFromQueue();
   }
 
   private restoreScene(snapshot: Synchronizer) {
@@ -887,6 +906,20 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       }
       this.animationTicker = !this.animationTicker;
       this.tick(shift);
+      for (let i = 0; i < this.battleStorageService.floatingTexts.length; i++) {
+        const floatingText = this.battleStorageService.floatingTexts[i];
+        floatingText.time += shift;
+        if (floatingText.time >= 0) {
+          this.changed = true;
+          floatingText.height += this.battleStorageService.floatingTextSpeed * shift;
+          floatingText.color.a = Math.min(1, (this.battleStorageService.floatingTextTime - floatingText.time) /
+            this.battleStorageService.floatingTextTime * 2);
+        }
+        if (floatingText.time > this.battleStorageService.floatingTextTime) {
+          this.battleStorageService.floatingTexts.splice(i, 1);
+          i--;
+        }
+      }
     }
   }
 

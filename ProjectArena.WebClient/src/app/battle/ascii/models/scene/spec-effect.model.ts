@@ -10,6 +10,7 @@ export interface SpecEffect {
   visualization: Visualization;
   action: ActionAnimation;
   onDeathAction: ActionAnimation;
+  onActionEffectAnimation: ActionAnimation;
 
   owner: Player;
   isAlive: boolean;

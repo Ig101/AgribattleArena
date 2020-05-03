@@ -8,9 +8,14 @@ import { InitiativePortrait } from '../models/gui/initiativePortrait.model';
 import { BehaviorSubject } from 'rxjs';
 import { AnimationDeclaration } from '../models/animations/animation-declaration.model';
 import { AnimationTile } from '../models/animations/animation-tile.model';
+import { FloatingText } from '../models/animations/floating-text.model';
 
 @Injectable()
 export class AsciiBattleStorageService {
+
+  floatingTextTime = 1000;
+  floatingTextSpeed = 0.07;
+  floatingTextDelay = 400;
 
   cameraX: number;
   cameraY: number;
@@ -28,6 +33,7 @@ export class AsciiBattleStorageService {
   defaultActionSquares: ActionSquare[];
 
   currentAnimations: AnimationTile[][];
+  floatingTexts: FloatingText[] = [];
 
   currentInitiativeList: BehaviorSubject<InitiativePortrait[]>;
 
@@ -66,5 +72,7 @@ export class AsciiBattleStorageService {
     this.defaultActionSquares = undefined;
     this.currentInitiativeList = undefined;
     this.turnTime = undefined;
+    this.currentAnimations = undefined;
+    this.floatingTexts = [];
   }
 }

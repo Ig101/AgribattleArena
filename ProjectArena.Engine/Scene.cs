@@ -403,7 +403,7 @@ namespace ProjectArena.Engine
             while (!turnStarted);
         }
 
-        private void Update(float time)
+        private void Update(float time, Actor specificActor = null)
         {
             PassedTime += time;
             for (int x = 0; x < Tiles.Length; x++)
@@ -416,7 +416,10 @@ namespace ProjectArena.Engine
 
             foreach (TileObject obj in Actors)
             {
-                obj.Update(time);
+                if (specificActor == null || obj == specificActor)
+                {
+                    obj.Update(time);
+                }
             }
 
             foreach (TileObject obj in Decorations)
@@ -573,7 +576,7 @@ namespace ProjectArena.Engine
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
                             {
-                                Update(0);
+                                Update(0, actor);
                                 AfterActionUpdate();
                             }
 
@@ -612,7 +615,7 @@ namespace ProjectArena.Engine
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
                             {
-                                Update(0);
+                                Update(0, actor);
                                 AfterActionUpdate();
                             }
 
@@ -651,7 +654,7 @@ namespace ProjectArena.Engine
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
                             {
-                                Update(0);
+                                Update(0, actor);
                                 AfterActionUpdate();
                             }
 
