@@ -99,7 +99,6 @@ export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Sk
       cloneTwoPhaseActionAnimation(skillNative.enemyAction),
     range: skill.range,
     cd: skill.cd,
-    mod: skill.mod,
     cost: skill.cost,
     preparationTime: Math.ceil(skill.preparationTime),
     meleeOnly: skill.meleeOnly
@@ -133,7 +132,6 @@ export function convertBuff(buff: SyncBuff): Buff {
     onPurgeAnimation: cloneActionAnimation(buffNative.onPurgeAnimation),
     passiveAnimation: cloneBuffAnimation(buffNative.passiveAnimation),
     onActionEffectAnimation: cloneActionAnimation(buffNative.onActionEffectAnimation),
-    mod: buff.mod,
     duration: buff.duration
   };
 }

@@ -54,14 +54,12 @@ export function synchronizeTile(tile: Tile, syncTile: SyncTile, owner?: Player) 
 export function synchronizeSkill(skill: Skill, syncSkill: SyncSkill) {
   skill.cd = syncSkill.cd;
   skill.cost = syncSkill.cost;
-  skill.mod = syncSkill.mod;
   skill.preparationTime = Math.ceil(syncSkill.preparationTime);
   skill.range = syncSkill.range;
   skill.meleeOnly = syncSkill.meleeOnly;
 }
 
 export function synchronizeBuff(buff: Buff, syncBuff: SyncBuff) {
-  buff.mod = syncBuff.mod;
   buff.duration = syncBuff.duration;
 }
 

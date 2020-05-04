@@ -10,8 +10,6 @@
 
         public float Cd { get; set; }
 
-        public float Mod { get; set; }
-
         public int Cost { get; set; }
 
         public float PreparationTime { get; set; }

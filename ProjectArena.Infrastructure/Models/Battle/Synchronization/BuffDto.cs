@@ -6,8 +6,6 @@
 
         public string NativeId { get; set; }
 
-        public float Mod { get; set; }
-
         public float? Duration { get; set; }
     }
 }

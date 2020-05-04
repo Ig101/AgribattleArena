@@ -9,7 +9,6 @@ export interface Skill {
 
   range: number;
   cd: number;
-  mod: number;
   cost: number;
   preparationTime: number;
   meleeOnly: boolean;

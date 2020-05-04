@@ -17,6 +17,5 @@ export interface Buff {
 
   passiveAnimation: BuffAnimation;
 
-  mod: number;
   duration?: number;
 }

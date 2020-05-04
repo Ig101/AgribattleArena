@@ -57,7 +57,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     Cd = actor.AttackingSkill.Cd,
                     Cost = actor.AttackingSkill.Cost,
                     Id = actor.AttackingSkill.Id,
-                    Mod = actor.AttackingSkill.Mod,
                     NativeId = actor.AttackingSkill.NativeId,
                     PreparationTime = actor.AttackingSkill.PreparationTime,
                     Range = actor.AttackingSkill.Range,
@@ -67,7 +66,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 {
                     Duration = k.Duration,
                     Id = k.Id,
-                    Mod = k.Mod,
                     NativeId = k.NativeId
                 }),
                 NativeId = actor.NativeId,
@@ -83,7 +81,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     Cd = k.Cd,
                     Cost = k.Cost,
                     Id = k.Id,
-                    Mod = k.Mod,
                     NativeId = k.NativeId,
                     PreparationTime = k.PreparationTime,
                     Range = k.Range,
