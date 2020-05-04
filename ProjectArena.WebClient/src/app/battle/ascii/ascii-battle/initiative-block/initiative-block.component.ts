@@ -12,6 +12,7 @@ import { AsciiBattleStorageService } from '../../services/ascii-battle-storage.s
 export class InitiativeBlockComponent implements OnInit, OnDestroy {
 
   @Output() changeSelected = new EventEmitter<InitiativePortrait>();
+  @Output() rightClick = new EventEmitter<{x: number, y: number}>();
 
   get timer() {
     return this.battleStorageService.turnTime;
@@ -27,6 +28,8 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+    this.changeSelected.unsubscribe();
+    this.rightClick.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -62,5 +65,11 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
       this.selectedActior = undefined;
       this.changeSelected.emit(undefined);
     }
+  }
+
+  onClick(portrait: InitiativePortrait) {
+    this.selectedActior = undefined;
+    this.changeSelected.emit(undefined);
+    this.rightClick.next({x: portrait.x, y: portrait.y});
   }
 }

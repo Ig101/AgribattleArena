@@ -36,6 +36,11 @@ import { LoadingService } from 'src/app/shared/services/loading.service';
 import { ModalService } from 'src/app/shared/services/modal.service';
 import { EndGameDeclaration } from '../models/modals/end-game-declaration.model';
 import { VictoryModalComponent } from '../modals/victory-modal/victory-modal.component';
+import { ActorModalComponent } from '../modals/actor-modal/actor-modal.component';
+import { SkillModalComponent } from '../modals/skill-modal/skill-modal.component';
+import { Skill } from '../models/scene/skill.model';
+import { IModal } from 'src/app/shared/interfaces/modal.interface';
+import { DecorationModalComponent } from '../modals/decoration-modal/decoration-modal.component';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -70,6 +75,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   selectedTile: { x: number, y: number, duration: number, forced: boolean };
+  selectedAlwaysTile: { x: number, y: number };
 
   tickingFrequency = 2;
   tickState = 0;
@@ -79,7 +85,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   synchronizationErrorSubscription: Subscription;
   animationSubscription: Subscription;
   finishLoadingSubscription: Subscription;
-  endGameSubscription: Subscription;
+  modalSubscription: Subscription;
 
   receivingMessagesFromHubAllowed = false;
   loadingFinished = false;
@@ -237,7 +243,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
       this.processNextActionFromQueueWithChecks(pending);
     });
-    this.endGameSubscription = battleAnimationsService.victoryAnimationPlayed.subscribe((declaration) => {
+    this.modalSubscription = battleAnimationsService.victoryAnimationPlayed.subscribe((declaration) => {
       this.endGame(declaration);
     });
     this.arenaActionsSubscription = arenaHub.battleSynchronizationActionsNotifier.subscribe(() => {
@@ -254,8 +260,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.synchronizationErrorSubscription.unsubscribe();
     this.animationSubscription.unsubscribe();
     this.finishLoadingSubscription.unsubscribe();
-    if (this.endGameSubscription) {
-      this.endGameSubscription.unsubscribe();
+    if (this.modalSubscription) {
+      this.modalSubscription.unsubscribe();
     }
   }
 
@@ -319,16 +325,48 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  openModalFromPosition(x: number, y: number) {
+    if (x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
+      const tile = this.battleStorageService.scene.tiles[x][y];
+      if (tile.actor) {
+        this.blocked = true;
+        this.selectedAlwaysTile = {x, y};
+        this.battleStorageService.openedModal = this.modalService.openModal(ActorModalComponent, tile.actor);
+        this.modalSubscription = this.battleStorageService.openedModal.onClose.subscribe(() => {
+          this.blocked = false;
+          this.selectedAlwaysTile = undefined;
+        });
+      }
+      if (tile.decoration) {
+        this.blocked = true;
+        const oldTile = this.selectedAlwaysTile;
+        this.selectedAlwaysTile = {x, y};
+        this.battleStorageService.openedModal = this.modalService.openModal(DecorationModalComponent, tile.decoration);
+        this.modalSubscription = this.battleStorageService.openedModal.onClose.subscribe(() => {
+          this.blocked = false;
+          this.selectedAlwaysTile = undefined;
+        });
+      }
+    }
+  }
+
+  openSkillModal(skill: Skill) {
+    this.blocked = true;
+    this.battleStorageService.openedModal = this.modalService.openModal(SkillModalComponent, skill);
+    this.modalSubscription = this.battleStorageService.openedModal.onClose.subscribe(() => this.blocked = false);
+  }
+
   onMouseUp(event: MouseEvent) {
+    this.recalculateMouseMove(event.x, event.y, event.timeStamp);
     if (!this.blocked) {
       if (!this.skillList.find(x => x.pressed) && !this.endTurn.pressed) {
-        this.recalculateMouseMove(event.x, event.y, event.timeStamp);
         this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
         const x = Math.floor(this.mouseState.x);
         const y = Math.floor(this.mouseState.y);
         this.recalculateMouseMove(event.x, event.y, event.timeStamp);
-        if (event.button === 2) {
+        if (event.button === 2 && Math.floor(this.mouseState.x) === x && Math.floor(this.mouseState.y) === y) {
           // Context
+          this.openModalFromPosition(x, y);
         }
         if (event.button === 0 && this.canAct && Math.floor(this.mouseState.x) === x && Math.floor(this.mouseState.y) === y) {
           // Action
@@ -463,8 +501,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     const leftKey = this.mouseState.buttonsInfo[0];
     const rightKey = this.mouseState.buttonsInfo[2];
     if (!rightKey.pressed && !leftKey.pressed) {
-      const cameraLeft = this.battleStorageService.cameraX - this.canvasWidth / 2 / this.tileWidth + 0.5;
-      const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight + 0.5;
+      const cameraLeft = this.battleStorageService.cameraX - this.canvasWidth / 2 / this.tileWidth;
+      const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight;
       const newX = x / this.zoom / this.tileWidth + cameraLeft;
       const newY = y / this.zoom / this.tileHeight + cameraTop;
       this.mouseState.x = newX;
@@ -522,7 +560,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         this.canvasContext.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
         this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
       }
-      const selected = this.selectedTile && this.selectedTile.duration > 500 && this.selectedTile.x === x && this.selectedTile.y === y;
+      const selected = (this.selectedTile && this.selectedTile.duration > 500 && this.selectedTile.x === x && this.selectedTile.y === y) ||
+      (this.selectedAlwaysTile && this.selectedAlwaysTile.x === x && this.selectedAlwaysTile.y === y);
       const replacement = this.battleStorageService.currentAnimations ? this.battleStorageService.currentAnimations[x][y] : undefined;
       if (drawChar) {
         const color = brightImpact(tile.bright, drawChar.color);
@@ -619,8 +658,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.changed = false;
     const scene = this.battleStorageService.scene;
     if (scene) {
-      const cameraLeft = this.battleStorageService.cameraX - this.canvasWidth / 2 / this.tileWidth + 0.5;
-      const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight + 0.5;
+      const cameraLeft = this.battleStorageService.cameraX - this.canvasWidth / 2 / this.tileWidth;
+      const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight;
       this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvasContext.font = `${this.tileHeight}px PT Mono`;
       this.canvasContext.textAlign = 'left';
@@ -665,8 +704,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       for (const text of this.battleStorageService.floatingTexts) {
         if (text.time >= 0) {
-          const x = (text.x - cameraLeft + 0.5) * this.tileWidth;
-          const y = (text.y - cameraTop + 0.5) * this.tileHeight - text.height;
+          const x = (text.x - cameraLeft) * this.tileWidth;
+          const y = (text.y - cameraTop) * this.tileHeight - text.height;
           this.canvasContext.font = `${26}px PT Mono`;
           this.canvasContext.textAlign = 'center';
           this.canvasContext.fillStyle = `rgba(${text.color.r}, ${text.color.g},
@@ -923,6 +962,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private endGame(declaration: EndGameDeclaration) {
     this.blocked = true;
+    this.battleStorageService.openedModal?.close();
     this.modalService.openModal(VictoryModalComponent, declaration);
   }
 

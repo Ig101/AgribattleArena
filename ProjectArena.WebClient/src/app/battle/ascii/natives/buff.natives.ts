@@ -5,7 +5,7 @@ export const buffNatives: { [id: string]: BuffNative } = {
     char: 's',
     color: { r: 100, g: 100, b: 250 },
     name: 'Stun',
-    description: 'Character cannot do anything',
+    description: 'Character cannot do anything and doesn\'t receive action points.',
     onApplyAnimation: undefined,
     effectAnimation: undefined,
     onActionEffectAnimation: undefined,

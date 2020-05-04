@@ -1,0 +1,19 @@
+:host {
+  @import '../../ascii.module.scss';
+
+  display: flex;
+  width: 100%;
+
+  .modal-size {
+    width: 700px;
+    max-width: 700px;
+    padding: 16px;
+  }
+  .extra {
+    text-align: right;
+  }
+
+  .description {
+    margin-top: 16px;
+  }
+}

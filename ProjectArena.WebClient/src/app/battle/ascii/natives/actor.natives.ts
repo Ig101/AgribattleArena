@@ -9,7 +9,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
       color: { r: 255, g: 55, b: 0, a: 1 }
     },
     enemyName: 'Mistspawn',
-    enemyDescription: undefined,
+    enemyDescription: 'Blue plague soldier',
     enemyVisualization: {
       char: 'S',
       color: { r: 55, g: 55, b: 255, a: 1 }

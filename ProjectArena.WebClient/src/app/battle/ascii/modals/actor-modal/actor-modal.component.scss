@@ -1,0 +1,93 @@
+:host {
+  @import '../../ascii.module.scss';
+
+  display: flex;
+  width: 100%;
+
+  .modal-size {
+    width: 700px;
+    max-width: 700px;
+    padding: 16px;
+  }
+
+  .title {
+    display: flex;
+    .actor-icon {
+      position: relative;
+      box-sizing: border-box;
+      border: double;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 90px;
+      height: 90px;
+      min-width: 90px;
+      min-height: 90px;
+      border-width: 6px;
+      font-size: 45px;
+      .health {
+        color: #bbb;
+        position: absolute;
+        left: 6px;
+        top: -8px;
+        font-size: 14px;
+      }
+    }
+    .actor-info-container {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-left: 16px;
+      margin-top: 4px;
+      .actor-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .buffs {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    max-height: 500px;
+    overflow: auto;
+    .buff {
+      margin: 4px 0;
+      display: flex;
+      align-items: center;
+      .buff-icon {
+        position: relative;
+        box-sizing: border-box;
+        border: double;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        min-height: 50px;
+        border-width: 4px;
+        .duration {
+          color: #bbb;
+          position: absolute;
+          left: 4px;
+          top: -2px;
+          font-size: 12px;
+        }
+      }
+      .buff-description {
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .buffs::-webkit-scrollbar {
+    width: 8px
+  }
+   
+  .buffs::-webkit-scrollbar-thumb {
+    background-color: white;
+  }
+}

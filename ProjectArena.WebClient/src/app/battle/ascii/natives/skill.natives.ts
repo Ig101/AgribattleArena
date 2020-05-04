@@ -86,7 +86,7 @@ function explosionIssueDeclaration(targetX, targetY, color: Color) {
 export const skillNatives: { [id: string]: SkillNative } = {
   slash: {
     name: 'Slash',
-    description: 'Strikes with character\'s weapon',
+    description: undefined,
     action: {
       generateIssueDeclarations: (x, y, targetX, targetY) => {
         const frames: AnimationFrame[] = [];
@@ -113,7 +113,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
   },
   explosion: {
     name: 'Explosion',
-    description: 'Strikes area 3x3 with fire and stun affected characters for 1 turn',
+    description: 'Creates 3x3 flame vortex that deals small amount of damage and stuns all affected targets for 1 turn.',
     action: {
       generateIssueDeclarations: (x, y, targetX, targetY) => {
         return explosionIssueDeclaration(targetX, targetY, {r: 255, g: 55, b: 0});

@@ -1,0 +1,29 @@
+<div class="overlay-container">
+  <div class="battle-modal modal-size">
+    <div class="title">
+      <div class="actor-icon title-font-inactive" [style.color]="actorColor" [style.border-color]="actorColor">
+        <div class="health">{{actorHealth}}/{{actorMaxHealth}}</div>
+        {{actorChar}}
+      </div>
+      <div class="actor-info-container">
+        <div class="title-font-inactive actor-name">{{actorName}}</div>
+        <div class="text-font-inactive actor-name">{{actorDescription}}</div>
+      </div>
+    </div>
+    <div class="buffs">
+      <div *ngIf="buffs.length === 0" class="buff">
+        <div class="article-font-inactive">
+          Character doesn't have any effects
+        </div>
+      </div>
+      <div class="buff" *ngFor="let buff of buffs">
+        <div class="text-font-inactive buff-icon" [style.color]="buff.color" [style.border-color]="buff.color">
+          <div class="article-font-inactive duration">{{buff.duration}}</div>
+          {{buff.char}}
+        </div>
+        <div class="article-font-inactive buff-description">{{buff.description}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="overlay-filler"></div>

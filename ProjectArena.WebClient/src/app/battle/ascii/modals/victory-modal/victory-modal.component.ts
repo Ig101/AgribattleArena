@@ -72,4 +72,5 @@ export class VictoryModalComponent implements OnInit, OnDestroy, IModal<any> {
     });
   }
 
+  close() { }
 }

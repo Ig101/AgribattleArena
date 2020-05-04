@@ -11,6 +11,9 @@ import { ActionPointsBlockComponent } from './ascii-battle/action-points-block/a
 import { HotkeyedButtonComponent } from './ascii-battle/hotkeyed-button/hotkeyed-button.component';
 import { AsciiBattleAnimationsService } from './services/ascii-battle-animations.service';
 import { VictoryModalComponent } from './modals/victory-modal/victory-modal.component';
+import { ActorModalComponent } from './modals/actor-modal/actor-modal.component';
+import { SkillModalComponent } from './modals/skill-modal/skill-modal.component';
+import { DecorationModalComponent } from './modals/decoration-modal/decoration-modal.component';
 
 
 
@@ -20,7 +23,10 @@ import { VictoryModalComponent } from './modals/victory-modal/victory-modal.comp
     InitiativeBlockComponent,
     ActionPointsBlockComponent,
     HotkeyedButtonComponent,
-    VictoryModalComponent],
+    VictoryModalComponent,
+    ActorModalComponent,
+    SkillModalComponent,
+    DecorationModalComponent],
   providers: [
     AsciiBattleStorageService,
     AsciiBattleSynchronizerService,

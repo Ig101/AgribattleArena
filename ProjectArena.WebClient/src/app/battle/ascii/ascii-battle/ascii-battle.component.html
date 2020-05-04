@@ -7,7 +7,7 @@
   </canvas>
 </div>
 <div class="interface">
-  <app-initiative-block (changeSelected)="onPositionSelect($event?.x, $event?.y)"></app-initiative-block>
+  <app-initiative-block (changeSelected)="onPositionSelect($event?.x, $event?.y)" (rightClick)="openModalFromPosition($event?.x, $event?.y)"></app-initiative-block>
   <div class="control-block" *ngIf="isMyTurn; else anotherTurn">
     <div class="casting-block">
       <app-action-points-block
@@ -21,7 +21,7 @@
           toggled: item.smartValue === 1,
           disabled: !canAct || item.disabled,
           'active-toggled': item.pressed && item.smartValue === 1
-        }" [disabled]="!canAct" [smartAction]="item">
+        }" [disabled]="!canAct" [smartAction]="item" (rightClick)="openSkillModal($event)">
           <div class="text-font-inactive">{{item.smartValue === 0 ? item.hotKey : 'X'}}) {{item.title}}</div>
           <div class="article-font-inactive">&nbsp;&nbsp;&nbsp;cost: {{item.smartObject.cost}}, 
             {{item.smartObject.preparationTime > 0 ? item.smartObject.preparationTime + ' turn' + (item.smartObject.preparationTime > 1 ? 's left' : ' left') : 'ready'}}</div>

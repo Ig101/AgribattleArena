@@ -10,9 +10,12 @@ import { AnimationDeclaration } from '../models/animations/animation-declaration
 import { AnimationTile } from '../models/animations/animation-tile.model';
 import { FloatingText } from '../models/animations/floating-text.model';
 import { EndGameDeclaration } from '../models/modals/end-game-declaration.model';
+import { IModal } from 'src/app/shared/interfaces/modal.interface';
 
 @Injectable()
 export class AsciiBattleStorageService {
+
+  openedModal: IModal<unknown>;
 
   endDeclaration: EndGameDeclaration;
   ended: boolean;
