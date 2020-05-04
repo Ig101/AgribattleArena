@@ -12,17 +12,7 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public SkillDto AttackingSkill { get; set; }
 
-        public int Strength { get; set; }
-
-        public int Willpower { get; set; }
-
-        public int Constitution { get; set; }
-
-        public int Speed { get; set; }
-
         public IEnumerable<SkillDto> Skills { get; set; }
-
-        public int ActionPointsIncome { get; set; }
 
         public IEnumerable<BuffDto> Buffs { get; set; }
 
@@ -31,8 +21,6 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
         public float Health { get; set; }
 
         public string OwnerId { get; set; }
-
-        public bool IsAlive { get; set; }
 
         public int X { get; set; }
 
@@ -44,15 +32,7 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public int ActionPoints { get; set; }
 
-        public float SkillPower { get; set; }
-
-        public float AttackPower { get; set; }
-
         public float Initiative { get; set; }
-
-        public IEnumerable<TagSynergyDto> Armor { get; set; }
-
-        public IEnumerable<TagSynergyDto> AttackModifiers { get; set; }
 
         public bool CanMove { get; set; }
 

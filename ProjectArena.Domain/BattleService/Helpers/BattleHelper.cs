@@ -52,8 +52,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return new ActorDto()
             {
                 ActionPoints = actor.ActionPoints,
-                ActionPointsIncome = actor.ActionPointsIncome,
-                Armor = actor.Armor.Select(x => MapTagSynergy(x)),
                 AttackingSkill = new SkillDto()
                 {
                     Cd = actor.AttackingSkill.Cd,
@@ -65,8 +63,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     Range = actor.AttackingSkill.Range,
                     MeleeOnly = actor.AttackingSkill.MeleeOnly
                 },
-                AttackModifiers = actor.AttackModifiers.Select(x => MapTagSynergy(x)),
-                AttackPower = actor.AttackPower,
                 Buffs = actor.Buffs.Select(k => new BuffDto()
                 {
                     Duration = k.Duration,
@@ -74,17 +70,14 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     Mod = k.Mod,
                     NativeId = k.NativeId
                 }),
-                Constitution = actor.Constitution,
                 NativeId = actor.NativeId,
                 Id = actor.Id,
                 ExternalId = actor.ExternalId,
-                Health = actor.Health,
                 Initiative = actor.Initiative,
                 InitiativePosition = actor.InitiativePosition,
-                IsAlive = actor.IsAlive,
                 MaxHealth = actor.MaxHealth,
+                Health = actor.Health,
                 OwnerId = actor.OwnerId,
-                SkillPower = actor.SkillPower,
                 Skills = actor.Skills.Select(k => new SkillDto()
                 {
                     Cd = k.Cd,
@@ -96,9 +89,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     Range = k.Range,
                     MeleeOnly = k.MeleeOnly
                 }),
-                Speed = actor.Speed,
-                Strength = actor.Strength,
-                Willpower = actor.Willpower,
                 X = actor.X,
                 Y = actor.Y,
                 Z = actor.Z,

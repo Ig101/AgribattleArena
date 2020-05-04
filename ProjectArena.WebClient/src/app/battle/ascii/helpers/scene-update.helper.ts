@@ -125,11 +125,6 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
       }
     });
   }
-  actor.strength = syncActor.strength;
-  actor.willpower = syncActor.willpower;
-  actor.constitution = syncActor.constitution;
-  actor.speed = syncActor.speed;
-  actor.actionPointsIncome = syncActor.actionPointsIncome;
   if (!compareBuffIdArrays(actor.buffs, syncActor.buffs)) {
     const deletedBuffs = actor.buffs.filter(x => !syncActor.buffs.some(b => b.id === x.id));
     if (deletedBuffs.length > 0) {
@@ -160,7 +155,6 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
   if (owner) {
     actor.owner = owner;
   }
-  actor.isAlive = syncActor.isAlive;
   if (actor.x !== syncActor.x || actor.y !== syncActor.y) {
     difference = getActorDifference(actor, syncActor, difference);
     difference.changedPosition = true;
@@ -170,11 +164,7 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
   actor.z = syncActor.z;
   actor.maxHealth = syncActor.maxHealth;
   actor.actionPoints = syncActor.actionPoints;
-  actor.skillPower = syncActor.skillPower;
-  actor.attackPower = syncActor.attackPower;
   actor.initiative = syncActor.initiative;
-  actor.armor = syncActor.armor;
-  actor.attackModifiers = syncActor.attackModifiers;
   actor.canAct = syncActor.canAct;
   actor.canMove = syncActor.canMove;
   return difference;
