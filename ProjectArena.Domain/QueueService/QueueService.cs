@@ -25,7 +25,7 @@ namespace ProjectArena.Domain.QueueService
             _queues = BattleHelper.GetNewModeQueue();
         }
 
-        public async Task QueueProcessingAsync(double time)
+        public void QueueProcessing(double time)
         {
             foreach (var queue in _queues.Values)
             {
@@ -73,7 +73,7 @@ namespace ProjectArena.Domain.QueueService
                 queue.Queue.RemoveWhere(x => allComplectedActors.Contains(x));
                 foreach (var complect in complectedActors)
                 {
-                    await _battleService.StartNewBattleAsync(queue.Mode, complect);
+                    _battleService.StartNewBattle(queue.Mode, complect);
                 }
             }
         }

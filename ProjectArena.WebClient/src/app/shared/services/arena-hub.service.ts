@@ -4,8 +4,13 @@ import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { ExternalResponse } from '../models/external-response.model';
 import { Synchronizer } from '../models/battle/synchronizer.model';
 import { BattleSynchronizationActionEnum } from '../models/enum/battle-synchronization-action.enum';
+import { LoadingScene } from '../models/loading/loading-scene.model';
+import { LoadingTile } from '../models/loading/loading-tile.model';
+import { tileNatives, actorNatives, decorationNatives } from 'src/app/battle/ascii/natives';
+import { heightImpact, brightImpact } from 'src/app/battle/ascii/helpers/scene-draw.helper';
+import { UserService } from './user.service';
+import { LoadingService } from './loading.service';
 
-const BATTLE_PREPARE = 'BattlePrepare';
 const BATTLE_SYNC_ERROR = 'BattleSynchronizationError';
 const BATTLE_START_GAME = 'BattleStartGame';
 const BATTLE_MOVE = 'BattleMove';
@@ -18,7 +23,7 @@ const BATTLE_END_GAME = 'BattleEndGame';
 const BATTLE_SKIP_TURN = 'BattleSkipTurn';
 const BATTLE_NO_ACTORS_DRAW = 'BattleNoActorsDraw';
 
-type BattleHubReturnMethod = typeof BATTLE_PREPARE | typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
+type BattleHubReturnMethod = typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
     typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_NO_ACTORS_DRAW |
     typeof BATTLE_SKIP_TURN | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT;
 
@@ -33,15 +38,18 @@ export class ArenaHubService {
   battleSynchronizationActionsList: { action: BattleSynchronizationActionEnum, sync: Synchronizer }[] = [];
   battleSynchronizationActionsNotifier = new Subject<any>();
 
-  prepareForBattleNotifier = new BehaviorSubject<boolean>(false);
+  prepareForBattleNotifier = new BehaviorSubject<LoadingScene>(undefined);
 
   synchronizationErrorState = new BehaviorSubject<boolean>(false);
 
   connected: boolean;
 
+  private userId: string;
   private hubConnection: signalR.HubConnection;
 
-  constructor() {
+  constructor(
+    private loadingService: LoadingService
+    ) {
     this.hubConnection = new signalR.HubConnectionBuilder()
     .withUrl('hub')
     .build();
@@ -53,7 +61,8 @@ export class ArenaHubService {
     });
   }
 
-  connect(): Observable<ExternalResponse<any>> {
+  connect(userId: string): Observable<ExternalResponse<any>> {
+    this.userId = userId;
     const subject = new Subject<ExternalResponse<any>>();
     this.hubConnection
         .start()
@@ -81,7 +90,10 @@ export class ArenaHubService {
   }
 
   private catchHubError(error: any) {
-      console.log(error);
+    console.error(error);
+    this.loadingService.startLoading({
+      title: 'Server connection is lost. Refresh the page or try again later...'
+    }, 0, true);
   }
 
   addNewListener(methodName: BattleHubReturnMethod, listener: (synchronizer: Synchronizer) => void) {
@@ -124,7 +136,7 @@ export class ArenaHubService {
       this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;
     }
     if (!this.prepareForBattleNotifier.value) {
-      this.prepareForBattleNotifier.next(false);
+      this.prepareForBattleNotifier.next(undefined);
     }
     return synchronizationObject;
   }
@@ -138,10 +150,52 @@ export class ArenaHubService {
   }
 
   private  addBattleListeners() {
-    this.addNewListener(BATTLE_PREPARE, () => this.prepareForBattleNotifier.next(true) );
     this.addNewListener(BATTLE_SYNC_ERROR, () => this.synchronizationErrorState.next(true) );
-    this.addNewListener(BATTLE_START_GAME, (synchronizer: Synchronizer) =>
-      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.StartGame, synchronizer));
+    this.addNewListener(BATTLE_START_GAME, (synchronizer: Synchronizer) => {
+      const currentPlayer = synchronizer.players.find(x => x.id === this.userId);
+      const loadingScene = {
+        tiles: new Array<LoadingTile[]>(synchronizer.tilesetWidth),
+        width: synchronizer.tilesetWidth,
+        height: synchronizer.tilesetHeight
+      } as LoadingScene;
+      for (let x = 0; x < loadingScene.width; x++) {
+        loadingScene.tiles[x] = new Array<LoadingTile>(synchronizer.tilesetHeight);
+      }
+      for (const tile of synchronizer.changedTiles) {
+        const tileNative = tileNatives[tile.nativeId];
+        loadingScene.tiles[tile.x][tile.y] = {
+          char: tileNative.visualization.char,
+          color: heightImpact(tile.height, tileNative.visualization.color),
+          backgroundColor: heightImpact(tile.height, tileNative.backgroundColor),
+          bright: tileNative.bright
+        };
+      }
+      for (const actor of synchronizer.changedActors) {
+        const actorNative = actorNatives[actor.nativeId];
+        const owner = synchronizer.players.find(x => x.id === actor.ownerId);
+        loadingScene.tiles[actor.x][actor.y].char = currentPlayer.team === owner?.team ?
+          actorNative.visualization.char :
+          actorNative.enemyVisualization.char;
+        loadingScene.tiles[actor.x][actor.y].color = heightImpact(actor.z, brightImpact(loadingScene.tiles[actor.x][actor.y].bright,
+          currentPlayer.team === owner?.team ?
+          actorNative.visualization.color :
+          actorNative.enemyVisualization.color));
+      }
+      for (const decoration of synchronizer.changedDecorations) {
+        const decorationNative = decorationNatives[decoration.nativeId];
+        const owner = synchronizer.players.find(x => x.id === decoration.ownerId);
+        loadingScene.tiles[decoration.x][decoration.y].char = currentPlayer.team === owner?.team ?
+          decorationNative.visualization.char :
+          decorationNative.enemyVisualization.char;
+        loadingScene.tiles[decoration.x][decoration.y].color = heightImpact(decoration.z,
+          brightImpact(loadingScene.tiles[decoration.x][decoration.y].bright,
+          currentPlayer.team === owner?.team ?
+          decorationNative.visualization.color :
+          decorationNative.enemyVisualization.color));
+      }
+      this.prepareForBattleNotifier.next(loadingScene);
+      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.StartGame, synchronizer);
+    });
     this.addNewListener(BATTLE_MOVE, (synchronizer: Synchronizer) =>
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Move, synchronizer));
     this.addNewListener(BATTLE_ATTACK, (synchronizer: Synchronizer) =>

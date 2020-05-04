@@ -9,7 +9,7 @@ namespace ProjectArena.Domain.BattleService
 {
     public interface IBattleService
     {
-        Task StartNewBattleAsync(SceneMode mode, IEnumerable<UserInQueue> users);
+        void StartNewBattle(SceneMode mode, IEnumerable<UserInQueue> users);
 
         void EngineTimeProcessing(double seconds);
 

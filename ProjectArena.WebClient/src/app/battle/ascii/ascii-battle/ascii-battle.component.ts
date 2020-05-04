@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, ActivationEnd } from '@angular/router';
 import { BattleResolverService } from '../../resolvers/battle-resolver.service';
 import { AsciiBattleStorageService } from '../services/ascii-battle-storage.service';
@@ -31,6 +31,8 @@ import { SmartActionTypeEnum } from '../models/enum/smart-action-type.enum';
 import { AsciiBattlePathCreatorService } from '../services/ascii-battle-path-creator.service';
 import { AsciiBattleAnimationsService } from '../services/ascii-battle-animations.service';
 import { AnimationTile } from '../models/animations/animation-tile.model';
+import { heightImpact, brightImpact } from '../helpers/scene-draw.helper';
+import { LoadingService } from 'src/app/shared/services/loading.service';
 
 // TODO Error instead of console.logs
 
@@ -39,7 +41,7 @@ import { AnimationTile } from '../models/animations/animation-tile.model';
   templateUrl: './ascii-battle.component.html',
   styleUrls: ['./ascii-battle.component.scss']
 })
-export class AsciiBattleComponent implements OnInit, OnDestroy {
+export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('battleCanvas', { static: true }) battleCanvas: ElementRef<HTMLCanvasElement>;
   private canvasContext: CanvasRenderingContext2D;
@@ -76,8 +78,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   arenaActionsSubscription: Subscription;
   synchronizationErrorSubscription: Subscription;
   animationSubscription: Subscription;
+  finishLoadingSubscription: Subscription;
 
   receivingMessagesFromHubAllowed = false;
+  loadingFinished = false;
   specificActionResponseForWait: {
     actorId: number,
     action: BattleSynchronizationActionEnum
@@ -180,7 +184,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     private battlePathCreator: AsciiBattlePathCreatorService,
     private arenaHub: ArenaHubService,
     private userService: UserService,
-    private battleAnimationsService: AsciiBattleAnimationsService
+    private battleAnimationsService: AsciiBattleAnimationsService,
+    private loadingService: LoadingService
   ) {
     this.endTurn = {
       hotKey: ' ',
@@ -208,11 +213,20 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       timeStamp: 0
     };
     this.onCloseSubscription = arenaHub.onClose.subscribe(() => {
-      console.log('Connection error');
+      this.loadingService.startLoading({
+        title: 'Server connection is lost. Refresh the page or try again later...'
+      }, 0, true);
+      console.error('Hub connection is lost');
     });
     this.synchronizationErrorSubscription = arenaHub.synchronizationErrorState.subscribe((value) => {
       if (value) {
-        console.log('Synchronization error');
+        this.loadingService.startLoading({
+          title: 'Desynchronization. Page will be refreshed in 2 seconds.'
+        }, 0, true);
+        console.error('Unexpected synchronization error');
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
       }
     });
     this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
@@ -231,6 +245,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     this.arenaActionsSubscription.unsubscribe();
     this.synchronizationErrorSubscription.unsubscribe();
     this.animationSubscription.unsubscribe();
+    this.finishLoadingSubscription.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -239,13 +254,23 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     this.canvasContext = this.battleCanvas.nativeElement.getContext('2d');
     this.battleStorageService.version = 0;
     const loadBattle = this.activatedRoute.snapshot.data.battle;
+    this.drawingTimer = setInterval(this.updateCycle, this.updatingFrequency, this);
     if (loadBattle) {
-      console.log('Restore game');
       const snapshot = this.battleResolver.popBattleSnapshot();
       this.restoreScene(snapshot);
+      if (!this.loadingFinished) {
+        return;
+      }
     }
-    this.drawingTimer = setInterval(this.updateCycle, this.updatingFrequency, this);
     this.processNextActionFromQueue();
+  }
+
+  ngAfterViewInit(): void {
+    this.finishLoadingSubscription = this.loadingService.finishLoading()
+      .subscribe(() => {
+        this.loadingFinished = true;
+        this.processNextActionFromQueue();
+      });
   }
 
   onResize() {
@@ -440,29 +465,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   }
 
    // Drawing
-   private brightImpact(bright: boolean, color: Color) {
-    if (bright) {
-      return {
-        r: color.r * 0.2,
-        g: color.g * 0.2,
-        b: color.b * 0.2,
-        a: color.a
-      };
-    }
-    return color;
-  }
-
-  private heightImpact(z: number, color: Color): Color {
-    if (z !== 0) {
-      return {
-        r: Math.min(255, Math.max(0, color.r * (1 + z / 200))),
-        g: Math.min(255, Math.max(0, color.g * (1 + z / 200))),
-        b: Math.min(255, Math.max(0, color.b * (1 + z / 200))),
-        a: color.a
-      };
-    }
-    return color;
-  }
 
   private mixColorWithReplacement(color: Color, replacement: AnimationTile, z: number): Color {
     const newColor = { r: color.r, g: color.g, b: color.b, a: color.a };
@@ -473,7 +475,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       a : replacement.unitAlpha ? 0 : replacement.color.a }
     : { r: 0, g: 0, b: 0, a: 0 };
     if (!(replacement?.ignoreHeight)) {
-      mainColor = this.heightImpact(z, mainColor);
+      mainColor = heightImpact(z, mainColor);
     }
     if (replacement && replacement.unitColorMultiplier < 1) {
       newColor.r *= replacement.unitColorMultiplier;
@@ -497,36 +499,36 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       const canvasY = (y - cameraTop) * this.tileHeight;
       const symbolY = canvasY + this.tileHeight * 0.75;
       if (tile.backgroundColor) {
-        const color = this.heightImpact(tile.height, tile.backgroundColor);
+        const color = heightImpact(tile.height, tile.backgroundColor);
         this.canvasContext.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
         this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
       }
       const selected = this.selectedTile && this.selectedTile.duration > 500 && this.selectedTile.x === x && this.selectedTile.y === y;
       const replacement = this.battleStorageService.currentAnimations ? this.battleStorageService.currentAnimations[x][y] : undefined;
       if (drawChar) {
-        const color = this.brightImpact(tile.bright, drawChar.color);
+        const color = brightImpact(tile.bright, drawChar.color);
         this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
         this.canvasContext.fillText(drawChar.char, canvasX, symbolY);
       } else
       if ((tile.actor || tile.decoration) && ((tile.specEffects.length === 0 && !selected) || Math.floor(this.tickState) % 2 === 1)) {
         if (tile.actor) {
-          let color = this.heightImpact(tile.actor.z, tile.actor === this.battleStorageService.currentActor &&
+          let color = heightImpact(tile.actor.z, tile.actor === this.battleStorageService.currentActor &&
             this.battleStorageService.currentActor.owner?.id === this.userService.user.id ?
             {r: 255, g: 255, b: 0, a: tile.actor.visualization.color.a} :
             tile.actor.visualization.color);
-          color = this.brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.actor.z) : color);
+          color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.actor.z) : color);
           this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
           this.canvasContext.fillText(replacement?.char ? replacement.char : tile.actor.visualization.char, canvasX, symbolY);
         } else if (tile.decoration) {
-          let color = this.heightImpact(tile.actor.z, tile.decoration.visualization.color);
-          color = this.brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.decoration.z) : color);
+          let color = heightImpact(tile.actor.z, tile.decoration.visualization.color);
+          color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.decoration.z) : color);
           this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
           this.canvasContext.fillText(replacement?.char ? replacement.char : tile.decoration.visualization.char, canvasX, symbolY);
         }
       } else if (tile.specEffects.length > 0 && !selected) {
         const firstEffect = tile.specEffects[0];
-        let color = this.heightImpact(tile.actor.z, firstEffect.visualization.color);
-        color =  this.brightImpact(tile.bright, replacement?.workingOnSpecEffects ?
+        let color = heightImpact(tile.actor.z, firstEffect.visualization.color);
+        color =  brightImpact(tile.bright, replacement?.workingOnSpecEffects ?
           this.mixColorWithReplacement(color, replacement, tile.actor.z) :
           color);
         this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
@@ -535,8 +537,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           firstEffect.visualization.char, canvasX, symbolY);
       } else {
         const color =  replacement?.workingOnSpecEffects && replacement?.char ?
-          this.brightImpact(tile.bright, replacement.color) :
-          this.heightImpact(tile.height, tile.visualization.color);
+          brightImpact(tile.bright, replacement.color) :
+          heightImpact(tile.height, tile.visualization.color);
         this.canvasContext.fillStyle = `rgba(${color.r}, ${color.g},
           ${color.b}, ${color.a})`;
         this.canvasContext.fillText(replacement?.char ? replacement.char : tile.visualization.char, canvasX, symbolY);
@@ -552,7 +554,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         } else {
           color = {r: 255, g: 0, b: 0};
         }
-        color = this.brightImpact(tile.bright, color);
+        color = brightImpact(tile.bright, color);
         const zoomMultiplier = Math.floor(this.battleZoom);
         this.canvasContext.lineWidth = zoomMultiplier * 2;
         this.canvasContext.strokeStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
@@ -592,7 +594,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   }
 
   private redrawScene() {
-    if (!this.changed) {
+    if (!this.changed && !this.loadingFinished) {
       return;
     }
     this.changed = false;
@@ -686,7 +688,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
               .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
               newAction.x, newAction.y);
         } else {
-          console.log('cannot move');
           this.specificActionResponseForWait = undefined;
         }
         break;
@@ -700,12 +701,17 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
             .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Attack, this.battleStorageService.currentActor,
             newAction.x, newAction.y);
         } else {
-          console.log('cannot attack');
           this.specificActionResponseForWait = undefined;
         }
         break;
       default:
-        console.log('Unprocessible action');
+        this.loadingService.startLoading({
+          title: 'Desynchronization. Page will be refreshed in 2 seconds.'
+        }, 0, true);
+        console.error('Action is not found');
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
         return;
     }
   }
@@ -814,7 +820,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   private processNextActionFromQueue() {
     this.receivingMessagesFromHubAllowed = false;
     if (this.battleStorageService.version + 1 < this.arenaHub.firstActionVersion) {
-      console.log('Version issue');
+      this.loadingService.startLoading({
+        title: 'Desynchronization. Page will be refreshed in 2 seconds.'
+      }, 0, true);
+      console.error('Version is not correct');
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
       this.receivingMessagesFromHubAllowed = true;
       return;
     }
@@ -827,7 +839,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     if (this.specificActionResponseForWait) {
       if (!action.sync.actorId ||
         action.sync.actorId !== this.specificActionResponseForWait.actorId) {
-        console.log('Awaiting action version issue');
+        this.loadingService.startLoading({
+          title: 'Desynchronization. Page will be refreshed in 2 seconds.'
+        }, 0, true);
+        console.error('Action is not correct');
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
         return;
       }
       onlySecondPart = true;
@@ -842,7 +860,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         console.log('Start game');
         // TODO Add some introducing animations
         this.restoreScene(action.sync);
-        this.processNextActionFromQueue();
+        if (!this.loadingFinished) {
+          this.processNextActionFromQueue();
+        }
         return;
       case BattleSynchronizationActionEnum.EndGame:
         if (currentPlayer.status === BattlePlayerStatusEnum.Victorious) {

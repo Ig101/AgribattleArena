@@ -350,10 +350,10 @@ namespace ProjectArena.Engine
         public void StartGame()
         {
             this.ReturnAction(this, new SyncEventArgs(this, ++Version, Helpers.Action.StartGame, GetFullSynchronizationData(true), null, null, null, null));
-            EndTurn();
+            EndTurn(true);
         }
 
-        public void EndTurn()
+        public void EndTurn(bool firstTurn = false)
         {
             bool turnStarted;
             do
@@ -381,7 +381,11 @@ namespace ProjectArena.Engine
 
                 if (newObject != null)
                 {
-                    this.RemainedTurnTime = newObject.Owner == null || newObject.Owner.TurnsSkipped <= 0 ? VarManager.TurnTimeLimit : VarManager.TurnTimeLimitAfterSkip;
+                    this.RemainedTurnTime = firstTurn ?
+                        VarManager.TurnTimeLimit + 20 :
+                        (newObject.Owner == null || newObject.Owner.TurnsSkipped <= 0 ?
+                        VarManager.TurnTimeLimit :
+                        VarManager.TurnTimeLimitAfterSkip);
                     this.TempTileObject = newObject;
                     Update(minInitiativePosition);
                     turnStarted = this.TempTileObject.StartTurn();

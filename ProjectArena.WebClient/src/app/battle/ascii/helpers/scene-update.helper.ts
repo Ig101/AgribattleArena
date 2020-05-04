@@ -18,9 +18,22 @@ import { DecorationDifference } from '../models/synchronization-differences/deco
 
 export function synchronizeTile(tile: Tile, syncTile: SyncTile, owner?: Player) {
   if (syncTile.nativeId !== tile.nativeId) {
-    const native = tileNatives[syncTile.nativeId];
+    let native = tileNatives[syncTile.nativeId];
     if (!native) {
-      console.log(`Native error id: ${syncTile.nativeId}`);
+      native = {
+        name: 'Undefined',
+        description: undefined,
+        visualization: {
+          char: '!',
+          color: { r: 200, g: 200, b: 0, a: 1 }
+        },
+        backgroundColor: { r: 15, g: 15, b: 0 },
+        bright: false,
+        action: undefined,
+        onActionEffectAnimation: undefined,
+        onStepAction: undefined
+      };
+      console.error(`Tile native ${tile.nativeId} is not found.`);
     }
     tile.name = native.name;
     tile.description = native.description;

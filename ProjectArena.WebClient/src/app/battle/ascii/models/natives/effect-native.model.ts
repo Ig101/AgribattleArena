@@ -14,6 +14,6 @@ export interface EffectNative {
   enemyDescription?: string;
   enemyVisualization?: Visualization;
   enemyAction?: ActionAnimation;
-  enemyOnActionEffectAnimation: ActionAnimation;
+  enemyOnActionEffectAnimation?: ActionAnimation;
   enemyOnDeathAction?: ActionAnimation;
 }

@@ -6,7 +6,7 @@ namespace ProjectArena.Domain.QueueService
 {
     public interface IQueueService
     {
-        Task QueueProcessingAsync(double time);
+        void QueueProcessing(double time);
 
         bool Enqueue(UserToEnqueueDto user);
 

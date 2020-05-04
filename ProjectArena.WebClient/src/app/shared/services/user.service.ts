@@ -33,7 +33,7 @@ export class UserService {
       this.user = result.result;
       if (this.user) {
         this.email = this.user.email;
-        return this.arenaHub.connect().pipe(map(connect => result));
+        return this.arenaHub.connect(this.user.id).pipe(map(connect => result));
       } else {
         this.unauthorized = true;
         return of(result);

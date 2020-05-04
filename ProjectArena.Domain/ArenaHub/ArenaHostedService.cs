@@ -50,7 +50,7 @@ namespace ProjectArena.Domain.ArenaHub
             var currentTime = DateTime.Now;
             var passed = (currentTime - _timeStamp).TotalSeconds;
             _timeStamp = currentTime;
-            _queueService.QueueProcessingAsync(passed).Wait();
+            _queueService.QueueProcessing(passed);
             _battleService.EngineTimeProcessing(passed);
         }
     }

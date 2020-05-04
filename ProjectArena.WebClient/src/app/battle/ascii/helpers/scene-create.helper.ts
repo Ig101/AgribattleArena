@@ -39,9 +39,22 @@ export function cloneBuffAnimation(animation: BuffAnimation): BuffAnimation {
 }
 
 export function convertTile(tile: SyncTile, owner: Player): Tile {
-  const native = tileNatives[tile.nativeId];
+  let native = tileNatives[tile.nativeId];
   if (!native) {
-    console.log(`Native error id: ${tile.nativeId}`);
+    native = {
+      name: 'Undefined',
+      description: undefined,
+      visualization: {
+        char: '!',
+        color: { r: 200, g: 200, b: 0, a: 1 }
+      },
+      backgroundColor: { r: 15, g: 15, b: 0 },
+      bright: false,
+      action: undefined,
+      onActionEffectAnimation: undefined,
+      onStepAction: undefined
+    };
+    console.error(`Tile native ${tile.nativeId} is not found.`);
   }
   return {
     x: tile.x,
@@ -65,9 +78,15 @@ export function convertTile(tile: SyncTile, owner: Player): Tile {
 }
 
 export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Skill {
-  const skillNative = skillNatives[skill.nativeId];
+  let skillNative = skillNatives[skill.nativeId];
   if (!skillNative) {
-    console.log(`Native error id: ${skill.nativeId}`);
+    skillNative = {
+      name: 'Undefined',
+      description: undefined,
+      action: undefined,
+      alternativeForm: false
+    };
+    console.error(`Skill native ${skill.nativeId} is not found.`);
   }
   return {
     id: skill.id,
@@ -88,9 +107,20 @@ export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Sk
 }
 
 export function convertBuff(buff: SyncBuff): Buff {
-  const buffNative = buffNatives[buff.nativeId];
+  let buffNative = buffNatives[buff.nativeId];
   if (!buffNative) {
-    console.log(`Native error id: ${buff.nativeId}`);
+    buffNative = {
+      name: 'Undefined',
+      description: undefined,
+      char: '!',
+      color: {r: 255, g: 255, b: 0, a: 1},
+      onActionEffectAnimation: undefined,
+      onApplyAnimation: undefined,
+      onPurgeAnimation: undefined,
+      passiveAnimation: undefined,
+      effectAnimation: undefined
+    };
+    console.error(`Buff native ${buff.nativeId} is not found.`);
   }
   return {
     id: buff.id,
@@ -109,9 +139,23 @@ export function convertBuff(buff: SyncBuff): Buff {
 }
 
 export function convertActor(actor: SyncActor, owner: Player, isCurrentPlayerTeam: boolean): Actor {
-  const native = actorNatives[actor.nativeId];
+  let native = actorNatives[actor.nativeId];
   if (!native) {
-    console.log(`Native error id: ${actor.nativeId}`);
+    native = {
+      name: 'Undefined',
+      description: undefined,
+      visualization: {
+        char: '!',
+        color: { r: 255, g: 255, b: 0, a: 1 }
+      },
+      enemyName: 'Undefined',
+      enemyDescription: undefined,
+      enemyVisualization: {
+        char: '!',
+        color: { r: 55, g: 55, b: 255, a: 1 }
+      }
+    };
+    console.error(`Actor native ${actor.nativeId} is not found.`);
   }
   const visualization = isCurrentPlayerTeam ? native.visualization : native.enemyVisualization;
   return {
@@ -152,9 +196,20 @@ export function convertActor(actor: SyncActor, owner: Player, isCurrentPlayerTea
 }
 
 export function convertDecoration(decoration: SyncDecoration, owner: Player, isCurrentPlayerTeam: boolean): ActiveDecoration {
-  const native = decorationNatives[decoration.nativeId];
+  let native = decorationNatives[decoration.nativeId];
   if (!native) {
-    console.log(`Native error id: ${decoration.nativeId}`);
+    native = {
+      name: 'Undefined',
+      description: undefined,
+      visualization: {
+        char: '!',
+        color: { r: 255, g: 0, b: 0, a: 1 }
+      },
+      action: undefined,
+      onDeathAction: undefined,
+      alternativeForm: false
+    };
+    console.error(`Decoration native ${decoration.nativeId} is not found.`);
   }
   return {
     id: decoration.id,
@@ -181,9 +236,21 @@ export function convertDecoration(decoration: SyncDecoration, owner: Player, isC
 }
 
 export function convertEffect(effect: SyncSpecEffect, owner: Player, isCurrentPlayerTeam: boolean): SpecEffect {
-  const native = effectNatives[effect.nativeId];
+  let native = effectNatives[effect.nativeId];
   if (!native) {
-    console.log(`Native error id: ${effect.nativeId}`);
+    native = {
+      name: 'Undefined',
+      description: undefined,
+      visualization: {
+        char: '!',
+        color: { r: 0, g: 255, b: 255, a: 1 }
+      },
+      action: undefined,
+      onActionEffectAnimation: undefined,
+      onDeathAction: undefined,
+      alternativeForm: false
+    };
+    console.error(`Effect native ${effect.nativeId} is not found.`);
   }
   return {
     id: effect.id,

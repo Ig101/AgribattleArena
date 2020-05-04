@@ -30,7 +30,7 @@ namespace ProjectArena.Engine
 
         float GetNextRandom();
 
-        void EndTurn();
+        void EndTurn(bool firstTurn = false);
 
         bool DecorationCast(ActiveDecoration actor);
 

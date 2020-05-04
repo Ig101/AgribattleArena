@@ -185,7 +185,7 @@ export class AsciiBattlePathCreatorService {
     const actorTile = this.battleStorageService.scene.tiles[actor.x][actor.y];
     const skill = actionId || actionId === -1 ? actor.skills.find(x => x.id === actionId) : actor.attackingSkill;
     if (!skill) {
-      console.log('Skill not found');
+      return [];
     }
     for (let sX = -1; sX <= 1; sX++) {
       for (let sY = -1; sY <= 1; sY++) {

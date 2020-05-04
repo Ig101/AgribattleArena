@@ -330,7 +330,14 @@ export class AsciiBattleAnimationsService {
         console.log('EndGame');
         return this.synchronizeFromSynchronizer(synchronizer);
       case BattleSynchronizationActionEnum.SkipTurn:
-        console.log('SkipTurn');
+        this.battleStorageService.floatingTexts.push({
+          text: `*skipped*`,
+          color: { r: 255, g: 255, b: 0, a: 1 },
+          time: 0,
+          x: this.battleStorageService.currentActor.x,
+          y: this.battleStorageService.currentActor.y,
+          height: 0
+        });
         return this.synchronizeFromSynchronizer(synchronizer);
     }
     const declarations = this.mergeFramesToDeclarations(synchronizer.action, synchronizer, notUploadSynchronizer, frames);

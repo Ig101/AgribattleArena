@@ -7,6 +7,7 @@ import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
 import { WebCommunicationService } from 'src/app/shared/services/web-communication.service';
 import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
 import { map } from 'rxjs/operators';
+import { LoadingService } from 'src/app/shared/services/loading.service';
 
 @Injectable()
 export class BattleResolverService implements Resolve<boolean> {
@@ -17,7 +18,7 @@ export class BattleResolverService implements Resolve<boolean> {
     private userService: UserService,
     private arenaHubService: ArenaHubService,
     private router: Router,
-    private webCommunicationService: WebCommunicationService
+    private webCommunicationService: WebCommunicationService,
     ) { }
 
   popBattleSnapshot() {
@@ -38,8 +39,7 @@ export class BattleResolverService implements Resolve<boolean> {
     return this.webCommunicationService.get<Synchronizer>('api/battle')
       .pipe(map(result => {
         if (!result.result) {
-          // TODO Add loading screen with one end
-          console.log('Battle resolver error');
+          this.router.navigate(['lobby']);
         }
         this.battleSnapshot = result.result;
         return true;

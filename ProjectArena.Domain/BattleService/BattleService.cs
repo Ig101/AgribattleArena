@@ -140,12 +140,11 @@ namespace ProjectArena.Domain.BattleService
             SetupNewNativeManagerAsync().Wait();
         }
 
-        public async Task StartNewBattleAsync(SceneMode mode, IEnumerable<UserInQueue> users)
+        public void StartNewBattle(SceneMode mode, IEnumerable<UserInQueue> users)
         {
             var battleHub = _serviceProvider.GetRequiredService<IHubContext<ArenaHub.ArenaHub>>();
 
             var userIds = users.Select(x => x.UserId).ToList();
-            await battleHub.Clients.Users(userIds).SendAsync("BattlePrepare");
             var tempSceneId = _sceneEnumerator;
             _sceneEnumerator++;
             if (_sceneEnumerator == long.MaxValue)
@@ -168,7 +167,8 @@ namespace ProjectArena.Domain.BattleService
                 players.Add(EngineHelper.CreatePlayerForGeneration(id, null, playerActors));
             }
 
-            _scenes.Add(Engine.ForExternalUse.EngineHelper.EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), SynchronizationInfoEventHandler));
+            var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), SynchronizationInfoEventHandler);
+            _scenes.Add(scene);
         }
 
         private void SynchronizationInfoEventHandler(object sender, ISyncEventArgs e)
