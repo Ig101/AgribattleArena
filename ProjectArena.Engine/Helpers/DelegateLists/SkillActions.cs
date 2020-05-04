@@ -29,7 +29,7 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
         {
             if (targetTile.TempObject != null && targetTile.TempObject is Actor target)
             {
-                target.BuffManager.AddBuff("stun", 0, 1);
+                target.BuffManager.AddBuff("stun", 0, (1 / owner.Initiative) + 0.05f);
             }
         }
 

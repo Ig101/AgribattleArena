@@ -10,6 +10,9 @@ import { AsciiBattleStorageService } from './ascii-battle-storage.service';
 import { AnimationTile } from '../models/animations/animation-tile.model';
 import { AnimationFrame } from '../models/animations/animation-frame.model';
 import { FloatingText } from '../models/animations/floating-text.model';
+import { EndGameDeclaration } from '../models/modals/end-game-declaration.model';
+import { UserService } from 'src/app/shared/services/user.service';
+import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle-status.enum';
 
 @Injectable()
 export class AsciiBattleAnimationsService {
@@ -19,12 +22,15 @@ export class AsciiBattleAnimationsService {
   animationsLoaded: boolean;
 
   generationConclusion = new Subject<boolean>();
+  victoryAnimationPlayed = new Subject<EndGameDeclaration>();
 
   private pending = false;
+  private skippedFlag = false;
 
   constructor(
     private battleSynchronizationService: AsciiBattleSynchronizerService,
     private battleStorageService: AsciiBattleStorageService,
+    private userService: UserService
     ) { }
 
   private synchronizeFromSynchronizer(synchronizer: { action: BattleSynchronizationActionEnum, sync: Synchronizer}): boolean {
@@ -35,13 +41,14 @@ export class AsciiBattleAnimationsService {
       const actorFloats = [];
       if (actor.endedTurn) {
         actorFloats.push({
-          text: `*end*`,
+          text: this.skippedFlag ? '*skip*' : '*end*',
           color: { r: 255, g: 255, b: 0, a: 1 },
           time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
           x: actor.x,
           y: actor.y,
           height: 0
         });
+        this.skippedFlag = false;
       }
       if (actor.healthChange) {
         actorFloats.push({
@@ -247,6 +254,12 @@ export class AsciiBattleAnimationsService {
       undefined;
     const frames: AnimationFrame[][] = [];
     this.pending = false;
+    const currentPlayer = synchronizer.sync.players.find(x => x.id === this.userService.user.id);
+    if (currentPlayer.status === BattlePlayerStatusEnum.Defeated) {
+      this.battleStorageService.endDeclaration = {
+        victory: false
+      };
+    }
     switch (synchronizer.action) {
       case BattleSynchronizationActionEnum.Attack:
         if (issuer) {
@@ -327,17 +340,15 @@ export class AsciiBattleAnimationsService {
       case BattleSynchronizationActionEnum.StartGame:
         return false;
       case BattleSynchronizationActionEnum.EndGame:
-        console.log('EndGame');
-        return this.synchronizeFromSynchronizer(synchronizer);
+        frames.push([]);
+        if (currentPlayer.status === BattlePlayerStatusEnum.Victorious) {
+          this.battleStorageService.endDeclaration = {
+            victory: true
+          };
+        }
+        break;
       case BattleSynchronizationActionEnum.SkipTurn:
-        this.battleStorageService.floatingTexts.push({
-          text: `*skipped*`,
-          color: { r: 255, g: 255, b: 0, a: 1 },
-          time: 0,
-          x: this.battleStorageService.currentActor.x,
-          y: this.battleStorageService.currentActor.y,
-          height: 0
-        });
+        this.skippedFlag = true;
         return this.synchronizeFromSynchronizer(synchronizer);
     }
     const declarations = this.mergeFramesToDeclarations(synchronizer.action, synchronizer, notUploadSynchronizer, frames);
@@ -365,11 +376,19 @@ export class AsciiBattleAnimationsService {
     return true;
   }
 
+  private endGameCheck() {
+    if (this.battleStorageService.endDeclaration && !this.battleStorageService.ended) {
+      this.battleStorageService.ended = true;
+      this.victoryAnimationPlayed.next(this.battleStorageService.endDeclaration);
+    }
+  }
+
   processNextAnimationFromQueue(): boolean {
     if (this.animationsQueue.length === 0) {
       this.battleStorageService.currentAnimations = undefined;
       if (this.animationsLoaded) {
         this.animationsLoaded = false;
+        this.endGameCheck();
         this.generationConclusion.next(this.pending);
       }
       return false;
@@ -385,6 +404,7 @@ export class AsciiBattleAnimationsService {
     if (this.animationsQueue.length === 0) {
       this.animationsLoaded = false;
       this.battleStorageService.currentAnimations = undefined;
+      this.endGameCheck();
       this.generationConclusion.next(this.pending);
     }
     return true;

@@ -1,0 +1,21 @@
+.overlay-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.overlay-filler {
+  min-width: 350px;
+  max-width: 350px;
+  width: 350px;
+}
+
+.battle-modal {
+  border: double 4px #fff;
+  background: #000414;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}

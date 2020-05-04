@@ -7,7 +7,7 @@ import { LoadingDefinition } from '../models/loading/loading-definition.model';
 })
 export class LoadingService {
 
-  alphaSpeed = 0.002;
+  alphaSpeed = 0.005;
   alpha = 1;
 
   definition: LoadingDefinition = {

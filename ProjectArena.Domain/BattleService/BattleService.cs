@@ -158,9 +158,9 @@ namespace ProjectArena.Domain.BattleService
             foreach (string id in userIds)
             {
                 var playerActors = new List<IActor>(5);
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 10; i++)
                 {
-                    playerActors.Add(EngineHelper.CreateActorForGeneration(externalIdIncrementor, "adventurer", "slash", 15, 15, 15, 10, new[] { "explosion" }, 6, null));
+                    playerActors.Add(EngineHelper.CreateActorForGeneration(externalIdIncrementor, "adventurer", "slash", 10, 10, 10, 10, new[] { "explosion" }, 6, null));
                     externalIdIncrementor++;
                 }
 

@@ -15,7 +15,7 @@ import { LoadingService } from 'src/app/shared/services/loading.service';
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss']
 })
-export class UserManagementComponent implements OnInit, OnDestroy, AfterViewInit {
+export class UserManagementComponent implements OnInit, OnDestroy {
 
   userManagementWindowEnum = UserManagementWindowEnum;
   userState: UserManagementWindowEnum = this.userManagementWindowEnum.SignIn;
@@ -23,7 +23,6 @@ export class UserManagementComponent implements OnInit, OnDestroy, AfterViewInit
   hubCloseSubscription: Subscription;
   hubBattleSubscription: Subscription;
   hubErrorSubscription: Subscription;
-  finishLoadingSubscription: Subscription;
 
   get loading() {
     return this.userManagementService.loading;
@@ -47,9 +46,6 @@ export class UserManagementComponent implements OnInit, OnDestroy, AfterViewInit
     if (this.hubErrorSubscription) {
       this.hubErrorSubscription.unsubscribe();
     }
-    if (this.finishLoadingSubscription) {
-      this.finishLoadingSubscription.unsubscribe();
-    }
   }
 
   ngOnInit(): void {
@@ -66,7 +62,7 @@ export class UserManagementComponent implements OnInit, OnDestroy, AfterViewInit
         this.loadingService.startLoading({
           title: 'Encountered enemy. Prepare for battle!',
           loadingScene: value
-        }, 30000).subscribe(() => {
+        }, 3000).subscribe(() => {
           this.router.navigate(['battle']);
         });
       }
@@ -82,10 +78,5 @@ export class UserManagementComponent implements OnInit, OnDestroy, AfterViewInit
         }, 2000);
       }
     });
-  }
-
-  ngAfterViewInit(): void {
-    this.finishLoadingSubscription = this.loadingService.finishLoading()
-      .subscribe(() => {});
   }
 }

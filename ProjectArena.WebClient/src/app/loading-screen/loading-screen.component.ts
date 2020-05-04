@@ -78,7 +78,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     const tile = scene.tiles[x][y];
     if (tile) {
       const canvasX = (x - cameraLeft) * tileWidth;
-      const canvasY = (y - cameraTop) * tileHeight + 260;
+      const canvasY = (y - cameraTop) * tileHeight + 140;
       const symbolY = canvasY + tileHeight * 0.75;
       if (tile.backgroundColor) {
         this.canvasContext.fillStyle = `rgb(${tile.backgroundColor.r}, ${tile.backgroundColor.g}, ${tile.backgroundColor.b})`;
@@ -97,7 +97,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     const titleHeight = 30;
     let titlePosition = this.canvasHeight / 2 + titleHeight * 0.375;
     if (definition.loadingScene) {
-      titlePosition = 240;
+      titlePosition = this.canvasHeight / 2 - 220;
       const sceneWidth = 1300;
       const sceneHeight = 680;
       let tileHeight = 30;
@@ -113,7 +113,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
         tileHeight *= sceneWidthCoefficient;
       }
       const cameraLeft = definition.loadingScene.width / 2 - this.canvasWidth / 2 / tileWidth;
-      const cameraTop = definition.loadingScene.height / 2 - (this.canvasHeight - 400) / 2 / tileHeight;
+      const cameraTop = definition.loadingScene.height / 2 - this.canvasHeight / 2 / tileHeight;
       this.canvasContext.font = `${tileHeight}px PT Mono`;
       this.canvasContext.fillStyle = `#ffffff`;
       this.canvasContext.textAlign = 'left';

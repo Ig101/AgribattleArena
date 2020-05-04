@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { LoadingScreenComponent } from './loading-screen/loading-screen.componen
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    OverlayModule
   ],
   providers: [],
   bootstrap: [AppComponent]

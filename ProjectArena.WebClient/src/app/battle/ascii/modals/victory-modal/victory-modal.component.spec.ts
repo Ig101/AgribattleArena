@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalShellComponent } from './modal-shell.component';
+import { VictoryModalComponent } from './victory-modal.component';
 
-describe('ModalShellComponent', () => {
-  let component: ModalShellComponent;
-  let fixture: ComponentFixture<ModalShellComponent>;
+describe('VictoryModalComponent', () => {
+  let component: VictoryModalComponent;
+  let fixture: ComponentFixture<VictoryModalComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ModalShellComponent ]
+      declarations: [ VictoryModalComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ModalShellComponent);
+    fixture = TestBed.createComponent(VictoryModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

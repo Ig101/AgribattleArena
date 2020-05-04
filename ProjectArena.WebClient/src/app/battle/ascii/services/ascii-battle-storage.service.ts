@@ -9,9 +9,13 @@ import { BehaviorSubject } from 'rxjs';
 import { AnimationDeclaration } from '../models/animations/animation-declaration.model';
 import { AnimationTile } from '../models/animations/animation-tile.model';
 import { FloatingText } from '../models/animations/floating-text.model';
+import { EndGameDeclaration } from '../models/modals/end-game-declaration.model';
 
 @Injectable()
 export class AsciiBattleStorageService {
+
+  endDeclaration: EndGameDeclaration;
+  ended: boolean;
 
   floatingTextTime = 1000;
   floatingTextSpeed = 0.07;
@@ -59,7 +63,7 @@ export class AsciiBattleStorageService {
   }
 
   setTurnTime(time: number) {
-    this.turnTime = time - 2;
+    this.turnTime = time - 1;
   }
 
   clear() {
@@ -74,5 +78,7 @@ export class AsciiBattleStorageService {
     this.turnTime = undefined;
     this.currentAnimations = undefined;
     this.floatingTexts = [];
+    this.ended = false;
+    this.endDeclaration = undefined;
   }
 }

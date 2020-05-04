@@ -58,15 +58,15 @@ namespace ProjectArena.Engine.SceneGenerators
 
             for (int i = 0; i < 2; i++)
             {
-                if (tempPlayers[i].KeyActorsGen.Count != 5)
+                if (tempPlayers[i].KeyActorsGen.Count != 10)
                 {
-                    throw new ArgumentException("Actors count should be 5. Thrown on player " + tempPlayers[i].Id, "players.keyActors");
+                    throw new ArgumentException("Actors count should be 10. Thrown on player " + tempPlayers[i].Id, "players.keyActors");
                 }
 
                 Player tempScenePlayer = GeneratorHelper.ConvertExternalPlayerFromGeneration(scene, tempPlayers[i], i);
                 for (int j = 0; j < tempPlayers[i].KeyActorsGen.Count; j++)
                 {
-                    tempScenePlayer.KeyActors.Add(GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempScenePlayer, sceneTiles[(i * 27) + 1][(j * 4) + 1], tempPlayers[i].KeyActorsGen[j], null));
+                    tempScenePlayer.KeyActors.Add(GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempScenePlayer, sceneTiles[(j * 3) + 1][(i * 16) + 1], tempPlayers[i].KeyActorsGen[j], null));
                 }
             }
         }

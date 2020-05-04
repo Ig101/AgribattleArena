@@ -3,7 +3,7 @@ import { ActivatedRoute, ActivationEnd } from '@angular/router';
 import { BattleResolverService } from '../../resolvers/battle-resolver.service';
 import { AsciiBattleStorageService } from '../services/ascii-battle-storage.service';
 import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
-import { Subscription } from 'rxjs';
+import { Subscription, Subscribable } from 'rxjs';
 import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
 import { BattleSynchronizationActionEnum } from 'src/app/shared/models/enum/battle-synchronization-action.enum';
 import { UserService } from 'src/app/shared/services/user.service';
@@ -33,8 +33,9 @@ import { AsciiBattleAnimationsService } from '../services/ascii-battle-animation
 import { AnimationTile } from '../models/animations/animation-tile.model';
 import { heightImpact, brightImpact } from '../helpers/scene-draw.helper';
 import { LoadingService } from 'src/app/shared/services/loading.service';
-
-// TODO Error instead of console.logs
+import { ModalService } from 'src/app/shared/services/modal.service';
+import { EndGameDeclaration } from '../models/modals/end-game-declaration.model';
+import { VictoryModalComponent } from '../modals/victory-modal/victory-modal.component';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -52,7 +53,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   updatingFrequency = 30;
   changed = false;
   blocked = false;
-  mouseBlocked = false;
 
   private tileWidthInternal = 0;
   private tileHeightInternal = 30;
@@ -79,6 +79,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   synchronizationErrorSubscription: Subscription;
   animationSubscription: Subscription;
   finishLoadingSubscription: Subscription;
+  endGameSubscription: Subscription;
 
   receivingMessagesFromHubAllowed = false;
   loadingFinished = false;
@@ -169,6 +170,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get actionPointsAfterSpend() {
+    if (!this.canAct) {
+      return this.battleStorageService.currentActor?.actionPoints;
+    }
     const mouseX = Math.floor(this.mouseState.x);
     const mouseY = Math.floor(this.mouseState.y);
     const currentActionSquare = this.battleStorageService.availableActionSquares
@@ -185,7 +189,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     private arenaHub: ArenaHubService,
     private userService: UserService,
     private battleAnimationsService: AsciiBattleAnimationsService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private modalService: ModalService
   ) {
     this.endTurn = {
       hotKey: ' ',
@@ -232,6 +237,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
       this.processNextActionFromQueueWithChecks(pending);
     });
+    this.endGameSubscription = battleAnimationsService.victoryAnimationPlayed.subscribe((declaration) => {
+      this.endGame(declaration);
+    });
     this.arenaActionsSubscription = arenaHub.battleSynchronizationActionsNotifier.subscribe(() => {
       if (this.receivingMessagesFromHubAllowed) {
         this.processNextActionFromQueue();
@@ -246,6 +254,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.synchronizationErrorSubscription.unsubscribe();
     this.animationSubscription.unsubscribe();
     this.finishLoadingSubscription.unsubscribe();
+    if (this.endGameSubscription) {
+      this.endGameSubscription.unsubscribe();
+    }
   }
 
   ngOnInit(): void {
@@ -303,67 +314,71 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onMouseDown(event: MouseEvent) {
-    this.mouseState.buttonsInfo[event.button] = {pressed: true, timeStamp: event.timeStamp};
+    if (!this.blocked) {
+      this.mouseState.buttonsInfo[event.button] = {pressed: true, timeStamp: event.timeStamp};
+    }
   }
 
   onMouseUp(event: MouseEvent) {
-    if (!this.blocked && !this.skillList.find(x => x.pressed) && !this.endTurn.pressed) {
-      this.recalculateMouseMove(event.x, event.y, event.timeStamp);
-      this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
-      const x = Math.floor(this.mouseState.x);
-      const y = Math.floor(this.mouseState.y);
-      this.recalculateMouseMove(event.x, event.y, event.timeStamp);
-      if (event.button === 2) {
-        // Context
-      }
-      if (event.button === 0 && this.canAct && Math.floor(this.mouseState.x) === x && Math.floor(this.mouseState.y) === y) {
-        // Action
-        const currentActionSquare = this.battleStorageService.availableActionSquares
-        ?.find(s => s.x === x && s.y === y && s.type !== ActionSquareTypeEnum.Actor);
-        if (currentActionSquare) {
-          // TODO cast spells
-          if (this.currentSkillId) {
-            this.arenaHub.orderCast(
-              this.battleStorageService.currentActor.id,
-              this.currentSkillId,
-              currentActionSquare.x,
-              currentActionSquare.y);
-            this.specificActionResponseForWait = {
-              actorId: this.battleStorageService.currentActor.id,
-              action: BattleSynchronizationActionEnum.Cast
-            };
-            this.battleAnimationsService
-              .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Cast, this.battleStorageService.currentActor,
-              currentActionSquare.x, currentActionSquare.y, this.currentSkillId);
-            this.resetSkillActions();
-          } else {
-            this.actionsQueue = [
-              ...currentActionSquare.parentSquares.filter(s => s.type !== ActionSquareTypeEnum.Actor)
-                .reverse().map(s => {
-                  return {
-                  actorId: this.battleStorageService.currentActor.id,
-                  x: s.x,
-                  y: s.y,
-                  action: s.type === ActionSquareTypeEnum.Move ?
-                    BattleSynchronizationActionEnum.Move :
-                    BattleSynchronizationActionEnum.Attack
-                  };
-                }), {
-                  actorId: this.battleStorageService.currentActor.id,
-                  x: currentActionSquare.x,
-                  y: currentActionSquare.y,
-                  action: currentActionSquare.type === ActionSquareTypeEnum.Move ?
-                    BattleSynchronizationActionEnum.Move :
-                    BattleSynchronizationActionEnum.Attack
-                }];
-            this.sendActionFromQueue();
+    if (!this.blocked) {
+      if (!this.skillList.find(x => x.pressed) && !this.endTurn.pressed) {
+        this.recalculateMouseMove(event.x, event.y, event.timeStamp);
+        this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
+        const x = Math.floor(this.mouseState.x);
+        const y = Math.floor(this.mouseState.y);
+        this.recalculateMouseMove(event.x, event.y, event.timeStamp);
+        if (event.button === 2) {
+          // Context
+        }
+        if (event.button === 0 && this.canAct && Math.floor(this.mouseState.x) === x && Math.floor(this.mouseState.y) === y) {
+          // Action
+          const currentActionSquare = this.battleStorageService.availableActionSquares
+          ?.find(s => s.x === x && s.y === y && s.type !== ActionSquareTypeEnum.Actor);
+          if (currentActionSquare) {
+            // TODO cast spells
+            if (this.currentSkillId) {
+              this.arenaHub.orderCast(
+                this.battleStorageService.currentActor.id,
+                this.currentSkillId,
+                currentActionSquare.x,
+                currentActionSquare.y);
+              this.specificActionResponseForWait = {
+                actorId: this.battleStorageService.currentActor.id,
+                action: BattleSynchronizationActionEnum.Cast
+              };
+              this.battleAnimationsService
+                .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Cast, this.battleStorageService.currentActor,
+                currentActionSquare.x, currentActionSquare.y, this.currentSkillId);
+              this.resetSkillActions();
+            } else {
+              this.actionsQueue = [
+                ...currentActionSquare.parentSquares.filter(s => s.type !== ActionSquareTypeEnum.Actor)
+                  .reverse().map(s => {
+                    return {
+                    actorId: this.battleStorageService.currentActor.id,
+                    x: s.x,
+                    y: s.y,
+                    action: s.type === ActionSquareTypeEnum.Move ?
+                      BattleSynchronizationActionEnum.Move :
+                      BattleSynchronizationActionEnum.Attack
+                    };
+                  }), {
+                    actorId: this.battleStorageService.currentActor.id,
+                    x: currentActionSquare.x,
+                    y: currentActionSquare.y,
+                    action: currentActionSquare.type === ActionSquareTypeEnum.Move ?
+                      BattleSynchronizationActionEnum.Move :
+                      BattleSynchronizationActionEnum.Attack
+                  }];
+              this.sendActionFromQueue();
+            }
           }
         }
+      } else {
+        this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
       }
-    } else {
-      this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
+      this.resetButtonsPressedState();
     }
-    this.resetButtonsPressedState();
   }
 
   onMouseLeave() {
@@ -374,9 +389,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onMouseMove(event: MouseEvent) {
-    this.mouseState.realX = event.x;
-    this.mouseState.realY = event.y;
-    if (!this.mouseBlocked) {
+    if (!this.blocked) {
+      this.mouseState.realX = event.x;
+      this.mouseState.realY = event.y;
       this.recalculateMouseMove(event.x, event.y, event.timeStamp);
     }
   }
@@ -389,13 +404,15 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    this.pressedKey = event.key;
-    this.resetButtonsPressedState();
-    const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
-    if (action && this.canAct && !action?.disabled) {
-      action.pressed = true;
-    } else if (event.key !== 'Escape') {
-      this.pressedKey = undefined;
+    if (!this.blocked) {
+      this.pressedKey = event.key;
+      this.resetButtonsPressedState();
+      const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
+      if (action && this.canAct && !action?.disabled) {
+        action.pressed = true;
+      } else if (event.key !== 'Escape') {
+        this.pressedKey = undefined;
+      }
     }
   }
 
@@ -409,21 +426,23 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onKeyUp(event: KeyboardEvent) {
-    if (this.pressedKey === event.key && event.key === 'Escape') {
-      this.resetSkillActions();
-    }
-    if (this.pressedKey === event.key && this.canAct) {
-      const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
-      if (action?.pressed && !action?.disabled) {
-        if (action.type === SmartActionTypeEnum.Toggle) {
-          action.actions[action.smartValue]();
-        } else if (action.type !== SmartActionTypeEnum.Hold || action.smartValue >= 0.95) {
-          action.actions[0]();
-        }
-        action.pressed = false;
-        this.changed = true;
+    if (!this.blocked) {
+      if (this.pressedKey === event.key && event.key === 'Escape') {
+        this.resetSkillActions();
       }
-      this.pressedKey = undefined;
+      if (this.pressedKey === event.key && this.canAct) {
+        const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
+        if (action?.pressed && !action?.disabled) {
+          if (action.type === SmartActionTypeEnum.Toggle) {
+            action.actions[action.smartValue]();
+          } else if (action.type !== SmartActionTypeEnum.Hold || action.smartValue >= 0.95) {
+            action.actions[0]();
+          }
+          action.pressed = false;
+          this.changed = true;
+        }
+        this.pressedKey = undefined;
+      }
     }
   }
 
@@ -851,24 +870,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       onlySecondPart = true;
     }
     const currentPlayer = action.sync.players.find(x => x.id === this.userService.user.id);
-    if (currentPlayer.status === BattlePlayerStatusEnum.Defeated) {
-      console.log('DEFEAT');
-      return;
-    }
     switch (action.action) {
       case BattleSynchronizationActionEnum.StartGame:
-        console.log('Start game');
         // TODO Add some introducing animations
         this.restoreScene(action.sync);
         if (!this.loadingFinished) {
           this.processNextActionFromQueue();
         }
         return;
-      case BattleSynchronizationActionEnum.EndGame:
-        if (currentPlayer.status === BattlePlayerStatusEnum.Victorious) {
-          console.log('VICTORY');
-        }
-        break;
     }
     if (!this.battleAnimationsService.generateAnimationsFromSynchronizer(action, onlySecondPart)) {
       this.processNextActionFromQueueWithChecks();
@@ -910,6 +919,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.tickState > 1000) {
       this.tickState -= 1000;
     }
+  }
+
+  private endGame(declaration: EndGameDeclaration) {
+    this.blocked = true;
+    this.modalService.openModal(VictoryModalComponent, declaration);
   }
 
   private updateScene() {

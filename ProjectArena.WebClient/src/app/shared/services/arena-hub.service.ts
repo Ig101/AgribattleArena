@@ -135,7 +135,7 @@ export class ArenaHubService {
     if (this.battleSynchronizationActionsList.length > 0) {
       this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;
     }
-    if (!this.prepareForBattleNotifier.value) {
+    if (this.prepareForBattleNotifier.value) {
       this.prepareForBattleNotifier.next(undefined);
     }
     return synchronizationObject;

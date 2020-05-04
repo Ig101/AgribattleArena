@@ -1,0 +1,25 @@
+:host {
+  @import '../../ascii.module.scss';
+
+  display: flex;
+  width: 100%;
+
+  .modal-size {
+    width: 300px;
+    height: 340px;
+  }
+
+  .victory {
+    text-align: center;
+    margin: 24px;
+  }
+
+  .press-any-key {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    margin: 24px;
+    margin-bottom: 80px;
+  }
+}

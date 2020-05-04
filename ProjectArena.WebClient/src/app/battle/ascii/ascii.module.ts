@@ -10,11 +10,17 @@ import { InitiativeBlockComponent } from './ascii-battle/initiative-block/initia
 import { ActionPointsBlockComponent } from './ascii-battle/action-points-block/action-points-block.component';
 import { HotkeyedButtonComponent } from './ascii-battle/hotkeyed-button/hotkeyed-button.component';
 import { AsciiBattleAnimationsService } from './services/ascii-battle-animations.service';
+import { VictoryModalComponent } from './modals/victory-modal/victory-modal.component';
 
 
 
 @NgModule({
-  declarations: [AsciiBattleComponent, InitiativeBlockComponent, ActionPointsBlockComponent, HotkeyedButtonComponent],
+  declarations: [
+    AsciiBattleComponent,
+    InitiativeBlockComponent,
+    ActionPointsBlockComponent,
+    HotkeyedButtonComponent,
+    VictoryModalComponent],
   providers: [
     AsciiBattleStorageService,
     AsciiBattleSynchronizerService,
