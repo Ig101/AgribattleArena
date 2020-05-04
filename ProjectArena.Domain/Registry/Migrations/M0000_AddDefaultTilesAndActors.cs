@@ -31,7 +31,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                 DefaultRange = 1,
                 DefaultCost = 2,
                 DefaultCd = 0,
-                DefaultMod = 25,
+                DefaultMod = 30,
                 Actions = new[] { "DoDamageAttack" },
                 MeleeOnly = true
             }).Wait();
@@ -42,7 +42,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                 DefaultRange = 3,
                 DefaultCost = 4,
                 DefaultCd = 3,
-                DefaultMod = 10,
+                DefaultMod = 20,
                 Actions = new[] { "DoSmallAoeDamageSkill", "DoSmallAoeOneTurnStun" },
                 MeleeOnly = false
             }).Wait();
