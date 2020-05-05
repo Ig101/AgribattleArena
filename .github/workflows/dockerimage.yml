@@ -14,19 +14,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Login
+    - name: Build and Publish
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
-    - name: Set connection string
-      env: 
         MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
-      run: heroku config:set MongoConnection__ServerName=$MONGO_CONNECTION_STRING -a blue-plague
-    - name: Set smtp password
-      env:
         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-      run: heroku config:set SmtpServer__SmtpPassword=$SMTP_PASSWORD -a blue-plague
-    - name: Push container
-      run: heroku container:push web -a blue-plague
-    - name: Release container
-      run: heroku container:release web -a blue-plague
+        APP_NAME: ${{ 'blue-plague' }}
+      run: |
+        docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+        heroku config:set MongoConnection__ServerName=$MONGO_CONNECTION_STRING -a $APP_NAME
+        heroku config:set SmtpServer__SmtpPassword=$SMTP_PASSWORD -a $APP_NAME
+        heroku container:push web -a $APP_NAME
+        heroku container:release web -a $APP_NAME
