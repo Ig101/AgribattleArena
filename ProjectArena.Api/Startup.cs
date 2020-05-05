@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +25,17 @@ namespace ProjectArena.Api
   public class Startup
     {
         public static LogEventLevel LogEventLevel { get; set; }
+
+        private readonly Func<HttpContext, Func<Task>, Task> _routingMiddleware =
+            async (context, next) =>
+            {
+                if (IsFrontendRoute(context))
+                {
+                    context.Request.Path = new PathString("/index.html");
+                }
+
+                await next();
+            };
 
         public Startup(IWebHostEnvironment environment)
         {
@@ -69,7 +81,7 @@ namespace ProjectArena.Api
             services.RegisterApplicationLayer();
         }
 
-        private bool IsFrontendRoute(HttpContext context)
+        public static bool IsFrontendRoute(HttpContext context)
         {
             var path = context.Request.Path;
             return path.HasValue &&
@@ -83,6 +95,12 @@ namespace ProjectArena.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.Use(_routingMiddleware);
+                app.UseDefaultFiles();
+                app.UseStaticFiles();
             }
 
             app.UseDomainLayer();
