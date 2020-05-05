@@ -31,7 +31,7 @@ RUN dotnet test
 # Dotnet publish
 FROM dotnetBuild AS publish
 WORKDIR /src/ProjectArena.Api
-COPY --from=nodeBuild /src/ProjectArena.WebClient/dist/* wwwroot/
+COPY --from=nodeBuild /src/dist/* wwwroot/
 RUN dotnet publish -c Release -o /src/publish
 
 # Run
