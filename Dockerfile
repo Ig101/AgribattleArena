@@ -35,8 +35,8 @@ WORKDIR /src/ProjectArena.Api
 RUN dotnet publish -c Release -o /src/publish
 
 # Angular copy
-WORKDIR /src/ProjectArena.WebClient
-COPY dist/* /src/public/wwwroot/
+WORKDIR /src/public
+COPY /src/ProjectArena.WebClient/dist/* wwwroot/
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 WORKDIR /app
