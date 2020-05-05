@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -85,6 +86,7 @@ namespace ProjectArena.Api
         {
             var path = context.Request.Path;
             return path.HasValue &&
+                !Path.HasExtension(path) &&
                 !path.Value.StartsWith("/api", StringComparison.OrdinalIgnoreCase) &&
                 !path.Value.StartsWith("/hub", StringComparison.OrdinalIgnoreCase);
         }

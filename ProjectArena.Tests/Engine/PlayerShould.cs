@@ -88,7 +88,7 @@ namespace ProjectArena.Tests.Engine
                 else if (tempPlayer.Status == ProjectArena.Engine.Helpers.PlayerStatus.Playing)
                 {
                     {
-                        Assert.That(Scene.RemainedTurnTime, Is.EqualTo(t == 0 ? 80 : 20));
+                        Assert.That(Scene.RemainedTurnTime, Is.EqualTo(t == 0 ? 100 : 20));
                         int i = 0;
                         while (tempPlayer.TurnsSkipped == skippedTurns && i < 100)
                         {
@@ -149,7 +149,7 @@ namespace ProjectArena.Tests.Engine
                             SyncMessages.Clear();
                         }
 
-                        Assert.That(Scene.RemainedTurnTime, Is.EqualTo(t == 0 || t == 2 ? 80 : 20));
+                        Assert.That(Scene.RemainedTurnTime, Is.EqualTo(t == 0 ? 100 : t == 2 ? 80 : 20));
                         int i = 0;
                         skippedTurns = tempPlayer.TurnsSkipped;
                         while (tempPlayer.TurnsSkipped == skippedTurns && i < 100)
