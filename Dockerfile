@@ -9,26 +9,24 @@ RUN npm run-script build
 # Dotnet restore
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS dotnetBuild
 WORKDIR /src
-COPY ProjectArena.Api .
-COPY ProjectArena.Application .
-COPY ProjectArena.Domain .
-COPY ProjectArena.Engine .
-COPY ProjectArena.Infrastructure .
-COPY ProjectArena.Tests .
+COPY ProjectArena.Api/*.csproj ProjectArena.Api/
+COPY ProjectArena.Application/*.csproj ProjectArena.Application/
+COPY ProjectArena.Domain/*.csproj ProjectArena.Domain/
+COPY ProjectArena.Engine/*.csproj ProjectArena.Engine/
+COPY ProjectArena.Infrastructure/*.csproj ProjectArena.Infrastructure/
+COPY ProjectArena.Tests/*.csproj ProjectArena.Tests/
 WORKDIR /src/ProjectArena.Api
-RUN ls
 RUN dotnet restore
 WORKDIR /src/ProjectArena.Tests
-RUN ls
 RUN dotnet restore
+WORKDIR /src
+COPY . .
 
 # Dotnet testing
 FROM dotnetBuild AS dotnetTesting
 WORKDIR /src/ProjectArena.Api
-RUN ls
 RUN dotnet build
 WORKDIR /src/ProjectArena.Tests
-RUN ls
 RUN dotnet test
 
 # Dotnet publish
