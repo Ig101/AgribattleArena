@@ -707,7 +707,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       for (const text of this.battleStorageService.floatingTexts) {
         if (text.time >= 0) {
-          const x = (text.x - cameraLeft) * this.tileWidth + 0.5;
+          const x = (text.x - cameraLeft) * this.tileWidth;
           const y = (text.y - cameraTop) * this.tileHeight - text.height;
           this.canvasContext.font = `${26}px PT Mono`;
           this.canvasContext.textAlign = 'center';
