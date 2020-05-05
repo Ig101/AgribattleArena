@@ -1,7 +1,7 @@
 # Angular build
 FROM node:12.16.3-stretch as nodeBuild
 WORKDIR /src
-COPY ProjectArena.WebClient/* web
+COPY ProjectArena.WebClient/* web/
 WORKDIR /src/web
 RUN npm install
 RUN npm run-script build
@@ -9,12 +9,12 @@ RUN npm run-script build
 # Dotnet restore
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS dotnetBuild
 WORKDIR /src
-COPY ProjectArena.Api/* ProjectArena.Api
-COPY ProjectArena.Application/* ProjectArena.Application
-COPY ProjectArena.Domain/* ProjectArena.Domain
-COPY ProjectArena.Engine/* ProjectArena.Engine
-COPY ProjectArena.Infrastructure/* ProjectArena.Infrastructure
-COPY ProjectArena.Tests/* ProjectArena.Tests
+COPY ProjectArena.Api/* ProjectArena.Api/
+COPY ProjectArena.Application/* ProjectArena.Application/
+COPY ProjectArena.Domain/* ProjectArena.Domain/
+COPY ProjectArena.Engine/* ProjectArena.Engine/
+COPY ProjectArena.Infrastructure/* ProjectArena.Infrastructure/
+COPY ProjectArena.Tests/* ProjectArena.Tests/
 WORKDIR /src/ProjectArena.Api
 RUN dotnet restore
 WORKDIR /src/ProjectArena.Tests
@@ -34,7 +34,7 @@ RUN dotnet publish -c Release -o /src/publish
 
 # Angular copy
 WORKDIR /src/web
-COPY dist/* /src/public/wwwroot
+COPY dist/* /src/public/wwwroot/
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 WORKDIR /app
