@@ -78,7 +78,7 @@ namespace ProjectArena.Api
                 Configuration.GetSection("MongoConnection:Registry"));
             services.Configure<EmailSenderSettings>(
                 Configuration.GetSection("SmtpServer"));
-            services.RegisterDomainLayer($"{Configuration["MongoConnection:ServerName"]}/{Configuration["MongoConnection:Identity:DatabaseName"]}");
+            services.RegisterDomainLayer(Configuration["MongoConnection:ConnectionString"]);
             services.RegisterApplicationLayer();
         }
 

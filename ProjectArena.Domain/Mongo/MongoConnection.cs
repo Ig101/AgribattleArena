@@ -18,7 +18,8 @@ namespace ProjectArena.Domain.Mongo
 
         public MongoConnection(IOptions<MongoConnectionSettings> connection,  IServiceProvider provider)
         {
-            _client = new MongoClient(connection.Value.ServerName);
+            var databaseName = new MongoUrl(connection.Value.ConnectionString).DatabaseName;
+            _client = new MongoClient(connection.Value.ConnectionString);
 
             var types = Assembly
                 .GetExecutingAssembly()
@@ -50,11 +51,11 @@ namespace ProjectArena.Domain.Mongo
                 var optionsType = typeof(IOptions<>).MakeGenericType(settingsType);
                 var options = provider.GetRequiredService(optionsType);
                 var config = (IMongoContextSettings)optionsType.GetProperty("Value").GetValue(options);
-                var database = _client.GetDatabase(config.DatabaseName);
+                var database = _client.GetDatabase(databaseName ?? "default");
                 foreach (var entity in entities)
                 {
                     var method = database.GetType().GetMethod("GetCollection").MakeGenericMethod(entity.Type);
-                    var collection = method.Invoke(database, new object[] { entity.Name, null });
+                    var collection = method.Invoke(database, new object[] { config.NamespaceName + "_" + entity.Name, null });
                     _collections.Add(entity.Type, collection);
                     var entityConfigs = configTypes.Where(x => x.EntityType == entity.Type).Select(x => x.Type).ToList();
                     foreach (var entityConfig in entityConfigs)
