@@ -16,15 +16,19 @@ COPY ProjectArena.Engine .
 COPY ProjectArena.Infrastructure .
 COPY ProjectArena.Tests .
 WORKDIR /src/ProjectArena.Api
+RUN ls
 RUN dotnet restore
 WORKDIR /src/ProjectArena.Tests
+RUN ls
 RUN dotnet restore
 
 # Dotnet testing
 FROM dotnetBuild AS dotnetTesting
 WORKDIR /src/ProjectArena.Api
+RUN ls
 RUN dotnet build
 WORKDIR /src/ProjectArena.Tests
+RUN ls
 RUN dotnet test
 
 # Dotnet publish
