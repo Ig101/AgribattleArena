@@ -14,8 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build
-      run: docker build . -t blue-plague -f Dockerfile
     - name: Login
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
