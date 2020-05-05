@@ -37,5 +37,5 @@ RUN dotnet publish -c Release -o /src/publish
 # Run
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 WORKDIR /app
-COPY --from=publish /src/publish .
+COPY /src/publish .
 CMD ASPNETCORE_URLS=https://*:$PORT dotnet ProjectArena.Api.dll
