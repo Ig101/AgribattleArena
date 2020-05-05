@@ -19,6 +19,7 @@ namespace ProjectArena.Domain.Mongo
         public MongoConnection(IOptions<MongoConnectionSettings> connection,  IServiceProvider provider)
         {
             var databaseName = new MongoUrl(connection.Value.ConnectionString).DatabaseName;
+
             _client = new MongoClient(connection.Value.ConnectionString);
 
             var types = Assembly
