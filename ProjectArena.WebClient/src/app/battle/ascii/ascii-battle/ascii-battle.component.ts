@@ -85,7 +85,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   synchronizationErrorSubscription: Subscription;
   animationSubscription: Subscription;
   finishLoadingSubscription: Subscription;
-  modalSubscription: Subscription;
+  victorySubscription: Subscription;
 
   receivingMessagesFromHubAllowed = false;
   loadingFinished = false;
@@ -243,7 +243,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
       this.processNextActionFromQueueWithChecks(pending);
     });
-    this.modalSubscription = battleAnimationsService.victoryAnimationPlayed.subscribe((declaration) => {
+    this.victorySubscription = battleAnimationsService.victoryAnimationPlayed.subscribe((declaration) => {
       this.endGame(declaration);
     });
     this.arenaActionsSubscription = arenaHub.battleSynchronizationActionsNotifier.subscribe(() => {
@@ -260,9 +260,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.synchronizationErrorSubscription.unsubscribe();
     this.animationSubscription.unsubscribe();
     this.finishLoadingSubscription.unsubscribe();
-    if (this.modalSubscription) {
-      this.modalSubscription.unsubscribe();
-    }
+    this.victorySubscription.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -332,9 +330,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         this.blocked = true;
         this.selectedAlwaysTile = {x, y};
         this.battleStorageService.openedModal = this.modalService.openModal(ActorModalComponent, tile.actor);
-        this.modalSubscription = this.battleStorageService.openedModal.onClose.subscribe(() => {
+        this.battleStorageService.openedModal.onClose.subscribe(() => {
           this.blocked = false;
           this.selectedAlwaysTile = undefined;
+          this.battleStorageService.openedModal = undefined;
         });
       }
       if (tile.decoration) {
@@ -342,9 +341,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         const oldTile = this.selectedAlwaysTile;
         this.selectedAlwaysTile = {x, y};
         this.battleStorageService.openedModal = this.modalService.openModal(DecorationModalComponent, tile.decoration);
-        this.modalSubscription = this.battleStorageService.openedModal.onClose.subscribe(() => {
+        this.battleStorageService.openedModal.onClose.subscribe(() => {
           this.blocked = false;
           this.selectedAlwaysTile = undefined;
+          this.battleStorageService.openedModal = undefined;
         });
       }
     }
@@ -353,7 +353,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   openSkillModal(skill: Skill) {
     this.blocked = true;
     this.battleStorageService.openedModal = this.modalService.openModal(SkillModalComponent, skill);
-    this.modalSubscription = this.battleStorageService.openedModal.onClose.subscribe(() => this.blocked = false);
+    this.battleStorageService.openedModal.onClose.subscribe(() => {
+      this.blocked = false;
+      this.battleStorageService.openedModal = undefined;
+    });
   }
 
   onMouseUp(event: MouseEvent) {
@@ -962,7 +965,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private endGame(declaration: EndGameDeclaration) {
     this.blocked = true;
-    this.battleStorageService.openedModal?.close();
+    if (this.battleStorageService.openedModal) {
+      this.battleStorageService.openedModal.close();
+    }
     this.modalService.openModal(VictoryModalComponent, declaration);
   }
 
