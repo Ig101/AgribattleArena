@@ -29,7 +29,7 @@ namespace ProjectArena.Domain.Email
                 Text = message.Body
             };
             using var emailClient = new SmtpClient();
-            await emailClient.ConnectAsync(_settings.SmtpHost, _settings.SmtpPort, false);
+            await emailClient.ConnectAsync(_settings.SmtpHost, _settings.SmtpPort, true);
             emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
             emailClient.Authenticate(_settings.SmtpLogin, _settings.SmtpPassword);
             emailClient.Send(mimeMessage);
