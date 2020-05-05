@@ -20,9 +20,9 @@ jobs:
         MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
       run: |
-      docker build . -t blue-plague -f Dockerfile
-      docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
-      heroku config:set MongoConnection__ServerName=$MONGO_CONNECTION_STRING
-      heroku config:set SmtpServer__SmtpPassword=$ SMTP_PASSWORD
-      heroku container:push web -a blue-plague
-      heroku container:release web -a blue-plague
+        docker build . -t blue-plague -f Dockerfile
+        docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+        heroku config:set MongoConnection__ServerName=$MONGO_CONNECTION_STRING
+        heroku config:set SmtpServer__SmtpPassword=$SMTP_PASSWORD
+        heroku container:push web -a blue-plague
+        heroku container:release web -a blue-plague
