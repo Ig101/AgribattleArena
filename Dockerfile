@@ -4,7 +4,7 @@ WORKDIR /src
 COPY ProjectArena.WebClient .
 WORKDIR /src/ProjectArena.WebClient
 RUN npm install
-RUN npm build-docker
+RUN npm run-script build-docker
 # Dotnet restore
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS dotnetBuild
 WORKDIR /src
