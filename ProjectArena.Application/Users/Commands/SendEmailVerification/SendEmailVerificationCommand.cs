@@ -47,7 +47,7 @@ namespace ProjectArena.Application.Users.Commands.SendEmailVerification
                     {
                         ToAdresses = new[] { request.User.Email },
                         Subject = "Email verification required",
-                        Body = $"<p>Hello!</p><p>To confirm your account in Blue Plague follow the <a href=\"{_serverSettings.Site}/lobby/signup/confirmation/{request.User.Id}/{HttpUtility.UrlEncode(token)}\">link</a>.</p><p>If you didn't request this message, just ignore it.</p>"
+                        Body = $"<p>Hello!</p><p>To confirm your account in Blue Plague follow the <a href=\"{_serverSettings.Site}/auth/signup/confirmation/{request.User.Id}/{HttpUtility.UrlEncode(token)}\">link</a>.</p><p>If you didn't request this message, just ignore it.</p>"
                     });
                 }
                 catch (Exception e)

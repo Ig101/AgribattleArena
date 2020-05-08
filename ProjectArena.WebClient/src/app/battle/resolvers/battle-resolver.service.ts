@@ -29,7 +29,7 @@ export class BattleResolverService implements Resolve<boolean> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (!this.userService.user || this.userService.user.state === UserStateEnum.Lobby) {
-      this.router.navigate(['lobby']);
+      this.router.navigate(['auth']);
       return EMPTY;
     }
     if (this.arenaHubService.prepareForBattleNotifier.value) {
@@ -39,7 +39,7 @@ export class BattleResolverService implements Resolve<boolean> {
     return this.webCommunicationService.get<Synchronizer>('api/battle')
       .pipe(map(result => {
         if (!result.result) {
-          this.router.navigate(['lobby']);
+          this.router.navigate(['auth']);
         }
         this.battleSnapshot = result.result;
         return true;

@@ -1,0 +1,23 @@
+:host {
+  @import '../auth.module.scss';
+
+  .auth-panel {
+    position: relative;
+    height: 610px;
+    margin: 32px;
+    border: double #fff 5px;
+    background: #000414;
+    display: block;
+  }
+
+  .auth-container {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    overflow: hidden;
+  }
+
+  .auth-panels-container {
+    justify-content: center;
+  }
+}

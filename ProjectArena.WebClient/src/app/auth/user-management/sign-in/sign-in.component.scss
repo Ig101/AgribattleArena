@@ -1,0 +1,11 @@
+:host {
+  @import '../../auth.module.scss';
+
+  .password {
+    margin-bottom: 4px;
+  }
+
+  .password-link {
+    margin-bottom: 10px;
+  }
+}

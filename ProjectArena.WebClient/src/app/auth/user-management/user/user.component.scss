@@ -1,0 +1,27 @@
+:host {
+  @import '../../auth.module.scss';
+
+  p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .uid {
+    margin-top: 0px;
+  }
+
+  .extra {
+    margin-left: 4px;
+    color: #ccc;
+  }
+
+  .queue-screen {
+    display: flex;
+    flex-direction: column;
+    p {
+      justify-content: center;
+      margin: 8px;
+    }
+  }
+}

@@ -62,7 +62,7 @@ namespace ProjectArena.Application.Users.Commands.SendPasswordChangeVerification
                     {
                         ToAdresses = new[] { request.Email },
                         Subject = "Change password request",
-                        Body = $"<p>Hello!</p><p>If you want to change you password in Blue Plague, follow the link <a href=\"{_serverSettings.Site}/lobby/signin/new-password/{user.Id}/{HttpUtility.UrlEncode(token)}\">link</a>.</p><p>If you didn't request this message, just ignore it.</p>"
+                        Body = $"<p>Hello!</p><p>If you want to change you password in Blue Plague, follow the link <a href=\"{_serverSettings.Site}/auth/signin/new-password/{user.Id}/{HttpUtility.UrlEncode(token)}\">link</a>.</p><p>If you didn't request this message, just ignore it.</p>"
                     });
                 }
                 catch (Exception e)
