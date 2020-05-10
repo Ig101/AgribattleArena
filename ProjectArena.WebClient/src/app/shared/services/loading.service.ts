@@ -7,6 +7,8 @@ import { LoadingDefinition } from '../models/loading/loading-definition.model';
 })
 export class LoadingService {
 
+  changed = false;
+
   alphaSpeed = 0.005;
   alpha = 1;
 
@@ -25,6 +27,7 @@ export class LoadingService {
   constructor() { }
 
   startLoading(loadingDefinition: LoadingDefinition, requiredTime?: number, stuck: boolean = false): Observable<any> {
+    this.changed = true;
     if (stuck) {
       this.stuck = stuck;
     }

@@ -14,7 +14,7 @@ export class EmailMenuResolverService implements Resolve<boolean> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (this.userService.user) {
-      this.router.navigate(['auth']);
+      this.router.navigate(['lobby']);
       return EMPTY;
     }
     if (!this.userService.email) {

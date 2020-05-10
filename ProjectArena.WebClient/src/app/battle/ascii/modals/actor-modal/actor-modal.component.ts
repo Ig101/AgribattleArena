@@ -75,6 +75,7 @@ export class ActorModalComponent implements IModal<any>, OnDestroy {
 
   close() {
     this.onClose.next();
+    this.overlay.detach();
     this.overlay.dispose();
   }
 }

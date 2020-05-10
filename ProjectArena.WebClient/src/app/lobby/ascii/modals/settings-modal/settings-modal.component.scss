@@ -1,0 +1,51 @@
+:host {
+  display: flex;
+  width: 100%;
+
+  @import '../../ascii.module.scss';
+  .modal {
+    position: relative;
+    width: 550px;
+    max-height: 600px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+  
+    form {
+      margin: 16px 0;
+      padding: 16px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .second-form {
+      margin-top: 0px;
+      padding-top: 0px;
+    }
+  }
+
+  p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 6px 0;
+  }
+
+  .uid-top {
+    margin-bottom: 0px;
+  }
+
+  .uid {
+    margin-top: 0px;
+  }
+
+  .extra {
+    margin-left: 4px;
+    color: #ccc;
+  }
+
+  app-text-input {
+    margin: 4px 0;
+  }
+}

@@ -269,7 +269,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.canvasContext = this.battleCanvas.nativeElement.getContext('2d');
     this.battleStorageService.version = 0;
     const loadBattle = this.activatedRoute.snapshot.data.battle;
-    this.drawingTimer = setInterval(this.updateCycle, this.updatingFrequency, this);
+    this.drawingTimer = setInterval(this.updateCycle, 1000 / this.updatingFrequency, this);
     if (loadBattle) {
       const snapshot = this.battleResolver.popBattleSnapshot();
       this.restoreScene(snapshot);

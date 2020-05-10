@@ -17,6 +17,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
   readonly defaultAspectRatio = this.defaultWidth / this.defaultHeight;
 
   private updateTimer;
+  private updateFrequency = 30;
 
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
@@ -39,10 +40,11 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     this.canvasContext = this.battleCanvas.nativeElement.getContext('2d');
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
     this.loadingService.setupTime();
+    this.loadingService.changed = true;
     this.updateTimer = setInterval(() => {
       this.loadingService.loadingUpdate();
       this.redraw();
-    }, 1000 / 33);
+    }, 1000 / this.updateFrequency);
   }
 
   ngOnDestroy(): void {
@@ -65,6 +67,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
       this.battleCanvas.nativeElement.height = oldHeight;
     }
     this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.loadingService.changed = true;
     this.redraw();
   }
 
@@ -92,6 +95,10 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
 
 
   redraw() {
+    if (!this.loadingService.changed) {
+      return;
+    }
+    this.loadingService.changed = false;
     this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     const definition = this.loadingService.definition;
     const titleHeight = 30;

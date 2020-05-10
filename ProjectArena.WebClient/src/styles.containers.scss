@@ -13,7 +13,9 @@
 }
 
 .modal {
-  border: double #fff;
-  border-width: 5px;
-  background-color: #000414;
+  border: double 4px #fff;
+  background: #000414;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }

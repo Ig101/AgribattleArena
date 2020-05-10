@@ -103,7 +103,7 @@ export class AsciiBattleSynchronizerService {
     } as Scene;
     this.battleStorageService.cameraX = this.battleStorageService.scene.width / 2;
     this.battleStorageService.cameraY = this.battleStorageService.scene.height / 2;
-    this.battleStorageService.zoom = 1.5;
+    this.battleStorageService.zoom = 2;
     this.battleStorageService.defaultActionSquares = this.battleStorageService.currentActor?.owner === currentPlayer ?
     this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) :
     undefined;

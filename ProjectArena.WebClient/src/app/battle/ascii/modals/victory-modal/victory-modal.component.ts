@@ -68,7 +68,7 @@ export class VictoryModalComponent implements OnInit, OnDestroy, IModal<any> {
       this.overlay.detach();
       this.overlay.dispose();
       this.userService.user.state = UserStateEnum.Lobby;
-      this.router.navigate(['auth']);
+      this.router.navigate(['lobby']);
     });
   }
 

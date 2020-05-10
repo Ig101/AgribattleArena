@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { VerifyEmailRequest } from '../models/verify-email-request.model';
 import { map } from 'rxjs/operators';
 import { UserManagementService } from '../services/user-management.service';
+import { UserService } from 'src/app/shared/services/user.service';
 
 @Injectable()
 export class EmailConfirmationResolverService implements Resolve<boolean> {
@@ -12,7 +13,8 @@ export class EmailConfirmationResolverService implements Resolve<boolean> {
   constructor(
     private webCommunicationService: WebCommunicationService,
     private router: Router,
-    private userManagementService: UserManagementService
+    private userManagementService: UserManagementService,
+    private userService: UserService
     ) {
   }
 
@@ -24,7 +26,7 @@ export class EmailConfirmationResolverService implements Resolve<boolean> {
     })
     .pipe(map(result => {
       if (result.success) {
-        this.userManagementService.emailWasConfirmed = true;
+        this.userService.emailWasConfirmed = true;
         this.router.navigate(['auth/signin']);
         return true;
       } else {

@@ -1,0 +1,13 @@
+.overlay-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.overlay-filler {
+  min-width: 374px;
+  max-width: 374px;
+  width: 374px;
+}

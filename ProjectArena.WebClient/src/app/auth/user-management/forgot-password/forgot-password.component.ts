@@ -74,7 +74,7 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   toSignIn() {
-    this.router.navigate(['auth']);
+    this.router.navigate(['auth/signin']);
   }
 
 }

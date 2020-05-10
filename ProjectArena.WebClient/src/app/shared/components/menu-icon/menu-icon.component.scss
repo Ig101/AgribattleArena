@@ -1,0 +1,27 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  max-height: 24px;
+  max-width: 24px;
+  min-height: 24px;
+  min-width: 24px;
+  cursor: pointer;
+  div {
+    margin: 2px;
+    height: 4px;
+    background-color: #fff;
+  }
+}
+
+:host:hover {
+  div {
+    background-color: #ff4;
+  }
+}
+
+:host:active {
+  div {
+    background-color: #aa0;
+  }
+}

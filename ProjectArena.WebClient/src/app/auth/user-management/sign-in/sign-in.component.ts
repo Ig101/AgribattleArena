@@ -11,6 +11,7 @@ import { ExternalResponse } from 'src/app/shared/models/external-response.model'
 import { ActiveUser } from 'src/app/shared/models/active-user.model';
 import { of } from 'rxjs';
 import { SignInRequest } from '../../models/sign-in-request.model';
+import { LoadingService } from 'src/app/shared/services/loading.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -30,7 +31,8 @@ export class SignInComponent implements OnInit {
     private userManagementService: UserManagementService,
     private userService: UserService,
     private router: Router,
-    private routeSnapshot: ActivatedRoute) {
+    private routeSnapshot: ActivatedRoute,
+    private loadingService: LoadingService) {
     }
 
   ngOnInit(): void {
@@ -39,10 +41,10 @@ export class SignInComponent implements OnInit {
       password: this.formBuilder.control('', [controlRequiredSilentValidator($localize`:@@controls.password:Password`)]),
     });
     setTimeout(() => {
-      this.showPasswordWasChangedMessage = this.userManagementService.passwordWasChanged;
-      this.showConfirmationMessage = this.userManagementService.emailWasConfirmed;
-      this.userManagementService.passwordWasChanged = false;
-      this.userManagementService.emailWasConfirmed = false;
+      this.showPasswordWasChangedMessage = this.userService.passwordWasChanged;
+      this.showConfirmationMessage = this.userService.emailWasConfirmed;
+      this.userService.passwordWasChanged = false;
+      this.userService.emailWasConfirmed = false;
       if (this.userService.email) {
         this.form.controls.email.setValue(this.userService.email);
       }
@@ -73,8 +75,12 @@ export class SignInComponent implements OnInit {
       }))
       .subscribe(result => {
         if (result.success) {
-          this.userService.unauthorized = false;
-          this.router.navigate(['auth']);
+          this.loadingService.startLoading({
+            title: 'Loading...'
+          }).subscribe(() => {
+            this.userService.unauthorized = false;
+            this.router.navigate(['lobby']);
+          });
         } else if (result.statusCode === 403) {
           this.userService.email = this.form.controls.email.value;
           this.router.navigate(['auth/signup/confirmation']);

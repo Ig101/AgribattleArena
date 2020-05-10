@@ -31,6 +31,7 @@ namespace ProjectArena.Api.Controllers
     {
       model.UserName = User.Identity.Name;
       await Mediator.Send(model);
+      Response.Cookies.Delete("Authorization");
       return NoContent();
     }
   }

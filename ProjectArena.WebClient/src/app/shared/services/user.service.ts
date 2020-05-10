@@ -15,6 +15,9 @@ export class UserService {
   user: ActiveUser;
   email: string;
 
+  passwordWasChanged = false;
+  emailWasConfirmed = false;
+
   constructor(
     private webCommunicationService: WebCommunicationService,
     private arenaHub: ArenaHubService

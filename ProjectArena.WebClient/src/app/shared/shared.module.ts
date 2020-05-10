@@ -5,13 +5,18 @@ import { TextInputComponent } from './components/text-input/text-input.component
 import { ButtonComponent } from './components/button/button.component';
 import { LinkComponent } from './components/link/link.component';
 import { FocusRemoverDirective } from './components/directives/focus-remover.directive';
+import { MenuIconComponent } from './components/menu-icon/menu-icon.component';
+import { ModalService } from './services/modal.service';
 
 @NgModule({
-  declarations: [TextInputComponent, ButtonComponent, LinkComponent, FocusRemoverDirective],
+  declarations: [TextInputComponent, ButtonComponent, LinkComponent, FocusRemoverDirective, MenuIconComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
+  ],
+  providers: [
+    ModalService
   ],
   exports: [
     CommonModule,
@@ -20,7 +25,8 @@ import { FocusRemoverDirective } from './components/directives/focus-remover.dir
     TextInputComponent,
     ButtonComponent,
     LinkComponent,
-    FocusRemoverDirective
+    FocusRemoverDirective,
+    MenuIconComponent
   ]
 })
 export class SharedModule { }

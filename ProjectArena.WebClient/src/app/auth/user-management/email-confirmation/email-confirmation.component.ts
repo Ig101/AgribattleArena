@@ -51,6 +51,6 @@ export class EmailConfirmationComponent implements OnInit, OnDestroy {
   }
 
   toSignIn() {
-    this.router.navigate(['auth']);
+    this.router.navigate(['auth/signin']);
   }
 }

@@ -66,7 +66,7 @@ export class AsciiBattleStorageService {
   }
 
   setTurnTime(time: number) {
-    this.turnTime = time - 1;
+    this.turnTime = time - 2;
   }
 
   clear() {

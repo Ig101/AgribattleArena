@@ -28,8 +28,12 @@ export class BattleResolverService implements Resolve<boolean> {
   }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    if (!this.userService.user || this.userService.user.state === UserStateEnum.Lobby) {
+    if (!this.userService.user) {
       this.router.navigate(['auth']);
+      return EMPTY;
+    }
+    if (this.userService.user.state === UserStateEnum.Lobby) {
+      this.router.navigate(['lobby']);
       return EMPTY;
     }
     if (this.arenaHubService.prepareForBattleNotifier.value) {

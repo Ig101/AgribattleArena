@@ -72,7 +72,7 @@ export class NewPasswordComponent implements OnInit {
       .subscribe(result => {
         if (result.success) {
           this.userService.user = undefined;
-          this.userManagementService.passwordWasChanged = true;
+          this.userService.passwordWasChanged = true;
           this.router.navigate(['auth/signin']);
         } else {
           this.form.controls.password.setValue('');
@@ -84,7 +84,7 @@ export class NewPasswordComponent implements OnInit {
   }
 
   toSignIn() {
-    this.router.navigate(['auth']);
+    this.router.navigate(['auth/signin']);
   }
 
 }

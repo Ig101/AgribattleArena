@@ -9,9 +9,6 @@ export class UserManagementService {
   errors = new BehaviorSubject<string[]>(undefined);
   showOk = true;
 
-  passwordWasChanged = false;
-  emailWasConfirmed = false;
-
   timer;
 
   emailTimer;

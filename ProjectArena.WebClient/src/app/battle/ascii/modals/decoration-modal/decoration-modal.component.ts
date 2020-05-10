@@ -61,6 +61,7 @@ export class DecorationModalComponent implements IModal<any>, OnDestroy {
 
   close() {
     this.onClose.next();
+    this.overlay.detach();
     this.overlay.dispose();
   }
 }

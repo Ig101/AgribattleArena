@@ -8,8 +8,6 @@ import { SignUpComponent } from './user-management/sign-up/sign-up.component';
 import { EmailConfirmationComponent } from './user-management/email-confirmation/email-confirmation.component';
 import { ForgotPasswordComponent } from './user-management/forgot-password/forgot-password.component';
 import { NewPasswordComponent } from './user-management/new-password/new-password.component';
-import { UserComponent } from './user-management/user/user.component';
-import { UserSettingsComponent } from './user-management/user-settings/user-settings.component';
 import { UserMenuResolverService } from './resolvers/user-menu-resolver.service';
 import { AuthorizationMenuResolverService } from './resolvers/authorization-menu-resolver.service';
 import { EmailMenuResolverService } from './resolvers/email-menu-resolver.service';
@@ -42,19 +40,13 @@ const loginRoutes: Routes = [
     resolve: { AuthorizationMenuResolverService }
   },
   {
-    path: '',
-    component: UserComponent,
-    resolve: { UserMenuResolverService }
-  },
-  {
-    path: 'settings',
-    component: UserSettingsComponent,
-    resolve: { UserMenuResolverService }
-  },
-  {
     path: 'signup/confirmation/:id/:token',
     component: SignInComponent,
     resolve: { EmailConfirmationResolverService }
+  },
+  {
+    path: '**',
+    redirectTo: 'signin'
   }
 ];
 
