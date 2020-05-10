@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  width: 100%;
+
+  @import '../../ascii.module.scss';
+
+  .modal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 612px;
+    height: 540px;
+  }
+}

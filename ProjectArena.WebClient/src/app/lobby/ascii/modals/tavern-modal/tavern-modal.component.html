@@ -1,1 +1,8 @@
-<p>tavern-modal works!</p>
+<div class="overlay-container" (click)="closeOnClick($event)">
+  <div class="modal">
+    <app-tavern *ngIf="!choosingReplacement" (chosenPatron)="choosePatron($event)"></app-tavern>
+    <app-characters-list *ngIf="choosingReplacement && !confirmingReplacement"></app-characters-list>
+    <div *ngIf="choosingReplacement && confirmingReplacement"></div>
+  </div>
+</div>
+<div class="overlay-filler" (click)="closeOnClick($event)"></div>

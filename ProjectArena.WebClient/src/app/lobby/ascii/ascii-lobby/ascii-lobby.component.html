@@ -1,4 +1,6 @@
-<canvas #lobbyCanvas></canvas>
+<canvas #lobbyCanvas (window:resize)="onResize()" (mousedown)="onMouseDown($event)"
+  (window:mouseup)="onMouseUpWindow($event)" (mouseleave)="onMouseLeave()"
+  (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp($event)" [style.cursor]="cursor || 'default'"></canvas>
 <div class="info-container">
   <div class="modal window">
     <div class="row">

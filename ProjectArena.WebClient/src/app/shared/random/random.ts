@@ -76,7 +76,7 @@ export class Random {
     if (start < -this.maxValue) {
       start = -this.maxValue;
     }
-    return Math.floor(this.nextDouble() * (end - start) + start);
+    return Math.floor(this.nextDouble() * (end + 1 - 0.000001 - start) + start);
   }
 
   // from 0 to 1

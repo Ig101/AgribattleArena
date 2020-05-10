@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActiveUser } from '../models/active-user.model';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { WebCommunicationService } from './web-communication.service';
 import { map, tap, switchMap } from 'rxjs/operators';
 import { ExternalResponse } from '../models/external-response.model';
@@ -13,6 +13,8 @@ export class UserService {
 
   unauthorized = false;
   user: ActiveUser;
+  userChanged = new Subject<any>();
+
   email: string;
 
   passwordWasChanged = false;

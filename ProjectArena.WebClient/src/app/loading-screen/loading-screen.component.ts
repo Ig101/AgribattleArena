@@ -41,6 +41,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
     this.loadingService.setupTime();
     this.loadingService.changed = true;
+    this.redraw();
     this.updateTimer = setInterval(() => {
       this.loadingService.loadingUpdate();
       this.redraw();

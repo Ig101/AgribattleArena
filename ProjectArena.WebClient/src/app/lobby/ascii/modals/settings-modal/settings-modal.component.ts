@@ -37,8 +37,6 @@ export class SettingsModalComponent implements OnInit, OnDestroy, IModal<any> {
 
   componentSizeEnum = ComponentSizeEnum;
 
-  @ViewChild('loadingOk') loadingOk: ButtonComponent;
-
   get userUniqueId() {
     return this.userService.user?.uniqueId;
   }
