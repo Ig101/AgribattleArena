@@ -180,7 +180,7 @@ namespace ProjectArena.Engine
             return CreateActor(owner, null, nativeName, NativeManager.GetRoleModelNative(roleNativeName), target, z);
         }
 
-        public Actor CreateActor(Player owner, long? externalId, string nativeName, RoleModelNative roleModel, Tile target, float? z)
+        public Actor CreateActor(Player owner, Guid? externalId, string nativeName, RoleModelNative roleModel, Tile target, float? z)
         {
             if (target.TempObject != null)
             {

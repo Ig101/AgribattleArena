@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ProjectArena.Engine.Helpers;
 
 namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
@@ -7,7 +8,7 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
     {
         int Id { get; }
 
-        long? ExternalId { get; }
+        Guid? ExternalId { get; }
 
         string NativeId { get; }
 

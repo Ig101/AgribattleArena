@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces
 {
     public interface IActor
     {
-        long? ExternalId { get; }
+        Guid? ExternalId { get; }
 
         string NativeId { get; }
 

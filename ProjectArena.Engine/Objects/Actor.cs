@@ -28,7 +28,7 @@ namespace ProjectArena.Engine.Objects
 
         public int SelfActionPointsIncome { get; private set; }
 
-        public long? ExternalId { get; }
+        public Guid? ExternalId { get; }
 
         public Skill AttackingSkill { get; }
 
@@ -70,7 +70,7 @@ namespace ProjectArena.Engine.Objects
 
         public List<TagSynergy> AttackModifiers => BuffManager.Attack;
 
-        public Actor(ISceneParentRef parent, IPlayerParentRef owner, long? externalId, ITileParentRef tempTile, float? z, ActorNative native, RoleModelNative roleModelNative)
+        public Actor(ISceneParentRef parent, IPlayerParentRef owner, Guid? externalId, ITileParentRef tempTile, float? z, ActorNative native, RoleModelNative roleModelNative)
             : base(parent, owner, tempTile, z ?? native.DefaultZ, new DamageModel(), native)
         {
             this.varManager = parent.VarManager;

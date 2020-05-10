@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 {
@@ -6,7 +7,7 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
     {
         public int Id { get; set; }
 
-        public long? ExternalId { get; set; }
+        public Guid? ExternalId { get; set; }
 
         public string NativeId { get; set; }
 

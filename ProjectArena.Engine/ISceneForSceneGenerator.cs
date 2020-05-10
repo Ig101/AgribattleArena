@@ -1,4 +1,5 @@
-﻿using ProjectArena.Engine.ForExternalUse;
+﻿using System;
+using ProjectArena.Engine.ForExternalUse;
 using ProjectArena.Engine.Helpers;
 using ProjectArena.Engine.Natives;
 using ProjectArena.Engine.Objects;
@@ -19,7 +20,7 @@ namespace ProjectArena.Engine
 
         Actor CreateActor(Player owner, string nativeName, string roleNativeName, Tile target, float? z);
 
-        Actor CreateActor(Player owner, long? externalId, string nativeName, RoleModelNative roleModel, Tile target, float? z);
+        Actor CreateActor(Player owner, Guid? externalId, string nativeName, RoleModelNative roleModel, Tile target, float? z);
 
         ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, float? z, int? health, TagSynergy[] armor, float? mod);
 

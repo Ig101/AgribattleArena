@@ -48,5 +48,20 @@ namespace ProjectArena.Tests.Engine.Helpers
 
             return scene;
         }
+
+        public static int GetOrderByGuid(Guid? guid)
+        {
+            if (guid == Guid.Parse("10505fc7-3cdf-4c2b-bf36-4c934673a080"))
+            {
+                return 1;
+            }
+
+            if (guid == Guid.Parse("d5bd9080-cd18-475d-9a30-1a1361f99e7e"))
+            {
+                return 2;
+            }
+
+            return 0;
+        }
     }
 }

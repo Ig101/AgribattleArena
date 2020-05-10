@@ -16,7 +16,7 @@ namespace ProjectArena.Tests.Engine
         {
             SyncMessages = new List<ISyncEventArgs>();
             Scene = SceneSamples.CreateSimpleScene(this.EventHandler, true);
-            Scene.Actors.Find(x => x.ExternalId == 1).ChangePosition(Scene.Tiles[17][2], true);
+            Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).ChangePosition(Scene.Tiles[17][2], true);
             SyncMessages.Clear();
         }
 
@@ -24,7 +24,7 @@ namespace ProjectArena.Tests.Engine
         public void StartState()
         {
             Assert.That(Scene.Tiles[1][2].TempObject, Is.Null, "Previous actor position");
-            Assert.That(((Actor)Scene.Tiles[17][2].TempObject).ExternalId, Is.EqualTo(1), "Previous actor position");
+            Assert.That(SceneHelper.GetOrderByGuid(((Actor)Scene.Tiles[17][2].TempObject).ExternalId), Is.EqualTo(1), "Previous actor position");
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace ProjectArena.Tests.Engine
         [TestCase(TestName = "SkipTurn (4 turns, Act on 2 turn)")]
         public void RefreshSkippedTurnsTime()
         {
-            Scene.Actors.Find(x => x.ExternalId == 1).ChangePosition(Scene.Tiles[16][2], true);
+            Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).ChangePosition(Scene.Tiles[16][2], true);
             Player tempPlayer = (Player)Scene.TempTileObject.Owner;
             int skippedTurns = 0;
             for (int t = 0; t < 4; t++)

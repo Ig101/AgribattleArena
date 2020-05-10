@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
 using ProjectArena.Engine.Helpers;
@@ -15,7 +16,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public int Id { get; }
 
-        public long? ExternalId { get; }
+        public Guid? ExternalId { get; }
 
         public string NativeId { get; }
 
@@ -101,7 +102,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
         }
 
         public Actor(
-            long externalId,
+            Guid? externalId,
             string nativeId,
             string attackingSkillName,
             int strength,

@@ -14,7 +14,7 @@ export interface Actor {
   defaultVisualization: Visualization;
   visualization: Visualization;
 
-  externalId?: number;
+  externalId?: string;
   attackingSkill: Skill;
   skills: Skill[];
   buffs: Buff[];

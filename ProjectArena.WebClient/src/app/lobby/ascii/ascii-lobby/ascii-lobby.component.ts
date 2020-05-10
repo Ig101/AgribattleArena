@@ -12,6 +12,8 @@ import { UserStateEnum } from 'src/app/shared/models/enum/user-state.enum';
 import { Router } from '@angular/router';
 import { QueueService } from '../../services/queue.service';
 import { SettingsModalComponent } from '../modals/settings-modal/settings-modal.component';
+import { LobbyTile } from '../model/lobby-tile.model';
+import { Character } from '../model/character.model';
 
 @Component({
   selector: 'app-ascii-lobby',
@@ -22,6 +24,8 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('lobbyCanvas', { static: true }) battleCanvas: ElementRef<HTMLCanvasElement>;
   private canvasContext: CanvasRenderingContext2D;
+
+  tiles: LobbyTile<Character>
 
   finishLoadingSubscription: Subscription;
   onCloseSubscription: Subscription;
@@ -195,26 +199,6 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
             };
           }
           this.drawPoint(scene, x, y, cameraLeft, cameraTop, drawChar);
-        }
-      }
-      if (this.battleStorageService.availableActionSquares?.length > 0) {
-        const path = this.generateActionSquareGrid(cameraLeft, cameraTop);
-        this.canvasContext.strokeStyle = this.currentSkillId ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 255, 0, 0.8)';
-        this.canvasContext.lineWidth = 2;
-        this.canvasContext.stroke(path);
-      }
-      for (const text of this.battleStorageService.floatingTexts) {
-        if (text.time >= 0) {
-          const x = (text.x + 0.5 - cameraLeft) * this.tileWidth;
-          const y = (text.y - cameraTop) * this.tileHeight - text.height;
-          this.canvasContext.font = `${26}px PT Mono`;
-          this.canvasContext.textAlign = 'center';
-          this.canvasContext.fillStyle = `rgba(${text.color.r}, ${text.color.g},
-            ${text.color.b}, ${text.color.a})`;
-          this.canvasContext.fillText(text.text, x, y);
-          this.canvasContext.lineWidth = 1;
-          this.canvasContext.strokeStyle = `rgba(0, 8, 24, ${text.color.a})`;
-          this.canvasContext.strokeText(text.text, x, y);
         }
       }
     }*/

@@ -31,7 +31,7 @@ namespace ProjectArena.Tests.Engine
         public void Impact()
         {
             Scene.ActorWait(Scene.TempTileObject.Id);
-            Assert.That((int)Scene.Actors.Find(x => x.ExternalId == 1).DamageModel.Health, Is.EqualTo(95), "Actor health after impact");
+            Assert.That((int)Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).DamageModel.Health, Is.EqualTo(95), "Actor health after impact");
             Assert.That(_effect.Duration, Is.LessThan(2), "Effect duration");
         }
 
@@ -45,7 +45,7 @@ namespace ProjectArena.Tests.Engine
             }
 
             Assert.That(i > 400, Is.False, "Cycle error");
-            Assert.That((int)Scene.Actors.Find(x => x.ExternalId == 1).DamageModel.Health, Is.EqualTo(70), "Actor health after impact");
+            Assert.That((int)Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).DamageModel.Health, Is.EqualTo(70), "Actor health after impact");
             Assert.That(_effect.Duration, Is.LessThanOrEqualTo(0), "Effect duration");
             Assert.That(_effect.IsAlive, Is.False, "Is alive");
             Assert.That(SyncMessages[SyncMessages.Count() - 1].SyncInfo.DeletedEffects.Count(), Is.EqualTo(1), "Count of deleted effects");

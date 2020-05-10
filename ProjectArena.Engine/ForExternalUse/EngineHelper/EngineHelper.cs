@@ -20,7 +20,7 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
         }
 
         public static IActor CreateActorForGeneration (
-            long externalId,
+            Guid? externalId,
             string nativeId,
             string attackingSkillName,
             int strength,

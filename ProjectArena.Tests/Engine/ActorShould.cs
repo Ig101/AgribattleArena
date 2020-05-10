@@ -32,7 +32,7 @@ namespace ProjectArena.Tests.Engine
         private void MoveCloseToEnemy(int x)
         {
             int step = 0;
-            if (_actor.ExternalId == 1)
+            if (SceneHelper.GetOrderByGuid(_actor.ExternalId) == 1)
             {
                 do
                 {
@@ -69,7 +69,7 @@ namespace ProjectArena.Tests.Engine
         [Test]
         public void StartState()
         {
-            Assert.That(_actor.ExternalId, Is.EqualTo(2), "TempTileObject externalId");
+            Assert.That(SceneHelper.GetOrderByGuid(_actor.ExternalId), Is.EqualTo(2), "TempTileObject externalId");
             Assert.That(_actor.TempTile.X, Is.EqualTo(18), "X position");
             Assert.That(_actor.TempTile.Y, Is.EqualTo(2), "Y position");
             Assert.That(_actor.ActionPoints, Is.EqualTo(4), "Amount of actionPoints");
@@ -95,7 +95,7 @@ namespace ProjectArena.Tests.Engine
         [Test]
         public void Resurrection()
         {
-            Actor resurrectionActor = Scene.Actors.Find(x => x.ExternalId == 1);
+            Actor resurrectionActor = Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1);
             Assert.That(Scene.Tiles[1][2].TempObject, Is.EqualTo(resurrectionActor), "Position");
             resurrectionActor.Kill();
             Scene.ActorWait(_actor.Id);
@@ -405,9 +405,9 @@ namespace ProjectArena.Tests.Engine
             int[] expectedActionPoints = new int[] { 0, 0 };
             for (int i = 0; i < repetitions; i++)
             {
-                Actor expectedActor = Scene.Actors.Find(x => x.ExternalId == expectedExternalIds[i]);
+                Actor expectedActor = Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == expectedExternalIds[i]);
                 expectedActionPoints[expectedExternalIds[i] - 1] = Math.Min(expectedActionPoints[expectedExternalIds[i] - 1] + expectedActor.ActionPointsIncome, 8);
-                Assert.That(((Actor)Scene.TempTileObject).ExternalId, Is.EqualTo(expectedExternalIds[i]), "ExternalId of temp actor");
+                Assert.That(SceneHelper.GetOrderByGuid(((Actor)Scene.TempTileObject).ExternalId), Is.EqualTo(expectedExternalIds[i]), "ExternalId of temp actor");
                 Assert.That(((Actor)Scene.TempTileObject).ActionPoints, Is.EqualTo(expectedActionPoints[expectedExternalIds[i] - 1]), "Action points of temp actor");
                 Scene.ActorWait(expectedActor.Id);
                 EndTurnAssertion(expectedActor.Id, expectedExternalIds[i + 1] != expectedExternalIds[i]);
