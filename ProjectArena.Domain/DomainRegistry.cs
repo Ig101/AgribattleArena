@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ProjectArena.Domain.ArenaHub;
 using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.Email;
+using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Identity;
 using ProjectArena.Domain.Identity.Entities;
 using ProjectArena.Domain.Mongo;
@@ -58,6 +59,7 @@ namespace ProjectArena.Domain
             });
             services.AddSingleton<IMongoConnection, MongoConnection>();
             services.AddTransient<RegistryContext>();
+            services.AddTransient<GameContext>();
             services.AddTransient<EmailSender>();
             services.AddSignalR();
             services.AddSingleton<BattleService.IBattleService, BattleService.BattleService>();

@@ -18,7 +18,7 @@
     top: 0px;
     display: flex;
     flex-direction: column;
-    div {
+    .nowrap {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -34,6 +34,7 @@
     .patrol {
       align-items: center;
       justify-content: center;
+      text-align: center;
       height: 200px;
       div {
         display: flex;

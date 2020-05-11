@@ -1,0 +1,18 @@
+:host {
+  padding: 22px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  div {
+    margin: 3px;
+    padding: 3px;
+    cursor: pointer;
+  }
+  div:hover {
+    color: #ff4 !important;
+  }
+  div:active {
+    color: #aa0 !important;
+  }
+}

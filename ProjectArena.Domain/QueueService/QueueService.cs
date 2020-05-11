@@ -73,7 +73,7 @@ namespace ProjectArena.Domain.QueueService
                 queue.Queue.RemoveWhere(x => allComplectedActors.Contains(x));
                 foreach (var complect in complectedActors)
                 {
-                    _battleService.StartNewBattle(queue.Mode, complect);
+                    _battleService.StartNewBattleAsync(queue.Mode, complect).Start();
                 }
             }
         }

@@ -15,6 +15,7 @@ using ProjectArena.Domain;
 using ProjectArena.Domain.ArenaHub;
 using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.Email;
+using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Mongo;
 using ProjectArena.Domain.QueueService;
 using ProjectArena.Domain.Registry;
@@ -76,6 +77,8 @@ namespace ProjectArena.Api
                 Configuration.GetSection("MongoConnection"));
             services.Configure<MongoContextSettings<RegistryContext>>(
                 Configuration.GetSection("MongoConnection:Registry"));
+            services.Configure<MongoContextSettings<GameContext>>(
+                Configuration.GetSection("MongoConnection:Game"));
             services.Configure<EmailSenderSettings>(
                 Configuration.GetSection("SmtpServer"));
             services.RegisterDomainLayer(Configuration["MongoConnection:ConnectionString"]);

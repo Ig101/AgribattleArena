@@ -19,7 +19,14 @@ namespace ProjectArena.Domain.Mongo.Operations
 
         public async Task ProcessAsync(IClientSessionHandle session, CancellationToken token)
         {
-            await _mongoCollection.InsertManyAsync(session, _objects, null, token);
+            if (session != null)
+            {
+                await _mongoCollection.InsertManyAsync(session, _objects, null, token);
+            }
+            else
+            {
+                await _mongoCollection.InsertManyAsync(_objects, null, token);
+            }
         }
     }
 }

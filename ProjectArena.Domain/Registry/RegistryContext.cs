@@ -37,25 +37,6 @@ namespace ProjectArena.Domain.Registry
             TileNatives = InitializeRepository<TileNative>();
         }
 
-        private Type GetMongoConfigEntity(Type type)
-        {
-            if (type != null)
-            {
-                var configuration = type.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEntityConfiguration<>));
-                if (configuration != null)
-                {
-                    return configuration.GetGenericArguments().First();
-                }
-            }
-
-            if (type == null)
-            {
-                return null;
-            }
-
-            return GetMongoConfigEntity(type.BaseType);
-        }
-
         public void LoadMigrations()
         {
             var types = Assembly

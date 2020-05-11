@@ -41,7 +41,7 @@ namespace ProjectArena.Engine.SceneGenerators
 
         public void GenerateNewScene(ISceneForSceneGenerator scene, IEnumerable<IPlayer> players, int seed)
         {
-            Tile[][] sceneTiles = scene.SetupEmptyTileSet(30, 19);
+            Tile[][] sceneTiles = scene.SetupEmptyTileSet(26, 16);
             for (int x = 0; x < sceneTiles.Length; x++)
             {
                 for (int y = 0; y < sceneTiles[x].Length; y++)
@@ -58,15 +58,15 @@ namespace ProjectArena.Engine.SceneGenerators
 
             for (int i = 0; i < 2; i++)
             {
-                if (tempPlayers[i].KeyActorsGen.Count != 10)
+                if (tempPlayers[i].KeyActorsGen.Count != 6)
                 {
-                    throw new ArgumentException("Actors count should be 10. Thrown on player " + tempPlayers[i].Id, "players.keyActors");
+                    throw new ArgumentException("Actors count should be 6. Thrown on player " + tempPlayers[i].Id, "players.keyActors");
                 }
 
                 Player tempScenePlayer = GeneratorHelper.ConvertExternalPlayerFromGeneration(scene, tempPlayers[i], i);
                 for (int j = 0; j < tempPlayers[i].KeyActorsGen.Count; j++)
                 {
-                    tempScenePlayer.KeyActors.Add(GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempScenePlayer, sceneTiles[(j * 3) + 1][(i * 16) + 1], tempPlayers[i].KeyActorsGen[j], null));
+                    tempScenePlayer.KeyActors.Add(GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempScenePlayer, sceneTiles[(j * 4) + 1][(i * 13) + 1], tempPlayers[i].KeyActorsGen[j], null));
                 }
             }
         }

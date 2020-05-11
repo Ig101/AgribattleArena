@@ -3,7 +3,7 @@
   (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp($event)" [style.cursor]="cursor || 'default'"></canvas>
 <div class="info-container">
   <div class="modal window">
-    <div class="row">
+    <div class="row nowrap">
       <app-menu-icon (click)="openSettings()"></app-menu-icon>
       <div class="title-font-inactive">{{userName}}</div>
     </div>
@@ -14,7 +14,10 @@
     </div>
   </div>
   <div class="modal window patrol">
-    <app-button *ngIf="!inQueue" [size]="componentSizeEnum.Large" (buttonClick)="patrol()">Patrol</app-button>
+    <div *ngIf="!fullParty">
+      <p class="text-font-inactive">You cannot patrol until your party is full. Proceed to tavern for new recruits.</p>
+    </div>
+    <app-button *ngIf="!inQueue && fullParty" [size]="componentSizeEnum.Large" (buttonClick)="patrol()">Patrol</app-button>
     <div *ngIf="inQueue">
       <p class="text-font">Patrolling</p>
       <p class="title-font time">{{ queueTimePassed | date: 'm:ss' }}</p>

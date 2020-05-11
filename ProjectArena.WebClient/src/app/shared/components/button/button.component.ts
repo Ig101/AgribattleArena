@@ -27,6 +27,8 @@ export class ButtonComponent implements OnInit {
   }
 
   click() {
-    this.buttonClick.emit();
+    if (!this.disabled) {
+      this.buttonClick.emit();
+    }
   }
 }

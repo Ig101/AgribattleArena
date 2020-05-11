@@ -4,11 +4,36 @@
 
   @import '../../ascii.module.scss';
 
+  @import '../../../../auth/auth.module.scss';
+
   .modal {
     position: relative;
     display: flex;
     flex-direction: column;
     width: 612px;
     height: 540px;
+  }
+
+  .title {
+    margin: 12px;
+    text-align: center;
+  }
+
+  form {
+    align-self: center;
+    margin: 12px;
+  }
+
+  .name-form {
+    margin-top: 104px;
+  }
+
+  .fire-form {
+    margin-top: 94px;
+    align-items: center;
+    app-text-input {
+      width: 60px;
+      margin-right: 4px;
+    }
   }
 }

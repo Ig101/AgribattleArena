@@ -21,7 +21,14 @@ namespace ProjectArena.Domain.Mongo.Operations
 
         public async Task ProcessAsync(IClientSessionHandle session, CancellationToken token)
         {
-            await _mongoCollection.DeleteManyAsync(session, _filter, null, token);
+            if (session != null)
+            {
+                await _mongoCollection.DeleteManyAsync(session, _filter, null, token);
+            }
+            else
+            {
+                await _mongoCollection.DeleteManyAsync(_filter, null, token);
+            }
         }
     }
 }

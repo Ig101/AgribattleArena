@@ -71,42 +71,42 @@ export class TavernComponent implements OnInit {
     this.patrons[0] = {
       xShift: 0,
       yShift: 0,
-      object: undefined,
+      object: this.userService.user.tavern.find(x => x.id === 1),
       x: 3,
       y: 6
     };
     this.patrons[1] = {
       xShift: 0,
       yShift: 0,
-      object: undefined,
+      object: this.userService.user.tavern.find(x => x.id === 2),
       x: 5,
       y: 6
     };
     this.patrons[2] = {
       xShift: 0,
       yShift: 0,
-      object: undefined,
+      object: this.userService.user.tavern.find(x => x.id === 3),
       x: 11,
       y: 5
     };
     this.patrons[3] = {
       xShift: 0,
       yShift: 0,
-      object: undefined,
+      object: this.userService.user.tavern.find(x => x.id === 4),
       x: 13,
       y: 5
     };
     this.patrons[4] = {
       xShift: 0,
       yShift: 0,
-      object: undefined,
+      object: this.userService.user.tavern.find(x => x.id === 5),
       x: 6,
       y: 3
     };
     this.patrons[5] = {
       xShift: 0,
       yShift: 0,
-      object: undefined,
+      object: this.userService.user.tavern.find(x => x.id === 6),
       x: 8,
       y: 3
     };
@@ -127,11 +127,10 @@ export class TavernComponent implements OnInit {
             a.x - a.xShift <= x &&
             a.x + a.xShift >= x &&
             a.y - a.yShift <= y &&
-            a.y + a.yShift >= y &&
-            a.object);
+            a.y + a.yShift >= y);
           if (x === 4 && y === 6 || x === 12 && y === 5 || x === 7 && y === 3) {
             this.tiles[x][y] = {
-              char: 'т',
+              char: '■',
               color: { r: 101, g: 67, b: 33, a: 1},
               backgroundColor: { r: 14, g: 13, b: 11},
               activator
@@ -157,8 +156,10 @@ export class TavernComponent implements OnInit {
             continue;
           }
           this.tiles[x][y] = {
-            char: activator?.x === x && activator?.y === y ? '@' : '.',
-            color: activator?.x === x && activator?.y === y ? { r: 160, g: 160, b: 160, a: 1 } : { r: 173, g: 165, b: 135, a: 1},
+            char: activator?.object && activator?.x === x && activator?.y === y ? '@' : '.',
+            color: activator?.object && activator?.x === x && activator?.y === y ?
+              { r: 160, g: 160, b: 160, a: 1 } :
+              { r: 173, g: 165, b: 135, a: 1},
             backgroundColor: { r: 14, g: 13, b: 11},
             activator
           };
@@ -180,7 +181,12 @@ export class TavernComponent implements OnInit {
   }
 
   onUpdate() {
-
+    for (const space of this.patrons) {
+      space.object = undefined;
+    }
+    for (const patron of this.userService.user.tavern) {
+      this.patrons[patron.id - 1].object = patron;
+    }
   }
 
   onResize() {

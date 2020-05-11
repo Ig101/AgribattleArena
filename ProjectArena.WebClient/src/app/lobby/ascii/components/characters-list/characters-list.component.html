@@ -1,1 +1,1 @@
-<p>characters-list works!</p>
+<div class="title-font-inactive" *ngFor="let item of characters" [style.color]="item.color" (click)="click(item)">{{item.character.name}}</div>

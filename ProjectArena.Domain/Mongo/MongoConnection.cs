@@ -16,11 +16,15 @@ namespace ProjectArena.Domain.Mongo
         private readonly IMongoClient _client;
         private readonly IDictionary<Type, object> _collections = new Dictionary<Type, object>();
 
+        public bool UseTransactions { get; private set; }
+
         public MongoConnection(IOptions<MongoConnectionSettings> connection,  IServiceProvider provider)
         {
-            var databaseName = new MongoUrl(connection.Value.ConnectionString).DatabaseName;
+            var mongoUrl = new MongoUrl(connection.Value.ConnectionString);
+            var databaseName = mongoUrl.DatabaseName;
+            UseTransactions = mongoUrl.RetryWrites != false;
 
-            _client = new MongoClient(connection.Value.ConnectionString);
+            _client = new MongoClient(mongoUrl);
 
             var types = Assembly
                 .GetExecutingAssembly()

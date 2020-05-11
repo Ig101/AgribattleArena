@@ -24,7 +24,14 @@ namespace ProjectArena.Domain.Mongo.Operations
 
         public async Task ProcessAsync(IClientSessionHandle session, CancellationToken token)
         {
-            await _mongoCollection.UpdateManyAsync(session, _filter, _update, null, token);
+            if (session != null)
+            {
+                await _mongoCollection.UpdateManyAsync(session, _filter, _update, null, token);
+            }
+            else
+            {
+                await _mongoCollection.UpdateManyAsync(_filter, _update, null, token);
+            }
         }
     }
 }

@@ -1,8 +1,27 @@
 <div class="overlay-container" (click)="closeOnClick($event)">
   <div class="modal">
-    <app-tavern *ngIf="!choosingReplacement" (chosenPatron)="choosePatron($event)"></app-tavern>
-    <app-characters-list *ngIf="choosingReplacement && !confirmingReplacement"></app-characters-list>
-    <div *ngIf="choosingReplacement && confirmingReplacement"></div>
+    <app-modal-loading *ngIf="loading" [errors]="errors" (finishLoading)="loading = false; errors = undefined;"></app-modal-loading>
+    <app-tavern *ngIf="state === tavernStateEnum.Tavern" (chosenPatron)="choosePatron($event)"></app-tavern>
+    <div class="title title-font-inactive" *ngIf="state === tavernStateEnum.ChooseReplacement">Your roster is full. Choose your soldier to replace with a new one.</div>
+    <app-characters-list *ngIf="state === tavernStateEnum.ChooseReplacement" (chosenCharacter)="chooseCharacter($event)"></app-characters-list>
+    <app-button *ngIf="state === tavernStateEnum.ChooseReplacement" class="form-info form-button" (buttonClick)="state = tavernStateEnum.Tavern">Back</app-button>
+    <div class="title title-font-inactive" *ngIf="state === tavernStateEnum.ConfirmReplacement">If you really want to fire {{currentCharacterForReplace.name}} type FIRE and press Ok. This action cannot be reverted.</div>
+    <form class="form fire-form" [formGroup]="fireForm" *ngIf="state === tavernStateEnum.ConfirmReplacement" (ngSubmit)="fireCharacter()">
+      <app-text-input class="form-text form-info" formControlName="textField" [validations]="fireForm.controls.textField.errors"></app-text-input>
+      <app-button class="form-info form-button" type="submit" [size]="componentSizeEnum.Large">Ok</app-button>
+      <app-button class="form-info form-button" (buttonClick)="state = tavernStateEnum.ChooseReplacement">Back</app-button>
+    </form>
+    <div class="title title-font-inactive" *ngIf="state === tavernStateEnum.ChooseName">Choose new soldier's name</div>
+    <form class="form name-form" [formGroup]="nameForm" *ngIf="state === tavernStateEnum.ChooseName" (ngSubmit)="hirePatron()">
+      <app-text-input class="form-text form-info" formControlName="textField" [validations]="nameForm.controls.textField.errors"></app-text-input>
+      <app-button class="form-info form-button" type="submit" [size]="componentSizeEnum.Large">Ok</app-button>
+      <app-button class="form-info form-button" (buttonClick)="backFromName()">Back</app-button>
+    </form>
+    <div class="form" *ngIf="state === tavernStateEnum.Restricted">
+      <p class="form-text text-font form-info">Tavern is unavailable in patrol.</p>
+      <p></p>
+      <app-button class="form-info form-button" (buttonClick)="close()">Ok</app-button>
+    </div>
   </div>
 </div>
 <div class="overlay-filler" (click)="closeOnClick($event)"></div>

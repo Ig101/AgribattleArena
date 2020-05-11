@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 using ProjectArena.Domain.Mongo.Operations;
 
 namespace ProjectArena.Domain.Mongo
@@ -20,23 +21,37 @@ namespace ProjectArena.Domain.Mongo
         {
             if (_operations.Count > 0)
             {
-                using var session = _connection.StartSession();
-                session.StartTransaction();
+                IClientSessionHandle session = null;
+                if (_connection.UseTransactions)
+                {
+                    session = _connection.StartSession();
+                    session.StartTransaction();
+                }
+
                 try
                 {
-                    var item = _operations.Dequeue();
-                    while (item != null)
+                    while (_operations.Count > 0)
                     {
+                        var item = _operations.Dequeue();
                         await item.ProcessAsync(session, token);
-                        item = _operations.Dequeue();
                     }
 
-                    await session.CommitTransactionAsync(token);
+                    if (session != null)
+                    {
+                        await session.CommitTransactionAsync(token);
+                        session.Dispose();
+                    }
+
                     _operations.Clear();
                 }
                 catch
                 {
-                    await session.AbortTransactionAsync(token);
+                    if (session != null)
+                    {
+                        await session.AbortTransactionAsync(token);
+                        session.Dispose();
+                    }
+
                     throw;
                 }
             }

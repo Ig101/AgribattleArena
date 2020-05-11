@@ -60,6 +60,8 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   private drawingTimer;
   changed = false;
 
+  fullParty = false;
+
   componentSizeEnum = ComponentSizeEnum;
 
   mouseState: MouseState = {
@@ -68,6 +70,12 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     y: -1,
     realX: -1,
     realY: -1
+  };
+
+  ground = {
+    char: '·',
+    color: {r: 225, g: 169, b: 95, a: 1} as Color,
+    backgroundColor: {r: 30, g: 23, b: 13, a: 1} as Color
   };
 
   get userName() {
@@ -132,17 +140,12 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       this.activators[i] = {
         xShift: 3,
         yShift: 1,
-        object: undefined,
+        object: this.userService.user.roster[i],
         x: Math.floor(this.campWidth / 2) + (i % 3 === 1 ? 7 : 4) * (i >= 3 ? 1 : -1),
         y: Math.floor(this.campHeight / 2) - 4 + ((i % 3) * 4)
       };
     }
     this.tiles = new Array<LobbyTile<Character>[]>(this.campWidth);
-    const ground = {
-      char: '·',
-      color: {r: 225, g: 169, b: 95, a: 1} as Color,
-      backgroundColor: {r: 30, g: 23, b: 13, a: 1} as Color
-    };
     for (let x = 0; x < this.campWidth; x++) {
       this.tiles[x] = new Array<LobbyTile<Character>>(this.campHeight);
       for (let y = 0; y < this.campHeight; y++) {
@@ -150,15 +153,14 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
           a.x - a.xShift <= x &&
           a.x + a.xShift >= x &&
           a.y - a.yShift  <= y &&
-          a.y >= y &&
-          a.object);
+          a.y >= y);
         const native = activator &&
           activator.object &&
           activator.x === x &&
           activator.y === y ?
           actorNatives[activator.object.nativeId] : undefined;
         const range = rangeBetweenShift(this.campWidth / 2 - 1 - x, this.campWidth / 2 - 1 - y * this.campWidth / this.campHeight);
-        let tile = ground;
+        let tile = this.ground;
         if (range > this.campWidth / 2 - 4) {
           const probability = range - this.campWidth / 2 + 4;
           if (userRandom.nextDouble() * 4 < probability) {
@@ -185,6 +187,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setupAspectRatio(this.lobbyCanvas.nativeElement.offsetWidth, this.lobbyCanvas.nativeElement.offsetHeight);
     this.canvasContext = this.lobbyCanvas.nativeElement.getContext('2d');
     this.generateCamp();
+    this.fullParty = this.userService.user.roster.length >= 6;
     this.changed = true;
     this.redrawScene();
     this.drawingTimer = setInterval(() => {
@@ -206,7 +209,20 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onUpdate() {
-
+    for (const activator of this.activators) {
+      activator.object = undefined;
+      this.tiles[activator.x][activator.y].char = this.ground.char;
+      this.tiles[activator.x][activator.y].color = this.ground.color;
+    }
+    for (let i = 0; i < this.userService.user.roster.length; i++) {
+      const activator = this.activators[i];
+      activator.object = this.userService.user.roster[i];
+      const native = actorNatives[this.userService.user.roster[i].nativeId];
+      this.tiles[activator.x][activator.y].char = native.visualization.char;
+      this.tiles[activator.x][activator.y].color = native.visualization.color;
+    }
+    this.fullParty = this.userService.user.roster.length >= 6;
+    this.changed = true;
   }
 
   onResize() {

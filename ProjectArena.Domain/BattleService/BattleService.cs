@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using ProjectArena.Domain.BattleService.Helpers;
 using ProjectArena.Domain.BattleService.Models;
+using ProjectArena.Domain.Game;
 using ProjectArena.Domain.QueueService.Models;
 using ProjectArena.Domain.Registry;
 using ProjectArena.Engine.ForExternalUse;
@@ -140,9 +141,10 @@ namespace ProjectArena.Domain.BattleService
             SetupNewNativeManagerAsync().Wait();
         }
 
-        public void StartNewBattle(SceneMode mode, IEnumerable<UserInQueue> users)
+        public async Task StartNewBattleAsync(SceneMode mode, IEnumerable<UserInQueue> users)
         {
             var battleHub = _serviceProvider.GetRequiredService<IHubContext<ArenaHub.ArenaHub>>();
+            var gameContext = _serviceProvider.GetRequiredService<GameContext>();
 
             var userIds = users.Select(x => x.UserId).ToList();
             var tempSceneId = _sceneEnumerator;
@@ -154,13 +156,18 @@ namespace ProjectArena.Domain.BattleService
 
             var players = new List<IPlayer>(users.Count());
 
+            var characters = await gameContext.Characters.GetAsync(x => userIds.Contains(x.RosterUserId) && !x.Deleted);
+
             foreach (string id in userIds)
             {
-                var playerActors = new List<IActor>(5);
-                for (int i = 0; i < 10; i++)
-                {
-                    playerActors.Add(EngineHelper.CreateActorForGeneration(Guid.NewGuid(), "adventurer", "slash", 10, 10, 10, 10, new[] { "explosion" }, 6, null));
-                }
+                var playerActors = new List<IActor>();
+                playerActors.AddRange(
+                    characters
+                    .Where(x => x.RosterUserId == id)
+                    .Select(x =>
+                    {
+                        return EngineHelper.CreateActorForGeneration(Guid.Parse(x.Id), "adventurer", "slash", 10, 10, 10, 10, new[] { "explosion" }, 6, null);
+                    }));
 
                 players.Add(EngineHelper.CreatePlayerForGeneration(id, null, playerActors));
             }

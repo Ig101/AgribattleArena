@@ -28,7 +28,14 @@ namespace ProjectArena.Domain.Mongo.Operations
             {
                 IsUpsert = _isUpsert
             };
-            await _mongoCollection.ReplaceOneAsync(session, _filter, _object, replaceOptions, token);
+            if (session != null)
+            {
+                await _mongoCollection.ReplaceOneAsync(session, _filter, _object, replaceOptions, token);
+            }
+            else
+            {
+                await _mongoCollection.ReplaceOneAsync(_filter, _object, replaceOptions, token);
+            }
         }
     }
 }

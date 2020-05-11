@@ -1,7 +1,8 @@
 <div><button appFocusRemover [ngClass]="{
     'text-font-inactive': size === componentSizeEnum.Medium,
     'article-font-inactive': size === componentSizeEnum.Small,
-    'title-font-inactive': size === componentSizeEnum.Large
+    'title-font-inactive': size === componentSizeEnum.Large,
+    'disabled': disabled
   }" 
   #button [type]="type" (focus)="focused=true" (mouseenter)="entered=true" (blur)="focused=false" (mouseleave)="entered=false" (click)="click()">
   <span [hidden]="focused || entered">&lt; </span>
