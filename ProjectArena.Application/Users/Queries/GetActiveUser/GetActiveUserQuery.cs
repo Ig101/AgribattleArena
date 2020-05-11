@@ -46,7 +46,6 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                     roster = new Roster()
                     {
                         UserId = user.Id,
-                        LastTimeRefreshed = DateTime.Now.ToUniversalTime().Date,
                         Experience = 0,
                         Seed = user.Id.GetHashCode(),
                         TavernCapacity = 6,

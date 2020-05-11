@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.QueueService;
+using ProjectArena.Infrastructure.Models.Game;
 
 namespace ProjectArena.Domain.ArenaHub
 {

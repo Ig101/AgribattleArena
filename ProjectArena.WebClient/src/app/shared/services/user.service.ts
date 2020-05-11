@@ -23,7 +23,13 @@ export class UserService {
   constructor(
     private webCommunicationService: WebCommunicationService,
     private arenaHub: ArenaHubService
-  ) { }
+  ) {
+    arenaHub.dailyUpdateNotifier.subscribe(info => {
+      this.user.tavern = info.tavern;
+      console.log('send');
+      this.userChanged.next();
+    });
+  }
 
   getActiveUser() {
     if (this.user) {

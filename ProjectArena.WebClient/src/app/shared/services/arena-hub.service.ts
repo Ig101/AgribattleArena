@@ -10,7 +10,9 @@ import { tileNatives, actorNatives, decorationNatives } from 'src/app/battle/asc
 import { heightImpact, brightImpact } from 'src/app/battle/ascii/helpers/scene-draw.helper';
 import { UserService } from './user.service';
 import { LoadingService } from './loading.service';
+import { DailyChanges } from '../models/daily-changes.model';
 
+const DAILY_UPDATE = 'DailyUpdate';
 const BATTLE_SYNC_ERROR = 'BattleSynchronizationError';
 const BATTLE_START_GAME = 'BattleStartGame';
 const BATTLE_MOVE = 'BattleMove';
@@ -23,7 +25,7 @@ const BATTLE_END_GAME = 'BattleEndGame';
 const BATTLE_SKIP_TURN = 'BattleSkipTurn';
 const BATTLE_NO_ACTORS_DRAW = 'BattleNoActorsDraw';
 
-type BattleHubReturnMethod = typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
+type BattleHubReturnMethod = typeof DAILY_UPDATE | typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
     typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_NO_ACTORS_DRAW |
     typeof BATTLE_SKIP_TURN | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT;
 
@@ -37,6 +39,7 @@ export class ArenaHubService {
   firstActionVersion: number;
   battleSynchronizationActionsList: { action: BattleSynchronizationActionEnum, sync: Synchronizer }[] = [];
   battleSynchronizationActionsNotifier = new Subject<any>();
+  dailyUpdateNotifier = new Subject<DailyChanges>();
 
   prepareForBattleNotifier = new BehaviorSubject<LoadingScene>(undefined);
 
@@ -150,6 +153,8 @@ export class ArenaHubService {
   }
 
   private  addBattleListeners() {
+    this.hubConnection.on(DAILY_UPDATE, (info: DailyChanges) => { this.dailyUpdateNotifier.next(info); });
+
     this.addNewListener(BATTLE_SYNC_ERROR, () => this.synchronizationErrorState.next(true) );
     this.addNewListener(BATTLE_START_GAME, (synchronizer: Synchronizer) => {
       const currentPlayer = synchronizer.players.find(x => x.id === this.userId);

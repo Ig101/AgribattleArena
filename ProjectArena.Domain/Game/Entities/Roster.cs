@@ -10,9 +10,6 @@ namespace ProjectArena.Domain.Game.Entities
         [BsonElement("id")]
         public string UserId { get; set; }
 
-        [BsonElement("t")]
-        public DateTime LastTimeRefreshed { get; set; }
-
         [BsonElement("e")]
         public int Experience { get; set; }
 

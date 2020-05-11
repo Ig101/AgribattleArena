@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef, HostListener, OnDestroy } from '@angular/core';
 import { CharacterForSale } from '../../model/character-for-sale.model';
 import { LobbyTileActivator } from '../../model/lobby-tile-activator.model';
 import { LobbyTile } from '../../model/lobby-tile.model';
@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './tavern.component.html',
   styleUrls: ['./tavern.component.scss']
 })
-export class TavernComponent implements OnInit {
+export class TavernComponent implements OnInit, OnDestroy {
 
   @ViewChild('tavernCanvas', { static: true }) tavernCanvas: ElementRef<HTMLCanvasElement>;
   private canvasContext: CanvasRenderingContext2D;
@@ -180,13 +180,23 @@ export class TavernComponent implements OnInit {
     }, 1000 / this.updateFrequency);
   }
 
+  ngOnDestroy(): void {
+    this.userChangedSubscription.unsubscribe();
+  }
+
   onUpdate() {
     for (const space of this.patrons) {
       space.object = undefined;
+      this.tiles[space.x][space.y].char = '.';
+      this.tiles[space.x][space.y].color = { r: 173, g: 165, b: 135, a: 1};
     }
     for (const patron of this.userService.user.tavern) {
-      this.patrons[patron.id - 1].object = patron;
+      const space = this.patrons[patron.id - 1];
+      space.object = patron;
+      this.tiles[space.x][space.y].char = '@';
+      this.tiles[space.x][space.y].color = { r: 160, g: 160, b: 160, a: 1 };
     }
+    this.changed = true;
   }
 
   onResize() {

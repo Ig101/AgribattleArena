@@ -80,7 +80,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
   }
 
   closeOnClick(event) {
-    if (event.target !== event.currentTarget) {
+    if (event.target !== event.currentTarget || this.loading) {
       return;
     }
     this.close();
@@ -126,7 +126,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
       })
         .subscribe((result) => {
           if (result.success) {
-            this.userService.user.tavern.splice(this.userService.user.tavern.indexOf(this.currentPatron));
+            this.userService.user.tavern.splice(this.userService.user.tavern.indexOf(this.currentPatron), 1);
             const newCharacter = {
               id: result.result.id,
               name: this.nameForm.controls.textField.value,
