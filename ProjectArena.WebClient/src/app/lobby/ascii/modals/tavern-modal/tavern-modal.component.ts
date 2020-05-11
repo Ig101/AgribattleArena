@@ -80,7 +80,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
   }
 
   closeOnClick(event) {
-    if (event.target !== event.currentTarget || this.loading) {
+    if (event.target !== event.currentTarget || (this.loading && !this.errors)) {
       return;
     }
     this.close();
@@ -139,7 +139,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
             }
             this.userService.userChanged.next();
             this.state = TavernStateEnum.Tavern;
-            this.loading = false;
+            this.errors = [`You recruited ${newCharacter.name}.`];
           } else {
             this.errors = result.errors;
           }

@@ -63,7 +63,7 @@ export class SettingsModalComponent implements OnInit, OnDestroy, IModal<any> {
   }
 
   closeOnClick(event) {
-    if (event.target !== event.currentTarget || this.loading) {
+    if (event.target !== event.currentTarget || (this.loading && !this.errors)) {
       return;
     }
     this.close();
