@@ -1,7 +1,11 @@
 <div class="overlay-container" (click)="closeOnClick($event)">
   <div class="modal">
     <app-modal-loading *ngIf="loading" [errors]="errors" (finishLoading)="loading = false; errors = undefined;"></app-modal-loading>
-    <p class="uid-top form-text text-font-inactive">Unique ID</p>
+    <div class="uid-top form-text text-font-inactive">
+      <span>Unique ID</span>
+      <div class="filler"></div>
+      <app-button class="close-button" [size]="componentSizeEnum.Small" (buttonClick)="close()">X</app-button>
+    </div>
     <p class="uid form-text article-font extra">{{userUniqueId}}</p>
     <form class="text-font" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
       <app-text-input class="form-text form-info" formControlName="currentPassword" type="password" [validations]="passwordForm.controls.currentPassword.errors">Current password:</app-text-input>

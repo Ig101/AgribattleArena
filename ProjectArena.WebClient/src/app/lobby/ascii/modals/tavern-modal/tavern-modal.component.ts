@@ -69,9 +69,11 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
   }
 
   close() {
-    this.onClose.next();
-    this.overlay.detach();
-    this.overlay.dispose();
+    if (!this.loading) {
+      this.onClose.next();
+      this.overlay.detach();
+      this.overlay.dispose();
+    }
   }
 
   ngOnDestroy() {
@@ -80,7 +82,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
   }
 
   closeOnClick(event) {
-    if (event.target !== event.currentTarget || (this.loading && !this.errors)) {
+    if (event.target !== event.currentTarget) {
       return;
     }
     this.close();

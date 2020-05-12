@@ -28,7 +28,7 @@ export class TavernComponent implements OnInit, OnDestroy {
   cursor: string;
 
   readonly defaultWidth = 612;
-  readonly defaultHeight = 540;
+  readonly defaultHeight = 532;
   readonly defaultAspectRatio = this.defaultWidth / this.defaultHeight;
 
   tileHeight = 60;

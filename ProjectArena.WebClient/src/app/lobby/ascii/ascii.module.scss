@@ -11,3 +11,16 @@
   max-width: 374px;
   width: 374px;
 }
+
+.close-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  app-button {
+    width: 76px;
+  }
+}
+
+.close-button {
+  width: 76px;
+}

@@ -1,6 +1,9 @@
 <div class="overlay-container" (click)="closeOnClick($event)">
   <div class="modal">
     <app-modal-loading *ngIf="loading" [errors]="errors" (finishLoading)="loading = false; errors = undefined;"></app-modal-loading>
+    <div class="close-container">
+      <app-button class="close-button" [size]="componentSizeEnum.Small" (buttonClick)="close()">X</app-button>
+    </div>
     <app-tavern *ngIf="state === tavernStateEnum.Tavern" (chosenPatron)="choosePatron($event)"></app-tavern>
     <div class="title title-font-inactive" *ngIf="state === tavernStateEnum.ChooseReplacement">Your roster is full. Choose your soldier to replace with a new one.</div>
     <app-characters-list *ngIf="state === tavernStateEnum.ChooseReplacement" (chosenCharacter)="chooseCharacter($event)"></app-characters-list>
@@ -17,10 +20,12 @@
       <app-button class="form-info form-button" type="submit" [size]="componentSizeEnum.Large">Ok</app-button>
       <app-button class="form-info form-button" (buttonClick)="backFromName()">Back</app-button>
     </form>
-    <div class="form" *ngIf="state === tavernStateEnum.Restricted">
-      <p class="form-text text-font form-info">Tavern is unavailable in patrol.</p>
-      <p></p>
-      <app-button class="form-info form-button" (buttonClick)="close()">Ok</app-button>
+    <div class="form restricted" *ngIf="state === tavernStateEnum.Restricted">
+      <div>
+        <p class="form-text text-font form-info">Tavern is unavailable in patrol.</p>
+        <p></p>
+        <app-button class="form-info form-button" (buttonClick)="close()">Ok</app-button>
+      </div>
     </div>
   </div>
 </div>
