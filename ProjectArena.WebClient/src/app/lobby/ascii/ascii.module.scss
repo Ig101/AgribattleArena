@@ -17,11 +17,13 @@
   justify-content: flex-end;
   align-items: center;
   app-button {
+    min-width: 76px;
     width: 76px;
   }
 }
 
 .close-button {
+  min-width: 76px;
   width: 76px;
 }
 

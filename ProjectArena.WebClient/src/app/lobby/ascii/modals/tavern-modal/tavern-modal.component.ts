@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { Subject } from 'rxjs';
 import { OverlayRef } from '@angular/cdk/overlay';
@@ -110,6 +110,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
       this.loading = true;
     } else {
       this.state = TavernStateEnum.ChooseName;
+      this.fireForm.controls.textField.setValue('');
     }
   }
 
@@ -142,6 +143,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
             this.userService.userChanged.next();
             this.state = TavernStateEnum.Tavern;
             this.errors = [`You recruited ${newCharacter.name}.`];
+            this.nameForm.controls.textField.setValue('');
           } else {
             this.errors = result.errors;
           }
@@ -150,6 +152,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
   }
 
   backFromName() {
+    this.nameForm.controls.textField.setValue('');
     if (this.userService.user.roster.length >= 6) {
       this.state = TavernStateEnum.ConfirmReplacement;
     } else {

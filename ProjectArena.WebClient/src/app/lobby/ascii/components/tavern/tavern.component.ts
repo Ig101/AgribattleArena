@@ -27,11 +27,11 @@ export class TavernComponent implements OnInit, OnDestroy {
   tiles: LobbyTile<CharacterForSale>[][];
   cursor: string;
 
-  readonly defaultWidth = 612;
-  readonly defaultHeight = 532;
+  readonly defaultWidth = 510;
+  readonly defaultHeight = 450;
   readonly defaultAspectRatio = this.defaultWidth / this.defaultHeight;
 
-  tileHeight = 60;
+  tileHeight = 50;
   tileWidth = 0;
   tavernHeight = 9;
   tavernWidth = 17;

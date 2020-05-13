@@ -10,30 +10,30 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 668px;
-  }
-
-  .inner-modal {
-    display: flex;
-    flex-direction: column;
-    width: 620px;
-    height: 540px;
+    max-width: 574px;
+    min-width: 574px;
+    height: 502px;
     app-tavern {
-      height: 532px;
+      width: 510px;
+      height: 450px;
     }
   }
 
   .close-container {
-    height: 42px;
+    align-items: flex-start;
     padding: 4px 4px 0px 4px;
     box-sizing: border-box;
     flex-direction: row;
   }
 
+  app-tavern {
+    margin-right: 56px;
+  }
+
   .title {
-    margin: 12px;
-    margin-top: 0px;
-    text-align: center;
+    margin: 8px;
+    margin-bottom: 12px;
+    text-align: left;
   }
 
   form {
@@ -42,15 +42,26 @@
   }
 
   .name-form {
-    margin-top: 104px;
+    margin-top: 116px;
   }
 
+  .fire-title {
+    min-height: 168px;
+  }
   .fire-form {
-    margin-top: 76px;
     align-items: center;
-    app-text-input {
-      width: 60px;
-      margin-right: 4px;
+    
+    input {
+      background: none;
+      border: solid 2px;
+      flex: 1;
+      outline: none;
+      width: 100%;
+      color: white;
+      padding: 4px;
+      padding-bottom: 0px;
+      width: 64px;
+      margin-bottom: 24px;
     }
   }
 }

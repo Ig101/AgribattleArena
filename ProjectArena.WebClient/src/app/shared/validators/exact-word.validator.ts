@@ -6,7 +6,7 @@ export function exactWordValidator(controlName: string, exactWord: string) {
     return {
       maxLength: {
         result: !error,
-        extendedText: $localize`:@@validators.exact-word:You have to type exactly a ${exactWord} in ${controlName}.`
+        extendedText: $localize`:@@validators.exact-word:You have to type exactly a ${exactWord} in the ${controlName}.`
       }
     };
   };
