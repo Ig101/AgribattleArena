@@ -21,12 +21,8 @@
         <app-button class="form-info form-button" type="submit" [size]="componentSizeEnum.Large">Ok</app-button>
         <app-button class="form-info form-button" (buttonClick)="backFromName()">Back</app-button>
       </form>
-      <div class="form restricted" *ngIf="state === tavernStateEnum.Restricted">
-        <div>
-          <p class="form-text text-font form-info">Tavern is unavailable in patrol.</p>
-          <p></p>
-          <app-button class="form-info form-button" (buttonClick)="close()">Ok</app-button>
-        </div>
+      <div class="form" *ngIf="state === tavernStateEnum.Restricted">
+        <div class="title title-font-inactive">You cannot visit the tavern while patrolling.</div>
       </div>
     </div>
   </div>
