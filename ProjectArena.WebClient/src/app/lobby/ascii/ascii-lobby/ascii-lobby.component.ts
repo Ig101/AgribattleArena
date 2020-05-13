@@ -23,6 +23,7 @@ import { rangeBetween, rangeBetweenShift } from 'src/app/helpers/math.helper';
 import { Color } from 'src/app/shared/models/color.model';
 import { getRandomBiom } from 'src/app/shared/bioms/biom.helper';
 import { TavernModalComponent } from '../modals/tavern-modal/tavern-modal.component';
+import { IModal } from 'src/app/shared/interfaces/modal.interface';
 
 @Component({
   selector: 'app-ascii-lobby',
@@ -77,6 +78,8 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     color: {r: 225, g: 169, b: 95, a: 1} as Color,
     backgroundColor: {r: 30, g: 23, b: 13, a: 1} as Color
   };
+
+  openedModal: IModal<unknown>;
 
   get userName() {
     return this.userService.user?.name;
@@ -318,7 +321,11 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openSettings() {
-    this.modalService.openModalWithoutArgs(SettingsModalComponent);
+    if (this.openedModal) {
+      this.openedModal.close();
+    }
+    this.openedModal = this.modalService.openModalWithoutArgs(SettingsModalComponent);
+    this.openedModal.onClose.subscribe(() => this.openedModal = undefined);
   }
 
   patrol() {
@@ -330,7 +337,11 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toTavern() {
-    this.modalService.openModalWithoutArgs(TavernModalComponent);
+    if (this.openedModal) {
+      this.openedModal.close();
+    }
+    this.openedModal = this.modalService.openModalWithoutArgs(TavernModalComponent);
+    this.openedModal.onClose.subscribe(() => this.openedModal = undefined);
   }
 
   private drawPoint(

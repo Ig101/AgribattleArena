@@ -17,15 +17,15 @@
     <div *ngIf="!fullParty">
       <p class="text-font-inactive">You cannot patrol until your party is full. Proceed to tavern for new recruits.</p>
     </div>
-    <app-button *ngIf="!inQueue && fullParty" [size]="componentSizeEnum.Large" (buttonClick)="patrol()">Patrol</app-button>
+    <app-button *ngIf="!inQueue && fullParty" [size]="componentSizeEnum.Large" (buttonClick)="patrol()" [disabled]="openedModal">Patrol</app-button>
     <div *ngIf="inQueue">
       <p class="text-font">Patrolling</p>
       <p class="title-font time">{{ queueTimePassed | date: 'm:ss' }}</p>
-      <app-button *ngIf="!exitingFromQueue" type="button" [size]="componentSizeEnum.Medium" (buttonClick)="cancelPatrol()">Return</app-button>
+      <app-button *ngIf="!exitingFromQueue" type="button" [size]="componentSizeEnum.Medium" (buttonClick)="cancelPatrol()" [disabled]="openedModal">Return</app-button>
       <p *ngIf="exitingFromQueue" class="text-font">Returning...</p>
     </div>
   </div>
   <div class="modal window">
-    <app-button (buttonClick)="toTavern()">Tavern</app-button>
+    <app-button (buttonClick)="toTavern()" [disabled]="openedModal">Tavern</app-button>
   </div>
 </div>

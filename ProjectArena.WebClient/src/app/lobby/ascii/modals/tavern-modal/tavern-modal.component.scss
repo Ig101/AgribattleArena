@@ -10,8 +10,14 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    width: 668px;
+  }
+
+  .inner-modal {
+    display: flex;
+    flex-direction: column;
     width: 620px;
-    height: 584px;
+    height: 540px;
     app-tavern {
       height: 532px;
     }
@@ -26,6 +32,7 @@
 
   .title {
     margin: 12px;
+    margin-top: 4px;
     text-align: center;
   }
 

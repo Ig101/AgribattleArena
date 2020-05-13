@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Inject, HostListener } from '@angular/core';
 import { ActiveDecoration } from '../../models/scene/active-decoration.model';
-import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { Subject } from 'rxjs';
+import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { MODAL_DATA } from 'src/app/shared/services/modal.service';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { SpecEffect } from '../../models/scene/spec-effect.model';

@@ -1,5 +1,5 @@
 <div class="overlay-container" (click)="closeOnClick($event)">
-  <div class="modal">
+  <div class="modal lobby-modal">
     <app-modal-loading *ngIf="loading" [errors]="errors" (finishLoading)="loading = false; errors = undefined;"></app-modal-loading>
     <div class="uid-top form-text text-font-inactive">
       <span>Unique ID</span>

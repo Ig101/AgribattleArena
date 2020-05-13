@@ -23,7 +23,7 @@
     color: #aa0;
   }
 
-  .disabled {
-    color: #aaa !important;
+  button:disabled {
+    color: #fff !important;
   }
 }
