@@ -392,27 +392,27 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       for (let x = -40; x <= 80; x++) {
         for (let y = -20; y <= 60; y++) {
           let tile: LobbyTile<Character>;
-          if (x >= 0 && y >= 0 && x < this.campWidth && y < this.campHeight) {
-            tile = this.tiles[x][y];
-            if (this.queueService.inQueue) {
+          if (x >= left && x <= right && y >= top && y <= bottom) {
+            if (x >= 0 && y >= 0 && x < this.campWidth && y < this.campHeight) {
+              tile = this.tiles[x][y];
+              if (this.queueService.inQueue && this.queueService.queueSeed) {
+                const biom = getRandomBiom(userRandom, this.campBiom);
+                tile = {
+                  char: tile.activator?.x === x && tile.activator.y === y ? tile.char : biom.char,
+                  color: tile.activator?.x === x && tile.activator.y === y ? tile.color : biom.color,
+                  backgroundColor: biom.backgroundColor,
+                  activator: tile.activator
+                };
+              }
+            } else {
               const biom = getRandomBiom(userRandom, this.campBiom);
               tile = {
-                char: tile.activator?.x === x && tile.activator.y === y ? tile.char : biom.char,
-                color: tile.activator?.x === x && tile.activator.y === y ? tile.color : biom.color,
+                char: biom.char,
+                color: biom.color,
                 backgroundColor: biom.backgroundColor,
-                activator: tile.activator
+                activator: undefined
               };
             }
-          } else {
-            const biom = getRandomBiom(userRandom, this.campBiom);
-            tile = {
-              char: biom.char,
-              color: biom.color,
-              backgroundColor: biom.backgroundColor,
-              activator: undefined
-            };
-          }
-          if (x >= left && x <= right && y >= top && y <= bottom) {
             this.drawPoint(tile, x, y, cameraLeft, cameraTop,
               tile.activator &&
               tile.activator.object &&
@@ -423,6 +423,8 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
               mouseY >= y - tile.activator.yShift &&
               mouseY <= y,
               clicked);
+          } else {
+            userRandom.nextDouble();
           }
         }
       }
