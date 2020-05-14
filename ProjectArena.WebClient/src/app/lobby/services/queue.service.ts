@@ -3,7 +3,7 @@ import { UserService } from 'src/app/shared/services/user.service';
 import { WebCommunicationService } from 'src/app/shared/services/web-communication.service';
 import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
 import { LoadingService } from 'src/app/shared/services/loading.service';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 
 @Injectable()
 export class QueueService {
@@ -14,6 +14,12 @@ export class QueueService {
   timePassed = 0;
 
   tickingTimer;
+
+  queueSeed: number;
+  ticksTillNewSeed = 1;
+  ticks: number;
+
+  queueUpdate = new Subject<any>();
 
   private queueSubscription: Subscription;
   private waitingForDequeue = false;
@@ -27,9 +33,19 @@ export class QueueService {
 
   private timerTick() {
     this.timePassed += 1000;
+    this.ticks -= 1;
+    if (this.ticks <= 0) {
+      this.setRandomQueueSeed();
+    }
     if (this.timePassed > 1000 * 60 * 59) {
       this.dequeue();
     }
+  }
+
+  private setRandomQueueSeed() {
+    this.ticks = this.ticksTillNewSeed;
+    this.queueSeed = Math.floor(Math.random() * 1000) + 1;
+    this.queueUpdate.next();
   }
 
   private setQueue(inQueue: boolean) {
@@ -38,6 +54,7 @@ export class QueueService {
     if (this.inQueue) {
       this.exiting = false;
       this.timePassed = 0;
+      this.setRandomQueueSeed();
       this.tickingTimer = setInterval(() => this.timerTick(), 1000);
     }
   }
@@ -94,6 +111,7 @@ export class QueueService {
             this.setQueue(false);
             this.queueSubscription.unsubscribe();
             this.queueSubscription = undefined;
+            this.queueUpdate.next();
             if (this.waitingForEnqueue) {
               this.waitingForEnqueue = false;
               this.enqueue();

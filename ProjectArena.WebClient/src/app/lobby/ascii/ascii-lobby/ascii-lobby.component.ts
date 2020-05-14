@@ -43,6 +43,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   onCloseSubscription: Subscription;
   hubBattleSubscription: Subscription;
   userChangedSubscription: Subscription;
+  queueSubscription: Subscription;
 
   readonly defaultWidth = 1504;
   readonly defaultHeight = 1080;
@@ -133,6 +134,9 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     this.userChangedSubscription = this.userService.userChanged.subscribe(() => this.onUpdate() );
+    this.queueSubscription = this.queueService.queueUpdate.subscribe(() => {
+      this.changed = true;
+    });
   }
 
   generateCamp() {
@@ -371,7 +375,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.changed = false;
-    const userRandom = new Random(this.lobbyStorageService.userHash);
+    const userRandom = new Random(this.lobbyStorageService.userHash + (this.queueService.inQueue ? this.queueService.queueSeed : 0));
     if (this.tiles) {
       const cameraLeft = this.campWidth / 2 - (this.canvasWidth - 374) / 2 / this.tileWidth + 0.5;
       const cameraTop = this.campHeight / 2 - this.canvasHeight / 2 / this.tileHeight + 0.8;
@@ -390,6 +394,15 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
           let tile: LobbyTile<Character>;
           if (x >= 0 && y >= 0 && x < this.campWidth && y < this.campHeight) {
             tile = this.tiles[x][y];
+            if (this.queueService.inQueue) {
+              const biom = getRandomBiom(userRandom, this.campBiom);
+              tile = {
+                char: tile.activator?.x === x && tile.activator.y === y ? tile.char : biom.char,
+                color: tile.activator?.x === x && tile.activator.y === y ? tile.color : biom.color,
+                backgroundColor: biom.backgroundColor,
+                activator: tile.activator
+              };
+            }
           } else {
             const biom = getRandomBiom(userRandom, this.campBiom);
             tile = {
