@@ -3,7 +3,7 @@ import { ActorNative } from '../models/natives/actor-native.model';
 export const actorNatives: {[id: string]: ActorNative} = {
   adventurer: {
     name: 'Adventurer',
-    description: undefined,
+    description: 'Adventurer',
     visualization: {
       char: '@',
       color: { r: 160, g: 160, b: 160, a: 1 }

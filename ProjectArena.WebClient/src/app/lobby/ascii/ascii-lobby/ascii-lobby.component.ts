@@ -24,6 +24,7 @@ import { Color } from 'src/app/shared/models/color.model';
 import { getRandomBiom } from 'src/app/shared/bioms/biom.helper';
 import { TavernModalComponent } from '../modals/tavern-modal/tavern-modal.component';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
+import { TalentsModalComponent } from '../modals/talents-modal/talents-modal.component';
 
 @Component({
   selector: 'app-ascii-lobby',
@@ -161,11 +162,6 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
           a.x + a.xShift >= x &&
           a.y - a.yShift  <= y &&
           a.y >= y);
-        const native = activator &&
-          activator.object &&
-          activator.x === x &&
-          activator.y === y ?
-          actorNatives[activator.object.nativeId] : undefined;
         const range = rangeBetweenShift(this.campWidth / 2 - 1 - x, this.campWidth / 2 - 1 - y * this.campWidth / this.campHeight);
         let tile = this.ground;
         if (range > this.campWidth / 2 - 4) {
@@ -180,8 +176,8 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         this.tiles[x][y] = {
           activator,
-          char: native ? native.visualization.char : tile.char,
-          color: native ? native.visualization.color : tile.color,
+          char: tile.char,
+          color: tile.color,
           backgroundColor: tile.backgroundColor
         };
       }
@@ -218,15 +214,10 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   onUpdate() {
     for (const activator of this.activators) {
       activator.object = undefined;
-      this.tiles[activator.x][activator.y].char = this.ground.char;
-      this.tiles[activator.x][activator.y].color = this.ground.color;
     }
     for (let i = 0; i < this.userService.user.roster.length; i++) {
       const activator = this.activators[i];
       activator.object = this.userService.user.roster[i];
-      const native = actorNatives[this.userService.user.roster[i].nativeId];
-      this.tiles[activator.x][activator.y].char = native.visualization.char;
-      this.tiles[activator.x][activator.y].color = native.visualization.color;
     }
     this.fullParty = this.userService.user.roster.length >= 6;
     this.changed = true;
@@ -257,7 +248,13 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       const activator = this.tiles[x][y].activator;
       const newActivator = this.tiles[newX][newY].activator;
       if (activator && activator.object && activator === newActivator) {
-        console.log(activator);
+        this.openedModal = this.modalService.openModal(TalentsModalComponent, activator.object);
+        this.openedModal.onClose.subscribe((result) => {
+          this.openedModal = undefined;
+        });
+        this.openedModal.onCancel.subscribe((result) => {
+          this.openedModal = undefined;
+        });
       }
     }
   }
@@ -359,13 +356,16 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       const canvasX = (x - cameraLeft) * this.tileWidth;
       const canvasY = (y - cameraTop) * this.tileHeight;
       const symbolY = canvasY + this.tileHeight * 0.75;
+      const native = tile.activator?.x === x && tile.activator?.y === y && tile.activator.object ?
+        actorNatives[tile.activator.object.nativeId] : undefined;
       if (tile.backgroundColor) {
         this.canvasContext.fillStyle = `rgb(${tile.backgroundColor.r}, ${tile.backgroundColor.g}, ${tile.backgroundColor.b})`;
         this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
       }
-      this.canvasContext.fillStyle = active ? (clicked ? `rgba(170, 170, 0, ${tile.color.a})` : `rgba(255, 255, 68, ${tile.color.a})`) :
-        `rgba(${tile.color.r}, ${tile.color.g}, ${tile.color.b}, ${tile.color.a})`;
-      this.canvasContext.fillText(tile.char, canvasX, symbolY);
+      const color = native ? native.visualization.color : tile.color;
+      this.canvasContext.fillStyle = active ? (clicked ? `rgba(170, 170, 0, ${color.a})` : `rgba(255, 255, 68, ${color.a})`) :
+        `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+      this.canvasContext.fillText(native ? native.visualization.char : tile.char, canvasX, symbolY);
     }
   }
 
@@ -398,8 +398,8 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
               if (this.queueService.inQueue && this.queueService.queueSeed) {
                 const biom = getRandomBiom(userRandom, this.campBiom);
                 tile = {
-                  char: tile.activator?.x === x && tile.activator.y === y ? tile.char : biom.char,
-                  color: tile.activator?.x === x && tile.activator.y === y ? tile.color : biom.color,
+                  char: biom.char,
+                  color: biom.color,
                   backgroundColor: biom.backgroundColor,
                   activator: tile.activator
                 };

@@ -4,6 +4,7 @@ import { LobbyRoutingModule } from './lobby-routing.module';
 import { LobbyResolverService } from './resolvers/lobby-resolver.service';
 import { SharedModule } from '../shared/shared.module';
 import { QueueService } from './services/queue.service';
+import { TalentsService } from './services/talents.service';
 
 
 
@@ -15,7 +16,8 @@ import { QueueService } from './services/queue.service';
   ],
   providers: [
     LobbyResolverService,
-    QueueService
+    QueueService,
+    TalentsService
   ]
 })
 export class LobbyModule { }

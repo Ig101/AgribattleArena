@@ -10,31 +10,13 @@ namespace ProjectArena.Domain.Registry
     {
         public IRepository<ContentMigration> Migrations { get; set; }
 
-        public IRepository<ActorNative> ActorNatives { get; set; }
-
-        public IRepository<BuffNative> BuffNatives { get; set; }
-
-        public IRepository<DecorationNative> DecorationNatives { get; set; }
-
-        public IRepository<EffectNative> EffectNatives { get; set; }
-
-        public IRepository<RoleModelNative> RoleModelNatives { get; set; }
-
-        public IRepository<SkillNative> SkillNatives { get; set; }
-
-        public IRepository<TileNative> TileNatives { get; set; }
+        public IRepository<TalentNode> TalentMap { get; set; }
 
         public RegistryContext(IMongoConnection connection)
             : base(connection)
         {
             Migrations = InitializeRepository<ContentMigration>();
-            ActorNatives = InitializeRepository<ActorNative>();
-            BuffNatives = InitializeRepository<BuffNative>();
-            DecorationNatives = InitializeRepository<DecorationNative>();
-            EffectNatives = InitializeRepository<EffectNative>();
-            RoleModelNatives = InitializeRepository<RoleModelNative>();
-            SkillNatives = InitializeRepository<SkillNative>();
-            TileNatives = InitializeRepository<TileNative>();
+            TalentMap = InitializeRepository<TalentNode>();
         }
 
         public void LoadMigrations()

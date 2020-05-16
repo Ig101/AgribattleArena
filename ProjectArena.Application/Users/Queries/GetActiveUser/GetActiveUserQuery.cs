@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -9,13 +8,14 @@ using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Game.Entities;
 using ProjectArena.Domain.Identity;
+using ProjectArena.Domain.Registry;
 using ProjectArena.Infrastructure.Enums;
 using ProjectArena.Infrastructure.Models.Game;
 using ProjectArena.Infrastructure.Models.User;
 
 namespace ProjectArena.Application.Users.Queries.GetActiveUser
 {
-    public class GetActiveUserQuery : IRequest<ActiveUserDto>
+  public class GetActiveUserQuery : IRequest<ActiveUserDto>
     {
         public ClaimsPrincipal User { get; set; }
 
@@ -24,15 +24,18 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
             private readonly IdentityUserManager _userManager;
             private readonly IBattleService _battleService;
             private readonly GameContext _gameContext;
+            private readonly RegistryContext _registryContext;
 
             public Handler(
                 IdentityUserManager userManager,
                 IBattleService battleService,
-                GameContext gameContext)
+                GameContext gameContext,
+                RegistryContext registryContext)
             {
                 _userManager = userManager;
                 _battleService = battleService;
                 _gameContext = gameContext;
+                _registryContext = registryContext;
             }
 
             public async Task<ActiveUserDto> Handle(GetActiveUserQuery request, CancellationToken cancellationToken)
@@ -71,6 +74,8 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                     }
                 }
 
+                var talents = await _registryContext.TalentMap.GetAsync(x => true);
+
                 return new ActiveUserDto()
                 {
                     Name = user.ViewName,
@@ -85,6 +90,21 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                         Id = x.Id,
                         Name = x.Name,
                         NativeId = "adventurer"
+                    }),
+                    TalentsMap = talents.Select(x => new TalentNodeDto()
+                    {
+                        X = x.Position / 1000,
+                        Y = x.Position % 1000,
+                        Name = x.Name,
+                        Description = x.UniqueDescription,
+                        Id = x.Id,
+                        Speed = x.SpeedModifier,
+                        Strength = x.StrengthModifier,
+                        Willpower = x.WillpowerModifier,
+                        Constitution = x.ConstitutionModifier,
+                        Class = x.Class,
+                        ClassPoints = x.ClassPoints,
+                        Exceptions = x.Exceptions
                     })
                 };
             }

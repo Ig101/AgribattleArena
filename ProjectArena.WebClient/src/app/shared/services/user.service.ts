@@ -25,9 +25,14 @@ export class UserService {
     private arenaHub: ArenaHubService
   ) {
     arenaHub.dailyUpdateNotifier.subscribe(info => {
-      this.user.tavern = info.tavern;
-      console.log('send');
-      this.userChanged.next();
+      let userChanged = false;
+      if (info.tavern) {
+        this.user.tavern = info.tavern;
+        userChanged = true;
+      }
+      if (userChanged) {
+        this.userChanged.next();
+      }
     });
   }
 

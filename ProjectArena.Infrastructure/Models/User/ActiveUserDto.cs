@@ -17,5 +17,7 @@ namespace ProjectArena.Infrastructure.Models.User
         public IEnumerable<CharacterDto> Roster { get; set; }
 
         public IEnumerable<CharacterForSaleDto> Tavern { get; set; }
+
+        public IEnumerable<TalentNodeDto> TalentsMap { get; set; }
     }
 }

@@ -1,0 +1,46 @@
+:host {
+  display: flex;
+  width: 100%;
+
+  @import '../../ascii.module.scss';
+
+  .overlay-container {
+    align-items: stretch;
+  }
+
+  .modal {
+    flex: 1;
+    .header {
+      margin: 4px;
+      display: flex;
+      .character-info {
+        flex: 1;
+        margin: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        .name-container {
+          display: flex;
+          flex-direction: row;
+          .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 16px;
+          }
+        }
+        .description {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-left: 4px;
+        }
+      }
+      .buttons {
+        min-width: 150px;
+        max-width: 150px;
+      }
+    }
+    canvas {
+      flex: 1;
+      background: #000818;
+    }
+  }
+}
