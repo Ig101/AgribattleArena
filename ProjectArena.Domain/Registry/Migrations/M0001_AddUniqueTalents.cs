@@ -357,7 +357,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                     Class = CharacterClass.Bloodletter,
                     ClassPoints = 1,
                     UniqueDescription = "Learns \"Blood bowl\" ability. Replaces \"Magic missle\" with skill that can be cast every turn, but every time it reduces health of caster.",
-                    UniqueAction = "LearnMistPact",
+                    UniqueAction = "LearnBloodBowl",
                     StrengthModifier = 0,
                     WillpowerModifier = 0,
                     ConstitutionModifier = 0,
