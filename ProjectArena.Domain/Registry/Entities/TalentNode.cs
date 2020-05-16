@@ -21,6 +21,9 @@ namespace ProjectArena.Domain.Registry.Entities
         [BsonElement("p")]
         public int ClassPoints { get; set; }
 
+        [BsonElement("sa")]
+        public int SkillsAmount { get; set; }
+
         [BsonElement("d")]
         public string UniqueDescription { get; set; }
 

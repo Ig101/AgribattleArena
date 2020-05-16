@@ -104,7 +104,8 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                         Constitution = x.ConstitutionModifier,
                         Class = x.Class,
                         ClassPoints = x.ClassPoints,
-                        Exceptions = x.Exceptions
+                        Exceptions = x.Exceptions,
+                        SkillsAmount = x.SkillsAmount
                     })
                 };
             }

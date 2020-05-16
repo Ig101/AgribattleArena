@@ -13,4 +13,5 @@ export interface TalentNode {
   constitution: number;
   speed: number;
   exceptions: string[];
+  skillsAmount: number;
 }

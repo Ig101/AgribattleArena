@@ -28,5 +28,7 @@ namespace ProjectArena.Infrastructure.Models.Game
         public int Speed { get; set; }
 
         public IEnumerable<string> Exceptions { get; set; }
+
+        public int SkillsAmount { get; set; }
     }
 }
