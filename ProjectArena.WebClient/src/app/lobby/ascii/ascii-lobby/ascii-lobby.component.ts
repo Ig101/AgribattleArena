@@ -25,6 +25,7 @@ import { getRandomBiom } from 'src/app/shared/bioms/biom.helper';
 import { TavernModalComponent } from '../modals/tavern-modal/tavern-modal.component';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { TalentsModalComponent } from '../modals/talents-modal/talents-modal.component';
+import { HintDeclaration } from '../model/hint-declaration.model';
 
 @Component({
   selector: 'app-ascii-lobby',
@@ -82,6 +83,9 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   openedModal: IModal<unknown>;
+
+  currentActor: Character;
+  hintDeclaration: HintDeclaration;
 
   get userName() {
     return this.userService.user?.name;
@@ -252,14 +256,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       const activator = this.tiles[x][y].activator;
       const newActivator = this.tiles[newX][newY].activator;
       if (activator && activator.object && activator === newActivator) {
-        this.openedModal = this.modalService.openModal(TalentsModalComponent, activator.object);
-        this.openedModal.onClose.subscribe((result) => {
-          this.openedModal = undefined;
-          this.changed = true;
-        });
-        this.openedModal.onCancel.subscribe((result) => {
-          this.openedModal = undefined;
-        });
+        this.currentActor = activator.object;
       }
     }
   }

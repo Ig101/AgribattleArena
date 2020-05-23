@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Inject, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, ViewChild, ElementRef, HostListener, Input, Output, EventEmitter } from '@angular/core';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { Subject } from 'rxjs';
 import { ComponentSizeEnum } from 'src/app/shared/models/enum/component-size.enum';
@@ -29,13 +29,19 @@ import { Random } from 'src/app/shared/random/random';
 import { InaccessibilityReasonEnum } from '../../model/enums/inaccessibility-reason.enum';
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 import { getNativeIdByTalents } from 'src/app/helpers/talents.helper';
+import { HintDeclaration } from '../../model/hint-declaration.model';
 
 @Component({
   selector: 'app-talents-modal',
   templateUrl: './talents-modal.component.html',
   styleUrls: ['./talents-modal.component.scss']
 })
-export class TalentsModalComponent implements OnInit, OnDestroy, IModal<any> {
+export class TalentsModalComponent implements OnInit, OnDestroy {
+
+  @Input() data: Character;
+
+  @Output() closeEvent = new EventEmitter<boolean>();
+  @Output() hintEvent = new EventEmitter<HintDeclaration>();
 
   @ViewChild('talentsCanvas', { static: true }) talentsCanvas: ElementRef<HTMLCanvasElement>;
   private canvasContext: CanvasRenderingContext2D;
@@ -64,9 +70,6 @@ export class TalentsModalComponent implements OnInit, OnDestroy, IModal<any> {
     realX: -1,
     realY: -1
   };
-
-  onClose = new Subject<any>();
-  onCancel = new Subject<any>();
 
   loading: boolean;
   errors: string[];
@@ -108,8 +111,6 @@ export class TalentsModalComponent implements OnInit, OnDestroy, IModal<any> {
   }
 
   constructor(
-    @Inject(MODAL_DATA) private data: Character,
-    private overlay: OverlayRef,
     private userService: UserService,
     private talentsService: TalentsService,
     private webCommunicationService: WebCommunicationService,
@@ -135,9 +136,8 @@ export class TalentsModalComponent implements OnInit, OnDestroy, IModal<any> {
         }
       }
       if (!changed) {
-        this.onClose.next();
-        this.overlay.detach();
-        this.overlay.dispose();
+        this.hintEvent.emit(undefined);
+        this.closeEvent.emit();
         return;
       }
       this.loading = true;
@@ -148,9 +148,8 @@ export class TalentsModalComponent implements OnInit, OnDestroy, IModal<any> {
           if (result.success) {
             this.data.talents = this.selectedTalents;
             this.data.nativeId = this.nativeId;
-            this.onClose.next();
-            this.overlay.detach();
-            this.overlay.dispose();
+            this.hintEvent.emit(undefined);
+            this.closeEvent.emit();
           } else {
             if (!this.webCommunicationService.desync(result)) {
               this.undo();
@@ -162,15 +161,8 @@ export class TalentsModalComponent implements OnInit, OnDestroy, IModal<any> {
   }
 
   ngOnDestroy() {
-    this.onClose.unsubscribe();
-    this.onCancel.unsubscribe();
-  }
-
-  closeOnClick(event) {
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-    this.close();
+    this.hintEvent.unsubscribe();
+    this.closeEvent.unsubscribe();
   }
 
   findPath(talent: TalentNodeWithStatus, checked: TalentNodeWithStatus[]): boolean {
@@ -597,7 +589,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy, IModal<any> {
       const symbolY = canvasY + this.tileHeight * 0.75;
       let color: string;
       if (tile.selected) {
-        color = tile.initiallySelected ? '#8800FF' : '#4444FF';
+        color = tile.initiallySelected ? '#8844FF' : '#4444FF';
       } else {
         if (tile.accessible) {
           color = tile.initiallySelected ? '#FF2222' : '#FFFFFF';

@@ -1,4 +1,4 @@
-<div class="overlay-container" (click)="closeOnClick($event)">
+<div class="overlay-container">
   <div class="modal lobby-modal">
     <app-modal-loading *ngIf="loading" [errors]="errors" (finishLoading)="loading = false; errors = undefined;"></app-modal-loading>
     <div class="header">
@@ -18,4 +18,3 @@
       (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp($event)" [style.cursor]="cursor || 'default'"></canvas>
   </div>
 </div>
-<div class="overlay-filler" (click)="closeOnClick($event)"></div>

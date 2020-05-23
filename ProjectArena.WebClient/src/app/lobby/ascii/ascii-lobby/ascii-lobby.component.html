@@ -25,7 +25,17 @@
       <p *ngIf="exitingFromQueue" class="text-font">Returning...</p>
     </div>
   </div>
-  <div class="modal window">
+  <div class="modal window" *ngIf="!currentActor; else characterInfo">
     <app-button (buttonClick)="toTavern()" [disabled]="openedModal">Tavern</app-button>
   </div>
+  <ng-template #characterInfo>
+    <div class="modal window hint-window">
+
+    </div>
+  </ng-template>
 </div>
+<app-talents-modal *ngIf="currentActor"
+  [data]="currentActor"
+  (closeEvent)="this.currentActor = undefined; this.changed = true;"
+  (hintEvent)="hintDeclaration = $event;"
+></app-talents-modal>
