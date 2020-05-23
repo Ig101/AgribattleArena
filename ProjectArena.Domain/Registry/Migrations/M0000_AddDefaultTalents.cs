@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectArena.Domain.Registry.Entities;
+using ProjectArena.Domain.Registry.Helpers;
 using ProjectArena.Infrastructure.Enums;
 
 namespace ProjectArena.Domain.Registry.Migrations
@@ -197,7 +198,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                     var (id, name, strength, willpower, constitution, speed) = defaultNodes.First(x => x.id == nodesList[choseNodeId]);
                     nodes.Add(new TalentNode
                     {
-                        Position = (x * 1000) + y,
+                        Position = TalentPositionHelper.GetPositionFromCoordinates(x, y),
                         Id = id,
                         Name = name,
                         Class = null,

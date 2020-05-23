@@ -87,6 +87,10 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.userService.user?.name;
   }
 
+  get userExperience() {
+    return this.userService.user?.experience;
+  }
+
   get canvasWidth() {
     return this.lobbyCanvas.nativeElement.width;
   }
@@ -251,6 +255,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
         this.openedModal = this.modalService.openModal(TalentsModalComponent, activator.object);
         this.openedModal.onClose.subscribe((result) => {
           this.openedModal = undefined;
+          this.changed = true;
         });
         this.openedModal.onCancel.subscribe((result) => {
           this.openedModal = undefined;
@@ -379,7 +384,6 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.tiles) {
       const cameraLeft = this.campWidth / 2 - (this.canvasWidth - 374) / 2 / this.tileWidth + 0.5;
       const cameraTop = this.campHeight / 2 - this.canvasHeight / 2 / this.tileHeight + 0.8;
-      this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvasContext.font = `${this.tileHeight}px PT Mono`;
       this.canvasContext.textAlign = 'left';
       const left = Math.floor(cameraLeft) - this.tileWidth;

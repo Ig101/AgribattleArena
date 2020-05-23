@@ -119,7 +119,9 @@ export class SettingsModalComponent implements OnInit, OnDestroy, IModal<any> {
             this.close();
           });
         } else {
-          this.errors = result.errors;
+          if (!this.webCommunicationService.desync(result)) {
+            this.errors = result.errors;
+          }
         }
       });
     }
@@ -140,7 +142,9 @@ export class SettingsModalComponent implements OnInit, OnDestroy, IModal<any> {
           this.close();
         });
       } else {
-        this.errors = result.errors;
+        if (!this.webCommunicationService.desync(result)) {
+          this.errors = result.errors;
+        }
       }
     });
   }

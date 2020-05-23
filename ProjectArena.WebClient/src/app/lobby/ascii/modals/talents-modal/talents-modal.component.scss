@@ -9,13 +9,18 @@
   }
 
   .modal {
+    max-height: calc(100% - 24px);
+    max-width: calc(100% - 24px);
+    position: relative;
     flex: 1;
     .header {
       margin: 4px;
+      margin-bottom: 0px;;
       display: flex;
       .character-info {
         flex: 1;
         margin: 8px 12px;
+        margin-bottom: 0;
         display: flex;
         flex-direction: column;
         .name-container {
@@ -27,18 +32,27 @@
             margin-right: 16px;
           }
         }
-        .description {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          margin-left: 4px;
-        }
       }
       .buttons {
         min-width: 150px;
         max-width: 150px;
       }
     }
+    .description {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+      display: flex;
+      .name {
+        min-width: 170px;
+      }
+      span {
+        margin-left: 20px;
+      }
+    }
     canvas {
+      max-width: 100%;
+      max-height: calc(100% - 88px);
       flex: 1;
       background: #000818;
     }

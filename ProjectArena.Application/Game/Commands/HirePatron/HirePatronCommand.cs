@@ -99,7 +99,7 @@ namespace ProjectArena.Application.Game.Commands.HirePatron
                     Deleted = false,
                     RosterUserId = roster.UserId,
                     Name = request.Name.Trim(),
-                    ChosenTalents = new string[0]
+                    ChosenTalents = new int[0]
                 };
                 if (request.CharacterForReplace != null)
                 {

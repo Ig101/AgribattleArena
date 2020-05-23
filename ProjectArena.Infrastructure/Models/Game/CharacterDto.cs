@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 
 namespace ProjectArena.Infrastructure.Models.Game
 {
@@ -8,6 +8,6 @@ namespace ProjectArena.Infrastructure.Models.Game
 
         public string Name { get; set; }
 
-        public string NativeId { get; set; }
+        public IEnumerable<PointDto> Talents { get; set; }
     }
 }

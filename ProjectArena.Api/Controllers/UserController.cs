@@ -36,17 +36,5 @@ namespace ProjectArena.Api.Controllers
           Response.Cookies.Delete("Authorization");
           return NoContent();
         }
-
-        [HttpPut("character")]
-        public async Task<ActionResult> HirePatronAsync(HirePatronCommand model)
-        {
-            var user = await Mediator.Send(new GetFullUserInfoByPrincipalQuery()
-            {
-                User = User
-            });
-            model.UserId = user.Id;
-            var result = await Mediator.Send(model);
-            return Ok(result);
-        }
     }
 }

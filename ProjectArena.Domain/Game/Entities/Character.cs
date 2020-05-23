@@ -18,6 +18,6 @@ namespace ProjectArena.Domain.Game.Entities
         public string Name { get; set; }
 
         [BsonElement("t")]
-        public IEnumerable<string> ChosenTalents { get; set; }
+        public IEnumerable<int> ChosenTalents { get; set; }
     }
 }

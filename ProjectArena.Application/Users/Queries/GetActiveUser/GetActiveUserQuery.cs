@@ -9,6 +9,7 @@ using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Game.Entities;
 using ProjectArena.Domain.Identity;
 using ProjectArena.Domain.Registry;
+using ProjectArena.Domain.Registry.Helpers;
 using ProjectArena.Infrastructure.Enums;
 using ProjectArena.Infrastructure.Models.Game;
 using ProjectArena.Infrastructure.Models.User;
@@ -76,6 +77,7 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
 
                 var talents = await _registryContext.TalentMap.GetAsync(x => true);
 
+                // TODO NativeId calculation by talents
                 return new ActiveUserDto()
                 {
                     Name = user.ViewName,
@@ -85,27 +87,42 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                     State = statusInBattle ? UserState.Battle : UserState.Lobby,
                     Experience = roster.Experience,
                     Tavern = tavern,
-                    Roster = characters.Select(x => new CharacterDto()
+                    Roster = characters.Select(x =>
                     {
-                        Id = x.Id,
-                        Name = x.Name,
-                        NativeId = "adventurer"
+                        return new CharacterDto()
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            Talents = x.ChosenTalents.Select(k =>
+                            {
+                                var coordinates = TalentPositionHelper.GetCoordinatesFromPosition(k);
+                                return new PointDto()
+                                {
+                                    X = coordinates.x,
+                                    Y = coordinates.y
+                                };
+                            })
+                        };
                     }),
-                    TalentsMap = talents.Select(x => new TalentNodeDto()
+                    TalentsMap = talents.Select(x =>
                     {
-                        X = x.Position / 1000,
-                        Y = x.Position % 1000,
-                        Name = x.Name,
-                        Description = x.UniqueDescription,
-                        Id = x.Id,
-                        Speed = x.SpeedModifier,
-                        Strength = x.StrengthModifier,
-                        Willpower = x.WillpowerModifier,
-                        Constitution = x.ConstitutionModifier,
-                        Class = x.Class,
-                        ClassPoints = x.ClassPoints,
-                        Exceptions = x.Exceptions,
-                        SkillsAmount = x.SkillsAmount
+                        var position = TalentPositionHelper.GetCoordinatesFromPosition(x.Position);
+                        return new TalentNodeDto()
+                        {
+                            X = position.x,
+                            Y = position.y,
+                            Name = x.Name,
+                            Description = x.UniqueDescription,
+                            Id = x.Id,
+                            Speed = x.SpeedModifier,
+                            Strength = x.StrengthModifier,
+                            Willpower = x.WillpowerModifier,
+                            Constitution = x.ConstitutionModifier,
+                            Class = x.Class,
+                            ClassPoints = x.ClassPoints,
+                            Exceptions = x.Exceptions,
+                            SkillsAmount = x.SkillsAmount
+                        };
                     })
                 };
             }

@@ -5,6 +5,8 @@ import { WebCommunicationService } from './web-communication.service';
 import { map, tap, switchMap } from 'rxjs/operators';
 import { ExternalResponse } from '../models/external-response.model';
 import { ArenaHubService } from './arena-hub.service';
+import { CharacterClassEnum } from 'src/app/lobby/ascii/model/enums/character-class.enum';
+import { getNativeIdByTalents } from 'src/app/helpers/talents.helper';
 
 @Injectable({
   providedIn: 'root'
@@ -48,6 +50,10 @@ export class UserService {
     .pipe(switchMap(result => {
       this.user = result.result;
       if (this.user) {
+        for (const character of this.user.roster) {
+          const characterTalents = this.user.talentsMap.filter(x => character.talents.some(k => k.x === x.x && k.y === x.y));
+          character.nativeId = getNativeIdByTalents(characterTalents);
+        }
         this.email = this.user.email;
         return this.arenaHub.connect(this.user.id).pipe(map(connect => result));
       } else {

@@ -3,13 +3,17 @@ import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular
 import { catchError, map } from 'rxjs/operators';
 import { ExternalResponse } from '../models/external-response.model';
 import { of } from 'rxjs';
+import { LoadingService } from './loading.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebCommunicationService {
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient,
+    private loadingService: LoadingService
+    ) { }
 
   handleError<T>(result: HttpErrorResponse) {
     if (result.status === 400) {
@@ -83,5 +87,18 @@ export class WebCommunicationService {
         } as ExternalResponse<T>;
       }))
       .pipe(catchError((result) => this.handleError<T>(result)));
+  }
+
+  desync(result: ExternalResponse<unknown>) {
+    if (result.statusCode >= 400 && result.statusCode < 500) {
+      this.loadingService.startLoading({
+        title: 'Desynchronization. Page will be refreshed in 2 seconds.'
+      }, 0, true);
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+      return true;
+    }
+    return false;
   }
 }

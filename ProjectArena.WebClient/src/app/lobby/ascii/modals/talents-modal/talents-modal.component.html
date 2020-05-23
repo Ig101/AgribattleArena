@@ -1,18 +1,21 @@
 <div class="overlay-container" (click)="closeOnClick($event)">
   <div class="modal lobby-modal">
+    <app-modal-loading *ngIf="loading" [errors]="errors" (finishLoading)="loading = false; errors = undefined;"></app-modal-loading>
     <div class="header">
       <div class="character-info">
         <div class="name-container title-font-inactive">
-          <div class="name" [style.color]="color">{{name}}</div>0/15
+          <div class="name">{{name}}</div>{{talentsCount}}/{{talentsMaxCount}}
         </div>
-        <div class="text-font-inactive description" [style.color]="color">{{description}}</div>
       </div>
       <div class="buttons">
         <app-button [size]="componentSizeEnum.Small" (buttonClick)="undo()">Undo</app-button>
       </div>
       <app-button class="close-button" [size]="componentSizeEnum.Small" (buttonClick)="close()">X</app-button>
     </div>
-    <canvas #talentsCanvas></canvas>
+    <div class="text-font-inactive description"><span class="name" [style.color]="color">{{description}}</span><span>St: {{strength}}</span><span>Wi: {{willpower}}</span><span>Co: {{constitution}}</span><span>Sp: {{speed}}</span></div>
+    <canvas #talentsCanvas (window:resize)="onResize()" (mousedown)="onMouseDown($event)"
+      (window:mouseup)="onMouseUpWindow($event)" (mouseleave)="onMouseLeave()"
+      (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp($event)" [style.cursor]="cursor || 'default'"></canvas>
   </div>
 </div>
 <div class="overlay-filler" (click)="closeOnClick($event)"></div>

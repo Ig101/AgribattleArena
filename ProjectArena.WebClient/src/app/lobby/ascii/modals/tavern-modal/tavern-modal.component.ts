@@ -16,6 +16,7 @@ import { ComponentSizeEnum } from 'src/app/shared/models/enum/component-size.enu
 import { WebCommunicationService } from 'src/app/shared/services/web-communication.service';
 import { HirePatronRequest } from '../../model/requests/hire-patron-request.model';
 import { NewCharacterResponse } from '../../model/requests/new-character-response.model';
+import { LoadingService } from 'src/app/shared/services/loading.service';
 
 @Component({
   selector: 'app-tavern-modal',
@@ -45,7 +46,8 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
     private userService: UserService,
     private queueService: QueueService,
     private formBuilder: FormBuilder,
-    private webCommunicationService: WebCommunicationService
+    private webCommunicationService: WebCommunicationService,
+    private loadingService: LoadingService
   ) { }
 
 
@@ -145,7 +147,9 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
             this.errors = [`You recruited ${newCharacter.name}.`];
             this.nameForm.controls.textField.setValue('');
           } else {
-            this.errors = result.errors;
+            if (!this.webCommunicationService.desync(result)) {
+              this.errors = result.errors;
+            }
           }
         });
     }

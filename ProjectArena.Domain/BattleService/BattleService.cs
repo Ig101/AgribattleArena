@@ -78,7 +78,17 @@ namespace ProjectArena.Domain.BattleService
                     .Where(x => x.RosterUserId == id)
                     .Select(x =>
                     {
-                        return EngineHelper.CreateActorForGeneration(Guid.Parse(x.Id), "adventurer", "slash", 50, 50, 50, 50, new[] { "explosion" }, 6, null);
+                        return EngineHelper.CreateActorForGeneration(
+                            Guid.Parse(x.Id),
+                            "adventurer",
+                            "slash",
+                            BattleHelper.DefaultStrength,
+                            BattleHelper.DefaultWillpower,
+                            BattleHelper.DefaultConstitution,
+                            BattleHelper.DefaultSpeed,
+                            new[] { "explosion" },
+                            6,
+                            null);
                     }));
 
                 players.Add(EngineHelper.CreatePlayerForGeneration(id, null, playerActors));

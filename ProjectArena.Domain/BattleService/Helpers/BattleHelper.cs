@@ -12,6 +12,14 @@ namespace ProjectArena.Domain.BattleService.Helpers
 {
     public static class BattleHelper
     {
+        public const int DefaultStrength = 25;
+
+        public const int DefaultWillpower = 25;
+
+        public const int DefaultConstitution = 25;
+
+        public const int DefaultSpeed = 25;
+
         public static string GetBattleActionMethodName(Engine.Helpers.Action? action)
         {
             return "Battle" + (action == null ? "Info" : action.ToString());
