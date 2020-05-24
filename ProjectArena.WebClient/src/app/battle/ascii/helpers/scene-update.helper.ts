@@ -56,7 +56,6 @@ export function synchronizeSkill(skill: Skill, syncSkill: SyncSkill) {
   skill.cost = syncSkill.cost;
   skill.preparationTime = Math.ceil(syncSkill.preparationTime);
   skill.range = syncSkill.range;
-  skill.meleeOnly = syncSkill.meleeOnly;
 }
 
 export function synchronizeBuff(buff: Buff, syncBuff: SyncBuff) {

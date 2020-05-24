@@ -1,4 +1,5 @@
 using ProjectArena.Engine.ForExternalUse;
+using ProjectArena.Engine.Helpers;
 
 namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
 {
@@ -13,6 +14,11 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 2,
                 0,
                 30,
+                new Targets()
+                {
+                    Allies = true,
+                    NotAllies = true
+                },
                 true,
                 new[] { "DoDamageAttack" });
             nativeManager.AddSkillNative(
@@ -22,6 +28,13 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 4,
                 3,
                 20,
+                new Targets()
+                {
+                    Allies = true,
+                    NotAllies = true,
+                    Unbearable = true,
+                    Bearable = true
+                },
                 false,
                 new[] { "DoSmallAoeDamageSkill", "DoSmallAoeOneTurnStun" });
         }

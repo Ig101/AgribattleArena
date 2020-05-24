@@ -41,6 +41,7 @@ import { SkillModalComponent } from '../modals/skill-modal/skill-modal.component
 import { Skill } from '../models/scene/skill.model';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { DecorationModalComponent } from '../modals/decoration-modal/decoration-modal.component';
+import { checkMilliness, checkSkillTargets } from '../helpers/scene-actions.helper';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -753,9 +754,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }
         break;
       case BattleSynchronizationActionEnum.Attack:
+        const skill = this.battleStorageService.currentActor.attackingSkill;
         if (newAction.actorId === this.battleStorageService.currentActor.id &&
           (sX === 1 && sY === 0 || sX === 0 && sY === 1) && this.battleStorageService.currentActor.canAct &&
-          (!this.battleStorageService.currentActor.attackingSkill.meleeOnly || Math.abs(tile.height - initialTile.height) < 10) &&
+          checkSkillTargets(initialTile, tile, skill.availableTargets) &&
+          (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
           (tile.actor || tile.decoration) && tile.actor !== this.battleStorageService.currentActor) {
           this.arenaHub.orderAttack(newAction.actorId, newAction.x, newAction.y);
           this.battleAnimationsService

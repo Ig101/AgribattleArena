@@ -1,4 +1,6 @@
-﻿namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
+﻿using ProjectArena.Engine.Helpers;
+
+namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 {
     public interface ISkill
     {
@@ -16,6 +18,8 @@
 
         float PreparationTime { get; }
 
-        bool MeleeOnly { get; set; }
+        Targets AvailableTargets { get; }
+
+        bool OnlyVisibleTargets { get; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ProjectArena.Engine.Helpers;
 using ProjectArena.Engine.Helpers.DelegateLists;
 
 namespace ProjectArena.Engine.Natives
@@ -16,11 +17,13 @@ namespace ProjectArena.Engine.Natives
 
         public float DefaultMod { get; }
 
-        public bool MeleeOnly { get; }
+        public Targets AvailableTargets { get; }
+
+        public bool OnlyVisibleTargets { get; }
 
         public SkillActions.Action Action { get; }
 
-        public SkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, bool meleeOnly, IEnumerable<string> actionNames)
+        public SkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, Targets availableTargets, bool onlyVisibleTargets, IEnumerable<string> actionNames)
             : this(
                 id,
                 tags,
@@ -28,20 +31,22 @@ namespace ProjectArena.Engine.Natives
                 defaultCost,
                 defaultCd,
                 defaultMod,
-                meleeOnly,
+                availableTargets,
+                onlyVisibleTargets,
                 actionNames.Select(actionName =>
                     (SkillActions.Action)Delegate.CreateDelegate(typeof(SkillActions.Action), typeof(SkillActions).GetMethod(actionName, BindingFlags.Public | BindingFlags.Static))))
         {
         }
 
-        public SkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, bool meleeOnly, IEnumerable<SkillActions.Action> actions)
+        public SkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, Targets availableTargets, bool onlyVisibleTargets, IEnumerable<SkillActions.Action> actions)
             : base(id, tags)
         {
             this.DefaultRange = defaultRange;
             this.DefaultCost = defaultCost;
             this.DefaultCd = defaultCd;
             this.DefaultMod = defaultMod;
-            this.MeleeOnly = meleeOnly;
+            this.AvailableTargets = availableTargets;
+            this.OnlyVisibleTargets = onlyVisibleTargets;
             this.Action = null;
             foreach (SkillActions.Action action in actions)
             {

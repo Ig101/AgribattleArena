@@ -1,4 +1,5 @@
 import { TwoPhaseActionAnimation } from '../two-phase-action-animation.model';
+import { Targets } from 'src/app/shared/models/battle/targets.model';
 
 export interface Skill {
   id: number;
@@ -11,5 +12,6 @@ export interface Skill {
   cd: number;
   cost: number;
   preparationTime: number;
-  meleeOnly: boolean;
+  availableTargets: Targets;
+  onlyVisibleTargets: boolean;
 }

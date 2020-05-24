@@ -1,0 +1,61 @@
+import { Tile } from '../models/scene/tile.model';
+import { rangeBetween, angleBetween } from 'src/app/helpers/math.helper';
+import { Skill } from '../models/scene/skill.model';
+import { Targets } from 'src/app/shared/models/battle/targets.model';
+
+export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
+    const range = rangeBetween(initial.x, initial.y, target.x, target.y);
+    let incrementingRange = 0;
+    const angle = angleBetween(initial.x, initial.y, target.x, target.y);
+    const sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+    let currentTile = initial;
+    while (incrementingRange <= range) {
+        incrementingRange++;
+        let nextTarget;
+        if (incrementingRange >= range) {
+            nextTarget = target;
+        } else {
+            const nextX = Math.round(initial.x + (incrementingRange * cos));
+            const nextY = Math.round(initial.y + (incrementingRange * sin));
+            nextTarget = tiles[nextX][nextY];
+        }
+
+        if (Math.abs(currentTile.height - nextTarget.height) >= 10) {
+            return false;
+        }
+
+        currentTile = nextTarget;
+    }
+
+    return true;
+}
+
+export function checkSkillTargets(initial: Tile, target: Tile, targets: Targets): boolean {
+  const allies =
+    targets.allies &&
+    (target.actor || target.decoration) &&
+    target.actor !== initial.actor &&
+    (!target.actor || target.actor.owner?.team === initial.actor.owner?.team) &&
+    (!target.decoration || target.decoration.owner?.team === initial.actor.owner?.team);
+  const notAllies =
+    targets.notAllies &&
+    (target.actor || target.decoration) &&
+    target.actor !== initial.actor &&
+    (!target.actor || !initial.actor.owner?.team || target.actor.owner?.team !== initial.actor.owner?.team) &&
+    (!target.decoration || !initial.actor.owner?.team || target.decoration.owner?.team !== initial.actor.owner?.team);
+  const self =
+    targets.self &&
+    target.actor === initial.actor;
+  const bearable =
+    targets.bearable &&
+    !target.actor &&
+    !target.decoration &&
+    !target.unbearable;
+  const unbearable =
+    targets.unbearable &&
+    !target.actor &&
+    !target.decoration &&
+    target.unbearable;
+  return allies || notAllies || self || bearable || unbearable;
+}

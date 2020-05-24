@@ -79,9 +79,9 @@ namespace ProjectArena.Engine.NativeManagers
             roleModelNatives.Add(id, new RoleModelNative(this, id, defaultStrength, defaultWillpower, defaultConstitution, defaultSpeed, defaultActionPointsIncome, attackingSkill, skills));
         }
 
-        public void AddSkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, bool meleeOnly, IEnumerable<string> actions)
+        public void AddSkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, Targets availableTargets, bool onlyVisibleTargets, IEnumerable<string> actions)
         {
-            skillNatives.Add(id, new SkillNative(id, InternTags(tags), defaultRange, defaultCost, defaultCd, defaultMod, meleeOnly, actions));
+            skillNatives.Add(id, new SkillNative(id, InternTags(tags), defaultRange, defaultCost, defaultCd, defaultMod, availableTargets, onlyVisibleTargets, actions));
         }
 
         public void AddTileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, IEnumerable<string> actions, IEnumerable<string> onStepActions)

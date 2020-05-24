@@ -590,16 +590,16 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
           }
           const paragraphs: string[] = [];
           if (this.hoveredTalent.strength) {
-            paragraphs.push(`Strength ${this.hoveredTalent.strength > 0 ? '+' : ''}${this.hoveredTalent.strength}`)
+            paragraphs.push(`Strength ${this.hoveredTalent.strength > 0 ? '+' : ''}${this.hoveredTalent.strength}`);
           }
           if (this.hoveredTalent.willpower) {
-            paragraphs.push(`Willpower ${this.hoveredTalent.willpower > 0 ? '+' : ''}${this.hoveredTalent.willpower}`)
+            paragraphs.push(`Willpower ${this.hoveredTalent.willpower > 0 ? '+' : ''}${this.hoveredTalent.willpower}`);
           }
           if (this.hoveredTalent.constitution) {
-            paragraphs.push(`Constitution ${this.hoveredTalent.constitution > 0 ? '+' : ''}${this.hoveredTalent.constitution}`)
+            paragraphs.push(`Constitution ${this.hoveredTalent.constitution > 0 ? '+' : ''}${this.hoveredTalent.constitution}`);
           }
           if (this.hoveredTalent.speed) {
-            paragraphs.push(`Speed ${this.hoveredTalent.speed > 0 ? '+' : ''}${this.hoveredTalent.speed}`)
+            paragraphs.push(`Speed ${this.hoveredTalent.speed > 0 ? '+' : ''}${this.hoveredTalent.speed}`);
           }
           const hint = {
             title: this.hoveredTalent.name,
@@ -705,7 +705,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
   showWillpowerHint() {
     this.hintEvent.emit({
       title: 'Willpower',
-      description: 'Each point of willpower increases damage soldier\'s magical abilities do.',
+      description: 'Each point of willpower increases damage soldier\'s magic abilities do.',
       error: undefined,
       paragraphs: []
     } as HintDeclaration);

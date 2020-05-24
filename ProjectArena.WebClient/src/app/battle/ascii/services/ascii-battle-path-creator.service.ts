@@ -7,6 +7,7 @@ import { rangeBetween, rangeBetweenShift } from 'src/app/helpers/math.helper';
 import { Skill } from '../models/scene/skill.model';
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 import { ActionSquareTypeEnum } from '../models/enum/action-square-type.enum';
+import { checkSkillTargets, checkMilliness } from '../helpers/scene-actions.helper';
 
 @Injectable()
 export class AsciiBattlePathCreatorService {
@@ -59,7 +60,8 @@ export class AsciiBattlePathCreatorService {
           newY < this.battleStorageService.scene.height && newY >= 0 &&
           rangeBetweenShift(sX, sY) <= skill.range) {
             const tile = this.battleStorageService.scene.tiles[newX][newY];
-            if ((!skill.meleeOnly || Math.abs(tile.height - initialTile.height) < 10) &&
+            if (checkSkillTargets(initialTile, tile, skill.availableTargets) &&
+              (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
               (!onlyTargets || tile.actor || tile.decoration) && tile.actor !== actor) {
               const existingSquare = allSquares.find(s => s.x === newX && s.y === newY);
               if (existingSquare && remainedActionPoints <= existingSquare.remainedPoints) {

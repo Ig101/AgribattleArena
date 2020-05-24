@@ -1,3 +1,5 @@
+import { Targets } from '../targets.model';
+
 export interface SyncSkill {
   id: number;
   range: number;
@@ -5,5 +7,6 @@ export interface SyncSkill {
   cd: number;
   cost: number;
   preparationTime: number;
-  meleeOnly: boolean;
+  availableTargets: Targets;
+  onlyVisibleTargets: boolean;
 }

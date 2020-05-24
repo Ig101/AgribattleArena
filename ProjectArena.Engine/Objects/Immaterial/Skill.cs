@@ -47,9 +47,49 @@ namespace ProjectArena.Engine.Objects.Immaterial
             }
         }
 
+        private bool CheckMilliness(Tile target)
+        {
+            var range = Misc.RangeBetween(parent.X, parent.Y, target.X, target.Y);
+            var incrementingRange = 0;
+            var angleBetween = Misc.AngleBetween(parent.X, parent.Y, target.X, target.Y);
+            var sin = Math.Sin(angleBetween);
+            var cos = Math.Cos(angleBetween);
+            var currentTile = parent.TempTile;
+            while (incrementingRange <= range)
+            {
+                incrementingRange++;
+                Tile nextTarget;
+                if (incrementingRange >= range)
+                {
+                    nextTarget = target;
+                }
+                else
+                {
+                    var nextX = (int)(parent.X + (incrementingRange * cos));
+                    var nextY = (int)(parent.Y + (incrementingRange * sin));
+                    nextTarget = parent.Parent.Tiles[nextX][nextY];
+                }
+
+                if (Math.Abs(currentTile.Height - nextTarget.Height) >= 10)
+                {
+                    return false;
+                }
+
+                currentTile = nextTarget;
+            }
+
+            return true;
+        }
+
         public bool Cast(Tile target)
         {
-            if (parent.ActionPoints >= cost && PreparationTime <= 0 && parent.BuffManager.CanAct && (!Native.MeleeOnly || Math.Abs(parent.TempTile.Height - target.Height) < 10) &&
+            if (parent.ActionPoints >= cost && PreparationTime <= 0 && parent.BuffManager.CanAct &&
+                    ((Native.AvailableTargets.Allies && target.TempObject != null && target.TempObject != parent && target.TempObject.Owner?.Team == parent.Owner?.Team) ||
+                    (Native.AvailableTargets.NotAllies && target.TempObject != null && target.TempObject != parent && (parent.Owner?.Team == null || target.TempObject.Owner?.Team != parent.Owner?.Team)) ||
+                    (Native.AvailableTargets.Self && target.TempObject == parent) ||
+                    (Native.AvailableTargets.Bearable && target.TempObject == null && !target.Native.Unbearable) ||
+                    (Native.AvailableTargets.Unbearable && target.TempObject == null && target.Native.Unbearable)) &&
+                (!Native.OnlyVisibleTargets || CheckMilliness(target)) &&
                 Misc.RangeBetween(parent.X, parent.Y, target.X, target.Y) <= range)
             {
                 Native.Action(parent.Parent, parent, target, this);

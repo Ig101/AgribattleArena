@@ -1,4 +1,5 @@
 ﻿using ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces;
+using ProjectArena.Engine.Helpers;
 
 namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 {
@@ -18,7 +19,9 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public float PreparationTime { get; }
 
-        public bool MeleeOnly { get; set; }
+        public Targets AvailableTargets { get; }
+
+        public bool OnlyVisibleTargets { get; }
 
         public Skill(Objects.Immaterial.Skill skill)
         {
@@ -29,7 +32,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Mod = skill.Mod;
             this.Cost = skill.Cost;
             this.PreparationTime = skill.PreparationTime;
-            this.MeleeOnly = skill.Native.MeleeOnly;
+            this.OnlyVisibleTargets = skill.Native.OnlyVisibleTargets;
+            this.AvailableTargets = skill.Native.AvailableTargets;
         }
     }
 }

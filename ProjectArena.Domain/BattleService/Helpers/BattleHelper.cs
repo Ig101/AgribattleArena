@@ -68,7 +68,15 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     NativeId = actor.AttackingSkill.NativeId,
                     PreparationTime = actor.AttackingSkill.PreparationTime,
                     Range = actor.AttackingSkill.Range,
-                    MeleeOnly = actor.AttackingSkill.MeleeOnly
+                    OnlyVisibleTargets = actor.AttackingSkill.OnlyVisibleTargets,
+                    AvailableTargets = new TargetsDto()
+                    {
+                        Allies = actor.AttackingSkill.AvailableTargets.Allies,
+                        Self = actor.AttackingSkill.AvailableTargets.Self,
+                        NotAllies = actor.AttackingSkill.AvailableTargets.NotAllies,
+                        Bearable = actor.AttackingSkill.AvailableTargets.Bearable,
+                        Unbearable = actor.AttackingSkill.AvailableTargets.Unbearable
+                    }
                 },
                 Buffs = actor.Buffs.Select(k => new BuffDto()
                 {
@@ -92,7 +100,15 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     NativeId = k.NativeId,
                     PreparationTime = k.PreparationTime,
                     Range = k.Range,
-                    MeleeOnly = k.MeleeOnly
+                    OnlyVisibleTargets = k.OnlyVisibleTargets,
+                    AvailableTargets = new TargetsDto()
+                    {
+                        Allies = k.AvailableTargets.Allies,
+                        Self = k.AvailableTargets.Self,
+                        NotAllies = k.AvailableTargets.NotAllies,
+                        Bearable = k.AvailableTargets.Bearable,
+                        Unbearable = k.AvailableTargets.Unbearable
+                    }
                 }),
                 X = actor.X,
                 Y = actor.Y,

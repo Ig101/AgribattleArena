@@ -101,7 +101,8 @@ export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Sk
     cd: skill.cd,
     cost: skill.cost,
     preparationTime: Math.ceil(skill.preparationTime),
-    meleeOnly: skill.meleeOnly
+    onlyVisibleTargets: skill.onlyVisibleTargets,
+    availableTargets: skill.availableTargets
   };
 }
 

@@ -14,6 +14,8 @@
 
         public float PreparationTime { get; set; }
 
-        public bool MeleeOnly { get; set; }
+        public TargetsDto AvailableTargets { get; set; }
+
+        public bool OnlyVisibleTargets { get; set; }
     }
 }
