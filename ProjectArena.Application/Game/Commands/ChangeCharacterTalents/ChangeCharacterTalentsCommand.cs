@@ -49,7 +49,7 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
             {
                 procesedNodes.Add(node);
                 var (x, y) = TalentPositionHelper.GetCoordinatesFromPosition(node.Position);
-                if ((Math.Abs(x - _centerX) == 1 && y == _centerY) || (Math.Abs(x - _centerY) == 1 && y == _centerX))
+                if ((Math.Abs(x - _centerX) == 1 && y == _centerY) || (Math.Abs(y - _centerY) == 1 && x == _centerX))
                 {
                     return true;
                 }
