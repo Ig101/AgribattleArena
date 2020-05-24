@@ -1,5 +1,4 @@
 export enum ActionSquareTypeEnum {
-  Actor,
-  Move,
-  Act
+  Move = 1,
+  Act = 2
 }

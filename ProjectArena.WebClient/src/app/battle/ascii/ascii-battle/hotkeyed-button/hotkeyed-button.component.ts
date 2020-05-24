@@ -39,7 +39,7 @@ export class HotkeyedButtonComponent implements OnInit, OnDestroy {
 
   @HostListener('mousedown', ['$event'])
   down(event: MouseEvent) {
-    if (event.button === 0) {
+    if (event.button === 0 && !this.disabled) {
       this.mouseDown.emit();
       this.smartAction.pressed = true;
     }
@@ -47,15 +47,15 @@ export class HotkeyedButtonComponent implements OnInit, OnDestroy {
 
   @HostListener('mouseup', ['$event'])
   up(event: MouseEvent) {
-      if (event.button === 0) {
+      if (event.button === 0 && !this.disabled) {
       if (this.smartAction.pressed) {
         if (this.smartAction.type === SmartActionTypeEnum.Toggle) {
           this.smartAction.actions[this.smartAction.smartValue]();
         } else if (this.smartAction.type !== SmartActionTypeEnum.Hold || this.smartAction.smartValue >= 0.95) {
           this.smartAction.actions[0]();
         }
-        this.smartAction.pressed = false;
       }
+      this.smartAction.pressed = false;
     }
   }
 

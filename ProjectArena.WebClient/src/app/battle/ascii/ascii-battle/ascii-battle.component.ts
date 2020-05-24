@@ -183,7 +183,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     const mouseX = Math.floor(this.mouseState.x);
     const mouseY = Math.floor(this.mouseState.y);
     const currentActionSquare = this.battleStorageService.availableActionSquares
-      ?.find(s => s.x === mouseX && s.y === mouseY && s.type !== ActionSquareTypeEnum.Actor);
+      ?.find(s => s.x === mouseX && s.y === mouseY && s.type);
     return ((currentActionSquare?.remainedPoints + 1) || (this.battleStorageService.currentActor?.actionPoints + 1)) - 1;
   }
 
@@ -375,7 +375,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         if (event.button === 0 && this.canAct && Math.floor(this.mouseState.x) === x && Math.floor(this.mouseState.y) === y) {
           // Action
           const currentActionSquare = this.battleStorageService.availableActionSquares
-          ?.find(s => s.x === x && s.y === y && s.type !== ActionSquareTypeEnum.Actor);
+          ?.find(s => s.x === x && s.y === y && s.type);
           if (currentActionSquare) {
             // TODO cast spells
             if (this.currentSkillId) {
@@ -394,7 +394,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
               this.resetSkillActions();
             } else {
               this.actionsQueue = [
-                ...currentActionSquare.parentSquares.filter(s => s.type !== ActionSquareTypeEnum.Actor)
+                ...currentActionSquare.parentSquares.filter(s => !s.isActor)
                   .reverse().map(s => {
                     return {
                     actorId: this.battleStorageService.currentActor.id,
@@ -675,7 +675,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const mouseX = Math.floor(this.mouseState.x);
       const mouseY = Math.floor(this.mouseState.y);
       const currentActionSquare = this.canAct ? this.battleStorageService.availableActionSquares
-        ?.find(s => s.x === mouseX && s.y === mouseY && s.type !== ActionSquareTypeEnum.Actor) : undefined;
+        ?.find(s => s.x === mouseX && s.y === mouseY && s.type) : undefined;
       for (let x = left; x <= right; x++) {
         for (let y = top; y <= bottom; y++ ) {
           let drawChar;
@@ -686,12 +686,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             };
           } else if (currentActionSquare?.type === ActionSquareTypeEnum.Act && currentActionSquare.parentSquares.length > 0 &&
             currentActionSquare?.parentSquares[0].x === x && currentActionSquare?.parentSquares[0].y === y &&
-            currentActionSquare?.parentSquares[0].type !== ActionSquareTypeEnum.Actor) {
+            !currentActionSquare?.parentSquares[0].isActor) {
             drawChar = {
               char: 'x',
               color: {r: 255, g: 255, b: 0, a: 1}
             };
-          } else if (currentActionSquare?.parentSquares.some(s => s.x === x && s.y === y && s.type !== ActionSquareTypeEnum.Actor)) {
+          } else if (currentActionSquare?.parentSquares.some(s => s.x === x && s.y === y && !s.isActor)) {
             drawChar = {
               char: '.',
               color: {r: 255, g: 255, b: 0, a: 1}
@@ -757,7 +757,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         const skill = this.battleStorageService.currentActor.attackingSkill;
         if (newAction.actorId === this.battleStorageService.currentActor.id &&
           (sX === 1 && sY === 0 || sX === 0 && sY === 1) && this.battleStorageService.currentActor.canAct &&
-          checkSkillTargets(initialTile, tile, skill.availableTargets) &&
+          checkSkillTargets(tile, this.battleStorageService.currentActor, skill.availableTargets) &&
           (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
           (tile.actor || tile.decoration) && tile.actor !== this.battleStorageService.currentActor) {
           this.arenaHub.orderAttack(newAction.actorId, newAction.x, newAction.y);

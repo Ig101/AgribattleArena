@@ -2,6 +2,7 @@ import { Tile } from '../models/scene/tile.model';
 import { rangeBetween, angleBetween } from 'src/app/helpers/math.helper';
 import { Skill } from '../models/scene/skill.model';
 import { Targets } from 'src/app/shared/models/battle/targets.model';
+import { Actor } from '../models/scene/actor.model';
 
 export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
     const range = rangeBetween(initial.x, initial.y, target.x, target.y);
@@ -31,22 +32,22 @@ export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
     return true;
 }
 
-export function checkSkillTargets(initial: Tile, target: Tile, targets: Targets): boolean {
+export function checkSkillTargets(target: Tile, actor: Actor, targets: Targets): boolean {
   const allies =
     targets.allies &&
     (target.actor || target.decoration) &&
-    target.actor !== initial.actor &&
-    (!target.actor || target.actor.owner?.team === initial.actor.owner?.team) &&
-    (!target.decoration || target.decoration.owner?.team === initial.actor.owner?.team);
+    target.actor !== actor &&
+    (!target.actor || target.actor.owner?.team === actor.owner?.team) &&
+    (!target.decoration || target.decoration.owner?.team === actor.owner?.team);
   const notAllies =
     targets.notAllies &&
     (target.actor || target.decoration) &&
-    target.actor !== initial.actor &&
-    (!target.actor || !initial.actor.owner?.team || target.actor.owner?.team !== initial.actor.owner?.team) &&
-    (!target.decoration || !initial.actor.owner?.team || target.decoration.owner?.team !== initial.actor.owner?.team);
+    target.actor !== actor &&
+    (!target.actor || !actor.owner?.team || target.actor.owner?.team !== actor.owner?.team) &&
+    (!target.decoration || !actor.owner?.team || target.decoration.owner?.team !== actor.owner?.team);
   const self =
     targets.self &&
-    target.actor === initial.actor;
+    target.actor === actor;
   const bearable =
     targets.bearable &&
     !target.actor &&

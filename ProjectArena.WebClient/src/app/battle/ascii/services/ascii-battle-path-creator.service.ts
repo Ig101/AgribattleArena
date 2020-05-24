@@ -60,7 +60,7 @@ export class AsciiBattlePathCreatorService {
           newY < this.battleStorageService.scene.height && newY >= 0 &&
           rangeBetweenShift(sX, sY) <= skill.range) {
             const tile = this.battleStorageService.scene.tiles[newX][newY];
-            if (checkSkillTargets(initialTile, tile, skill.availableTargets) &&
+            if (checkSkillTargets(tile, actor, skill.availableTargets) &&
               (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
               (!onlyTargets || tile.actor || tile.decoration) && tile.actor !== actor) {
               const existingSquare = allSquares.find(s => s.x === newX && s.y === newY);
@@ -75,6 +75,7 @@ export class AsciiBattlePathCreatorService {
                 remainedPoints: remainedActionPoints,
                 parentSquares: !previousSquare ? [] : [previousSquare, ...previousSquare.parentSquares],
                 type: ActionSquareTypeEnum.Act,
+                isActor: false,
                 topSquare: existingSquare?.topSquare,
                 bottomSquare: existingSquare?.bottomSquare,
                 leftSquare: existingSquare?.leftSquare,
@@ -133,6 +134,7 @@ export class AsciiBattlePathCreatorService {
         remainedPoints: remainedActionPoints - 1,
         parentSquares: !previousSquare ? [] : [previousSquare, ...previousSquare.parentSquares],
         type: ActionSquareTypeEnum.Move,
+        isActor: false,
         topSquare: existingSquare?.topSquare,
         bottomSquare: existingSquare?.bottomSquare,
         leftSquare: existingSquare?.leftSquare,
@@ -176,16 +178,17 @@ export class AsciiBattlePathCreatorService {
     if (actor.actionPoints === 0) {
       return [];
     }
+    const skill = actionId || actionId === -1 ? actor.skills.find(x => x.id === actionId) : actor.attackingSkill;
     const actorSquare = {
       x: actor.x,
       y: actor.y,
       remainedPoints: actor.actionPoints,
       parentSquares: [],
-      type: ActionSquareTypeEnum.Actor
+      type: skill.availableTargets.self ? ActionSquareTypeEnum.Act : undefined,
+      isActor: true
     };
     const allSquares: ActionSquare[] = [actorSquare];
     const actorTile = this.battleStorageService.scene.tiles[actor.x][actor.y];
-    const skill = actionId || actionId === -1 ? actor.skills.find(x => x.id === actionId) : actor.attackingSkill;
     if (!skill) {
       return [];
     }

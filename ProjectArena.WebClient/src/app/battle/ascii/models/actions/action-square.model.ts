@@ -6,6 +6,7 @@ export interface ActionSquare {
   remainedPoints: number;
   parentSquares: ActionSquare[];
   type: ActionSquareTypeEnum;
+  isActor: boolean;
   topSquare?: boolean;
   leftSquare?: boolean;
   bottomSquare?: boolean;
