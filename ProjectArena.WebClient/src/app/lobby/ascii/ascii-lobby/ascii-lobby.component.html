@@ -2,6 +2,25 @@
   (window:mouseup)="onMouseUpWindow($event)" (mouseleave)="onMouseLeave()"
   (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp($event)" [style.cursor]="cursor || 'default'"></canvas>
 <div class="info-container">
+  <div *ngIf="currentActor" class="modal window hint-window">
+    <div *ngIf="!hintDeclaration; else hintInfo" class="small-font-inactive paragraph">
+      Point cursor at the element to get its description 
+    </div>
+    <ng-template #hintInfo>
+      <div class="text-font-inactive paragraph" *ngIf="hintDeclaration.title">
+        {{hintDeclaration.title}}
+      </div>
+      <div class="small-font-inactive paragraph error" *ngIf="hintDeclaration.error">
+        {{hintDeclaration.error}}
+      </div>
+      <div class="small-font-inactive paragraph" *ngIf="hintDeclaration.description">
+        {{hintDeclaration.description}}
+      </div>
+      <div class="small-font-inactive paragraph" *ngIf="hintDeclaration.paragraphs.length > 0">
+        <p *ngFor="let item of hintDeclaration.paragraphs">{{item}}</p>
+      </div>
+    </ng-template>
+  </div>
   <div class="modal window">
     <div class="row nowrap">
       <app-menu-icon (click)="openSettings()"></app-menu-icon>
@@ -25,14 +44,9 @@
       <p *ngIf="exitingFromQueue" class="text-font">Returning...</p>
     </div>
   </div>
-  <div class="modal window" *ngIf="!currentActor; else characterInfo">
+  <div class="modal window" *ngIf="!currentActor">
     <app-button (buttonClick)="toTavern()" [disabled]="openedModal">Tavern</app-button>
   </div>
-  <ng-template #characterInfo>
-    <div class="modal window hint-window">
-
-    </div>
-  </ng-template>
 </div>
 <app-talents-modal *ngIf="currentActor"
   [data]="currentActor"

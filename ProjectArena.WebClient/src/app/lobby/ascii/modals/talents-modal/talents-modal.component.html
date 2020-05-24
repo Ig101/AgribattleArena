@@ -12,7 +12,12 @@
       </div>
       <app-button class="close-button" [size]="componentSizeEnum.Small" (buttonClick)="close()">X</app-button>
     </div>
-    <div class="text-font-inactive description"><span class="name" [style.color]="color">{{description}}</span><span>St: {{strength}}</span><span>Wi: {{willpower}}</span><span>Co: {{constitution}}</span><span>Sp: {{speed}}</span></div>
+    <div class="text-font-inactive description">
+      <span class="name" [style.color]="color">{{description}}</span>
+      <span (mouseenter)="showStrengthHint()" (mouseleave)="hideHint()">St: {{strength}}</span>
+      <span (mouseenter)="showWillpowerHint()" (mouseleave)="hideHint()">Wi: {{willpower}}</span>
+      <span (mouseenter)="showConstitutionHint()" (mouseleave)="hideHint()">Co: {{constitution}}</span>
+      <span (mouseenter)="showSpeedHint()" (mouseleave)="hideHint()">Sp: {{speed}}</span></div>
     <canvas #talentsCanvas (window:resize)="onResize()" (mousedown)="onMouseDown($event)"
       (window:mouseup)="onMouseUpWindow($event)" (mouseleave)="onMouseLeave()"
       (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp($event)" [style.cursor]="cursor || 'default'"></canvas>

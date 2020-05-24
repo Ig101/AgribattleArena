@@ -63,6 +63,8 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
   private drawingTimer;
   changed = false;
 
+  hoveredTalent: TalentNodeWithStatus;
+
   mouseState: MouseState = {
     buttonsInfo: {},
     x: -1,
@@ -509,7 +511,11 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
       this.changed = true;
-      this.recalculateMouseMove(event.offsetX, event.offsetY, event.timeStamp);
+      if (event.target !== this.talentsCanvas.nativeElement) {
+        this.recalculateMouseMove(-1, -1, event.timeStamp);
+      } else {
+        this.recalculateMouseMove(event.offsetX, event.offsetY, event.timeStamp);
+      }
     });
   }
 
@@ -548,6 +554,64 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
       this.mouseState.x = newX;
       this.mouseState.y = newY;
       this.changed = true;
+      let newHoveredTalent: TalentNodeWithStatus;
+      if (mouseY >= 0 && mouseY < this.mapHeight && mouseX >= 0 && mouseX < this.mapWidth) {
+        newHoveredTalent = this.talents[mouseX][mouseY];
+      }
+      if (newHoveredTalent !== this.hoveredTalent) {
+        this.hoveredTalent = newHoveredTalent;
+        if (this.hoveredTalent) {
+          let error: string;
+          if (!this.hoveredTalent.accessible) {
+            switch (this.hoveredTalent.inaccessibilityReason) {
+              case InaccessibilityReasonEnum.Unreachable:
+                error = 'New talent should be adjacent to existing ones.';
+                break;
+              case InaccessibilityReasonEnum.Cost:
+                error = 'Not enough experience.';
+                break;
+              case InaccessibilityReasonEnum.Exception:
+                const exceptions = this.selectedTalents.filter(k => this.hoveredTalent.exceptions.includes(k.id));
+                error = `Excluding talent was found: \"${exceptions.map(k => k.name).join('\", \"')}\".`;
+                break;
+              case InaccessibilityReasonEnum.Key:
+                error = 'All talents should be connected to the root node.';
+                break;
+              case InaccessibilityReasonEnum.Limit:
+                error = `Soldier cannot have more than ${this.talentsMaxCount} talents.`;
+                break;
+              case InaccessibilityReasonEnum.Skills:
+                error = 'Soldier cannot know more than 5 skills.';
+                break;
+              case InaccessibilityReasonEnum.Stats:
+                error = 'Soldier\'s stats cannot be less than 5.';
+                break;
+            }
+          }
+          const paragraphs: string[] = [];
+          if (this.hoveredTalent.strength) {
+            paragraphs.push(`Strength ${this.hoveredTalent.strength > 0 ? '+' : ''}${this.hoveredTalent.strength}`)
+          }
+          if (this.hoveredTalent.willpower) {
+            paragraphs.push(`Willpower ${this.hoveredTalent.willpower > 0 ? '+' : ''}${this.hoveredTalent.willpower}`)
+          }
+          if (this.hoveredTalent.constitution) {
+            paragraphs.push(`Constitution ${this.hoveredTalent.constitution > 0 ? '+' : ''}${this.hoveredTalent.constitution}`)
+          }
+          if (this.hoveredTalent.speed) {
+            paragraphs.push(`Speed ${this.hoveredTalent.speed > 0 ? '+' : ''}${this.hoveredTalent.speed}`)
+          }
+          const hint = {
+            title: this.hoveredTalent.name,
+            description: this.hoveredTalent.description,
+            error,
+            paragraphs
+          };
+          this.hintEvent.emit(hint);
+        } else {
+          this.hintEvent.emit(undefined);
+        }
+      }
     }
   }
 
@@ -627,5 +691,45 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
           x === (this.mapWidth - 1) / 2 && y === (this.mapHeight - 1) / 2);
       }
     }
+  }
+
+  showStrengthHint() {
+    this.hintEvent.emit({
+      title: 'Strength',
+      description: 'Each point of strength increases damage soldier\'s physical abilities do.',
+      error: undefined,
+      paragraphs: []
+    } as HintDeclaration);
+  }
+
+  showWillpowerHint() {
+    this.hintEvent.emit({
+      title: 'Willpower',
+      description: 'Each point of willpower increases damage soldier\'s magical abilities do.',
+      error: undefined,
+      paragraphs: []
+    } as HintDeclaration);
+  }
+
+  showConstitutionHint() {
+    this.hintEvent.emit({
+      title: 'Constitution',
+      description: 'Each point of constitution increases soldier\'s amount of health.',
+      error: undefined,
+      paragraphs: []
+    } as HintDeclaration);
+  }
+
+  showSpeedHint() {
+    this.hintEvent.emit({
+      title: 'Speed',
+      description: 'Each point of speed decreases the time between soldier\'s turns.',
+      error: undefined,
+      paragraphs: []
+    } as HintDeclaration);
+  }
+
+  hideHint() {
+    this.hintEvent.emit(undefined);
   }
 }

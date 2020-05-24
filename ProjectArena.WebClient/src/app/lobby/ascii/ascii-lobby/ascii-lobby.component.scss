@@ -69,6 +69,17 @@
     }
     .hint-window {
       flex: 1;
+      overflow: hidden;
+      .paragraph {
+        margin: 8px;
+        p {
+          margin: 0;
+          padding: 2px 0;
+        }
+      }
+      .error {
+        color: #f00;
+      }
     }
   }
 }
