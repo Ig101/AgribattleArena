@@ -1,9 +1,11 @@
 import { AnimationDeclaration } from './animations/animation-declaration.model';
 import { AnimationFrame } from './animations/animation-frame.model';
+import { Actor } from './scene/actor.model';
+import { Tile } from './scene/tile.model';
 
 export interface TwoPhaseActionAnimation {
-  generateIssueDeclarations: (x: number, y: number, targetX: number, targetY: number, animation: TwoPhaseActionAnimation)
+  generateIssueDeclarations: (issuer: Actor, tile: Tile, animation: TwoPhaseActionAnimation)
                               => AnimationFrame[];
-  generateSyncDeclarations: (x: number, y: number, targetX: number, targetY: number, animation: TwoPhaseActionAnimation)
+  generateSyncDeclarations: (issuer: Actor, tile: Tile, animation: TwoPhaseActionAnimation)
                              => AnimationFrame[];
 }

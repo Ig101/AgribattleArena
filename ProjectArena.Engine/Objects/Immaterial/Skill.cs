@@ -70,7 +70,9 @@ namespace ProjectArena.Engine.Objects.Immaterial
                     nextTarget = parent.Parent.Tiles[nextX][nextY];
                 }
 
-                if (Math.Abs(currentTile.Height - nextTarget.Height) >= 10)
+                if (nextTarget.Height - currentTile.Height >= 10 ||
+                    (nextTarget != target && nextTarget.TempObject != null) ||
+                    nextTarget.Native.Unbearable)
                 {
                     return false;
                 }

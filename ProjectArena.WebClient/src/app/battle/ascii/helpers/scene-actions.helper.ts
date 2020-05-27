@@ -12,21 +12,24 @@ export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
     const cos = Math.cos(angle);
     let currentTile = initial;
     while (incrementingRange <= range) {
-        incrementingRange++;
-        let nextTarget;
-        if (incrementingRange >= range) {
-            nextTarget = target;
-        } else {
-            const nextX = Math.round(initial.x + (incrementingRange * cos));
-            const nextY = Math.round(initial.y + (incrementingRange * sin));
-            nextTarget = tiles[nextX][nextY];
-        }
+      incrementingRange++;
+      let nextTarget: Tile;
+      if (incrementingRange >= range) {
+        nextTarget = target;
+      } else {
+        const nextX = Math.floor(initial.x + (incrementingRange * cos));
+        const nextY = Math.floor(initial.y + (incrementingRange * sin));
+        nextTarget = tiles[nextX][nextY];
+      }
 
-        if (Math.abs(currentTile.height - nextTarget.height) >= 10) {
-            return false;
-        }
+      if (nextTarget.height - currentTile.height >= 10 ||
+        (nextTarget !== target && !nextTarget.decoration && !nextTarget.actor) ||
+        nextTarget.unbearable) {
 
-        currentTile = nextTarget;
+        return false;
+      }
+
+      currentTile = nextTarget;
     }
 
     return true;

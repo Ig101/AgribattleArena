@@ -267,20 +267,16 @@ export class AsciiBattleAnimationsService {
           if (!onlySecondPart && issuer.attackingSkill.action?.generateIssueDeclarations) {
             frames[0].push(...issuer.attackingSkill.action
               .generateIssueDeclarations(
-                issuer.x,
-                issuer.y,
-                synchronizer.sync.targetX,
-                synchronizer.sync.targetY,
+                issuer,
+                this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
                 issuer.attackingSkill.action));
             this.getFramesFromAction(issuer, frames);
           }
           if (issuer.attackingSkill.action?.generateSyncDeclarations) {
             frames[0].push(...issuer.attackingSkill.action
               .generateSyncDeclarations(
-                issuer.x,
-                issuer.y,
-                synchronizer.sync.targetX,
-                synchronizer.sync.targetY,
+                issuer,
+                this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
                 issuer.attackingSkill.action));
           }
         }
@@ -300,10 +296,8 @@ export class AsciiBattleAnimationsService {
               if (skill.action.generateIssueDeclarations) {
               frames[0].push(...skill.action
                 .generateIssueDeclarations(
-                  issuer.x,
-                  issuer.y,
-                  synchronizer.sync.targetX,
-                  synchronizer.sync.targetY,
+                  issuer,
+                  this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
                   issuer.attackingSkill.action));
               }
               this.getFramesFromAction(issuer, frames);
@@ -311,10 +305,8 @@ export class AsciiBattleAnimationsService {
             if (skill.action.generateSyncDeclarations) {
               frames[0].push(...skill.action
                 .generateSyncDeclarations(
-                  issuer.x,
-                  issuer.y,
-                  synchronizer.sync.targetX,
-                  synchronizer.sync.targetY,
+                  issuer,
+                  this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
                   issuer.attackingSkill.action));
             }
           }
@@ -365,7 +357,7 @@ export class AsciiBattleAnimationsService {
       action === BattleSynchronizationActionEnum.Attack ? actor.attackingSkill : actor.skills.find(s => s.id === skillId);
     const frames = [];
     if (skill?.action?.generateIssueDeclarations) {
-      frames.push(skill.action.generateIssueDeclarations(actor.x, actor.y, x, y, skill.action));
+      frames.push(skill.action.generateIssueDeclarations(actor, this.battleStorageService.scene.tiles[x][y], skill.action));
     } else {
       frames.push([]);
     }

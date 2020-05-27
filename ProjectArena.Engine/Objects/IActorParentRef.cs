@@ -67,5 +67,7 @@ namespace ProjectArena.Engine.Objects
         void SpendActionPoints(int amount);
 
         bool Damage(float amount, IEnumerable<string> tags);
+
+        void ChangePosition(Tile target, bool changeHeight);
     }
 }

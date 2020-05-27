@@ -9,7 +9,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
         {
             nativeManager.AddSkillNative(
                 "slash",
-                new[] { "damage", "target", "slash", "melee" },
+                new[] { "damage", "target", "weapon", "melee" },
                 1,
                 2,
                 0,
@@ -22,12 +22,12 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 true,
                 new[] { "DoDamageAttack" });
             nativeManager.AddSkillNative(
-                "explosion",
-                new[] { "damage", "area", "magic", "fire", "range" },
-                3,
+                "magicMissle",
+                new[] { "damage", "target", "magic", "pure", "ranged", "direct" },
                 4,
                 3,
-                20,
+                4,
+                40,
                 new Targets()
                 {
                     Allies = true,
@@ -35,8 +35,23 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                     Unbearable = true,
                     Bearable = true
                 },
-                false,
-                new[] { "DoSmallAoeDamageSkill", "DoSmallAoeOneTurnStun" });
+                true,
+                new[] { "DoDamageAttack" });
+            nativeManager.AddSkillNative(
+                "charge",
+                new[] { "damage", "target", "movement", "control", "weapon", "direct" },
+                4,
+                4,
+                3,
+                10,
+                new Targets()
+                {
+                    Allies = true,
+                    NotAllies = true,
+                    Bearable = true
+                },
+                true,
+                new[] { "DoDamageAttack", "DoChargeStun", "DoChargeMove" });
         }
     }
 }
