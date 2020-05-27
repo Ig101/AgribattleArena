@@ -69,7 +69,11 @@ export class AsciiBattleAnimationsService {
           y: actor.y,
           height: 0
         });
-        const buffFrames = buff.onApplyAnimation?.generateDeclarations(actor.x, actor.y, buff.onApplyAnimation);
+        const buffFrames = buff.onApplyAnimation?.generateDeclarations(
+          actor.x,
+          actor.y,
+          this.battleStorageService.scene,
+          buff.onApplyAnimation);
         if (buffFrames) {
           buffFrames[buffFrames.length - 1].specificAction = () => {
             buff.passiveAnimation.doSomethingWithBearer(buff.passiveAnimation, actor.actor);
@@ -80,7 +84,11 @@ export class AsciiBattleAnimationsService {
         }
       }
       for (const buff of actor.removedBuffs) {
-        const buffFrames = buff.onPurgeAnimation?.generateDeclarations(actor.x, actor.y, buff.onApplyAnimation);
+        const buffFrames = buff.onPurgeAnimation?.generateDeclarations(
+          actor.x,
+          actor.y,
+          this.battleStorageService.scene,
+          buff.onApplyAnimation);
         actorFloats.push({
           text: `-${buff.char}`,
           color: { r: buff.color.r, g: buff.color.g, b: buff.color.b, a: 1 },
@@ -100,7 +108,7 @@ export class AsciiBattleAnimationsService {
       }
       if (actor.changedPosition) {
         const tile = this.battleStorageService.scene.tiles[actor.x][actor.y];
-        const tileFrames = tile.onStepAction?.generateDeclarations(actor.x, actor.y, tile.onStepAction);
+        const tileFrames = tile.onStepAction?.generateDeclarations(actor.x, actor.y, this.battleStorageService.scene, tile.onStepAction);
         if (tileFrames) {
           frames.push(tileFrames);
         }
@@ -121,7 +129,11 @@ export class AsciiBattleAnimationsService {
       }
       if (decoration.changedPosition) {
         const tile = this.battleStorageService.scene.tiles[decoration.x][decoration.y];
-        const tileFrames = tile.onStepAction?.generateDeclarations(decoration.x, decoration.y, tile.onStepAction);
+        const tileFrames = tile.onStepAction?.generateDeclarations(
+          decoration.x,
+          decoration.y,
+          this.battleStorageService.scene,
+          tile.onStepAction);
         if (tileFrames) {
           frames.push(tileFrames);
         }
@@ -204,14 +216,26 @@ export class AsciiBattleAnimationsService {
 
   private getFramesFromAction(actor: Actor, frames: AnimationFrame[][]): AnimationFrame[][] {
     for (const buff of actor.buffs) {
-      buff.onActionEffectAnimation?.generateDeclarations(actor.x, actor.y, buff.onActionEffectAnimation);
+      buff.onActionEffectAnimation?.generateDeclarations(
+        actor.x,
+        actor.y,
+        this.battleStorageService.scene,
+        buff.onActionEffectAnimation,
+        );
     }
     for (const effect of this.battleStorageService.scene.effects) {
-      effect.onActionEffectAnimation?.generateDeclarations(effect.x, effect.y, effect.onActionEffectAnimation);
+      effect.onActionEffectAnimation?.generateDeclarations(
+        effect.x,
+        effect.y,
+        this.battleStorageService.scene,
+        effect.onActionEffectAnimation);
     }
     for (let x = 0; x < this.battleStorageService.scene.width; x++) {
       for (let y = 0; y < this.battleStorageService.scene.height; y++) {
-        this.battleStorageService.scene.tiles[x][y].onActionEffectAnimation?.generateDeclarations(x, y,
+        this.battleStorageService.scene.tiles[x][y].onActionEffectAnimation?.generateDeclarations(
+          x,
+          y,
+          this.battleStorageService.scene,
           this.battleStorageService.scene.tiles[x][y].onActionEffectAnimation);
       }
     }
@@ -221,15 +245,26 @@ export class AsciiBattleAnimationsService {
   private getFramesFromEndTurn(frames: AnimationFrame[][]): AnimationFrame[][] {
     for (const actor of this.battleStorageService.scene.actors) {
       for (const buff of actor.buffs) {
-        buff.effectAnimation?.generateDeclarations(actor.x, actor.y, buff.effectAnimation);
+        buff.effectAnimation?.generateDeclarations(
+          actor.x,
+          actor.y,
+          this.battleStorageService.scene,
+          buff.effectAnimation);
       }
     }
     for (const effect of this.battleStorageService.scene.effects) {
-      effect.action?.generateDeclarations(effect.x, effect.y, effect.action);
+      effect.action?.generateDeclarations(
+        effect.x,
+        effect.y,
+        this.battleStorageService.scene,
+        effect.action);
     }
     for (let x = 0; x < this.battleStorageService.scene.width; x++) {
       for (let y = 0; y < this.battleStorageService.scene.height; y++) {
-        this.battleStorageService.scene.tiles[x][y].action?.generateDeclarations(x, y,
+        this.battleStorageService.scene.tiles[x][y].action?.generateDeclarations(
+          x,
+          y,
+          this.battleStorageService.scene,
           this.battleStorageService.scene.tiles[x][y].action);
       }
     }
@@ -269,6 +304,7 @@ export class AsciiBattleAnimationsService {
               .generateIssueDeclarations(
                 issuer,
                 this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
+                this.battleStorageService.scene,
                 issuer.attackingSkill.action));
             this.getFramesFromAction(issuer, frames);
           }
@@ -277,6 +313,7 @@ export class AsciiBattleAnimationsService {
               .generateSyncDeclarations(
                 issuer,
                 this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
+                this.battleStorageService.scene,
                 issuer.attackingSkill.action));
           }
         }
@@ -298,6 +335,7 @@ export class AsciiBattleAnimationsService {
                 .generateIssueDeclarations(
                   issuer,
                   this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
+                  this.battleStorageService.scene,
                   issuer.attackingSkill.action));
               }
               this.getFramesFromAction(issuer, frames);
@@ -307,6 +345,7 @@ export class AsciiBattleAnimationsService {
                 .generateSyncDeclarations(
                   issuer,
                   this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
+                  this.battleStorageService.scene,
                   issuer.attackingSkill.action));
             }
           }
@@ -322,6 +361,7 @@ export class AsciiBattleAnimationsService {
             .generateDeclarations(
               decoration.x,
               decoration.y,
+              this.battleStorageService.scene,
               decoration.action));
         }
         break;
@@ -357,7 +397,11 @@ export class AsciiBattleAnimationsService {
       action === BattleSynchronizationActionEnum.Attack ? actor.attackingSkill : actor.skills.find(s => s.id === skillId);
     const frames = [];
     if (skill?.action?.generateIssueDeclarations) {
-      frames.push(skill.action.generateIssueDeclarations(actor, this.battleStorageService.scene.tiles[x][y], skill.action));
+      frames.push(skill.action.generateIssueDeclarations(
+        actor,
+        this.battleStorageService.scene.tiles[x][y],
+        this.battleStorageService.scene,
+        skill.action));
     } else {
       frames.push([]);
     }
