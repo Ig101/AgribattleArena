@@ -23,12 +23,12 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
 
         public static void AddStrengthMultiplier(IBuffManagerParentRef manager, Buff buff)
         {
-            manager.AdditionStrength += manager.Parent.SelfStrength;
+            manager.AdditionStrength += manager.Parent.SelfStrength * buff.Mod;
         }
 
         public static void AddWillpowerMultiplier(IBuffManagerParentRef manager, Buff buff)
         {
-            manager.AdditionWillpower += manager.Parent.SelfWillpower;
+            manager.AdditionWillpower += manager.Parent.SelfWillpower * buff.Mod;
         }
 
         public static void Stun(IBuffManagerParentRef manager, Buff buff)
