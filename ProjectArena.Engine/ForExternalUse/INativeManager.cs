@@ -7,7 +7,7 @@ namespace ProjectArena.Engine.ForExternalUse
     {
         void AddActorNative(string id, string[] tags, float defaultZ, TagSynergy[] armor);
 
-        void AddBuffNative(string id, string[] tags, bool eternal, int repeatable, bool summarizeLength, int? defaultDuration, float defaultMod, IEnumerable<string> actions, IEnumerable<string> appliers, IEnumerable<string> onPurgeActions);
+        void AddBuffNative(string id, string[] tags, bool eternal, int repeatable, bool summarizeLength, bool onTile, int? defaultDuration, float defaultMod, IEnumerable<string> actions, IEnumerable<string> appliers, IEnumerable<string> onPurgeActions);
 
         void AddDecorationNative(string id, string[] tags, TagSynergy[] defaultArmor, int defaultHealth, float defaultZ, float defaultMod, IEnumerable<string> actions, IEnumerable<string> onDeathActions);
 

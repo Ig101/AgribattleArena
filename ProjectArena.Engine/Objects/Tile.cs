@@ -61,6 +61,9 @@ namespace ProjectArena.Engine.Objects
                 return false;
             }
 
+            if (this.TempObject is Actor actor) {
+                actor.BuffManager.RemoveBuff
+            }
             TempObject = null;
             return true;
         }

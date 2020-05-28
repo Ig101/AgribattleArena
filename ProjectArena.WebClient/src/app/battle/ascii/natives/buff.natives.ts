@@ -31,5 +31,27 @@ export const buffNatives: { [id: string]: BuffNative } = {
         bearer.visualization.color.b += action.colorDifference.b;
       }
     }
-  }
+  },
+  tilepower: {
+    char: 'p',
+    color: { r: 255, g: 255, b: 100 },
+    name: 'Place of power',
+    description: 'Character have increased strength and willpower.',
+    onApplyAnimation: undefined,
+    effectAnimation: undefined,
+    onActionEffectAnimation: undefined,
+    onPurgeAnimation: undefined,
+    passiveAnimation: undefined
+  },
+  empower: {
+    char: 'e',
+    color: { r: 255, g: 100, b: 255 },
+    name: 'Empower',
+    description: 'Character\'s actions are more effective.',
+    onApplyAnimation: undefined,
+    effectAnimation: undefined,
+    onActionEffectAnimation: undefined,
+    onPurgeAnimation: undefined,
+    passiveAnimation: undefined
+  },
 };

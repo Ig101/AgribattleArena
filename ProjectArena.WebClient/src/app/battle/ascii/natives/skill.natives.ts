@@ -4,8 +4,10 @@ import { Color } from 'src/app/shared/models/color.model';
 import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
 import { AnimationTile } from '../models/animations/animation-tile.model';
 import { explosionIssueDeclaration } from './complex-animations/explosion.animation';
-import { throwIssueDeclaration } from './complex-animations/throw.animation';
+import { throwIssueDeclaration, arrowThrowIssueDeclaration } from './complex-animations/throw.animation';
 import { chargeIssueDeclaration, chargeSyncDeclaration } from './complex-animations/charge.animation';
+import { shadowstepSyncDeclaration } from './complex-animations/shadowstep.animation';
+import { powerplaceIssueAnimation } from './complex-animations/powerplace.animation';
 
 export const skillNatives: { [id: string]: SkillNative } = {
   slash: {
@@ -40,7 +42,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
     description: 'Throws a missle of pure mist magic to the target that deals medium damage.',
     action: {
       generateIssueDeclarations: (issuer, tile) => {
-        return throwIssueDeclaration(issuer.x, issuer.y, tile.x, tile.y, {r: 100, g: 100, b: 255});
+        return throwIssueDeclaration(issuer.x, issuer.y, tile.x, tile.y, '*', {r: 100, g: 100, b: 255});
       },
       generateSyncDeclarations: undefined
     },
@@ -60,4 +62,49 @@ export const skillNatives: { [id: string]: SkillNative } = {
     },
     alternativeForm: false
   },
+  warden: {
+    name: 'Warden',
+    description: 'Throws a shield to the target that deals medium damage.',
+    action: {
+      generateIssueDeclarations: (issuer, tile) => {
+        return throwIssueDeclaration(issuer.x, issuer.y, tile.x, tile.y, 'o', {r: 200, g: 200, b: 200});
+      },
+      generateSyncDeclarations: undefined
+    },
+    alternativeForm: false
+  },
+  shot: {
+    name: 'Shot',
+    description: undefined,
+    action: {
+      generateIssueDeclarations: (issuer, tile) => {
+        return arrowThrowIssueDeclaration(issuer.x, issuer.y, tile.x, tile.y, {r: 200, g: 200, b: 200});
+      },
+      generateSyncDeclarations: undefined
+    },
+    alternativeForm: false
+  },
+  shadowstep: {
+    name: 'Shadowstep',
+    description: 'Teleports to the target location.',
+    action: {
+      generateIssueDeclarations: undefined,
+      generateSyncDeclarations: (issuer, tile) => {
+        return shadowstepSyncDeclaration(issuer.x, issuer.y, tile.x, tile.y);
+      },
+    },
+    alternativeForm: false
+  },
+  powerplace: {
+    name: 'Place of power',
+    description: `Creates a place of power on the target position that increases strange and willpower by 100%
+      of its default value. Works only on characters that stay on chosen position.`,
+    action: {
+      generateIssueDeclarations: (issuer, tile) => {
+        return powerplaceIssueAnimation(tile.x, tile.y);
+      },
+      generateSyncDeclarations: undefined
+    },
+    alternativeForm: false
+  }
 };

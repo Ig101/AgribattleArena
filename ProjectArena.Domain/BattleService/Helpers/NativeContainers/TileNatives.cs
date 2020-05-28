@@ -15,6 +15,15 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 1,
                 new string[0],
                 new string[0]);
+            nativeManager.AddTileNative(
+                "powerplace",
+                new string[] { "magic", "positive" },
+                false,
+                0,
+                false,
+                1,
+                new string[0],
+                new string[] { "addTilePower" });
         }
     }
 }

@@ -318,6 +318,22 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
             RecalculateBuffs();
         }
 
+        public void RemoveTileBuffs()
+        {
+            Parent.Affected = true;
+            for (int i = 0; i < Buffs.Count; i++)
+            {
+                if (Buffs[i].Native.OnTile)
+                {
+                    Buffs[i].Purge();
+                    Buffs.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            RecalculateBuffs();
+        }
+
         public void Update(float time)
         {
             int changedBuffs = 0;

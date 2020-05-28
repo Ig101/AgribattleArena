@@ -42,6 +42,14 @@ namespace ProjectArena.Engine.Objects
 
         int Speed { get; }
 
+        int SelfStrength { get; }
+
+        int SelfWillpower { get; }
+
+        int SelfConstitution { get; }
+
+        int SelfSpeed { get; }
+
         int MaxHealth { get; }
 
         int ActionPointsIncome { get; }

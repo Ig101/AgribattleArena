@@ -14,6 +14,8 @@ namespace ProjectArena.Engine.Natives
 
         public bool SummarizeLength { get; }
 
+        public bool OnTile { get; }
+
         public BuffActions.Action Action { get; }
 
         public BuffActions.Applier Applier { get; }
@@ -24,13 +26,14 @@ namespace ProjectArena.Engine.Natives
 
         public float DefaultMod { get; }
 
-        public BuffNative(string id, string[] tags, bool eternal, int repeatable, bool summarizeLength, float? defaultDuration, float defaultMod, IEnumerable<string> actionNames, IEnumerable<string> applierNames, IEnumerable<string> onPurgeActionNames)
+        public BuffNative(string id, string[] tags, bool eternal, int repeatable, bool summarizeLength, bool onTile, float? defaultDuration, float defaultMod, IEnumerable<string> actionNames, IEnumerable<string> applierNames, IEnumerable<string> onPurgeActionNames)
             : this(
                 id,
                 tags,
                 eternal,
                 repeatable,
                 summarizeLength,
+                onTile,
                 defaultDuration,
                 defaultMod,
                 actionNames.Select(actionName => (BuffActions.Action)Delegate.CreateDelegate(
@@ -51,6 +54,7 @@ namespace ProjectArena.Engine.Natives
             bool eternal,
             int repeatable,
             bool summarizeLength,
+            bool onTile,
             float? defaultDuration,
             float defaultMod,
             IEnumerable<BuffActions.Action> actions,
@@ -61,6 +65,7 @@ namespace ProjectArena.Engine.Natives
             this.Eternal = eternal;
             this.Repeatable = repeatable < 1 ? 1 : repeatable;
             this.SummarizeLength = summarizeLength;
+            this.OnTile = onTile;
             this.DefaultDuration = defaultDuration;
             this.DefaultMod = defaultMod;
             this.Action = null;

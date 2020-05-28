@@ -21,6 +21,16 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
             manager.AdditionStrength += buff.Mod;
         }
 
+        public static void AddStrengthMultiplier(IBuffManagerParentRef manager, Buff buff)
+        {
+            manager.AdditionStrength += manager.Parent.SelfStrength;
+        }
+
+        public static void AddWillpowerMultiplier(IBuffManagerParentRef manager, Buff buff)
+        {
+            manager.AdditionWillpower += manager.Parent.SelfWillpower;
+        }
+
         public static void Stun(IBuffManagerParentRef manager, Buff buff)
         {
             manager.CanMove = false;
@@ -49,6 +59,11 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
         public static void AddSpellDamage(IBuffManagerParentRef manager, Buff buff)
         {
             manager.SkillPower += buff.Mod;
+        }
+
+        public static void AddAttackDamage(IBuffManagerParentRef manager, Buff buff)
+        {
+            manager.AttackPower += buff.Mod;
         }
 
         public static void ReducePureResistance(IBuffManagerParentRef manager, Buff buff)

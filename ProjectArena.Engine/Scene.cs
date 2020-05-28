@@ -235,6 +235,11 @@ namespace ProjectArena.Engine
 
             if (tile.TempObject != null)
             {
+                if (tile.TempObject is Actor actor)
+                {
+                    actor.BuffManager.RemoveTileBuffs();
+                }
+
                 Tiles[x][y].Native.OnStepAction(this, Tiles[x][y]);
             }
 

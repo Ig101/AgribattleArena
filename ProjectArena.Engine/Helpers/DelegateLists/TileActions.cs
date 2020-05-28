@@ -44,6 +44,14 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
             }
         }
 
+        public static void AddTilePower(ISceneParentRef parent, Tile tile)
+        {
+            if (tile.TempObject != null && tile.TempObject is Actor actor)
+            {
+                actor.BuffManager.AddBuff("tilepower", tile.Native.DefaultMod, null);
+            }
+        }
+
         public static void ReducePureResistanceTile(ISceneParentRef parent, Tile tile)
         {
             if (tile.TempObject != null && tile.TempObject is Actor actor)

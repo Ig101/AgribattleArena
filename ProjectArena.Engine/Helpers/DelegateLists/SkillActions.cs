@@ -42,6 +42,11 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
             }
         }
 
+        public static void DoMove(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            owner.ChangePosition(targetTile, true);
+        }
+
         public static void DoChargeMove(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
         {
             var angle = Misc.AngleBetween(targetTile.X, targetTile.Y, owner.X, owner.Y);
@@ -86,9 +91,9 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
             }
         }
 
-        public static void MakePureLandOnSelf(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        public static void MakePowerPlace(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
         {
-            scene.ChangeTile("tile_pure", targetTile.X, targetTile.Y, targetTile.Height, owner.Owner);
+            scene.ChangeTile("powerplace", targetTile.X, targetTile.Y, targetTile.Height, owner.Owner);
         }
     }
 }

@@ -47,13 +47,14 @@ namespace ProjectArena.Engine.NativeManagers
             bool eternal,
             int repeatable,
             bool summarizeLength,
+            bool onTile,
             int? defaultDuration,
             float defaultMod,
             IEnumerable<string> actions,
             IEnumerable<string> appliers,
             IEnumerable<string> onPurgeActions)
         {
-            buffNatives.Add(id, new BuffNative(id, InternTags(tags), eternal, repeatable, summarizeLength, defaultDuration, defaultMod, actions, appliers, onPurgeActions));
+            buffNatives.Add(id, new BuffNative(id, InternTags(tags), eternal, repeatable, summarizeLength, onTile, defaultDuration, defaultMod, actions, appliers, onPurgeActions));
         }
 
         public void AddDecorationNative(
