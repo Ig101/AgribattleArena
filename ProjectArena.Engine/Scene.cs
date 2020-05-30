@@ -375,9 +375,9 @@ namespace ProjectArena.Engine
                     }
                 }
 
-                foreach (TileObject obj in Decorations)
+                foreach (ActiveDecoration obj in Decorations)
                 {
-                    if (obj.IsAlive && obj.InitiativePosition < minInitiativePosition)
+                    if (obj.IsAlive && obj.InitiativePosition < minInitiativePosition && obj.Native.Action != null)
                     {
                         minInitiativePosition = obj.InitiativePosition;
                         newObject = obj;

@@ -787,6 +787,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         color: `rgba(${color.r},${color.g},${color.b},${color.a})`,
         char: x.visualization.char,
         initiativePosition: x.initiativePosition,
+        active: true,
         speed: x.initiative,
         x: x.x,
         y: x.y
@@ -798,6 +799,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           color: `rgba(${color.r},${color.g},${color.b},${color.a})`,
           char: x.visualization.char,
           initiativePosition: x.initiativePosition,
+          active: x.active,
           speed: 1,
           x: x.x,
           y: x.y
@@ -811,7 +813,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       let candidate = allPortraits[0];
       let candidateInitiative = allPortraits[0].initiativePosition;
       for (let i = 1; i < allPortraits.length; i++) {
-        if (allPortraits[i].initiativePosition < candidateInitiative) {
+        if (allPortraits[i].active && allPortraits[i].initiativePosition < candidateInitiative) {
           candidate = allPortraits[i];
           candidateInitiative = allPortraits[i].initiativePosition;
         }

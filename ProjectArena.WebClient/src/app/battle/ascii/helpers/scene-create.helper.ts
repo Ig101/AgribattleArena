@@ -194,6 +194,7 @@ export function convertDecoration(decoration: SyncDecoration, owner: Player, isC
         char: '!',
         color: { r: 255, g: 0, b: 0, a: 1 }
       },
+      active: false,
       action: undefined,
       onDeathAction: undefined,
       alternativeForm: false
@@ -211,6 +212,7 @@ export function convertDecoration(decoration: SyncDecoration, owner: Player, isC
     onDeathAction: !native.alternativeForm || isCurrentPlayerTeam ?
       cloneActionAnimation(native.onDeathAction) :
       cloneActionAnimation(native.enemyOnDeathAction),
+    active: native.active,
     mod: decoration.mod,
     initiativePosition: decoration.initiativePosition,
     health: decoration.health,

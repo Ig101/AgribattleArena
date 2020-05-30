@@ -11,6 +11,7 @@ export interface ActiveDecoration {
   visualization: Visualization;
   action: ActionAnimation;
   onDeathAction: ActionAnimation;
+  active: boolean;
 
   mod: number;
   initiativePosition: number;
