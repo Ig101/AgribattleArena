@@ -38,16 +38,19 @@ export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
 export function checkSkillTargets(target: Tile, actor: Actor, targets: Targets): boolean {
   const allies =
     targets.allies &&
-    (target.actor || target.decoration) &&
+    target.actor &&
     target.actor !== actor &&
     (!target.actor || target.actor.owner?.team === actor.owner?.team) &&
     (!target.decoration || target.decoration.owner?.team === actor.owner?.team);
   const notAllies =
     targets.notAllies &&
-    (target.actor || target.decoration) &&
+    target.actor &&
     target.actor !== actor &&
     (!target.actor || !actor.owner?.team || target.actor.owner?.team !== actor.owner?.team) &&
     (!target.decoration || !actor.owner?.team || target.decoration.owner?.team !== actor.owner?.team);
+  const decorations =
+    targets.decorations &&
+    !!target.decoration;
   const self =
     targets.self &&
     target.actor === actor;
@@ -61,5 +64,5 @@ export function checkSkillTargets(target: Tile, actor: Actor, targets: Targets):
     !target.actor &&
     !target.decoration &&
     target.unbearable;
-  return allies || notAllies || self || bearable || unbearable;
+  return allies || notAllies || self || bearable || unbearable || decorations;
 }

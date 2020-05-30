@@ -8,6 +8,8 @@ namespace ProjectArena.Engine.Helpers
 
         public bool NotAllies { get; set; }
 
+        public bool Decorations { get; set; }
+
         public bool Bearable { get; set; }
 
         public bool Unbearable { get; set; }

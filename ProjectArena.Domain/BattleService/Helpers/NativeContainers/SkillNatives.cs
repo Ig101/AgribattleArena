@@ -17,7 +17,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 new Targets()
                 {
                     Allies = true,
-                    NotAllies = true
+                    NotAllies = true,
+                    Decorations = true,
                 },
                 true,
                 new[] { "DoDamageAttack" });
@@ -33,7 +34,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                     Allies = true,
                     NotAllies = true,
                     Unbearable = true,
-                    Bearable = true
+                    Bearable = true,
+                    Decorations = true
                 },
                 true,
                 new[] { "DoDamageAttack" });
@@ -48,7 +50,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 {
                     Allies = true,
                     NotAllies = true,
-                    Bearable = true
+                    Bearable = true,
+                    Decorations = true
                 },
                 true,
                 new[] { "DoDamageAttack", "DoChargeStun", "DoChargeMove" });
@@ -64,7 +67,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                     Allies = true,
                     NotAllies = true,
                     Unbearable = true,
-                    Bearable = true
+                    Bearable = true,
+                    Decorations = true
                 },
                 true,
                 new[] { "DoDamageAttack" });
@@ -79,6 +83,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 {
                     Allies = true,
                     NotAllies = true,
+                    Decorations = true
                 },
                 true,
                 new[] { "DoDamageAttack" });
@@ -106,7 +111,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 {
                     Bearable = true,
                     Allies = true,
-                    NotAllies = true
+                    NotAllies = true,
+                    Decorations = true
                 },
                 false,
                 new[] { "MakePowerPlace" });
