@@ -41,6 +41,16 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 new[] { "organic", "intelligent" },
                 0,
                 new Engine.Helpers.TagSynergy[0]);
+            nativeManager.AddActorNative(
+                "mistspawn",
+                new[] { "organic", "intelligent", "controlled" },
+                0,
+                new Engine.Helpers.TagSynergy[0]);
+            nativeManager.AddActorNative(
+                "offspring",
+                new[] { "organic", "controlled" },
+                0,
+                new Engine.Helpers.TagSynergy[0]);
         }
     }
 }

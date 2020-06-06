@@ -375,7 +375,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                     Name = "Offspring",
                     Class = CharacterClass.Bloodletter,
                     ClassPoints = 1,
-                    UniqueDescription = "Learns the \"Offspring\" ability. Summons a spawn with 20% of caster's health nearby and reduces health of caster by that amount. Can be sacrificed to heal organic object nearby by its amount of health. Costs 2 action points. Recharges in 8 turns.",
+                    UniqueDescription = "Learns the \"Offspring\" ability. Summons a spawn with 20% of caster's health nearby and reduces health of the caster by that amount. Strength depends on the amount of sacrificed health. Can be sacrificed to heal organic object nearby by its amount of health. Costs 2 action points. Recharges in 8 turns.",
                     UniqueAction = "LearnOffspring",
                     StrengthModifier = 0,
                     WillpowerModifier = -5,

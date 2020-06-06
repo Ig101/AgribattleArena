@@ -39,7 +39,7 @@ namespace ProjectArena.Engine
 
         Actor CreateActor(Player owner, Guid? externalId, string nativeName, RoleModelNative roleModel, Tile target, float? z);
 
-        ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, float? z, int? health, TagSynergy[] armor, float? mod);
+        ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, TagSynergy[] armor, float? z, int? health, float? mod);
 
         SpecEffect CreateEffect(Player owner, string nativeName, Tile target, float? z, float? duration, float? mod);
 

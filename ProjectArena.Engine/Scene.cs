@@ -193,7 +193,7 @@ namespace ProjectArena.Engine
             return actor;
         }
 
-        public ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, float? z, int? health, TagSynergy[] armor, float? mod)
+        public ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, TagSynergy[] armor, float? z, int? health, float? mod)
         {
             if (target.TempObject != null)
             {

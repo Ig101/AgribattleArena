@@ -31,12 +31,6 @@ export function throwIssueDeclaration(issueX: number, issueY: number, targetX: n
       specificAction: undefined
     });
   }
-  frames.push({
-    updateSynchronizer: true,
-    animationTiles: [{x: targetX, y: targetY, char: undefined, color: {r: 255, g: 255, b: 255, a: 1}, unitAlpha: true,
-      unitColorMultiplier: 0, priority: 10, ignoreHeight: true, overflowHealth: false, workingOnSpecEffects: false}],
-    specificAction: undefined
-  });
   return frames;
 }
 
@@ -94,11 +88,5 @@ export function arrowThrowIssueDeclaration(issueX: number, issueY: number, targe
       specificAction: undefined
     });
   }
-  frames.push({
-    updateSynchronizer: true,
-    animationTiles: [{x: targetX, y: targetY, char: undefined, color: {r: 255, g: 255, b: 255, a: 1}, unitAlpha: true,
-      unitColorMultiplier: 0, priority: 10, ignoreHeight: true, overflowHealth: false, workingOnSpecEffects: false}],
-    specificAction: undefined
-  });
   return frames;
 }

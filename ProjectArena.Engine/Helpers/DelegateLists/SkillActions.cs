@@ -1,4 +1,5 @@
 ﻿using System;
+using ProjectArena.Engine.Natives;
 using ProjectArena.Engine.Objects;
 using ProjectArena.Engine.Objects.Immaterial;
 
@@ -7,6 +8,26 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
     public class SkillActions
     {
         public delegate void Action(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill);
+
+        public static void DoDamagePercentSelf(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            owner.Damage(skill.Mod * owner.MaxHealth, skill.AggregatedTags);
+        }
+
+        public static void DoDamageSelf(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            owner.Damage(skill.Mod, skill.AggregatedTags);
+        }
+
+        public static void DoFixedSmallDamageSelf(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            owner.Damage(5, skill.AggregatedTags);
+        }
+
+        public static void Sacrifice(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            owner.Damage(owner.MaxHealth, new string[0]);
+        }
 
         public static void DoDamageAttack(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
         {
@@ -23,6 +44,14 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
             {
                 float mod = skill.CalculateModSkillPower(targetTile.TempObject.Native.Tags);
                 targetTile.TempObject.Damage(mod, skill.AggregatedTags);
+            }
+        }
+
+        public static void DoDamageByCurrentHealth(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            if (targetTile.TempObject != null)
+            {
+                targetTile.TempObject.Damage(skill.Mod * owner.DamageModel.Health, skill.AggregatedTags);
             }
         }
 
@@ -94,6 +123,49 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
         public static void MakePowerPlace(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
         {
             scene.ChangeTile("powerplace", targetTile.X, targetTile.Y, targetTile.Height, owner.Owner);
+        }
+
+        public static void Empower(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            if (targetTile.TempObject != null && targetTile.TempObject is Actor target)
+            {
+                var mod = owner.SkillPower;
+                target.BuffManager.AddBuff("empower", mod * skill.Mod, 3);
+            }
+        }
+
+        public static void MakeBarrier(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            scene.CreateDecoration(owner.Owner as Player, "barrier", targetTile, null, null, null, null);
+        }
+
+        public static void CreateMistspawn(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            scene.CreateActor(owner.Owner as Player, "mistspawn", "mistspawn", targetTile, null);
+        }
+
+        public static void CreateOffspring(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
+        {
+            var mod = (int)Math.Ceiling(owner.Constitution * skill.Mod);
+            scene.CreateActor(
+                owner.Owner as Player,
+                null,
+                "offspring",
+                new RoleModelNative(
+                    scene.NativeManager,
+                    "offspring",
+                    mod,
+                    0,
+                    mod,
+                    15,
+                    6,
+                    "slash",
+                    new string[]
+                    {
+                        "sacrifice"
+                    }),
+                targetTile,
+                null);
         }
     }
 }
