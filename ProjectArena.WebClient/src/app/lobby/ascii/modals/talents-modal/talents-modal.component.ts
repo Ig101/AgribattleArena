@@ -76,7 +76,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
   loading: boolean;
   errors: string[];
 
-  talentsMaxCount = 15;
+  talentsMaxCount = 30;
 
   nativeId: string;
   name: string;
@@ -262,6 +262,11 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
       if (this.selectedTalents.some(k => talent.exceptions.includes(k.id))) {
         talent.accessible = false;
         talent.inaccessibilityReason = InaccessibilityReasonEnum.Exception;
+        return;
+      }
+      if (talent.prerequisites.some(k => !this.selectedTalents.some(t => t.id === k))) {
+        talent.accessible = false;
+        talent.inaccessibilityReason = InaccessibilityReasonEnum.Prerequisite;
         return;
       }
     }
@@ -573,6 +578,11 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
               case InaccessibilityReasonEnum.Exception:
                 const exceptions = this.selectedTalents.filter(k => this.hoveredTalent.exceptions.includes(k.id));
                 error = `Excluding talent was found: \"${exceptions.map(k => k.name).join('\", \"')}\".`;
+                break;
+              case InaccessibilityReasonEnum.Prerequisite:
+                const prerequisites = this.userService.user.talentsMap
+                  .filter(k => this.hoveredTalent.prerequisites.includes(k.id) && !this.selectedTalents.some(talent => talent.id === k.id));
+                error = `Required talent wasn't found: \"${prerequisites.map(k => k.name).join('\", \"')}\".`;
                 break;
               case InaccessibilityReasonEnum.Key:
                 error = 'All talents should be connected to the root node.';

@@ -12,6 +12,7 @@ export interface TalentNode {
   willpower: number;
   constitution: number;
   speed: number;
+  prerequisites: string[];
   exceptions: string[];
   skillsAmount: number;
 }

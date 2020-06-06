@@ -35,7 +35,7 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
 
             private readonly int _centerX = 24;
             private readonly int _centerY = 12;
-            private readonly int _talentsMaxCount = 15;
+            private readonly int _talentsMaxCount = 30;
 
             public Handler(
                 GameContext gameContext,
@@ -212,6 +212,15 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
                             throw new HttpException()
                             {
                                 Error = "Cannot add talent with unprocessible exceptions",
+                                StatusCode = 400
+                            };
+                        }
+
+                        if (changeTalent.Prerequisites != null && changeTalent.Prerequisites.Any(x => !characterTalents.Any(t => t.Id == x)))
+                        {
+                            throw new HttpException()
+                            {
+                                Error = "Cannot add talent with unresolved prerequisites",
                                 StatusCode = 400
                             };
                         }

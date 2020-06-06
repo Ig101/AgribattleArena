@@ -42,6 +42,9 @@ namespace ProjectArena.Domain.Registry.Entities
         [BsonElement("i")]
         public int SpeedModifier { get; set; }
 
+        [BsonElement("r")]
+        public IEnumerable<string> Prerequisites { get; set; }
+
         [BsonElement("e")]
         public IEnumerable<string> Exceptions { get; set; }
     }

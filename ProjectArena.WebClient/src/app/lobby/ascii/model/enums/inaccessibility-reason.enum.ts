@@ -4,6 +4,7 @@ export enum InaccessibilityReasonEnum {
   Skills,
   Stats,
   Exception,
+  Prerequisite,
   Cost,
   Limit
 }
