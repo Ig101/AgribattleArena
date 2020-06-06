@@ -223,6 +223,7 @@ namespace ProjectArena.Engine
             Tile tile = Tiles[x][y];
             tile.Owner = owner;
             tile.Native = NativeManager.GetTileNative(nativeName);
+            tile.Affected = true;
             if (height != null)
             {
                 tile.Height = height.Value;

@@ -3,8 +3,8 @@ import { Color } from 'src/app/shared/models/color.model';
 
 export function architectSummonIssueDeclaration(targetX: number, targetY: number, color: Color, increment: Color) {
   const frames: AnimationFrame[] = [];
-  for (let i = 0; i < 15; i++) {
-    const frameColor = { r: color.r + increment.r * i, g: color.g + increment.r * i, b: color.b + increment.r * i, a: 1};
+  for (let i = 0; i < 7; i++) {
+    const frameColor = { r: color.r + increment.r * i, g: color.g + increment.g * i, b: color.b + increment.b * i, a: 1};
     frames.push({
       updateSynchronizer: false,
       animationTiles: [

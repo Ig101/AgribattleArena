@@ -214,40 +214,46 @@ export class AsciiBattleSynchronizerService {
     // Deletions
     for (const syncActor of synchronizer.deletedActors) {
       const actor = this.battleStorageService.scene.actors.find(x => x.id === syncActor);
-      differences.actors.push({
-        x: actor.x,
-        y: actor.y,
-        actor: undefined,
-        healthChange: -Math.ceil(actor.health),
-        newBuffs: [],
-        removedBuffs: [],
-        endedTurn: false,
-        changedPosition: false
-      });
-      removeFromArray(this.battleStorageService.scene.actors, actor);
-      if (this.battleStorageService.scene.tiles[actor.x][actor.y].actor === actor) {
-        this.battleStorageService.scene.tiles[actor.x][actor.y].actor = undefined;
+      if (actor) {
+        differences.actors.push({
+          x: actor.x,
+          y: actor.y,
+          actor: undefined,
+          healthChange: -Math.ceil(actor.health),
+          newBuffs: [],
+          removedBuffs: [],
+          endedTurn: false,
+          changedPosition: false
+        });
+        removeFromArray(this.battleStorageService.scene.actors, actor);
+        if (this.battleStorageService.scene.tiles[actor.x][actor.y].actor === actor) {
+          this.battleStorageService.scene.tiles[actor.x][actor.y].actor = undefined;
+        }
       }
     }
     for (const syncDecoration of synchronizer.deletedDecorations) {
       const decoration = this.battleStorageService.scene.decorations.find(x => x.id === syncDecoration);
-      differences.decorations.push({
-        x: decoration.x,
-        y: decoration.y,
-        decoration: undefined,
-        healthChange: -Math.ceil(decoration.health),
-        changedPosition: false
-      });
-      removeFromArray(this.battleStorageService.scene.decorations, decoration);
-      if (this.battleStorageService.scene.tiles[decoration.x][decoration.y].decoration === decoration) {
-        this.battleStorageService.scene.tiles[decoration.x][decoration.y].decoration = undefined;
+      if (decoration) {
+        differences.decorations.push({
+          x: decoration.x,
+          y: decoration.y,
+          decoration: undefined,
+          healthChange: -Math.ceil(decoration.health),
+          changedPosition: false
+        });
+        removeFromArray(this.battleStorageService.scene.decorations, decoration);
+        if (this.battleStorageService.scene.tiles[decoration.x][decoration.y].decoration === decoration) {
+          this.battleStorageService.scene.tiles[decoration.x][decoration.y].decoration = undefined;
+        }
       }
     }
     for (const syncEffect of synchronizer.deletedEffects) {
       const effect = this.battleStorageService.scene.effects.find(x => x.id === syncEffect);
-      removeFromArray(this.battleStorageService.scene.effects, effect);
-      removeFromArray(this.battleStorageService.scene.tiles[effect.x][effect.y].specEffects, effect);
-      this.battleStorageService.scene.tiles[effect.x][effect.y].specEffects.sort((a, b) => b.z - a.z);
+      if (effect) {
+        removeFromArray(this.battleStorageService.scene.effects, effect);
+        removeFromArray(this.battleStorageService.scene.tiles[effect.x][effect.y].specEffects, effect);
+        this.battleStorageService.scene.tiles[effect.x][effect.y].specEffects.sort((a, b) => b.z - a.z);
+      }
     }
 
     // Change turn

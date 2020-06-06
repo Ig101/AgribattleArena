@@ -45,8 +45,8 @@ namespace ProjectArena.Engine.Objects.Abstract
             this.Affected = true;
             this.TempTile.Affected = true;
             target.Affected = true;
-            target.ChangeTempObject(this, true);
             this.TempTile.RemoveTempObject();
+            target.ChangeTempObject(this, true);
             this.TempTile = target;
             this.X = target.X;
             this.Y = target.Y;

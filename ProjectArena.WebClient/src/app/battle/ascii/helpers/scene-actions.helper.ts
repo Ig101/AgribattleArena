@@ -17,15 +17,19 @@ export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
       if (incrementingRange >= range) {
         nextTarget = target;
       } else {
-        const nextX = Math.floor(initial.x + (incrementingRange * cos));
-        const nextY = Math.floor(initial.y + (incrementingRange * sin));
+        const nextXFloat = initial.x + (incrementingRange * cos);
+        const nextYFloat = initial.y + (incrementingRange * sin);
+        const nextX = Math.floor(nextXFloat) + (nextXFloat % 1 > 0.5 ? 1 : 0);
+        const nextY = Math.floor(nextYFloat) + (nextYFloat % 1 > 0.5 ? 1 : 0);
         nextTarget = tiles[nextX][nextY];
+        if (nextTarget === currentTile) {
+            continue;
+        }
       }
 
       if (nextTarget.height - currentTile.height >= 10 ||
-        (nextTarget !== target && !nextTarget.decoration && !nextTarget.actor) ||
+        (nextTarget !== target && (nextTarget.decoration || nextTarget.actor)) ||
         nextTarget.unbearable) {
-
         return false;
       }
 

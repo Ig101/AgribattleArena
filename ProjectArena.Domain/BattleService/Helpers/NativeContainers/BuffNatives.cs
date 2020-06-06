@@ -26,7 +26,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 1,
                 false,
                 true,
-                1,
+                null,
                 1,
                 new string[0],
                 new[] { "AddStrengthMultiplier", "AddWillpowerMultiplier" },

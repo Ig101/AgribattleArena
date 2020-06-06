@@ -112,7 +112,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                     Bearable = true,
                     Allies = true,
                     NotAllies = true,
-                    Decorations = true
+                    Decorations = true,
+                    Self = true
                 },
                 false,
                 new[] { "MakePowerPlace" });
@@ -161,8 +162,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 "bloodsphere",
                 new[] { "damage", "target", "magic", "blood", "ranged", "direct" },
                 5,
+                3,
                 0,
-                4,
                 40,
                 new Targets()
                 {
@@ -191,7 +192,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 "sacrifice",
                 new[] { "target", "heal", "magic", "blood" },
                 1,
-                0,
+                1,
                 0,
                 -1,
                 new Targets()
@@ -203,7 +204,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 true,
                 new[] { "DoDamageByCurrentHealth", "Sacrifice" });
             nativeManager.AddSkillNative(
-                "sacrifice",
+                "empower",
                 new[] { "target", "buff", "magic", "pure" },
                 4,
                 6,
@@ -222,7 +223,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 1,
                 2,
                 0,
-                18,
+                21,
                 new Targets()
                 {
                     Allies = true,
@@ -237,7 +238,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 5,
                 2,
                 0,
-                12,
+                14,
                 new Targets()
                 {
                     Allies = true,

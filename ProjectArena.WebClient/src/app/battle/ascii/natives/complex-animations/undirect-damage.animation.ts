@@ -19,7 +19,7 @@ export function undirectDamageIssueDeclaration(issueX: number, issueY: number, c
   frames.push({
     updateSynchronizer: false,
     animationTiles: [{x: issueX, y: issueY, char, color, unitAlpha: false,
-      unitColorMultiplier: 1, priority: 10, ignoreHeight: false, overflowHealth: true, workingOnSpecEffects: true}],
+      unitColorMultiplier: 0, priority: 10, ignoreHeight: false, overflowHealth: true, workingOnSpecEffects: true}],
     specificAction: undefined
   });
   return frames;
@@ -30,7 +30,7 @@ export function undirectDamageSyncDeclaration(targetX: number, targetY: number, 
   frames.push({
     updateSynchronizer: false,
     animationTiles: [{x: targetX, y: targetY, char, color, unitAlpha: false,
-      unitColorMultiplier: 1, priority: 10, ignoreHeight: false, overflowHealth: true, workingOnSpecEffects: true}],
+      unitColorMultiplier: 0, priority: 10, ignoreHeight: false, overflowHealth: true, workingOnSpecEffects: true}],
     specificAction: undefined
   });
   frames.push({

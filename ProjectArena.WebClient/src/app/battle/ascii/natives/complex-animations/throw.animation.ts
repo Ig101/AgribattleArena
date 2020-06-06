@@ -8,7 +8,7 @@ export function throwIssueDeclaration(issueX: number, issueY: number, targetX: n
   const angle = angleBetween(issueX, issueY, targetX, targetY);
   const sin = Math.sin(angle);
   const cos = Math.cos(angle);
-  for (let i = 0; i < range; i++) {
+  for (let i = 0; i < range + 1; i++) {
     const passed = i;
     const frameColor = {
       r: (Math.random() + 9) / 10 * color.r,

@@ -101,13 +101,13 @@ export const actorNatives: {[id: string]: ActorNative} = {
   },
   mistspawn: {
     name: 'Tamed mistspawn',
-    description: 'Lesser spawn of blue mist summoned by mage',
+    description: 'Lesser spawn of blue mist',
     visualization: {
       char: 's',
       color: { r: 135, g: 100, b: 255, a: 1 }
     },
     enemyName: 'Lesser mistspawn',
-    enemyDescription: 'Lesser spawn of blue mist summoned by mage',
+    enemyDescription: 'Lesser spawn of blue miste',
     enemyVisualization: {
       char: 's',
       color: { r: 55, g: 55, b: 255, a: 1 }

@@ -23,7 +23,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 false,
                 1,
                 new string[0],
-                new string[] { "addTilePower" });
+                new string[] { "AddTilePower" });
         }
     }
 }

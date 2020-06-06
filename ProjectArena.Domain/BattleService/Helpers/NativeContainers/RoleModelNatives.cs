@@ -8,9 +8,9 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
         {
             nativeManager.AddRoleModelNative(
                 "mistspawn",
-                8,
-                0,
-                8,
+                12,
+                2,
+                12,
                 20,
                 6,
                 "slash",

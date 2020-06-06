@@ -52,8 +52,8 @@ export class AsciiBattleAnimationsService {
       }
       if (actor.healthChange) {
         actorFloats.push({
-          text: actor.healthChange.toString(),
-          color: { r: 255, g: 0, b: 0, a: 1 },
+          text: (actor.healthChange > 0 ? '+' : '') + actor.healthChange.toString(),
+          color: actor.healthChange > 0 ? { r: 0, g: 255, b: 0, a: 1 } : { r: 255, g: 0, b: 0, a: 1 },
           time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
           x: actor.x,
           y: actor.y,
@@ -76,11 +76,11 @@ export class AsciiBattleAnimationsService {
           buff.onApplyAnimation);
         if (buffFrames) {
           buffFrames[buffFrames.length - 1].specificAction = () => {
-            buff.passiveAnimation.doSomethingWithBearer(buff.passiveAnimation, actor.actor);
+            buff.passiveAnimation?.doSomethingWithBearer(buff.passiveAnimation, actor.actor);
           };
           frames.push(buffFrames);
         } else {
-          buff.passiveAnimation.doSomethingWithBearer(buff.passiveAnimation, actor.actor);
+          buff.passiveAnimation?.doSomethingWithBearer(buff.passiveAnimation, actor.actor);
         }
       }
       for (const buff of actor.removedBuffs) {
@@ -99,11 +99,11 @@ export class AsciiBattleAnimationsService {
         });
         if (buffFrames) {
           buffFrames[buffFrames.length - 1].specificAction = () => {
-            buff.passiveAnimation.resetEffect(buff.passiveAnimation, actor.actor);
+            buff.passiveAnimation?.resetEffect(buff.passiveAnimation, actor.actor);
           };
           frames.push(buffFrames);
         } else {
-          buff.passiveAnimation.resetEffect(buff.passiveAnimation, actor.actor);
+          buff.passiveAnimation?.resetEffect(buff.passiveAnimation, actor.actor);
         }
       }
       if (actor.changedPosition) {
@@ -182,7 +182,7 @@ export class AsciiBattleAnimationsService {
     const declarations = new Array<AnimationDeclaration>(maxLength);
     for (let i = 0; i < maxLength; i++) {
       const tiles = new Array<AnimationTile[]>(this.battleStorageService.scene.width);
-      const actions = new Array<() => void>(this.battleStorageService.scene.width);
+      const actions = new Array<() => void>();
       for (let t = 0; t < this.battleStorageService.scene.width; t++) {
         tiles[t] = new Array<AnimationTile>(this.battleStorageService.scene.height);
       }

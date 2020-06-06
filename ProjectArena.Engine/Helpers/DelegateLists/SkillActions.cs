@@ -155,9 +155,9 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
                     scene.NativeManager,
                     "offspring",
                     mod,
-                    0,
+                    2,
                     mod,
-                    15,
+                    30,
                     6,
                     "slash",
                     new string[]

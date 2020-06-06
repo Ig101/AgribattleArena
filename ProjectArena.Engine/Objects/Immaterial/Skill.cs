@@ -65,9 +65,15 @@ namespace ProjectArena.Engine.Objects.Immaterial
                 }
                 else
                 {
-                    var nextX = (int)(parent.X + (incrementingRange * cos));
-                    var nextY = (int)(parent.Y + (incrementingRange * sin));
+                    var nextXFloat = parent.X + (incrementingRange * cos);
+                    var nextYFloat = parent.Y + (incrementingRange * sin);
+                    var nextX = (int)nextXFloat + (nextXFloat % 1 > 0.5 ? 1 : 0);
+                    var nextY = (int)nextYFloat + (nextYFloat % 1 > 0.5 ? 1 : 0);
                     nextTarget = parent.Parent.Tiles[nextX][nextY];
+                    if (nextTarget == currentTile)
+                    {
+                        continue;
+                    }
                 }
 
                 if (nextTarget.Height - currentTile.Height >= 10 ||
@@ -88,7 +94,7 @@ namespace ProjectArena.Engine.Objects.Immaterial
             if (parent.ActionPoints >= cost && PreparationTime <= 0 && parent.BuffManager.CanAct &&
                     ((Native.AvailableTargets.Allies && target.TempObject != null && target.TempObject is Actor && target.TempObject != parent && target.TempObject.Owner?.Team == parent.Owner?.Team) ||
                     (Native.AvailableTargets.NotAllies && target.TempObject != null && target.TempObject is Actor && target.TempObject != parent && (parent.Owner?.Team == null || target.TempObject.Owner?.Team != parent.Owner?.Team)) ||
-                    (Native.AvailableTargets.Decorations && target.TempObject == null && target.TempObject is ActiveDecoration) ||
+                    (Native.AvailableTargets.Decorations && target.TempObject != null && target.TempObject is ActiveDecoration) ||
                     (Native.AvailableTargets.Self && target.TempObject == parent) ||
                     (Native.AvailableTargets.Bearable && target.TempObject == null && !target.Native.Unbearable) ||
                     (Native.AvailableTargets.Unbearable && target.TempObject == null && target.Native.Unbearable)) &&

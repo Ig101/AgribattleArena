@@ -123,7 +123,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       of its default value. Works only on characters that stay on chosen position.`,
     action: {
       generateIssueDeclarations: (issuer, tile) => {
-        return architectSummonIssueDeclaration(tile.x, tile.y, {r: 20, g: 20, b: 135, a: 1}, {r: 8, g: 8, b: 8});
+        return architectSummonIssueDeclaration(tile.x, tile.y, {r: 20, g: 20, b: 135, a: 1}, {r: 16, g: 16, b: 8});
       },
       generateSyncDeclarations: (issuer, tile) => {
         return architectSummonSyncDeclaration(tile.x, tile.y, {r: 140, g: 140, b: 255, a: 1});
@@ -136,7 +136,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
     description: `Creates an unpassable barrier on the target position with large amount of health.`,
     action: {
       generateIssueDeclarations: (issuer, tile) => {
-        return architectSummonIssueDeclaration(tile.x, tile.y, {r: 54, g: 32, b: 0, a: 1}, {r: 8, g: 4, b: 0});
+        return architectSummonIssueDeclaration(tile.x, tile.y, {r: 54, g: 32, b: 0, a: 1}, {r: 16, g: 8, b: 0});
       },
       generateSyncDeclarations: (issuer, tile) => {
         return architectSummonSyncDeclaration(tile.x, tile.y, {r: 174, g: 92, b: 0, a: 1});
@@ -162,7 +162,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
     description: 'Summons lesser mist spawn that fights for you.',
     action: {
       generateIssueDeclarations: (issuer, tile) => {
-        return summonIssueAnimation(issuer.x, issuer.y, { r: 15, g: 10, b: 135, a: 1 }, { r: 8, g: 6, b: 8});
+        return summonIssueAnimation(issuer.x, issuer.y, tile.x, tile.y, { r: 15, g: 10, b: 135, a: 1 }, { r: 16, g: 12, b: 16});
       },
       generateSyncDeclarations: (issuer, tile) => {
         return summonSyncDeclaration(tile.x, tile.y, { r: 135, g: 100, b: 255, a: 1 });
@@ -172,7 +172,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
     enemyName: 'Mist pact',
     enemyAction: {
       generateIssueDeclarations: (issuer, tile) => {
-        return summonIssueAnimation(issuer.x, issuer.y, { r: 10, g: 10, b: 135, a: 1 }, { r: 3, g: 3, b: 8});
+        return summonIssueAnimation(issuer.x, issuer.y, tile.x, tile.y, { r: 10, g: 10, b: 135, a: 1 }, { r: 6, g: 6, b: 16});
       },
       generateSyncDeclarations: (issuer, tile) => {
         return summonSyncDeclaration(tile.x, tile.y, { r: 55, g: 55, b: 255, a: 1 });
@@ -207,7 +207,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       Can attack and sacrifice itself transferring all health to the target. Doesn\'t have intelligence by self.`,
     action: {
       generateIssueDeclarations: (issuer, tile) => {
-        return summonIssueAnimation(issuer.x, issuer.y, { r: 135, g: 0, b: 0, a: 1 }, { r: 8, g: 0, b: 0});
+        return summonIssueAnimation(issuer.x, issuer.y, tile.x, tile.y, { r: 135, g: 0, b: 0, a: 1 }, { r: 16, g: 0, b: 0});
       },
       generateSyncDeclarations: (issuer, tile) => {
         return summonSyncDeclaration(tile.x, tile.y, { r: 255, g: 0, b: 0, a: 1 });
@@ -217,7 +217,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
     enemyName: 'Offspring',
     enemyAction: {
       generateIssueDeclarations: (issuer, tile) => {
-        return summonIssueAnimation(issuer.x, issuer.y, { r: 10, g: 10, b: 135, a: 1 }, { r: 3, g: 3, b: 8});
+        return summonIssueAnimation(issuer.x, issuer.y, tile.x, tile.y, { r: 10, g: 10, b: 135, a: 1 }, { r: 6, g: 6, b: 16});
       },
       generateSyncDeclarations: (issuer, tile) => {
         return summonSyncDeclaration(tile.x, tile.y, { r: 55, g: 55, b: 255, a: 1 });

@@ -11,5 +11,7 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
         public bool Bearable { get; set; }
 
         public bool Unbearable { get; set; }
+
+        public bool Decorations { get; set; }
     }
 }

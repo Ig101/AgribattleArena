@@ -73,6 +73,74 @@ namespace ProjectArena.Domain.BattleService
             foreach (string id in userIds)
             {
                 var playerActors = new List<IActor>();
+                var playerCharacters = characters.Where(x => x.RosterUserId == id).ToList();
+                playerActors.Add(EngineHelper.CreateActorForGeneration(
+                    Guid.Parse(playerCharacters[0].Id),
+                    "architect",
+                    "slash",
+                    BattleHelper.DefaultStrength,
+                    BattleHelper.DefaultWillpower,
+                    BattleHelper.DefaultConstitution,
+                    BattleHelper.DefaultSpeed,
+                    new[] { "barrier", "powerplace" },
+                    6,
+                    null));
+                playerActors.Add(EngineHelper.CreateActorForGeneration(
+                    Guid.Parse(playerCharacters[1].Id),
+                    "bloodletter",
+                    "slash",
+                    BattleHelper.DefaultStrength,
+                    BattleHelper.DefaultWillpower,
+                    BattleHelper.DefaultConstitution,
+                    BattleHelper.DefaultSpeed,
+                    new[] { "bloodsphere", "offspring" },
+                    6,
+                    null));
+                playerActors.Add(EngineHelper.CreateActorForGeneration(
+                    Guid.Parse(playerCharacters[2].Id),
+                    "enchanter",
+                    "mistShot",
+                    BattleHelper.DefaultStrength,
+                    BattleHelper.DefaultWillpower,
+                    BattleHelper.DefaultConstitution,
+                    BattleHelper.DefaultSpeed,
+                    new[] { "empower" },
+                    6,
+                    null));
+                playerActors.Add(EngineHelper.CreateActorForGeneration(
+                    Guid.Parse(playerCharacters[3].Id),
+                    "fighter",
+                    "mistSlash",
+                    BattleHelper.DefaultStrength,
+                    BattleHelper.DefaultWillpower,
+                    BattleHelper.DefaultConstitution,
+                    BattleHelper.DefaultSpeed,
+                    new[] { "warden", "charge" },
+                    6,
+                    null));
+                playerActors.Add(EngineHelper.CreateActorForGeneration(
+                    Guid.Parse(playerCharacters[4].Id),
+                    "mistcaller",
+                    "wand",
+                    BattleHelper.DefaultStrength,
+                    BattleHelper.DefaultWillpower,
+                    BattleHelper.DefaultConstitution,
+                    BattleHelper.DefaultSpeed,
+                    new[] { "magicMissle", "mistpact" },
+                    6,
+                    null));
+                playerActors.Add(EngineHelper.CreateActorForGeneration(
+                    Guid.Parse(playerCharacters[5].Id),
+                    "ranger",
+                    "shot",
+                    BattleHelper.DefaultStrength,
+                    BattleHelper.DefaultWillpower,
+                    BattleHelper.DefaultConstitution,
+                    BattleHelper.DefaultSpeed,
+                    new[] { "shadowstep" },
+                    6,
+                    null));
+                /*
                 playerActors.AddRange(
                     characters
                     .Where(x => x.RosterUserId == id)
@@ -89,7 +157,7 @@ namespace ProjectArena.Domain.BattleService
                             new[] { "explosion" },
                             6,
                             null);
-                    }));
+                    }));*/
 
                 players.Add(EngineHelper.CreatePlayerForGeneration(id, null, playerActors));
             }

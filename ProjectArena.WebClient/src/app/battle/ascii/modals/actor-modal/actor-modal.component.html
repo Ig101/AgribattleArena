@@ -18,7 +18,7 @@
       </div>
       <div class="buff" *ngFor="let buff of buffs">
         <div class="text-font-inactive buff-icon" [style.color]="buff.color" [style.border-color]="buff.color">
-          <div class="article-font-inactive duration">{{buff.duration}}</div>
+          <div class="article-font-inactive duration" *ngIf="buff.duration">{{buff.duration}}</div>
           {{buff.char}}
         </div>
         <div class="article-font-inactive buff-description">{{buff.description}}</div>

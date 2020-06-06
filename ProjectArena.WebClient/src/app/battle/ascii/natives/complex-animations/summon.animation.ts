@@ -1,20 +1,14 @@
 import { Color } from 'src/app/shared/models/color.model';
 import { AnimationFrame } from '../../models/animations/animation-frame.model';
 
-export function summonIssueAnimation(x: number, y: number, color: Color, increment: Color) {
+export function summonIssueAnimation(x: number, y: number, targetX: number, targetY: number, color: Color, increment: Color) {
   const frames: AnimationFrame[] = [];
-  for (let i = 0; i < 15; i++) {
-    const frameColor = { r: color.r + increment.r * i, g: color.g + increment.r * i, b: color.b + increment.r * i, a: 1};
+  for (let i = 0; i < 7; i++) {
+    const frameColor = { r: color.r + increment.r * i, g: color.g + increment.g * i, b: color.b + increment.b * i, a: 1};
     frames.push({
       updateSynchronizer: false,
       animationTiles: [
-        {x: x - 1, y, char: '-', color: frameColor, unitAlpha: false,
-        unitColorMultiplier: 0, priority: 10, ignoreHeight: false, overflowHealth: true, workingOnSpecEffects: true},
-        {x: x + 1, y, char: '-', color: frameColor, unitAlpha: false,
-        unitColorMultiplier: 0, priority: 10, ignoreHeight: false, overflowHealth: true, workingOnSpecEffects: true},
-        {x, y: y + 1, char: '|', color: frameColor, unitAlpha: false,
-        unitColorMultiplier: 0, priority: 10, ignoreHeight: false, overflowHealth: true, workingOnSpecEffects: true},
-        {x, y: y - 1, char: '|', color: frameColor, unitAlpha: false,
+        {x: targetX, y: targetY, char: targetX - x !== 0 ? '-' : '|', color: frameColor, unitAlpha: false,
         unitColorMultiplier: 0, priority: 10, ignoreHeight: false, overflowHealth: true, workingOnSpecEffects: true}],
       specificAction: undefined
     });

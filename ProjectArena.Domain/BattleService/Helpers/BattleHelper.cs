@@ -46,7 +46,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Mode = new SceneMode()
                         {
                             Generator = EngineHelper.CreateDuelSceneGenerator(),
-                            VarManager = EngineHelper.CreateVarManager(80, 20, 3, 8, 4, 0.05f, 0.05f, 0.05f),
+                            VarManager = EngineHelper.CreateVarManager(80000, 20, 3, 8, 4, 0.05f, 0.05f, 0.05f),
                             BattleResultProcessor = BattleResultProcessors.ProcessMainDuelBattleResult,
                             MaxPlayers = 2
                         }
@@ -75,7 +75,8 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Self = actor.AttackingSkill.AvailableTargets.Self,
                         NotAllies = actor.AttackingSkill.AvailableTargets.NotAllies,
                         Bearable = actor.AttackingSkill.AvailableTargets.Bearable,
-                        Unbearable = actor.AttackingSkill.AvailableTargets.Unbearable
+                        Unbearable = actor.AttackingSkill.AvailableTargets.Unbearable,
+                        Decorations = actor.AttackingSkill.AvailableTargets.Decorations
                     }
                 },
                 Buffs = actor.Buffs.Select(k => new BuffDto()
@@ -107,7 +108,8 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Self = k.AvailableTargets.Self,
                         NotAllies = k.AvailableTargets.NotAllies,
                         Bearable = k.AvailableTargets.Bearable,
-                        Unbearable = k.AvailableTargets.Unbearable
+                        Unbearable = k.AvailableTargets.Unbearable,
+                        Decorations = k.AvailableTargets.Decorations
                     }
                 }),
                 X = actor.X,

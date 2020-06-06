@@ -44,7 +44,7 @@ namespace ProjectArena.Engine.Objects
 
         public override void OnDeathAction()
         {
-            Native.OnDeathAction(Parent, this);
+            Native?.OnDeathAction(Parent, this);
         }
     }
 }

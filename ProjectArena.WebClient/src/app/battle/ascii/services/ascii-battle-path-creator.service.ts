@@ -81,19 +81,19 @@ export class AsciiBattlePathCreatorService {
                 leftSquare: existingSquare?.leftSquare,
                 rightSquare: existingSquare?.rightSquare
               };
-              const leftSquare = allSquares.find(s => s.x === newX - 1 && s.y === newY);
+              const leftSquare = allSquares.find(s => s.x === newX - 1 && s.y === newY && (s.type !== undefined || onlyTargets));
               if (leftSquare) {
                 this.calculateNeighbourhood(tempSquare, leftSquare);
               }
-              const rightSquare = allSquares.find(s => s.x === newX + 1 && s.y === newY);
+              const rightSquare = allSquares.find(s => s.x === newX + 1 && s.y === newY && (s.type !== undefined || onlyTargets));
               if (rightSquare) {
                 this.calculateNeighbourhood(tempSquare, rightSquare);
               }
-              const topSquare = allSquares.find(s => s.x === newX && s.y === newY - 1);
+              const topSquare = allSquares.find(s => s.x === newX && s.y === newY - 1 && (s.type !== undefined || onlyTargets));
               if (topSquare) {
                 this.calculateNeighbourhood(tempSquare, topSquare);
               }
-              const bottomSquare = allSquares.find(s => s.x === newX && s.y === newY + 1);
+              const bottomSquare = allSquares.find(s => s.x === newX && s.y === newY + 1 && (s.type !== undefined || onlyTargets));
               if (bottomSquare) {
                 this.calculateNeighbourhood(tempSquare, bottomSquare);
               }
@@ -178,7 +178,7 @@ export class AsciiBattlePathCreatorService {
     if (actor.actionPoints === 0) {
       return [];
     }
-    const skill = actionId || actionId === -1 ? actor.skills.find(x => x.id === actionId) : actor.attackingSkill;
+    const skill = actionId && actionId > 0 ? actor.skills.find(x => x.id === actionId) : actor.attackingSkill;
     const actorSquare = {
       x: actor.x,
       y: actor.y,
@@ -203,6 +203,6 @@ export class AsciiBattlePathCreatorService {
     }
     this.calculateRangeSquares(actor, actorTile, actor.x, actor.y, actorSquare,
       actor.actionPoints - skill.cost, allSquares, !actionId, skill);
-    return allSquares;
+    return allSquares.filter(x => x.type !== undefined);
   }
 }

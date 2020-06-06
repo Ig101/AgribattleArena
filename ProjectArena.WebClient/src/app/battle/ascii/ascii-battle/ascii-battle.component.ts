@@ -237,7 +237,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Unexpected synchronization error');
         setTimeout(() => {
-          location.reload();
+       //   location.reload();
         }, 2000);
       }
     });
@@ -582,16 +582,16 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
           this.canvasContext.fillText(replacement?.char ? replacement.char : tile.actor.visualization.char, canvasX, symbolY);
         } else if (tile.decoration) {
-          let color = heightImpact(tile.actor.z, tile.decoration.visualization.color);
+          let color = heightImpact(tile.decoration.z, tile.decoration.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.decoration.z) : color);
           this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
           this.canvasContext.fillText(replacement?.char ? replacement.char : tile.decoration.visualization.char, canvasX, symbolY);
         }
       } else if (tile.specEffects.length > 0 && !selected) {
         const firstEffect = tile.specEffects[0];
-        let color = heightImpact(tile.actor.z, firstEffect.visualization.color);
+        let color = heightImpact(firstEffect.z, firstEffect.visualization.color);
         color =  brightImpact(tile.bright, replacement?.workingOnSpecEffects ?
-          this.mixColorWithReplacement(color, replacement, tile.actor.z) :
+          this.mixColorWithReplacement(color, replacement, firstEffect.z) :
           color);
         this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
         this.canvasContext.fillText( replacement?.workingOnSpecEffects ?
@@ -756,7 +756,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       case BattleSynchronizationActionEnum.Attack:
         const skill = this.battleStorageService.currentActor.attackingSkill;
         if (newAction.actorId === this.battleStorageService.currentActor.id &&
-          (sX === 1 && sY === 0 || sX === 0 && sY === 1) && this.battleStorageService.currentActor.canAct &&
+          this.battleStorageService.currentActor.canAct &&
           checkSkillTargets(tile, this.battleStorageService.currentActor, skill.availableTargets) &&
           (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
           (tile.actor || tile.decoration) && tile.actor !== this.battleStorageService.currentActor) {
@@ -774,7 +774,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Action is not found');
         setTimeout(() => {
-          location.reload();
+     //     location.reload();
         }, 2000);
         return;
     }
@@ -891,7 +891,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }, 0, true);
       console.error('Version is not correct');
       setTimeout(() => {
-        location.reload();
+   //     location.reload();
       }, 2000);
       this.receivingMessagesFromHubAllowed = true;
       return;
@@ -910,7 +910,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Action is not correct');
         setTimeout(() => {
-          location.reload();
+    //      location.reload();
         }, 2000);
         return;
       }
