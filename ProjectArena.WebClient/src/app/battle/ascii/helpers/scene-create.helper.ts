@@ -137,7 +137,7 @@ export function convertBuff(buff: SyncBuff): Buff {
   };
 }
 
-export function convertActor(actor: SyncActor, owner: Player, isCurrentPlayerTeam: boolean): Actor {
+export function convertActor(actor: SyncActor, owner: Player, isCurrentPlayerTeam: boolean, name: string): Actor {
   let native = actorNatives[actor.nativeId];
   if (!native) {
     native = {
@@ -159,8 +159,8 @@ export function convertActor(actor: SyncActor, owner: Player, isCurrentPlayerTea
   const visualization = isCurrentPlayerTeam ? native.visualization : native.enemyVisualization;
   return {
     id: actor.id,
-    name: isCurrentPlayerTeam ? native.name : native.enemyName,
-    description: isCurrentPlayerTeam ? native.description : native.enemyDescription,
+    name: name ? name : (isCurrentPlayerTeam ? native.name : native.enemyName),
+    description: isCurrentPlayerTeam ? (name ? native.name : native.description) : (name ? native.enemyName : native.enemyDescription),
     defaultVisualization: visualization,
     visualization: {
       char: visualization.char,

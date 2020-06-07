@@ -88,7 +88,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 true,
                 new[] { "DoDamageAttack" });
             nativeManager.AddSkillNative(
-                "shadowstep",
+                "mistwalk",
                 new[] { "target", "movement", "magic", "alteration" },
                 5,
                 1,

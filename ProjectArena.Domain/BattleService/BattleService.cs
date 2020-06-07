@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,12 +10,16 @@ using ProjectArena.Domain.BattleService.Helpers;
 using ProjectArena.Domain.BattleService.Helpers.NativeContainers;
 using ProjectArena.Domain.BattleService.Models;
 using ProjectArena.Domain.Game;
+using ProjectArena.Domain.Game.Entities;
 using ProjectArena.Domain.QueueService.Models;
 using ProjectArena.Domain.Registry;
+using ProjectArena.Domain.Registry.Entities;
+using ProjectArena.Domain.Registry.Helpers;
 using ProjectArena.Engine.ForExternalUse;
 using ProjectArena.Engine.ForExternalUse.EngineHelper;
 using ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
 using ProjectArena.Engine.ForExternalUse.Synchronization;
+using ProjectArena.Infrastructure.Enums;
 using ProjectArena.Infrastructure.Models.Battle.Synchronization;
 
 namespace ProjectArena.Domain.BattleService
@@ -53,10 +58,131 @@ namespace ProjectArena.Domain.BattleService
             SetupNewNativeManager();
         }
 
+        private void ApplyTalentAction(
+            ref string attackSkill,
+            ref int actionPointsIncome,
+            ref ICollection<string> skills,
+            ref ICollection<string> startBuffs,
+            TalentNode talent,
+            IEnumerable<TalentNode> talents,
+            ICollection<int> appliedTalents)
+        {
+            if (talent.Prerequisites.Count() > 0)
+            {
+                var requiredTalents = talents.Where(x => !appliedTalents.Contains(x.Position) && talent.Prerequisites.Contains(x.Id));
+                foreach (var requiredTalent in requiredTalents)
+                {
+                    ApplyTalentAction(ref attackSkill, ref actionPointsIncome, ref skills, ref startBuffs, requiredTalent, talents, appliedTalents);
+                }
+            }
+
+            var action = (TalentActionDelegates.Action)Delegate.CreateDelegate(
+                typeof(TalentActionDelegates.Action),
+                typeof(TalentActionDelegates).GetMethod(talent.UniqueAction, BindingFlags.Public | BindingFlags.Static));
+            action(ref attackSkill, ref actionPointsIncome, ref skills, ref startBuffs);
+            appliedTalents.Add(talent.Position);
+        }
+
+        private IActor GenerateActor(Character character, IEnumerable<TalentNode> talents)
+        {
+            var strength = BattleHelper.DefaultStrength;
+            var willpower = BattleHelper.DefaultWillpower;
+            var constitution = BattleHelper.DefaultConstitution;
+            var speed = BattleHelper.DefaultSpeed;
+            var classPoints = new Dictionary<CharacterClass?, int>();
+            foreach (var talent in talents)
+            {
+                strength += talent.StrengthModifier;
+                willpower += talent.WillpowerModifier;
+                constitution += talent.ConstitutionModifier;
+                speed += talent.SpeedModifier;
+                if (talent.Class.HasValue)
+                {
+                    classPoints.TryAdd(talent.Class, 0);
+                    classPoints[talent.Class.Value] += talent.ClassPoints;
+                }
+            }
+
+            var nativeId = "adventurer";
+            if (classPoints.Count != 0)
+            {
+                var bestClass = classPoints.First();
+                var draw = false;
+                foreach (var points in classPoints)
+                {
+                    if (bestClass.Value < points.Value)
+                    {
+                        bestClass = points;
+                        draw = false;
+                    }
+
+                    if (bestClass.Value == points.Value && bestClass.Key != points.Key)
+                    {
+                        draw = true;
+                    }
+                }
+
+                if (!draw)
+                {
+                    switch (bestClass.Key)
+                    {
+                        case CharacterClass.Architect:
+                            nativeId = "architect";
+                            break;
+                        case CharacterClass.Bloodletter:
+                            nativeId = "bloodletter";
+                            break;
+                        case CharacterClass.Enchanter:
+                            nativeId = "enchanter";
+                            break;
+                        case CharacterClass.Fighter:
+                            nativeId = "fighter";
+                            break;
+                        case CharacterClass.Mistcaller:
+                            nativeId = "mistcaller";
+                            break;
+                        case CharacterClass.Ranger:
+                            nativeId = "ranger";
+                            break;
+                    }
+                }
+            }
+
+            var attackingSkill = "slash";
+            ICollection<string> skills = new List<string>() { "magicMissle" };
+            var actionPointsIncome = 6;
+            ICollection<string> startBuffs = new List<string>();
+
+            var talentsWithUniqueAction = talents.Where(t => t.UniqueAction != null).ToList();
+            var talentPositionsWithAppliedActions = new List<int>();
+            foreach (var talent in talentsWithUniqueAction)
+            {
+                if (talentPositionsWithAppliedActions.Contains(talent.Position))
+                {
+                    continue;
+                }
+
+                ApplyTalentAction(ref attackingSkill, ref actionPointsIncome, ref skills, ref startBuffs, talent, talentsWithUniqueAction, talentPositionsWithAppliedActions);
+            }
+
+            return EngineHelper.CreateActorForGeneration(
+                Guid.Parse(character.Id),
+                nativeId,
+                attackingSkill,
+                strength,
+                willpower,
+                constitution,
+                speed,
+                skills,
+                actionPointsIncome,
+                startBuffs);
+        }
+
         public async Task StartNewBattleAsync(SceneMode mode, IEnumerable<UserInQueue> users)
         {
             var battleHub = _serviceProvider.GetRequiredService<IHubContext<ArenaHub.ArenaHub>>();
             var gameContext = _serviceProvider.GetRequiredService<GameContext>();
+            var registryContext = _serviceProvider.GetRequiredService<RegistryContext>();
 
             var userIds = users.Select(x => x.UserId).ToList();
             var tempSceneId = _sceneEnumerator;
@@ -69,95 +195,21 @@ namespace ProjectArena.Domain.BattleService
             var players = new List<IPlayer>(users.Count());
 
             var characters = await gameContext.Characters.GetAsync(x => userIds.Contains(x.RosterUserId) && !x.Deleted);
+            var allTalentIds = characters.SelectMany(x => x.ChosenTalents).ToList();
+            var allTalents = await registryContext.TalentMap.GetAsync(x => allTalentIds.Contains(x.Position));
 
             foreach (string id in userIds)
             {
                 var playerActors = new List<IActor>();
                 var playerCharacters = characters.Where(x => x.RosterUserId == id).ToList();
-                playerActors.Add(EngineHelper.CreateActorForGeneration(
-                    Guid.Parse(playerCharacters[0].Id),
-                    "architect",
-                    "slash",
-                    BattleHelper.DefaultStrength,
-                    BattleHelper.DefaultWillpower,
-                    BattleHelper.DefaultConstitution,
-                    BattleHelper.DefaultSpeed,
-                    new[] { "barrier", "powerplace" },
-                    6,
-                    null));
-                playerActors.Add(EngineHelper.CreateActorForGeneration(
-                    Guid.Parse(playerCharacters[1].Id),
-                    "bloodletter",
-                    "slash",
-                    BattleHelper.DefaultStrength,
-                    BattleHelper.DefaultWillpower,
-                    BattleHelper.DefaultConstitution,
-                    BattleHelper.DefaultSpeed,
-                    new[] { "bloodsphere", "offspring" },
-                    6,
-                    null));
-                playerActors.Add(EngineHelper.CreateActorForGeneration(
-                    Guid.Parse(playerCharacters[2].Id),
-                    "enchanter",
-                    "mistShot",
-                    BattleHelper.DefaultStrength,
-                    BattleHelper.DefaultWillpower,
-                    BattleHelper.DefaultConstitution,
-                    BattleHelper.DefaultSpeed,
-                    new[] { "empower" },
-                    6,
-                    null));
-                playerActors.Add(EngineHelper.CreateActorForGeneration(
-                    Guid.Parse(playerCharacters[3].Id),
-                    "fighter",
-                    "mistSlash",
-                    BattleHelper.DefaultStrength,
-                    BattleHelper.DefaultWillpower,
-                    BattleHelper.DefaultConstitution,
-                    BattleHelper.DefaultSpeed,
-                    new[] { "warden", "charge" },
-                    6,
-                    null));
-                playerActors.Add(EngineHelper.CreateActorForGeneration(
-                    Guid.Parse(playerCharacters[4].Id),
-                    "mistcaller",
-                    "wand",
-                    BattleHelper.DefaultStrength,
-                    BattleHelper.DefaultWillpower,
-                    BattleHelper.DefaultConstitution,
-                    BattleHelper.DefaultSpeed,
-                    new[] { "magicMissle", "mistpact" },
-                    6,
-                    null));
-                playerActors.Add(EngineHelper.CreateActorForGeneration(
-                    Guid.Parse(playerCharacters[5].Id),
-                    "ranger",
-                    "shot",
-                    BattleHelper.DefaultStrength,
-                    BattleHelper.DefaultWillpower,
-                    BattleHelper.DefaultConstitution,
-                    BattleHelper.DefaultSpeed,
-                    new[] { "shadowstep" },
-                    6,
-                    null));
-                /*
                 playerActors.AddRange(
                     characters
                     .Where(x => x.RosterUserId == id)
                     .Select(x =>
                     {
-                        return EngineHelper.CreateActorForGeneration(
-                            Guid.Parse(x.Id),
-                            "adventurer",
-                            "slash",
-                            BattleHelper.DefaultStrength,
-                            BattleHelper.DefaultWillpower,
-                            BattleHelper.DefaultConstitution,
-                            BattleHelper.DefaultSpeed,
-                            new[] { "explosion" },
-                            6,
-                            null);
-                    }));*/
+                        var talents = allTalents.Where(t => x.ChosenTalents.Contains(t.Position)).ToList();
+                        return GenerateActor(x, talents);
+                    }));
 
                 players.Add(EngineHelper.CreatePlayerForGeneration(id, null, playerActors));
             }

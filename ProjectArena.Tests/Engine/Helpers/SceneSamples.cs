@@ -93,11 +93,11 @@ namespace ProjectArena.Tests.Engine.Helpers
 
             IActor[] firstPlayerActors = new IActor[]
             {
-                EngineHelper.CreateActorForGeneration(Guid.Parse("10505fc7-3cdf-4c2b-bf36-4c934673a080"), "test_actor", "test_actor_attack_range", 20, 10, 20, 10, new string[] { "test_actor_skill", "test_actor_skill_range" }, 5, new string[0])
+                EngineHelper.CreateActorForGeneration(Guid.Parse("10505fc7-3cdf-4c2b-bf36-4c934673a080"), "test_actor", "test_actor_attack_range", 20, 10, 20, 10, new string[] { "test_actor_skill", "test_actor_skill_range" }, 5)
             };
             IActor[] secondPlayerActors = new IActor[]
             {
-                EngineHelper.CreateActorForGeneration(Guid.Parse("d5bd9080-cd18-475d-9a30-1a1361f99e7e"), "test_actor", "test_actor_attack", 10, 20, 10, 18, new string[] { "test_actor_skill", "test_actor_skill_range" }, 4, new string[0])
+                EngineHelper.CreateActorForGeneration(Guid.Parse("d5bd9080-cd18-475d-9a30-1a1361f99e7e"), "test_actor", "test_actor_attack", 10, 20, 10, 18, new string[] { "test_actor_skill", "test_actor_skill_range" }, 4)
             };
             return SceneHelper.CreateNewScene(nativeManager, tileSet, victory, firstPlayerActors, secondPlayerActors, eventHandler);
         }

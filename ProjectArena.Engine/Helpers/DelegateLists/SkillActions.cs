@@ -11,7 +11,8 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
 
         public static void DoDamagePercentSelf(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
         {
-            owner.Damage(skill.Mod * owner.MaxHealth, skill.AggregatedTags);
+            var mod = (int)Math.Ceiling(owner.Constitution * skill.Mod) * scene.VarManager.ConstitutionMod;
+            owner.Damage(mod, skill.AggregatedTags);
         }
 
         public static void DoDamageSelf(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)

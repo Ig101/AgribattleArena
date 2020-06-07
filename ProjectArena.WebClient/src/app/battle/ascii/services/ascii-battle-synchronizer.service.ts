@@ -58,7 +58,8 @@ export class AsciiBattleSynchronizerService {
     const actors: Actor[] = [];
     for (const actor of synchronizer.changedActors) {
       const owner = this.battleStorageService.players.find(x => x.id === actor.ownerId);
-      const newActor = convertActor(actor, owner, owner && currentPlayer.team === owner?.team);
+      const character = this.userService.user.roster.find(x => x.id === actor.externalId);
+      const newActor = convertActor(actor, owner, owner && currentPlayer.team === owner?.team, character?.name);
       for (const buff of newActor.buffs) {
         buff.passiveAnimation?.doSomethingWithBearer(buff.passiveAnimation, newActor);
       }
@@ -146,7 +147,8 @@ export class AsciiBattleSynchronizerService {
       const actor = this.battleStorageService.scene.actors.find(x => x.id === syncActor.id);
       if (!actor) {
         owner = this.battleStorageService.players.find(x => x.id === syncActor.ownerId);
-        const newActor = convertActor(syncActor, owner, owner && currentPlayer.team === owner?.team);
+        const character = this.userService.user.roster.find(x => x.id === actor.externalId);
+        const newActor = convertActor(syncActor, owner, owner && currentPlayer.team === owner?.team, character?.name);
         this.battleStorageService.scene.tiles[newActor.x][newActor.y].actor = newActor;
         this.battleStorageService.scene.actors.push(newActor);
         continue;

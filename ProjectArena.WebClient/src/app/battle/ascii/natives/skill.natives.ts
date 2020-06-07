@@ -106,8 +106,8 @@ export const skillNatives: { [id: string]: SkillNative } = {
     },
     alternativeForm: false
   },
-  shadowstep: {
-    name: 'Shadowstep',
+  mistwalk: {
+    name: 'Mistwalk',
     description: 'Teleports to the target location.',
     action: {
       generateIssueDeclarations: undefined,
