@@ -22,7 +22,7 @@ namespace ProjectArena.Engine.Helpers.DelegateLists
 
         public static void DoFixedSmallDamageSelf(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)
         {
-            owner.Damage(5, skill.AggregatedTags);
+            owner.Damage(10, skill.AggregatedTags);
         }
 
         public static void Sacrifice(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, Skill skill)

@@ -76,7 +76,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 "shot",
                 new[] { "damage", "target", "weapon", "physic", "ranged", "direct" },
                 5,
-                2,
+                3,
                 0,
                 20,
                 new Targets()
@@ -237,7 +237,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 "mistShot",
                 new[] { "damage", "target", "weapon", "physic", "magic", "pure", "ranged", "direct" },
                 5,
-                2,
+                3,
                 0,
                 14,
                 new Targets()

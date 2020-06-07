@@ -119,7 +119,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
   },
   powerplace: {
     name: 'Place of power',
-    description: `Creates a place of power on the target position that increases strangth and willpower by 100%
+    description: `Creates a place of power on the target position that increases strangth and willpower by 200%
       of its default value. Works only on characters that stay on chosen position.`,
     action: {
       generateIssueDeclarations: (issuer, tile) => {
@@ -181,7 +181,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
   },
   bloodsphere: {
     name: 'Blood sphere',
-    description: 'Throws an infused with blood magic missle to the target that deals medium damage. Costs 5 health.',
+    description: 'Throws an infused with blood magic missle to the target that deals medium damage. Costs 10 health.',
     action: {
       generateIssueDeclarations: (issuer, tile) => {
         return throwIssueDeclaration(issuer.x, issuer.y, tile.x, tile.y, '*', {r: 255, g: 0, b: 0});
