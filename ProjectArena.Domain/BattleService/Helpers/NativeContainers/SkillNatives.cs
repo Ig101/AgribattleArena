@@ -206,7 +206,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
             nativeManager.AddSkillNative(
                 "empower",
                 new[] { "target", "buff", "magic", "pure" },
-                4,
+                8,
                 6,
                 4,
                 0.5f,
