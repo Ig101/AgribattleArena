@@ -213,7 +213,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 new Targets()
                 {
                     Allies = true,
-                    NotAllies = true
+                    NotAllies = true,
+                    Self = true
                 },
                 true,
                 new[] { "Empower" });
