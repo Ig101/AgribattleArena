@@ -5,6 +5,7 @@ import { SyncSpecEffect } from './synchronization/sync-spec-effect.model';
 import { SyncTile } from './synchronization/sync-tile.model';
 
 export interface Synchronizer {
+  id: string;
   version: number;
   actorId?: number;
   skillActionId?: number;

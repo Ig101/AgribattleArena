@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProjectArena.Domain.BattleService.Models;
@@ -13,11 +14,13 @@ namespace ProjectArena.Domain.BattleService
 
         void EngineTimeProcessing(double seconds);
 
-        IScene GetUserScene(string userId);
+        IScene GetUserScene(string userId, Guid sceneId);
 
         bool IsUserInBattle(string userId);
 
         SynchronizerDto GetUserSynchronizationInfo(string userId);
+
+        IEnumerable<SynchronizerDto> GetAllUserSynchronizationInfos(string userId);
 
         void Init();
     }

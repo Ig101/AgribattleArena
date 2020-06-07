@@ -199,6 +199,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
         public static SynchronizerDto MapSynchronizer(ISyncEventArgs syncEventArgs)
         {
             var synchronizer = MapSynchronizer(syncEventArgs.SyncInfo);
+            synchronizer.Id = syncEventArgs.Scene.Id;
             synchronizer.TargetX = syncEventArgs.TargetX;
             synchronizer.TargetY = syncEventArgs.TargetY;
             synchronizer.SkillActionId = syncEventArgs.SkillActionId;

@@ -63,7 +63,7 @@ namespace ProjectArena.Engine
 
         public TileObject TempTileObject { get; private set; }
 
-        public long Id { get; }
+        public Guid Id { get; }
 
         public int RandomCounter { get; private set; }
 
@@ -84,7 +84,7 @@ namespace ProjectArena.Engine
         }
 
         public Scene(
-            long id,
+            Guid id,
             IEnumerable<ForExternalUse.Generation.ObjectInterfaces.IPlayer> players,
             ForExternalUse.Generation.ISceneGenerator generator,
             ForExternalUse.INativeManager nativeManager,
@@ -108,7 +108,7 @@ namespace ProjectArena.Engine
             this.DeletedActors = new List<Actor>();
             this.DeletedDecorations = new List<ActiveDecoration>();
             this.DeletedEffects = new List<SpecEffect>();
-            tempGenerator.GenerateNewScene(this, players, unchecked(seed * (int)id));
+            tempGenerator.GenerateNewScene(this, players, unchecked(seed * id.GetHashCode()));
         }
 
         public float GetNextRandom()

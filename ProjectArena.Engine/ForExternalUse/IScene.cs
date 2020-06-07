@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ProjectArena.Engine.ForExternalUse.Synchronization;
 
 namespace ProjectArena.Engine.ForExternalUse
 {
     public interface IScene
     {
+        Guid Id { get; }
+
         float PassedTime { get; }
 
         string EnemyActorsPrefix { get; }

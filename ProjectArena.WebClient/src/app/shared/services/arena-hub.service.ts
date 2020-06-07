@@ -103,24 +103,24 @@ export class ArenaHubService {
       this.hubConnection.on(methodName, listener);
   }
 
-  orderAttack(actorId: number, targetX: number, targetY: number) {
+  orderAttack(sceneId: string, actorId: number, targetX: number, targetY: number) {
     this.hubConnection
-      .invoke('OrderAttackAsync', actorId, targetX, targetY).catch(err => this.catchHubError(err));
+      .invoke('OrderAttackAsync', sceneId, actorId, targetX, targetY).catch(err => this.catchHubError(err));
   }
 
-  orderMove(actorId: number, targetX: number, targetY: number) {
+  orderMove(sceneId: string, actorId: number, targetX: number, targetY: number) {
     this.hubConnection
-      .invoke('OrderMoveAsync', actorId, targetX, targetY).catch(err => this.catchHubError(err));
+      .invoke('OrderMoveAsync', sceneId, actorId, targetX, targetY).catch(err => this.catchHubError(err));
   }
 
-  orderCast(actorId: number, skillId: number, targetX: number, targetY: number) {
+  orderCast(sceneId: string, actorId: number, skillId: number, targetX: number, targetY: number) {
     this.hubConnection
-      .invoke('OrderCastAsync', actorId, skillId, targetX, targetY).catch(err => this.catchHubError(err));
+      .invoke('OrderCastAsync', sceneId, actorId, skillId, targetX, targetY).catch(err => this.catchHubError(err));
   }
 
-  orderWait(actorId: number) {
+  orderWait(sceneId: string, actorId: number) {
     this.hubConnection
-      .invoke('OrderWaitAsync', actorId).catch(err => this.catchHubError(err));
+      .invoke('OrderWaitAsync', sceneId, actorId).catch(err => this.catchHubError(err));
   }
 
   pickBattleSynchronizationAction(currentVersion: number) {

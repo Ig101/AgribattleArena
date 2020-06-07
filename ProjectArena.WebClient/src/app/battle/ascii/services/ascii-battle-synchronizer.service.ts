@@ -95,6 +95,7 @@ export class AsciiBattleSynchronizerService {
       undefined;
 
     this.battleStorageService.scene = {
+      id: synchronizer.id,
       actors,
       decorations,
       effects,

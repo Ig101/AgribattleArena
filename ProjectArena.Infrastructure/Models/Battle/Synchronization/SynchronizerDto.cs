@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 {
     public class SynchronizerDto
     {
+        public Guid Id { get; set; }
+
         public int Version { get; set; }
 
         public int? ActorId { get; set; }

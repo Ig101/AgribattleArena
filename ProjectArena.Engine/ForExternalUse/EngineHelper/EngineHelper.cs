@@ -76,7 +76,7 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
         }
 
         public static IScene CreateNewScene(
-            long id,
+            Guid id,
             IEnumerable<Generation.ObjectInterfaces.IPlayer> players,
             ISceneGenerator generator,
             INativeManager nativeManager,

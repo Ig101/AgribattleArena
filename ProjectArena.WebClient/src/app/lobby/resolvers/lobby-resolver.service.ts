@@ -36,17 +36,5 @@ export class LobbyResolverService implements Resolve<boolean> {
       return EMPTY;
     }
     return true;
-    /*if (this.arenaHubService.prepareForBattleNotifier.value) {
-      this.battleSnapshot = undefined;
-      return false;
-    }
-    return this.webCommunicationService.get<Synchronizer>('api/battle')
-      .pipe(map(result => {
-        if (!result.result) {
-          this.router.navigate(['auth']);
-        }
-        this.battleSnapshot = result.result;
-        return true;
-      }));*/
   }
 }

@@ -30,13 +30,11 @@ namespace ProjectArena.Domain.BattleService
         private readonly IList<IScene> _scenes;
         private readonly Random _random;
         private INativeManager _nativeManager;
-        private long _sceneEnumerator;
 
         public BattleService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
             _scenes = new List<IScene>();
-            _sceneEnumerator = 0;
             _random = new Random();
         }
 
@@ -185,12 +183,7 @@ namespace ProjectArena.Domain.BattleService
             var registryContext = _serviceProvider.GetRequiredService<RegistryContext>();
 
             var userIds = users.Select(x => x.UserId).ToList();
-            var tempSceneId = _sceneEnumerator;
-            _sceneEnumerator++;
-            if (_sceneEnumerator == long.MaxValue)
-            {
-                _sceneEnumerator = 0;
-            }
+            var tempSceneId = Guid.NewGuid();
 
             var players = new List<IPlayer>(users.Count());
 
@@ -259,28 +252,26 @@ namespace ProjectArena.Domain.BattleService
 
         public SynchronizerDto GetUserSynchronizationInfo(string userId)
         {
-            foreach (var scene in _scenes)
+            var scene = _scenes.FirstOrDefault(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null);
+            if (scene == null)
             {
-                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
-                {
-                    return BattleHelper.GetFullSynchronizationData(scene);
-                }
+                return null;
             }
 
-            return null;
+            return BattleHelper.GetFullSynchronizationData(scene);
         }
 
-        public IScene GetUserScene(string userId)
+        public IEnumerable<SynchronizerDto> GetAllUserSynchronizationInfos(string userId)
         {
-            foreach (var scene in _scenes)
-            {
-                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
-                {
-                    return scene;
-                }
-            }
+            return _scenes
+                .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
+                .Select(scene => BattleHelper.GetFullSynchronizationData(scene))
+                .ToList();
+        }
 
-            return null;
+        public IScene GetUserScene(string userId, Guid sceneId)
+        {
+            return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null);
         }
     }
 }

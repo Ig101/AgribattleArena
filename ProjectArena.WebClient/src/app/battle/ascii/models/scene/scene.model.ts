@@ -4,6 +4,7 @@ import { SpecEffect } from './spec-effect.model';
 import { Tile } from './tile.model';
 
 export interface Scene {
+  id: string;
   actors: Actor[];
   decorations: ActiveDecoration[];
   effects: SpecEffect[];

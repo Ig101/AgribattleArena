@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ namespace ProjectArena.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSynchronizationInfoAsync()
+        public async Task<IActionResult> GetSynchronizationInfoAsync(Guid sceneId)
         {
             var user = await Mediator.Send(new GetFullUserInfoByPrincipalQuery()
             {

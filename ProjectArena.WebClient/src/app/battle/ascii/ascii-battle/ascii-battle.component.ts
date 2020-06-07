@@ -209,7 +209,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           actorId: this.battleStorageService.currentActor.id,
           action: BattleSynchronizationActionEnum.Wait
         };
-        this.arenaHub.orderWait(this.battleStorageService.currentActor.id);
+        this.arenaHub.orderWait(this.battleStorageService.scene.id, this.battleStorageService.currentActor.id);
         this.battleAnimationsService
           .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Wait, this.battleStorageService.currentActor);
       }],
@@ -380,6 +380,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             // TODO cast spells
             if (this.currentSkillId) {
               this.arenaHub.orderCast(
+                this.battleStorageService.scene.id,
                 this.battleStorageService.currentActor.id,
                 this.currentSkillId,
                 currentActionSquare.x,
@@ -745,7 +746,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           (sX === 1 && sY === 0 || sX === 0 && sY === 1) && this.battleStorageService.currentActor.canMove &&
           !tile.unbearable && !tile.actor && !tile.decoration &&
           Math.abs(tile.height - initialTile.height) < 10) {
-            this.arenaHub.orderMove(newAction.actorId, newAction.x, newAction.y);
+            this.arenaHub.orderMove(this.battleStorageService.scene.id, newAction.actorId, newAction.x, newAction.y);
             this.battleAnimationsService
               .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
               newAction.x, newAction.y);
@@ -760,7 +761,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           checkSkillTargets(tile, this.battleStorageService.currentActor, skill.availableTargets) &&
           (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
           (tile.actor || tile.decoration) && tile.actor !== this.battleStorageService.currentActor) {
-          this.arenaHub.orderAttack(newAction.actorId, newAction.x, newAction.y);
+          this.arenaHub.orderAttack(this.battleStorageService.scene.id, newAction.actorId, newAction.x, newAction.y);
           this.battleAnimationsService
             .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Attack, this.battleStorageService.currentActor,
             newAction.x, newAction.y);

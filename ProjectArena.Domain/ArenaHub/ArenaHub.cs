@@ -45,10 +45,10 @@ namespace ProjectArena.Domain.ArenaHub
         await this.Clients.User(userId).SendAsync("BattleSynchronizationError");
     }
 
-    public async Task OrderAttackAsync(int actorId, int targetX, int targetY)
+    public async Task OrderAttackAsync(Guid sceneId, int actorId, int targetX, int targetY)
     {
         var userId = Context.UserIdentifier;
-        var scene = _battleService.GetUserScene(userId);
+        var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
         if (scene.GetPlayerActors(userId).Contains(actorId))
         {
@@ -61,10 +61,10 @@ namespace ProjectArena.Domain.ArenaHub
         }
     }
 
-    public async Task OrderMoveAsync(int actorId, int targetX, int targetY)
+    public async Task OrderMoveAsync(Guid sceneId, int actorId, int targetX, int targetY)
     {
         var userId = Context.UserIdentifier;
-        var scene = _battleService.GetUserScene(userId);
+        var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
         if (scene.GetPlayerActors(userId).Contains(actorId))
         {
@@ -77,10 +77,10 @@ namespace ProjectArena.Domain.ArenaHub
         }
     }
 
-    public async Task OrderCastAsync(int actorId, int skillId, int targetX, int targetY)
+    public async Task OrderCastAsync(Guid sceneId, int actorId, int skillId, int targetX, int targetY)
     {
         var userId = Context.UserIdentifier;
-        var scene = _battleService.GetUserScene(userId);
+        var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
         if (scene.GetPlayerActors(userId).Contains(actorId))
         {
@@ -93,10 +93,10 @@ namespace ProjectArena.Domain.ArenaHub
         }
     }
 
-    public async Task OrderWaitAsync(int actorId)
+    public async Task OrderWaitAsync(Guid sceneId, int actorId)
     {
         var userId = Context.UserIdentifier;
-        var scene = _battleService.GetUserScene(userId);
+        var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
         if (scene.GetPlayerActors(userId).Contains(actorId))
         {
