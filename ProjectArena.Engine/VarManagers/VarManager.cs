@@ -18,6 +18,8 @@
 
         public float SpeedMod { get; }
 
+        public float MinimumInitiative { get; }
+
         public VarManager(
             float turnTimeLimit,
             float turnTimeLimitAfterSkip,
@@ -26,7 +28,8 @@
             int constitutionMod,
             float willpowerMod,
             float strengthMod,
-            float speedMod)
+            float speedMod,
+            float minimumInitiative)
         {
             this.TurnTimeLimit = turnTimeLimit;
             this.TurnTimeLimitAfterSkip = turnTimeLimitAfterSkip;
@@ -36,6 +39,7 @@
             this.WillpowerMod = willpowerMod;
             this.StrengthMod = strengthMod;
             this.SpeedMod = speedMod;
+            this.MinimumInitiative = minimumInitiative;
         }
     }
 }

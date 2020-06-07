@@ -17,5 +17,7 @@
         float StrengthMod { get; }
 
         float SpeedMod { get; }
+
+        float MinimumInitiative { get; }
     }
 }

@@ -58,7 +58,7 @@ namespace ProjectArena.Engine.Objects
 
         public float AttackPower => (Strength * varManager.StrengthMod) + BuffManager.AttackPower;
 
-        public float Initiative => (Speed * varManager.SpeedMod) + BuffManager.Initiative;
+        public float Initiative => varManager.MinimumInitiative + (Speed * varManager.SpeedMod) + BuffManager.Initiative;
 
         public List<Skill> Skills { get; }
 

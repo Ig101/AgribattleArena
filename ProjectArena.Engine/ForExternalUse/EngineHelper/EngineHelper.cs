@@ -57,7 +57,8 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
             int constitutionMod,
             float willpowerMod,
             float strengthMod,
-            float speedMod)
+            float speedMod,
+            float minimumInitiative)
         {
             return new VarManagers.VarManager(
                 turnTimeLimit,
@@ -67,7 +68,8 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
                 constitutionMod,
                 willpowerMod,
                 strengthMod,
-                speedMod);
+                speedMod,
+                minimumInitiative);
         }
 
         public static INativeManager CreateNativeManager()
