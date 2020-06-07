@@ -14,14 +14,32 @@
     }
   }
   .interface {
-    min-width: 350px;
-    max-width: 350px;
-    width: 350px;
-    box-sizing: border-box;
-    background-color: #000414;
+    position: fixed;
+    left: calc(100% - 374px);
+    width: 374px;
+    height: 100%;
+    top: 0px;
+    display: flex;
+    flex-direction: column;
+    .window {
+      margin: 12px;
+    }
+    .name-window {
+      padding: 12px;
+    }
+    .nowrap {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    app-menu-icon {
+      align-self: center;
+      margin-right: 6px;
+    }
   }
   app-initiative-block {
-    margin: 5px;
+    margin: 1px;
+    margin-bottom: 5px;
   }
   .control-block {
     display: flex;

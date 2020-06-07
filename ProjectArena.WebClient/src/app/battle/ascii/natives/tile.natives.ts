@@ -18,10 +18,10 @@ export const tileNatives: { [id: string]: TileNative } = {
     name: 'Place of power',
     description: 'Increases strength and willpower of standing character.',
     visualization: {
-      char: '_',
+      char: 'o',
       color: { r: 155, g: 155, b: 255, a: 1 }
     },
-    backgroundColor: { r: 10, g: 10, b: 20 },
+    backgroundColor: { r: 20, g: 20, b: 60 },
     bright: false,
     action: undefined,
     onActionEffectAnimation: undefined,

@@ -212,6 +212,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
         public static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer, IScene scene)
         {
             var synchronizer = MapSynchronizer(oldSynchronizer);
+            synchronizer.Id = scene.Id;
             synchronizer.Version = scene.Version;
             synchronizer.TurnTime = scene.RemainedTurnTime;
             return synchronizer;

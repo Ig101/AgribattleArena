@@ -42,6 +42,8 @@ import { Skill } from '../models/scene/skill.model';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { DecorationModalComponent } from '../modals/decoration-modal/decoration-modal.component';
 import { checkMilliness, checkSkillTargets } from '../helpers/scene-actions.helper';
+import { Random } from 'src/app/shared/random/random';
+import { getRandomBiom } from 'src/app/shared/bioms/biom.helper';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -62,7 +64,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private tileWidthInternal = 0;
   private tileHeightInternal = 30;
-  readonly defaultWidth = 1180;
+  readonly defaultWidth = 1530;
   readonly defaultHeight = 1080;
   readonly defaultAspectRatio = this.defaultWidth / this.defaultHeight;
 
@@ -187,6 +189,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     return ((currentActionSquare?.remainedPoints + 1) || (this.battleStorageService.currentActor?.actionPoints + 1)) - 1;
   }
 
+  get interfaceShift() {
+    return 374 / this.zoom;
+  }
+
+  get userName() {
+    return this.userService.user.name;
+  }
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private battleResolver: BattleResolverService,
@@ -197,7 +207,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     private userService: UserService,
     private battleAnimationsService: AsciiBattleAnimationsService,
     private loadingService: LoadingService,
-    private modalService: ModalService
+    private modalService: ModalService,
   ) {
     this.endTurn = {
       hotKey: ' ',
@@ -322,6 +332,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.blocked) {
       this.mouseState.buttonsInfo[event.button] = {pressed: true, timeStamp: event.timeStamp};
     }
+  }
+
+  openSettingsl() {
+
   }
 
   openModalFromPosition(x: number, y: number) {
@@ -506,7 +520,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     const leftKey = this.mouseState.buttonsInfo[0];
     const rightKey = this.mouseState.buttonsInfo[2];
     if (!rightKey.pressed && !leftKey.pressed) {
-      const cameraLeft = this.battleStorageService.cameraX - this.canvasWidth / 2 / this.tileWidth;
+      const cameraLeft = this.battleStorageService.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight;
       const newX = x / this.zoom / this.tileWidth + cameraLeft;
       const newY = y / this.zoom / this.tileHeight + cameraTop;
@@ -552,6 +566,25 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     newColor.b += mainColor.b;
     newColor.a += mainColor.a;
     return newColor;
+  }
+
+  private drawDummyPoint(
+    char: string,
+    color: Color,
+    backgroundColor: Color,
+    x: number, y: number,
+    cameraLeft: number,
+    cameraTop: number) {
+    const dim = 0.5;
+    const canvasX = (x - cameraLeft) * this.tileWidth;
+    const canvasY = (y - cameraTop) * this.tileHeight;
+    const symbolY = canvasY + this.tileHeight * 0.75;
+    if (backgroundColor) {
+      this.canvasContext.fillStyle = `rgb(${backgroundColor.r * dim}, ${backgroundColor.g * dim}, ${backgroundColor.b * dim})`;
+      this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
+    }
+    this.canvasContext.fillStyle = `rgba(${color.r * dim}, ${color.g * dim}, ${color.b * dim}, ${color.a})`;
+    this.canvasContext.fillText(char, canvasX, symbolY);
   }
 
   private drawPoint(scene: Scene, x: number, y: number, cameraLeft: number, cameraTop: number, drawChar: Visualization) {
@@ -663,42 +696,52 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.changed = false;
     const scene = this.battleStorageService.scene;
     if (scene) {
-      const cameraLeft = this.battleStorageService.cameraX - this.canvasWidth / 2 / this.tileWidth;
+      const sceneRandom = new Random(this.battleStorageService.scene.hash);
+      const cameraLeft = this.battleStorageService.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight;
       this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvasContext.font = `${this.tileHeight}px PT Mono`;
       this.canvasContext.textAlign = 'left';
-      const left = Math.max(0, Math.floor(cameraLeft));
-      const right = Math.min(scene.width - 1, Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)));
-      const top = Math.max(0, Math.floor(cameraTop));
-      const bottom = Math.min(scene.height - 1, Math.ceil(cameraTop + this.canvasHeight / (this.tileHeight)));
-
+      const left = Math.floor(cameraLeft) - 1;
+      const right = Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)) + 1;
+      const top = Math.floor(cameraTop) - 1;
+      const bottom = Math.ceil(cameraTop + this.canvasHeight / (this.tileHeight)) + 1;
       const mouseX = Math.floor(this.mouseState.x);
       const mouseY = Math.floor(this.mouseState.y);
       const currentActionSquare = this.canAct ? this.battleStorageService.availableActionSquares
         ?.find(s => s.x === mouseX && s.y === mouseY && s.type) : undefined;
-      for (let x = left; x <= right; x++) {
-        for (let y = top; y <= bottom; y++ ) {
-          let drawChar;
-          if (currentActionSquare?.x === x && currentActionSquare?.y === y) {
-            drawChar = {
-              char: 'x',
-              color: currentActionSquare.type === ActionSquareTypeEnum.Act ? {r: 255, g: 0, b: 0, a: 1} : {r: 255, g: 255, b: 0, a: 1}
-            };
-          } else if (currentActionSquare?.type === ActionSquareTypeEnum.Act && currentActionSquare.parentSquares.length > 0 &&
-            currentActionSquare?.parentSquares[0].x === x && currentActionSquare?.parentSquares[0].y === y &&
-            !currentActionSquare?.parentSquares[0].isActor) {
-            drawChar = {
-              char: 'x',
-              color: {r: 255, g: 255, b: 0, a: 1}
-            };
-          } else if (currentActionSquare?.parentSquares.some(s => s.x === x && s.y === y && !s.isActor)) {
-            drawChar = {
-              char: '.',
-              color: {r: 255, g: 255, b: 0, a: 1}
-            };
+      for (let x = -40; x <= 80; x++) {
+        for (let y = -20; y <= 60; y++) {
+          if (x >= left && y >= top && x <= right && y <= bottom) {
+            if (x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
+              let drawChar;
+              if (currentActionSquare?.x === x && currentActionSquare?.y === y) {
+                drawChar = {
+                  char: 'x',
+                  color: currentActionSquare.type === ActionSquareTypeEnum.Act ? {r: 255, g: 0, b: 0, a: 1} : {r: 255, g: 255, b: 0, a: 1}
+                };
+              } else if (currentActionSquare?.type === ActionSquareTypeEnum.Act && currentActionSquare.parentSquares.length > 0 &&
+                currentActionSquare?.parentSquares[0].x === x && currentActionSquare?.parentSquares[0].y === y &&
+                !currentActionSquare?.parentSquares[0].isActor) {
+                drawChar = {
+                  char: 'x',
+                  color: {r: 255, g: 255, b: 0, a: 1}
+                };
+              } else if (currentActionSquare?.parentSquares.some(s => s.x === x && s.y === y && !s.isActor)) {
+                drawChar = {
+                  char: '.',
+                  color: {r: 255, g: 255, b: 0, a: 1}
+                };
+              }
+              sceneRandom.next();
+              this.drawPoint(scene, x, y, cameraLeft, cameraTop, drawChar);
+            } else {
+              const biom = getRandomBiom(sceneRandom, this.battleStorageService.scene.biom);
+              this.drawDummyPoint(biom.char, biom.color, biom.backgroundColor, x, y, cameraLeft, cameraTop);
+            }
+          } else {
+            sceneRandom.next();
           }
-          this.drawPoint(scene, x, y, cameraLeft, cameraTop, drawChar);
         }
       }
       if (this.battleStorageService.availableActionSquares?.length > 0) {

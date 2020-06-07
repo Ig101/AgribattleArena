@@ -115,6 +115,10 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.queueService.exiting;
   }
 
+  get interfaceShift() {
+    return 374 / this.zoom;
+  }
+
   constructor(
     private loadingService: LoadingService,
     private lobbyStorageService: AsciiLobbyStorageService,
@@ -288,7 +292,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   private recalculateMouseMove(x: number, y: number, timeStamp?: number) {
     const leftKey = this.mouseState.buttonsInfo[0];
     const rightKey = this.mouseState.buttonsInfo[2];
-    const cameraLeft = this.campWidth / 2 - (this.canvasWidth - 374) / 2 / this.tileWidth + 0.5;
+    const cameraLeft = this.campWidth / 2 - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
     const cameraTop = this.campHeight / 2 - this.canvasHeight / 2 / this.tileHeight + 0.5;
     const newX = x / this.zoom / this.tileWidth + cameraLeft;
     const newY = y / this.zoom / this.tileHeight + cameraTop;
@@ -379,7 +383,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     this.changed = false;
     const userRandom = new Random(this.lobbyStorageService.userHash + (this.queueService.inQueue ? this.queueService.queueSeed : 0));
     if (this.tiles) {
-      const cameraLeft = this.campWidth / 2 - (this.canvasWidth - 374) / 2 / this.tileWidth + 0.5;
+      const cameraLeft = this.campWidth / 2 - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.campHeight / 2 - this.canvasHeight / 2 / this.tileHeight + 0.8;
       this.canvasContext.font = `${this.tileHeight}px PT Mono`;
       this.canvasContext.textAlign = 'left';

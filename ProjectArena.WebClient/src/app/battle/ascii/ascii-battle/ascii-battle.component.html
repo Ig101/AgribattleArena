@@ -1,5 +1,5 @@
 <div class="battle">
-  <canvas #battleCanvas width="1570" height="1080"
+  <canvas #battleCanvas
     (window:resize)="onResize()" (window:keydown)="onKeyDown($event)"
     (window:keyup)="onKeyUp($event)" (window:mousedown)="onMouseDown($event)"
     (window:mouseup)="onMouseUp($event)" (window:mousemove)="onMouseMove($event)">
@@ -7,38 +7,46 @@
   </canvas>
 </div>
 <div class="interface">
-  <app-initiative-block (changeSelected)="onPositionSelect($event?.x, $event?.y)" (rightClick)="openModalFromPosition($event?.x, $event?.y)"></app-initiative-block>
-  <div class="control-block" *ngIf="isMyTurn; else anotherTurn">
-    <div class="casting-block">
-      <app-action-points-block
-        [actionPointsMaxCount]="maxActionPoints"
-        [currentActionPointsCount]="currentActionPoints"
-        [actionPointsAfterSpendCount]="actionPointsAfterSpend"
-        [actorColor]="currentActorColor"></app-action-points-block>
-      <div class="skills">
-        <app-hotkeyed-button (mouseDown)="resetButtonsPressedState()" (mouseUp)="changed = true;" *ngFor="let item of skillList" [pressedKey]="pressedKey" [ngClass]="{
-          active: item.pressed && item.smartValue === 0,
-          toggled: item.smartValue === 1,
-          disabled: !canAct || item.disabled,
-          'active-toggled': item.pressed && item.smartValue === 1
-        }" [disabled]="!canAct" [smartAction]="item" [disabled]="!canAct || item.disabled" (rightClick)="openSkillModal($event)">
-          <div class="text-font-inactive">{{item.smartValue === 0 ? item.hotKey : 'X'}}) {{item.title}}</div>
-          <div class="article-font-inactive">&nbsp;&nbsp;&nbsp;cost: {{item.smartObject.cost}}, 
-            {{item.smartObject.preparationTime > 0 ? item.smartObject.preparationTime + ' turn' + (item.smartObject.preparationTime > 1 ? 's left' : ' left') : 'ready'}}</div>
-        </app-hotkeyed-button>
-      </div>
+  <div class="modal window name-window">
+    <div class="row nowrap">
+      <app-menu-icon (click)="openSettings()"></app-menu-icon>
+      <div class="title-font-inactive">{{userName}}</div>
     </div>
-    <app-hotkeyed-button (mouseDown)="resetButtonsPressedState()" (mouseUp)="changed = true;" [smartAction]="endTurn" [pressedKey]="pressedKey" class="end-turn" 
-      [style.background]="endTurn.pressed ?
-        'linear-gradient(to right, #aa0 ' + (endTurn.smartValue * 100) + '%, #ff4 ' + (endTurn.smartValue * 100) + '%)' :
-        '#fff'">
-      <div class="text-font-inactive medium">-------</div>
-      <div class="button-content">
-        <div class="text-font-inactive medium">{{endTurn.title}}</div>
-        <div class="article-font-inactive small">(hold space)</div>
-      </div>
-      <div class="text-font-inactive medium">-------</div>
-    </app-hotkeyed-button>
   </div>
-  <ng-template #anotherTurn><div class="non-control-block title-font-inactive">Enemy turn</div></ng-template>
+  <div class="modal window">
+    <app-initiative-block (changeSelected)="onPositionSelect($event?.x, $event?.y)" (rightClick)="openModalFromPosition($event?.x, $event?.y)"></app-initiative-block>
+    <div class="control-block" *ngIf="isMyTurn; else anotherTurn">
+      <div class="casting-block">
+        <app-action-points-block
+          [actionPointsMaxCount]="maxActionPoints"
+          [currentActionPointsCount]="currentActionPoints"
+          [actionPointsAfterSpendCount]="actionPointsAfterSpend"
+          [actorColor]="currentActorColor"></app-action-points-block>
+        <div class="skills">
+          <app-hotkeyed-button (mouseDown)="resetButtonsPressedState()" (mouseUp)="changed = true;" *ngFor="let item of skillList" [pressedKey]="pressedKey" [ngClass]="{
+            active: item.pressed && item.smartValue === 0,
+            toggled: item.smartValue === 1,
+            disabled: !canAct || item.disabled,
+            'active-toggled': item.pressed && item.smartValue === 1
+          }" [disabled]="!canAct" [smartAction]="item" [disabled]="!canAct || item.disabled" (rightClick)="openSkillModal($event)">
+            <div class="text-font-inactive">{{item.smartValue === 0 ? item.hotKey : 'X'}}) {{item.title}}</div>
+            <div class="article-font-inactive">&nbsp;&nbsp;&nbsp;cost: {{item.smartObject.cost}}, 
+              {{item.smartObject.preparationTime > 0 ? item.smartObject.preparationTime + ' turn' + (item.smartObject.preparationTime > 1 ? 's left' : ' left') : 'ready'}}</div>
+          </app-hotkeyed-button>
+        </div>
+      </div>
+      <app-hotkeyed-button (mouseDown)="resetButtonsPressedState()" (mouseUp)="changed = true;" [smartAction]="endTurn" [pressedKey]="pressedKey" class="end-turn" 
+        [style.background]="endTurn.pressed ?
+          'linear-gradient(to right, #aa0 ' + (endTurn.smartValue * 100) + '%, #ff4 ' + (endTurn.smartValue * 100) + '%)' :
+          '#fff'">
+        <div class="text-font-inactive medium">-------</div>
+        <div class="button-content">
+          <div class="text-font-inactive medium">{{endTurn.title}}</div>
+          <div class="article-font-inactive small">(hold space)</div>
+        </div>
+        <div class="text-font-inactive medium">-------</div>
+      </app-hotkeyed-button>
+    </div>
+    <ng-template #anotherTurn><div class="non-control-block title-font-inactive">Enemy turn</div></ng-template>
+  </div>
 </div>
