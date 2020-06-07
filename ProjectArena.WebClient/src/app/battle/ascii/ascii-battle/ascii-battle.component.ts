@@ -40,10 +40,12 @@ import { ActorModalComponent } from '../modals/actor-modal/actor-modal.component
 import { SkillModalComponent } from '../modals/skill-modal/skill-modal.component';
 import { Skill } from '../models/scene/skill.model';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
-import { DecorationModalComponent } from '../modals/decoration-modal/decoration-modal.component';
 import { checkMilliness, checkSkillTargets } from '../helpers/scene-actions.helper';
 import { Random } from 'src/app/shared/random/random';
 import { getRandomBiom } from 'src/app/shared/bioms/biom.helper';
+import { SceneObjectModalComponent } from '../modals/scene-object-modal/scene-object-modal.component';
+import { isObject } from 'util';
+import { ModalObject } from '../models/modals/modal-object.model';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -78,7 +80,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   selectedTile: { x: number, y: number, duration: number, forced: boolean };
-  selectedAlwaysTile: { x: number, y: number };
+  selectedAlwaysTile: { x: number, y: number, id: number };
 
   tickingFrequency = 2;
   tickState = 0;
@@ -334,34 +336,102 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  openSettingsl() {
+  openSettings() {
 
+  }
+
+  private onPositionModalClose() {
+    this.battleStorageService.openedModal.onClose.subscribe((object: ModalObject) => {
+      if (!object) {
+        this.blocked = false;
+        this.selectedAlwaysTile = undefined;
+        this.battleStorageService.openedModal = undefined;
+        return;
+      }
+      this.selectedAlwaysTile.id = object.id;
+      if (object.actor) {
+        this.battleStorageService.openedModal = this.modalService.openModal(
+          ActorModalComponent,
+          object);
+      } else {
+        this.battleStorageService.openedModal = this.modalService.openModal(
+          SceneObjectModalComponent,
+          object);
+      }
+      this.onPositionModalClose();
+    });
   }
 
   openModalFromPosition(x: number, y: number) {
     if (x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
       const tile = this.battleStorageService.scene.tiles[x][y];
+      this.blocked = true;
+      const modalObjects: ModalObject[] = [];
       if (tile.actor) {
-        this.blocked = true;
-        this.selectedAlwaysTile = {x, y};
-        this.battleStorageService.openedModal = this.modalService.openModal(ActorModalComponent, tile.actor);
-        this.battleStorageService.openedModal.onClose.subscribe(() => {
-          this.blocked = false;
-          this.selectedAlwaysTile = undefined;
-          this.battleStorageService.openedModal = undefined;
+        modalObjects.push({
+          id: tile.actor.id,
+          char: tile.actor.visualization.char,
+          color:  `rgba(${tile.actor.visualization.color.r},${tile.actor.visualization.color.g},
+            ${tile.actor.visualization.color.b},${tile.actor.visualization.color.a})`,
+          name: tile.actor.name,
+          description: tile.actor.description,
+          health: { current: tile.actor.health, max: tile.actor.maxHealth },
+          actor: tile.actor,
+          anotherObjects: undefined
+        });
+      } else if (tile.decoration) {
+        modalObjects.push({
+          id: tile.decoration.id,
+          char: tile.decoration.visualization.char,
+          color: `rgba(${tile.decoration.visualization.color.r},${tile.decoration.visualization.color.g},
+            ${tile.decoration.visualization.color.b},${tile.decoration.visualization.color.a})`,
+          name: tile.decoration.name,
+          description: tile.decoration.description,
+          health: { current: tile.decoration.health, max: tile.decoration.maxHealth },
+          anotherObjects: undefined
         });
       }
-      if (tile.decoration) {
-        this.blocked = true;
-        const oldTile = this.selectedAlwaysTile;
-        this.selectedAlwaysTile = {x, y};
-        this.battleStorageService.openedModal = this.modalService.openModal(DecorationModalComponent, tile.decoration);
-        this.battleStorageService.openedModal.onClose.subscribe(() => {
-          this.blocked = false;
-          this.selectedAlwaysTile = undefined;
-          this.battleStorageService.openedModal = undefined;
-        });
+      if (tile.specEffects.length > 0) {
+        modalObjects.push(...tile.specEffects.map(e => {
+          return {
+            id: e.id,
+            char: e.visualization.char,
+            color: `rgba(${e.visualization.color.r},${e.visualization.color.g},
+              ${e.visualization.color.b},${e.visualization.color.a})`,
+            name: e.name,
+            description: e.description,
+            health: undefined,
+            anotherObjects: undefined
+          };
+        }));
+        if (modalObjects.length > 10) {
+          modalObjects.splice(10);
+        }
       }
+      modalObjects.push({
+        id: undefined,
+        char: tile.visualization.char,
+        color: `rgba(${tile.visualization.color.r},${tile.visualization.color.g},
+          ${tile.visualization.color.b},${tile.visualization.color.a})`,
+        name: tile.name,
+        description: tile.description,
+        health: undefined,
+        anotherObjects: undefined
+      });
+      for (const modal of modalObjects) {
+        modal.anotherObjects = modalObjects.filter(o => o !== modal);
+      }
+      this.selectedAlwaysTile = {x, y, id: modalObjects[0].id};
+      if (modalObjects[0].actor) {
+        this.battleStorageService.openedModal = this.modalService.openModal(
+          ActorModalComponent,
+          modalObjects[0]);
+      } else {
+        this.battleStorageService.openedModal = this.modalService.openModal(
+          SceneObjectModalComponent,
+          modalObjects[0]);
+      }
+      this.onPositionModalClose();
     }
   }
 
@@ -598,15 +668,22 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         this.canvasContext.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
         this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
       }
-      const selected = (this.selectedTile && this.selectedTile.duration > 500 && this.selectedTile.x === x && this.selectedTile.y === y) ||
-      (this.selectedAlwaysTile && this.selectedAlwaysTile.x === x && this.selectedAlwaysTile.y === y);
+      const selectedAlways = (this.selectedAlwaysTile && this.selectedAlwaysTile.x === x && this.selectedAlwaysTile.y === y);
+      const selected = selectedAlways ||
+        (this.selectedTile && this.selectedTile.duration > 500 && this.selectedTile.x === x && this.selectedTile.y === y);
       const replacement = this.battleStorageService.currentAnimations ? this.battleStorageService.currentAnimations[x][y] : undefined;
       if (drawChar) {
         const color = brightImpact(tile.bright, drawChar.color);
         this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
         this.canvasContext.fillText(drawChar.char, canvasX, symbolY);
       } else
-      if ((tile.actor || tile.decoration) && ((tile.specEffects.length === 0 && !selected) || Math.floor(this.tickState) % 2 === 1)) {
+      if ((tile.actor || tile.decoration) &&
+        ((tile.specEffects.length === 0 && !selected) || Math.floor(this.tickState) % 2 === 1) &&
+        (!selectedAlways ||
+          tile.actor?.id === this.selectedAlwaysTile.id ||
+          tile.decoration?.id === this.selectedAlwaysTile.id ||
+          !this.selectedAlwaysTile.id)
+      ) {
         if (tile.actor) {
           let color = heightImpact(tile.actor.z, tile.actor === this.battleStorageService.currentActor &&
             this.battleStorageService.currentActor.owner?.id === this.userService.user.id ?
@@ -621,16 +698,21 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
           this.canvasContext.fillText(replacement?.char ? replacement.char : tile.decoration.visualization.char, canvasX, symbolY);
         }
-      } else if (tile.specEffects.length > 0 && !selected) {
-        const firstEffect = tile.specEffects[0];
-        let color = heightImpact(firstEffect.z, firstEffect.visualization.color);
+      } else if (tile.specEffects.length > 0 &&
+        (!selected ||
+        (selectedAlways &&
+          tile.specEffects.some(e => e.id === this.selectedAlwaysTile.id) && Math.floor(this.tickState) % 2 === 1)
+        )
+      ) {
+        const effectForDraw = selectedAlways ?  tile.specEffects.find(e => e.id === this.selectedAlwaysTile.id) : tile.specEffects[0];
+        let color = heightImpact(effectForDraw.z, effectForDraw.visualization.color);
         color =  brightImpact(tile.bright, replacement?.workingOnSpecEffects ?
-          this.mixColorWithReplacement(color, replacement, firstEffect.z) :
+          this.mixColorWithReplacement(color, replacement, effectForDraw.z) :
           color);
         this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
         this.canvasContext.fillText( replacement?.workingOnSpecEffects ?
           replacement.char :
-          firstEffect.visualization.char, canvasX, symbolY);
+          effectForDraw.visualization.char, canvasX, symbolY);
       } else {
         const color =  replacement?.workingOnSpecEffects && replacement?.char ?
           brightImpact(tile.bright, replacement.color) :

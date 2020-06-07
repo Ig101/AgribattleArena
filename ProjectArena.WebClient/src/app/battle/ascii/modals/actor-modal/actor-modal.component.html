@@ -25,5 +25,6 @@
       </div>
     </div>
   </div>
+  <app-modal-tabs-component *ngIf="tabs.length > 0" [modalObjects]="tabs" (chooseItem)="changeTab($event)"></app-modal-tabs-component>
 </div>
 <div class="overlay-filler"></div>

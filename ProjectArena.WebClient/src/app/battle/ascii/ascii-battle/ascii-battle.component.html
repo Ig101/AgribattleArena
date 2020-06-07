@@ -39,12 +39,12 @@
         [style.background]="endTurn.pressed ?
           'linear-gradient(to right, #aa0 ' + (endTurn.smartValue * 100) + '%, #ff4 ' + (endTurn.smartValue * 100) + '%)' :
           '#fff'">
-        <div class="text-font-inactive medium">-------</div>
+        <div class="text-font-inactive medium">------</div>
         <div class="button-content">
           <div class="text-font-inactive medium">{{endTurn.title}}</div>
           <div class="article-font-inactive small">(hold space)</div>
         </div>
-        <div class="text-font-inactive medium">-------</div>
+        <div class="text-font-inactive medium">------</div>
       </app-hotkeyed-button>
     </div>
     <ng-template #anotherTurn><div class="non-control-block title-font-inactive">Enemy turn</div></ng-template>

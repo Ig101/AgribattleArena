@@ -1,0 +1,18 @@
+<div class="overlay-container">
+  <div class="modal modal-size">
+    <div class="title">
+      <div class="decoration-icon title-font-inactive" [style.color]="color" [style.border-color]="color">
+        <div class="health" *ngIf="health">{{health.current}}/{{health.max}}</div>
+        {{char}}
+      </div>
+      <div class="decoration-info-container">
+        <div class="title-font-inactive decoration-name">{{name}}</div>
+      </div>
+    </div>
+    <div class="description text-font-inactive">
+      {{description}}
+    </div>
+  </div>
+  <app-modal-tabs-component *ngIf="tabs.length > 0" [modalObjects]="tabs" (chooseItem)="changeTab($event)"></app-modal-tabs-component>
+</div>
+<div class="overlay-filler"></div>

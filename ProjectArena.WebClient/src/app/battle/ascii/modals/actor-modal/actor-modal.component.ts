@@ -9,16 +9,17 @@ import { Actor } from '../../models/scene/actor.model';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { Observable, Subject } from 'rxjs';
 import { Color } from 'src/app/shared/models/color.model';
+import { ModalObject } from '../../models/modals/modal-object.model';
 
 @Component({
   selector: 'app-actor-modal',
   templateUrl: './actor-modal.component.html',
   styleUrls: ['./actor-modal.component.scss']
 })
-export class ActorModalComponent implements IModal<any>, OnDestroy {
+export class ActorModalComponent implements IModal<ModalObject>, OnDestroy {
 
-  onClose = new Subject<any>();
-  onCancel = new Subject<any>();
+  onClose = new Subject<ModalObject>();
+  onCancel = new Subject<ModalObject>();
 
   actorChar: string;
   actorColor: string;
@@ -26,20 +27,20 @@ export class ActorModalComponent implements IModal<any>, OnDestroy {
   actorHealth: number;
   actorMaxHealth: number;
   actorDescription: string;
+  tabs: ModalObject[];
   buffs: {char: string, color: string, description: string, duration: number}[];
 
   constructor(
-    @Inject(MODAL_DATA) data: Actor,
+    @Inject(MODAL_DATA) data: ModalObject,
     private overlay: OverlayRef
   ) {
-    this.actorChar = data.defaultVisualization.char;
-    this.actorColor = `rgba(${data.defaultVisualization.color.r},${data.defaultVisualization.color.g},
-      ${data.defaultVisualization.color.b},${data.defaultVisualization.color.a})`;
+    this.actorChar = data.char;
+    this.actorColor = data.color;
     this.actorName = data.name;
     this.actorDescription = data.description;
-    this.actorHealth = Math.ceil(data.health);
-    this.actorMaxHealth = data.maxHealth;
-    this.buffs = data.buffs.map(buff => {
+    this.actorHealth = Math.ceil(data.health.current);
+    this.actorMaxHealth = data.health.max;
+    this.buffs = data.actor.buffs.map(buff => {
       return {
         char: buff.char,
         color: `rgba(${buff.color.r},${buff.color.g},
@@ -48,6 +49,7 @@ export class ActorModalComponent implements IModal<any>, OnDestroy {
         duration: Math.round(buff.duration * 100) / 100
       };
     });
+    this.tabs = data.anotherObjects;
   }
 
   ngOnDestroy() {
@@ -73,8 +75,14 @@ export class ActorModalComponent implements IModal<any>, OnDestroy {
     this.close();
   }
 
+  changeTab(item: ModalObject) {
+    this.onClose.next(item);
+    this.overlay.detach();
+    this.overlay.dispose();
+  }
+
   close() {
-    this.onClose.next();
+    this.onClose.next(undefined);
     this.overlay.detach();
     this.overlay.dispose();
   }

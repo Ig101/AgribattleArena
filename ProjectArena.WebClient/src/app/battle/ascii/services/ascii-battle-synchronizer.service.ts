@@ -152,7 +152,7 @@ export class AsciiBattleSynchronizerService {
       const actor = this.battleStorageService.scene.actors.find(x => x.id === syncActor.id);
       if (!actor) {
         owner = this.battleStorageService.players.find(x => x.id === syncActor.ownerId);
-        const character = actor.externalId ? this.userService.user.roster.find(x => x.id === actor.externalId) : undefined;
+        const character = this.userService.user.roster.find(x => x.id === syncActor.externalId);
         const newActor = convertActor(syncActor, owner, owner && currentPlayer.team === owner?.team, character?.name);
         this.battleStorageService.scene.tiles[newActor.x][newActor.y].actor = newActor;
         this.battleStorageService.scene.actors.push(newActor);

@@ -13,7 +13,8 @@ import { AsciiBattleAnimationsService } from './services/ascii-battle-animations
 import { VictoryModalComponent } from './modals/victory-modal/victory-modal.component';
 import { ActorModalComponent } from './modals/actor-modal/actor-modal.component';
 import { SkillModalComponent } from './modals/skill-modal/skill-modal.component';
-import { DecorationModalComponent } from './modals/decoration-modal/decoration-modal.component';
+import { SceneObjectModalComponent } from './modals/scene-object-modal/scene-object-modal.component';
+import { ModalTabsComponentComponent } from './modals/modal-tabs-component/modal-tabs-component.component';
 
 
 
@@ -26,7 +27,8 @@ import { DecorationModalComponent } from './modals/decoration-modal/decoration-m
     VictoryModalComponent,
     ActorModalComponent,
     SkillModalComponent,
-    DecorationModalComponent],
+    SceneObjectModalComponent,
+    ModalTabsComponentComponent],
   providers: [
     AsciiBattleStorageService,
     AsciiBattleSynchronizerService,
