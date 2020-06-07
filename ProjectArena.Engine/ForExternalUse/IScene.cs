@@ -18,9 +18,9 @@ namespace ProjectArena.Engine.ForExternalUse
 
         IEnumerable<IPlayerShort> ShortPlayers { get; }
 
-        IEnumerable<int> GetPlayerActors(string playerId);
-
         float RemainedTurnTime { get; }
+
+        IEnumerable<int> GetPlayerActors(string playerId);
 
         ISynchronizer GetFullSynchronizationData();
 
@@ -33,5 +33,7 @@ namespace ProjectArena.Engine.ForExternalUse
         bool ActorAttack(int actorId, int targetX, int targetY);
 
         bool ActorWait(int actorId);
+
+        bool LeaveScene(string playerId);
     }
 }

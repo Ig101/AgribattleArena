@@ -8,7 +8,8 @@ namespace ProjectArena.Engine.Helpers
     {
         Playing,
         Victorious,
-        Defeated
+        Defeated,
+        Left
     }
 
     public enum Action
@@ -21,6 +22,7 @@ namespace ProjectArena.Engine.Helpers
         EndTurn,
         EndGame,
         SkipTurn,
+        Leave,
         StartGame,
         NoActorsDraw
     }

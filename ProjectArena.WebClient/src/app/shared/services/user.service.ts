@@ -7,6 +7,7 @@ import { ExternalResponse } from '../models/external-response.model';
 import { ArenaHubService } from './arena-hub.service';
 import { CharacterClassEnum } from 'src/app/lobby/ascii/model/enums/character-class.enum';
 import { getNativeIdByTalents } from 'src/app/helpers/talents.helper';
+import { Reward } from '../models/battle/reward.model';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,12 @@ export class UserService {
         this.userChanged.next();
       }
     });
+  }
+
+  applyReward(reward: Reward) {
+    if (reward) {
+      this.user.experience += reward.experience;
+    }
   }
 
   getActiveUser() {

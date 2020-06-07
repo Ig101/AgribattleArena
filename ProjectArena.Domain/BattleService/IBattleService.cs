@@ -23,5 +23,7 @@ namespace ProjectArena.Domain.BattleService
         IEnumerable<SynchronizerDto> GetAllUserSynchronizationInfos(string userId);
 
         void Init();
+
+        bool LeaveScene(string userId, Guid sceneId);
     }
 }

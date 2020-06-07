@@ -1,5 +1,6 @@
 export enum BattlePlayerStatusEnum {
   Playing,
   Victorious,
-  Defeated
+  Defeated,
+  Left
 }

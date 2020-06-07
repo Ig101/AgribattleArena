@@ -13,6 +13,7 @@ import { FloatingText } from '../models/animations/floating-text.model';
 import { EndGameDeclaration } from '../models/modals/end-game-declaration.model';
 import { UserService } from 'src/app/shared/services/user.service';
 import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle-status.enum';
+import { throwIssueDeclaration } from '../natives/complex-animations/throw.animation';
 
 @Injectable()
 export class AsciiBattleAnimationsService {
@@ -51,14 +52,38 @@ export class AsciiBattleAnimationsService {
         this.skippedFlag = false;
       }
       if (actor.healthChange) {
-        actorFloats.push({
-          text: (actor.healthChange > 0 ? '+' : '') + actor.healthChange.toString(),
-          color: actor.healthChange > 0 ? { r: 0, g: 255, b: 0, a: 1 } : { r: 255, g: 0, b: 0, a: 1 },
-          time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
-          x: actor.x,
-          y: actor.y,
-          height: 0
-        });
+        switch (synchronizer.action) {
+          case BattleSynchronizationActionEnum.SkipTurn:
+            actorFloats.push({
+              text: '*flee*',
+              color: { r: 255, g: 255, b: 0, a: 1 },
+              time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
+              x: actor.x,
+              y: actor.y,
+              height: 0
+            });
+            break;
+          case BattleSynchronizationActionEnum.Leave:
+            actorFloats.push({
+              text: '*flee*',
+              color: { r: 255, g: 255, b: 0, a: 1 },
+              time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
+              x: actor.x,
+              y: actor.y,
+              height: 0
+            });
+            break;
+          default:
+            actorFloats.push({
+              text: (actor.healthChange > 0 ? '+' : '') + actor.healthChange.toString(),
+              color: actor.healthChange > 0 ? { r: 0, g: 255, b: 0, a: 1 } : { r: 255, g: 0, b: 0, a: 1 },
+              time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
+              x: actor.x,
+              y: actor.y,
+              height: 0
+            });
+            break;
+        }
       }
       for (const buff of actor.newBuffs) {
         actorFloats.push({
@@ -290,11 +315,6 @@ export class AsciiBattleAnimationsService {
     const frames: AnimationFrame[][] = [];
     this.pending = false;
     const currentPlayer = synchronizer.sync.players.find(x => x.id === this.userService.user.id);
-    if (currentPlayer.status === BattlePlayerStatusEnum.Defeated) {
-      this.battleStorageService.endDeclaration = {
-        victory: false
-      };
-    }
     switch (synchronizer.action) {
       case BattleSynchronizationActionEnum.Attack:
         if (issuer) {
@@ -378,10 +398,24 @@ export class AsciiBattleAnimationsService {
             victory: true
           };
         }
+        if (currentPlayer.status === BattlePlayerStatusEnum.Defeated ||
+            currentPlayer.status === BattlePlayerStatusEnum.Left) {
+          this.battleStorageService.endDeclaration = {
+            victory: false
+          };
+        }
+        break;
+      case BattleSynchronizationActionEnum.NoActorsDraw:
+        frames.push([]);
+        this.battleStorageService.endDeclaration = {
+          victory: false
+        };
         break;
       case BattleSynchronizationActionEnum.SkipTurn:
         this.skippedFlag = true;
         return this.synchronizeFromSynchronizer(synchronizer);
+      case BattleSynchronizationActionEnum.Leave:
+        frames.push([]);
     }
     const declarations = this.mergeFramesToDeclarations(synchronizer.action, synchronizer, notUploadSynchronizer, frames);
     this.animationsQueue.push(...declarations);

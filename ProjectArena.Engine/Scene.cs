@@ -447,10 +447,13 @@ namespace ProjectArena.Engine
         {
             foreach (Player player in players)
             {
-                if (player.Status == PlayerStatus.Playing &&
-                    (player.TurnsSkipped >= VarManager.SkippedTurnsLimit || DefeatCondition(this, player)))
+                if (player.Status == PlayerStatus.Playing && player.TurnsSkipped >= VarManager.SkippedTurnsLimit)
                 {
-                    player.Defeat();
+                    player.Defeat(true);
+                }
+                else if (player.Status == PlayerStatus.Playing && DefeatCondition(this, player))
+                {
+                    player.Defeat(false);
                 }
             }
 
@@ -540,6 +543,24 @@ namespace ProjectArena.Engine
         }
 
         // Actions methods
+        public bool LeaveScene(string playerId)
+        {
+            var player = this.players.FirstOrDefault(x => x.Id == playerId);
+            if (player == null || player.Left)
+            {
+                return false;
+            }
+
+            player.Left = true;
+            if (player.Status == PlayerStatus.Playing)
+            {
+                player.Defeat(true);
+                AfterUpdateSynchronization(Helpers.Action.Leave, TempTileObject, null, null, null);
+            }
+
+            return true;
+        }
+
         private void ApplyActionAfterSkipping()
         {
             RemainedTurnTime += VarManager.TurnTimeLimit - VarManager.TurnTimeLimitAfterSkip;

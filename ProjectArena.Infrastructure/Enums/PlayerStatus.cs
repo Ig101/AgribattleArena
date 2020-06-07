@@ -4,6 +4,7 @@ namespace ProjectArena.Infrastructure.Enums
     {
         Playing,
         Victorious,
-        Defeated
+        Defeated,
+        Left
     }
 }

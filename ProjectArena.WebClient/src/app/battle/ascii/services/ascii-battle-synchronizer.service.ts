@@ -44,6 +44,7 @@ export class AsciiBattleSynchronizerService {
       }
       return newPlayer;
     });
+    this.battleStorageService.reward = synchronizer.reward;
     this.battleStorageService.turnTime = synchronizer.turnTime;
 
     // Tiles
@@ -127,6 +128,7 @@ export class AsciiBattleSynchronizerService {
       actors: [],
       decorations: []
     } as SynchronizationDifference;
+    this.battleStorageService.reward = synchronizer.reward;
     // Players
     let currentPlayer: Player;
     for (const syncPlayer of synchronizer.players) {

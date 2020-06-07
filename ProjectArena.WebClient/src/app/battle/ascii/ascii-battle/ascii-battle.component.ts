@@ -46,6 +46,7 @@ import { getRandomBiom } from 'src/app/shared/bioms/biom.helper';
 import { SceneObjectModalComponent } from '../modals/scene-object-modal/scene-object-modal.component';
 import { isObject } from 'util';
 import { ModalObject } from '../models/modals/modal-object.model';
+import { MenuModalComponent } from '../modals/menu-modal/menu-modal.component';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -249,7 +250,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Unexpected synchronization error');
         setTimeout(() => {
-       //   location.reload();
+      //    location.reload();
         }, 2000);
       }
     });
@@ -267,13 +268,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
-    this.battleStorageService.clear();
     this.onCloseSubscription.unsubscribe();
     this.arenaActionsSubscription.unsubscribe();
     this.synchronizationErrorSubscription.unsubscribe();
     this.animationSubscription.unsubscribe();
     this.finishLoadingSubscription.unsubscribe();
     this.victorySubscription.unsubscribe();
+    this.battleStorageService.clear();
   }
 
   ngOnInit(): void {
@@ -337,7 +338,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   openSettings() {
-
+    this.blocked = true;
+    this.battleStorageService.openedModal = this.modalService.openModalWithoutArgs(
+      MenuModalComponent);
+    this.battleStorageService.openedModal.onClose.subscribe((object: ModalObject) => {
+      this.blocked = false;
+      this.battleStorageService.openedModal = undefined;
+    });
   }
 
   private onPositionModalClose() {
@@ -1036,7 +1043,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Action is not correct');
         setTimeout(() => {
-    //      location.reload();
+     //     location.reload();
         }, 2000);
         return;
       }

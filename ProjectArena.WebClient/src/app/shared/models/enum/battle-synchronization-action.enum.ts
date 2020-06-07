@@ -8,5 +8,6 @@ export enum BattleSynchronizationActionEnum {
   EndTurn,
   EndGame,
   SkipTurn,
+  Leave,
   NoActorsDraw
 }

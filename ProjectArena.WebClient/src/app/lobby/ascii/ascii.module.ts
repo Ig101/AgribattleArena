@@ -8,7 +8,6 @@ import { TavernComponent } from './components/tavern/tavern.component';
 import { CharactersListComponent } from './components/characters-list/characters-list.component';
 import { TavernModalComponent } from './modals/tavern-modal/tavern-modal.component';
 import { SettingsModalComponent } from './modals/settings-modal/settings-modal.component';
-import { ModalLoadingComponent } from './modals/modal-loading/modal-loading.component';
 import { TalentsModalComponent } from './modals/talents-modal/talents-modal.component';
 
 
@@ -20,7 +19,6 @@ import { TalentsModalComponent } from './modals/talents-modal/talents-modal.comp
     CharactersListComponent,
     TavernModalComponent,
     SettingsModalComponent,
-    ModalLoadingComponent,
     TalentsModalComponent],
   imports: [
     SharedModule,

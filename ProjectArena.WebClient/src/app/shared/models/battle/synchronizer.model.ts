@@ -3,6 +3,7 @@ import { SyncDecoration } from './synchronization/sync-decoration.model';
 import { SyncPlayer } from './synchronization/sync-player.model';
 import { SyncSpecEffect } from './synchronization/sync-spec-effect.model';
 import { SyncTile } from './synchronization/sync-tile.model';
+import { Reward } from './reward.model';
 
 export interface Synchronizer {
   id: string;
@@ -16,6 +17,7 @@ export interface Synchronizer {
   turnTime: number;
   tempActor?: number;
   tempDecoration?: number;
+  reward: Reward;
   players: SyncPlayer[];
   changedActors: SyncActor[];
   changedDecorations: SyncDecoration[];

@@ -15,6 +15,8 @@ import { ActorModalComponent } from './modals/actor-modal/actor-modal.component'
 import { SkillModalComponent } from './modals/skill-modal/skill-modal.component';
 import { SceneObjectModalComponent } from './modals/scene-object-modal/scene-object-modal.component';
 import { ModalTabsComponentComponent } from './modals/modal-tabs-component/modal-tabs-component.component';
+import { MenuModalComponent } from './modals/menu-modal/menu-modal.component';
+import { RewardForModalComponent } from './modals/reward-for-modal/reward-for-modal.component';
 
 
 
@@ -28,7 +30,9 @@ import { ModalTabsComponentComponent } from './modals/modal-tabs-component/modal
     ActorModalComponent,
     SkillModalComponent,
     SceneObjectModalComponent,
-    ModalTabsComponentComponent],
+    ModalTabsComponentComponent,
+    MenuModalComponent,
+    RewardForModalComponent],
   providers: [
     AsciiBattleStorageService,
     AsciiBattleSynchronizerService,

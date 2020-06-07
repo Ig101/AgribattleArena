@@ -31,6 +31,8 @@ namespace ProjectArena.Engine
 
         float GetNextRandom();
 
+        IEnumerable<int> GetPlayerActors(string playerId);
+
         void EndTurn(bool firstTurn = false);
 
         bool DecorationCast(ActiveDecoration actor);

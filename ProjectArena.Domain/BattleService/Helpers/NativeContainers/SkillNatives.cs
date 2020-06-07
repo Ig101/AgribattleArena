@@ -134,7 +134,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 "wand",
                 new[] { "damage", "target", "weapon", "magic", "pure", "ranged", "direct" },
                 4,
-                2,
+                3,
                 0,
                 20,
                 new Targets()

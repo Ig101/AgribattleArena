@@ -12,6 +12,7 @@ import { FloatingText } from '../models/animations/floating-text.model';
 import { EndGameDeclaration } from '../models/modals/end-game-declaration.model';
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
+import { Reward } from 'src/app/shared/models/battle/reward.model';
 
 @Injectable()
 export class AsciiBattleStorageService {
@@ -62,6 +63,7 @@ export class AsciiBattleStorageService {
     return !!this.scene;
   }
 
+  reward: Reward;
   constructor() {
     this.currentInitiativeList = new BehaviorSubject<InitiativePortrait[]>(undefined);
   }
@@ -71,6 +73,7 @@ export class AsciiBattleStorageService {
   }
 
   clear() {
+    this.reward = undefined;
     this.scene = undefined;
     this.currentActor = undefined;
     this.currentDecoration = undefined;
@@ -78,7 +81,7 @@ export class AsciiBattleStorageService {
     this.version = -1;
     this.availableActionSquares = undefined;
     this.defaultActionSquares = undefined;
-    this.currentInitiativeList = undefined;
+    this.currentInitiativeList.next(undefined);
     this.turnTime = undefined;
     this.currentAnimations = undefined;
     this.floatingTexts = [];

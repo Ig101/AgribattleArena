@@ -436,7 +436,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                     Name = "Marksmanship",
                     Class = CharacterClass.Ranger,
                     ClassPoints = 1,
-                    UniqueDescription = "Replaces attack with the range one that deals slightly less damage within a range of 4.",
+                    UniqueDescription = "Replaces attack with the range one that deals slightly less damage within a range of 5.",
                     UniqueAction = "LearnMarksmanship",
                     StrengthModifier = 0,
                     WillpowerModifier = 0,

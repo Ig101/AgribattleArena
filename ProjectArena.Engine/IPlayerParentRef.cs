@@ -20,7 +20,7 @@ namespace ProjectArena.Engine
 
         bool ActThisTurn();
 
-        void Defeat();
+        void Defeat(bool leave);
 
         void Victory();
     }

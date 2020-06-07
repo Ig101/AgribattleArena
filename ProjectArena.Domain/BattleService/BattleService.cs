@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 using ProjectArena.Domain.BattleService.Helpers;
 using ProjectArena.Domain.BattleService.Helpers.NativeContainers;
 using ProjectArena.Domain.BattleService.Models;
@@ -216,11 +217,25 @@ namespace ProjectArena.Domain.BattleService
             var battleHub = _serviceProvider.GetRequiredService<IHubContext<ArenaHub.ArenaHub>>();
 
             string actionName = BattleHelper.GetBattleActionMethodName(e.Action);
-            var synchronizer = BattleHelper.MapSynchronizer(e);
-            battleHub.Clients.Users(e.Scene.ShortPlayers.Select(x => x.Id).ToList())?.SendAsync(actionName, synchronizer);
-            if (e.Action == Engine.Helpers.Action.EndGame)
+
+            foreach (var player in e.Scene.ShortPlayers)
             {
-                // TODO Rewards
+                if (player.Left)
+                {
+                    continue;
+                }
+
+                var user = battleHub.Clients.User(player.Id);
+                if (user != null)
+                {
+                    var synchronizer = BattleHelper.MapSynchronizer(e, player.Id);
+                    if (BattleHelper.CalculateReward(ref synchronizer, e.Scene, player.Id))
+                    {
+                        Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
+                    }
+
+                    battleHub.Clients.User(player.Id).SendAsync(actionName, synchronizer);
+                }
             }
         }
 
@@ -241,7 +256,7 @@ namespace ProjectArena.Domain.BattleService
         {
             foreach (var scene in _scenes)
             {
-                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
+                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId && !x.Left) != null)
                 {
                     return true;
                 }
@@ -250,28 +265,63 @@ namespace ProjectArena.Domain.BattleService
             return false;
         }
 
+        private async Task PayRewardAsync(RewardDto reward, string playerId)
+        {
+            var gameContext = _serviceProvider.GetRequiredService<GameContext>();
+            gameContext.Rosters.Update(
+                x => x.UserId == playerId,
+                Builders<Roster>.Update.Inc(x => x.Experience, reward.Experience));
+            await gameContext.ApplyChangesAsync();
+        }
+
         public SynchronizerDto GetUserSynchronizationInfo(string userId)
         {
-            var scene = _scenes.FirstOrDefault(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null);
+            var scene = _scenes.FirstOrDefault(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId && !x.Left) != null);
             if (scene == null)
             {
                 return null;
             }
 
-            return BattleHelper.GetFullSynchronizationData(scene);
+            var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
+            if (BattleHelper.CalculateReward(ref synchronizer, scene, userId))
+            {
+                Task.Run(async () => await PayRewardAsync(synchronizer.Reward, userId));
+            }
+
+            return synchronizer;
         }
 
         public IEnumerable<SynchronizerDto> GetAllUserSynchronizationInfos(string userId)
         {
             return _scenes
-                .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null)
-                .Select(scene => BattleHelper.GetFullSynchronizationData(scene))
+                .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId && !x.Left) != null)
+                .Select(scene =>
+                {
+                    var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
+                    if (BattleHelper.CalculateReward(ref synchronizer, scene, userId))
+                    {
+                        Task.Run(async () => await PayRewardAsync(synchronizer.Reward, userId));
+                    }
+
+                    return synchronizer;
+                })
                 .ToList();
         }
 
         public IScene GetUserScene(string userId, Guid sceneId)
         {
-            return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId) != null);
+            return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId && !x.Left) != null);
+        }
+
+        public bool LeaveScene(string userId, Guid sceneId)
+        {
+            var scene = GetUserScene(userId, sceneId);
+            if (scene == null)
+            {
+                return false;
+            }
+
+            return scene.LeaveScene(userId);
         }
     }
 }

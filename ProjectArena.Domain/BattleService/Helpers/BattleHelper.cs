@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectArena.Domain.BattleService.Models;
@@ -196,7 +197,38 @@ namespace ProjectArena.Domain.BattleService.Helpers
             };
         }
 
-        public static SynchronizerDto MapSynchronizer(ISyncEventArgs syncEventArgs)
+        public static bool CalculateReward(ref SynchronizerDto synchronizer, IScene scene, string playerId)
+        {
+            var currentPlayer = scene.ShortPlayers.First(x => x.Id == playerId);
+            var update = currentPlayer.TryRedeemPlayerStatusHash(out int? statusHash);
+            if (statusHash.HasValue)
+            {
+                var rewardRandom = new Random(statusHash.Value);
+                switch (currentPlayer.Status)
+                {
+                    case Engine.Helpers.PlayerStatus.Victorious:
+                        synchronizer.Reward = new RewardDto()
+                        {
+                            Experience = 5
+                        };
+
+                        break;
+                    case Engine.Helpers.PlayerStatus.Defeated:
+                        synchronizer.Reward = new RewardDto()
+                        {
+                            Experience = 2
+                        };
+
+                        break;
+                    case Engine.Helpers.PlayerStatus.Left:
+                        return false;
+                }
+            }
+
+            return update;
+        }
+
+        public static SynchronizerDto MapSynchronizer(ISyncEventArgs syncEventArgs, string playerId)
         {
             var synchronizer = MapSynchronizer(syncEventArgs.SyncInfo);
             synchronizer.Id = syncEventArgs.Scene.Id;
@@ -209,7 +241,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return synchronizer;
         }
 
-        public static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer, IScene scene)
+        public static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer, IScene scene, string playerId)
         {
             var synchronizer = MapSynchronizer(oldSynchronizer);
             synchronizer.Id = scene.Id;
@@ -218,10 +250,10 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return synchronizer;
         }
 
-        public static SynchronizerDto GetFullSynchronizationData(IScene scene)
+        public static SynchronizerDto GetFullSynchronizationData(IScene scene, string playerId)
         {
             var synchronizer = scene.GetFullSynchronizationData();
-            return MapSynchronizer(synchronizer, scene);
+            return MapSynchronizer(synchronizer, scene, playerId);
         }
     }
 }

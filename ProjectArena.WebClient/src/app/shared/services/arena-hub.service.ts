@@ -23,11 +23,12 @@ const BATTLE_DECORATION = 'BattleDecoration';
 const BATTLE_END_TURN = 'BattleEndTurn';
 const BATTLE_END_GAME = 'BattleEndGame';
 const BATTLE_SKIP_TURN = 'BattleSkipTurn';
+const BATTLE_LEAVE = 'BattleLeave';
 const BATTLE_NO_ACTORS_DRAW = 'BattleNoActorsDraw';
 
 type BattleHubReturnMethod = typeof DAILY_UPDATE | typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
     typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_NO_ACTORS_DRAW |
-    typeof BATTLE_SKIP_TURN | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT;
+    typeof BATTLE_SKIP_TURN | typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT;
 
 @Injectable({
   providedIn: 'root'
@@ -217,6 +218,8 @@ export class ArenaHubService {
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndGame, synchronizer));
     this.addNewListener(BATTLE_SKIP_TURN, (synchronizer: Synchronizer) =>
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.SkipTurn, synchronizer));
+    this.addNewListener(BATTLE_LEAVE, (synchronizer: Synchronizer) =>
+    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Leave, synchronizer));
     this.addNewListener(BATTLE_NO_ACTORS_DRAW, (synchronizer: Synchronizer) =>
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.NoActorsDraw, synchronizer));
   }

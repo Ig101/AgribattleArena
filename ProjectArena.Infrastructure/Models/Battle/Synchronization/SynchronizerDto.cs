@@ -23,6 +23,8 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public int? TempDecoration { get; set; }
 
+        public RewardDto Reward { get; set; }
+
         public IEnumerable<PlayerDto> Players { get; set; }
 
         public IEnumerable<ActorDto> ChangedActors { get; set; }

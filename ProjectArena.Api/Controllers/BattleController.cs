@@ -19,7 +19,7 @@ namespace ProjectArena.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSynchronizationInfoAsync(Guid sceneId)
+        public async Task<IActionResult> GetSynchronizationInfoAsync()
         {
             var user = await Mediator.Send(new GetFullUserInfoByPrincipalQuery()
             {
@@ -29,6 +29,21 @@ namespace ProjectArena.Api.Controllers
             return Ok(await Mediator.Send(new GetFullSynchronizationInfoQuery()
             {
                 UserId = user.Id
+            }));
+        }
+
+        [HttpDelete("{sceneId}")]
+        public async Task<IActionResult> LeaveBattleAsync(Guid sceneId)
+        {
+            var user = await Mediator.Send(new GetFullUserInfoByPrincipalQuery()
+            {
+                User = User
+            });
+
+            return Ok(await Mediator.Send(new LeaveSceneCommand()
+            {
+                UserId = user.Id,
+                SceneId = sceneId
             }));
         }
     }

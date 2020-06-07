@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { LoadingService } from 'src/app/shared/services/loading.service';
 import { UserService } from 'src/app/shared/services/user.service';
 import { UserStateEnum } from 'src/app/shared/models/enum/user-state.enum';
+import { AsciiBattleStorageService } from '../../services/ascii-battle-storage.service';
 
 @Component({
   selector: 'app-victory-modal',
@@ -30,7 +31,8 @@ export class VictoryModalComponent implements OnInit, OnDestroy, IModal<any> {
     private overlay: OverlayRef,
     private router: Router,
     private loadingService: LoadingService,
-    private userService: UserService
+    private userService: UserService,
+    private battleStorageService: AsciiBattleStorageService
   ) {
     this.victory = data.victory;
   }
@@ -68,6 +70,7 @@ export class VictoryModalComponent implements OnInit, OnDestroy, IModal<any> {
       this.overlay.detach();
       this.overlay.dispose();
       this.userService.user.state = UserStateEnum.Lobby;
+      this.userService.applyReward(this.battleStorageService.reward);
       this.router.navigate(['lobby']);
     });
   }
