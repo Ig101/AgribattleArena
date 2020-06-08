@@ -17,6 +17,7 @@ import { WebCommunicationService } from 'src/app/shared/services/web-communicati
 import { HirePatronRequest } from '../../model/requests/hire-patron-request.model';
 import { NewCharacterResponse } from '../../model/requests/new-character-response.model';
 import { LoadingService } from 'src/app/shared/services/loading.service';
+import { controlMinLengthValidator } from 'src/app/shared/validators/control-min-length.validator';
 
 @Component({
   selector: 'app-tavern-modal',
@@ -64,8 +65,8 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
     });
     this.nameForm = new AppFormGroup({
       textField: this.formBuilder.control('', [
-        controlRequiredValidator($localize`:@@controls.text-field:Text field`),
-        controlMaxLengthValidator($localize`:@@controls.text-field:Text field`, 15)
+        controlMinLengthValidator($localize`:@@controls.text-field:Text field`, 3),
+        controlMaxLengthValidator($localize`:@@controls.text-field:Text field`, 20)
       ]),
     });
   }
@@ -135,7 +136,9 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
             const newCharacter = {
               id: result.result.id,
               name: this.nameForm.controls.textField.value,
-              nativeId: 'adventurer'
+              nativeId: 'adventurer',
+              isKeyCharacter: false,
+              talents: []
             } as Character;
             if (this.currentCharacterForReplace) {
               this.userService.user.roster[this.userService.user.roster.indexOf(this.currentCharacterForReplace)] = newCharacter;

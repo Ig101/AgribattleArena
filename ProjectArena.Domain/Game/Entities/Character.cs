@@ -11,6 +11,9 @@ namespace ProjectArena.Domain.Game.Entities
         [BsonElement("d")]
         public bool Deleted { get; set; }
 
+        [BsonElement("k")]
+        public bool IsKeyCharacter { get; set; }
+
         [BsonElement("r")]
         public string RosterUserId { get; set; }
 

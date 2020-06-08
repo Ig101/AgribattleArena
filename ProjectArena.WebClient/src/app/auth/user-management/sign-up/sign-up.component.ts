@@ -39,7 +39,6 @@ export class SignUpComponent implements OnInit {
   ngOnInit(): void {
     this.form = new AppFormGroup({
       name: this.formBuilder.control('', [
-        controlLettersDigitsValidator($localize`:@@controls.name:Name`),
         controlMinLengthValidator($localize`:@@controls.name:Name`, 3),
         controlMaxLengthValidator($localize`:@@controls.name:Name`, 20)
       ]),

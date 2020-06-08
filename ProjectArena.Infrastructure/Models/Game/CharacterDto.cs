@@ -8,6 +8,8 @@ namespace ProjectArena.Infrastructure.Models.Game
 
         public string Name { get; set; }
 
+        public bool IsKeyCharacter { get; set; }
+
         public IEnumerable<PointDto> Talents { get; set; }
     }
 }

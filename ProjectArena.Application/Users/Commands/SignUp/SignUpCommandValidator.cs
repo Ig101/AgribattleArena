@@ -8,6 +8,8 @@ namespace ProjectArena.Application.Users.Commands.SignUp
     {
         RuleFor(x => x.Email).NotEmpty();
         RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x.Name).MaximumLength(20);
+        RuleFor(x => x.Name).MinimumLength(3);
         RuleFor(x => x.Password).NotEmpty();
     }
   }

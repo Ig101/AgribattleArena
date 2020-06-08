@@ -90,6 +90,15 @@ namespace ProjectArena.Application.Game.Commands.HirePatron
 
                 var characterForReplace = characters.FirstOrDefault(x => x.Id == request.CharacterForReplace);
 
+                if (request.CharacterForReplace != null && characterForReplace.IsKeyCharacter)
+                {
+                    throw new HttpException()
+                    {
+                        Error = "Cannot fire key character",
+                        StatusCode = 400
+                    };
+                }
+
                 _gameContext.Rosters.Update(
                     x => x.UserId == roster.UserId,
                     Builders<Roster>.Update.Set(x => x.BoughtPatrons, roster.BoughtPatrons.Append(request.PatronId)));
@@ -97,6 +106,7 @@ namespace ProjectArena.Application.Game.Commands.HirePatron
                 {
                     Id = characterForReplace != null ? characterForReplace.Id : Guid.NewGuid().ToString(),
                     Deleted = false,
+                    IsKeyCharacter = false,
                     RosterUserId = roster.UserId,
                     Name = request.Name.Trim(),
                     ChosenTalents = new int[0]

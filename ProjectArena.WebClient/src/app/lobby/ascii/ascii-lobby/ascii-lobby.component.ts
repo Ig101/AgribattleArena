@@ -158,10 +158,10 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     this.activators = new Array<LobbyTileActivator<Character>>(this.charactersMaxCount);
     for (let i = 0; i < this.charactersMaxCount; i++) {
       this.activators[i] = {
-        xShift: 3,
+        xShift: 4,
         yShift: 1,
         object: this.userService.user.roster[i],
-        x: Math.floor(this.campWidth / 2) + (i % 3 === 1 ? 7 : 4) * (i >= 3 ? 1 : -1),
+        x: Math.floor(this.campWidth / 2) + (i % 3 === 1 ? 7 : 5) * (i >= 3 ? 1 : -1),
         y: Math.floor(this.campHeight / 2) - 4 + ((i % 3) * 4)
       };
     }

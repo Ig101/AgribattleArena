@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, OnDestroy, Input } from '@angular/core';
 import { Character } from '../../model/character.model';
 import { UserService } from 'src/app/shared/services/user.service';
 import { CharacterListElement } from '../../model/character-list-element.model';
@@ -11,6 +11,8 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./characters-list.component.scss']
 })
 export class CharactersListComponent implements OnInit, OnDestroy {
+
+  @Input() includeKeyActors = false;
 
   @Output() chosenCharacter = new EventEmitter<Character>();
 
@@ -25,7 +27,9 @@ export class CharactersListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.characters = this.userService.user.roster.map(x => {
+    this.characters = this.userService.user.roster
+    .filter(x => !x.isKeyCharacter || this.includeKeyActors)
+    .map(x => {
       const native = actorNatives[x.nativeId];
       return {
         character: x,
@@ -42,7 +46,9 @@ export class CharactersListComponent implements OnInit, OnDestroy {
   }
 
   onUpdate() {
-    this.characters = this.userService.user.roster.map(x => {
+    this.characters = this.userService.user.roster
+    .filter(x => !x.isKeyCharacter || this.includeKeyActors)
+    .map(x => {
       const native = actorNatives[x.nativeId];
       return {
         character: x,

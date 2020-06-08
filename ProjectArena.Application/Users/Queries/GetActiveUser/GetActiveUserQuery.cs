@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -55,8 +56,19 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                         TavernCapacity = 6,
                         BoughtPatrons = new int[0]
                     };
-                    await _gameContext.Rosters.InsertOneAtomicallyAsync(roster);
-                    characters = new Character[0];
+                    _gameContext.Rosters.InsertOne(roster);
+                    var userCharacter = new Character()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Deleted = false,
+                        IsKeyCharacter = true,
+                        RosterUserId = roster.UserId,
+                        Name = user.ViewName,
+                        ChosenTalents = new int[0]
+                    };
+                    _gameContext.Characters.InsertOne(userCharacter);
+                    characters = new Character[] { userCharacter };
+                    await _gameContext.ApplyChangesAsync();
                 }
                 else
                 {
@@ -93,6 +105,7 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                         {
                             Id = x.Id,
                             Name = x.Name,
+                            IsKeyCharacter = x.IsKeyCharacter,
                             Talents = x.ChosenTalents.Select(k =>
                             {
                                 var coordinates = TalentPositionHelper.GetCoordinatesFromPosition(k);
