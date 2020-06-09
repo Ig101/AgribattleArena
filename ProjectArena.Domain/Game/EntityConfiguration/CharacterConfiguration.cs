@@ -11,7 +11,7 @@ namespace ProjectArena.Domain.Game.EntityConfiguration
         {
             await collection.Indexes.CreateManyAsync(new[]
             {
-                new CreateIndexModel<Character>(Builders<Character>.IndexKeys.Ascending(x => x.RosterUserId)),
+                new CreateIndexModel<Character>(Builders<Character>.IndexKeys.Ascending(x => x.RosterId)),
             });
         }
     }

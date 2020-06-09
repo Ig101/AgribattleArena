@@ -8,6 +8,9 @@ namespace ProjectArena.Domain.Game.Entities
     {
         [BsonId]
         [BsonElement("id")]
+        public string Id { get; set; }
+
+        [BsonElement("u")]
         public string UserId { get; set; }
 
         [BsonElement("e")]

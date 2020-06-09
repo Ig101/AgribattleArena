@@ -243,7 +243,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return update;
         }
 
-        public static SynchronizerDto MapSynchronizer(ISyncEventArgs syncEventArgs, string playerId)
+        public static SynchronizerDto MapSynchronizer(ISyncEventArgs syncEventArgs)
         {
             var synchronizer = MapSynchronizer(syncEventArgs.SyncInfo);
             synchronizer.Id = syncEventArgs.Scene.Id;
@@ -256,7 +256,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return synchronizer;
         }
 
-        public static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer, IScene scene, string playerId)
+        public static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer, IScene scene)
         {
             var synchronizer = MapSynchronizer(oldSynchronizer);
             synchronizer.Id = scene.Id;
@@ -265,10 +265,10 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return synchronizer;
         }
 
-        public static SynchronizerDto GetFullSynchronizationData(IScene scene, string playerId)
+        public static SynchronizerDto GetFullSynchronizationData(IScene scene)
         {
             var synchronizer = scene.GetFullSynchronizationData();
-            return MapSynchronizer(synchronizer, scene, playerId);
+            return MapSynchronizer(synchronizer, scene);
         }
     }
 }

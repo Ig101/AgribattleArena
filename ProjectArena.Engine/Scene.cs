@@ -168,9 +168,9 @@ namespace ProjectArena.Engine
             return tiles;
         }
 
-        public Player CreatePlayer(string id, int? team)
+        public Player CreatePlayer(string id, string userId, int? team)
         {
-            Player player = new Player(this, id, team);
+            Player player = new Player(this, id, userId, team);
             players.Add(player);
             return player;
         }

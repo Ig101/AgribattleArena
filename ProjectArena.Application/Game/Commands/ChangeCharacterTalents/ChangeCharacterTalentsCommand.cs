@@ -111,7 +111,7 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
                     throw new NotFoundException("Character is not found");
                 }
 
-                if (character.RosterUserId != request.UserId)
+                if (character.RosterId != roster.Id)
                 {
                     throw new CannotPerformOperationException("Character is not belong to user");
                 }

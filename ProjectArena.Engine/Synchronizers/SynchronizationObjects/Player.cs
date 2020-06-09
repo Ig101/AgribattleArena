@@ -11,6 +11,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string Id { get; }
 
+        public string UserId { get; }
+
         public int? Team { get; }
 
         public List<int> KeyActorsSync { get; }
@@ -21,6 +23,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public Player(Engine.Player player)
         {
+            this.UserId = player.UserId;
             this.Id = player.Id;
             this.Team = player.Team;
             this.KeyActorsSync = player.KeyActors.Select(x => x.Id).ToList();
@@ -28,10 +31,11 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Status = player.Status;
         }
 
-        public Player(string id, int? team, List<ForExternalUse.Generation.ObjectInterfaces.IActor> keyActors)
+        public Player(string id, string userId, int? team, List<ForExternalUse.Generation.ObjectInterfaces.IActor> keyActors)
         {
-            this.Team = team;
+            this.UserId = userId;
             this.Id = id;
+            this.Team = team;
             this.KeyActorsGen = keyActors;
         }
     }

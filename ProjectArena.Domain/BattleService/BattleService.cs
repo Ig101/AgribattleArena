@@ -27,6 +27,9 @@ namespace ProjectArena.Domain.BattleService
 {
     public class BattleService : IBattleService
     {
+        private const int RandomModifier = 10000;
+        private const int MaxExperience = 1000000;
+
         private readonly IServiceProvider _serviceProvider;
         private readonly IList<IScene> _scenes;
         private readonly Random _random;
@@ -188,24 +191,27 @@ namespace ProjectArena.Domain.BattleService
 
             var players = new List<IPlayer>(users.Count());
 
-            var characters = await gameContext.Characters.GetAsync(x => userIds.Contains(x.RosterUserId) && !x.Deleted);
+            var rosters = await gameContext.Rosters.GetAsync(x => userIds.Contains(x.UserId));
+            var rosterIds = rosters.Select(x => x.Id).ToList();
+            var characters = await gameContext.Characters.GetAsync(x => rosterIds.Contains(x.RosterId) && !x.Deleted);
             var allTalentIds = characters.SelectMany(x => x.ChosenTalents).ToList();
             var allTalents = await registryContext.TalentMap.GetAsync(x => allTalentIds.Contains(x.Position));
 
             foreach (string id in userIds)
             {
-                var playerActors = new List<IActor>();
-                var playerCharacters = characters.Where(x => x.RosterUserId == id).ToList();
-                playerActors.AddRange(
-                    characters
-                    .Where(x => x.RosterUserId == id)
-                    .Select(x =>
-                    {
-                        var talents = allTalents.Where(t => x.ChosenTalents.Contains(t.Position)).ToList();
-                        return GenerateActor(x, talents);
-                    }));
+                var playerRosters = rosters.Where(x => x.UserId == id).ToList();
+                var roster = playerRosters[_random.Next(playerRosters.Count * RandomModifier) % playerRosters.Count];
+                var playerCharacters = characters.Where(x => x.RosterId == roster.Id).ToList();
+                var playerActors = characters
+                .Where(x => x.RosterId == roster.Id)
+                .Select(x =>
+                {
+                    var talents = allTalents.Where(t => x.ChosenTalents.Contains(t.Position)).ToList();
+                    return GenerateActor(x, talents);
+                })
+                .ToList();
 
-                players.Add(EngineHelper.CreatePlayerForGeneration(id, null, playerActors));
+                players.Add(EngineHelper.CreatePlayerForGeneration(roster.Id, id, null, playerActors));
             }
 
             var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), SynchronizationInfoEventHandler);
@@ -228,13 +234,13 @@ namespace ProjectArena.Domain.BattleService
                 var user = battleHub.Clients.User(player.Id);
                 if (user != null)
                 {
-                    var synchronizer = BattleHelper.MapSynchronizer(e, player.Id);
+                    var synchronizer = BattleHelper.MapSynchronizer(e);
                     if (BattleHelper.CalculateReward(ref synchronizer, e.Scene, player.Id))
                     {
                         Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
                     }
 
-                    battleHub.Clients.User(player.Id).SendAsync(actionName, synchronizer);
+                    battleHub.Clients.User(player.UserId).SendAsync(actionName, synchronizer);
                 }
             }
         }
@@ -256,7 +262,7 @@ namespace ProjectArena.Domain.BattleService
         {
             foreach (var scene in _scenes)
             {
-                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId && !x.Left) != null)
+                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && x.Id == userId && !x.Left) != null)
                 {
                     return true;
                 }
@@ -268,24 +274,26 @@ namespace ProjectArena.Domain.BattleService
         private async Task PayRewardAsync(RewardDto reward, string playerId)
         {
             var gameContext = _serviceProvider.GetRequiredService<GameContext>();
+            var roster = await gameContext.Rosters.GetOneAsync(x => x.Id == playerId);
             gameContext.Rosters.Update(
-                x => x.UserId == playerId,
-                Builders<Roster>.Update.Inc(x => x.Experience, reward.Experience));
+                x => x.Id == playerId,
+                Builders<Roster>.Update.Set(x => x.Experience, Math.Min(roster.Experience + reward.Experience, MaxExperience)));
             await gameContext.ApplyChangesAsync();
         }
 
         public SynchronizerDto GetUserSynchronizationInfo(string userId)
         {
-            var scene = _scenes.FirstOrDefault(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId && !x.Left) != null);
+            var scene = _scenes.FirstOrDefault(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && x.Id == userId && !x.Left) != null);
             if (scene == null)
             {
                 return null;
             }
 
-            var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
-            if (BattleHelper.CalculateReward(ref synchronizer, scene, userId))
+            var player = scene.ShortPlayers.First(x => x.UserId == userId);
+            var synchronizer = BattleHelper.GetFullSynchronizationData(scene);
+            if (BattleHelper.CalculateReward(ref synchronizer, scene, player.Id))
             {
-                Task.Run(async () => await PayRewardAsync(synchronizer.Reward, userId));
+                Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
             }
 
             return synchronizer;
@@ -294,13 +302,14 @@ namespace ProjectArena.Domain.BattleService
         public IEnumerable<SynchronizerDto> GetAllUserSynchronizationInfos(string userId)
         {
             return _scenes
-                .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId && !x.Left) != null)
+                .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
                 .Select(scene =>
                 {
-                    var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
-                    if (BattleHelper.CalculateReward(ref synchronizer, scene, userId))
+                    var player = scene.ShortPlayers.First(x => x.UserId == userId);
+                    var synchronizer = BattleHelper.GetFullSynchronizationData(scene);
+                    if (BattleHelper.CalculateReward(ref synchronizer, scene, player.Id))
                     {
-                        Task.Run(async () => await PayRewardAsync(synchronizer.Reward, userId));
+                        Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
                     }
 
                     return synchronizer;
@@ -310,7 +319,7 @@ namespace ProjectArena.Domain.BattleService
 
         public IScene GetUserScene(string userId, Guid sceneId)
         {
-            return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.Id == userId && !x.Left) != null);
+            return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
         }
 
         public bool LeaveScene(string userId, Guid sceneId)
@@ -321,7 +330,7 @@ namespace ProjectArena.Domain.BattleService
                 return false;
             }
 
-            return scene.LeaveScene(userId);
+            return scene.LeaveScene(scene.ShortPlayers.First(x => x.UserId == userId).Id);
         }
     }
 }

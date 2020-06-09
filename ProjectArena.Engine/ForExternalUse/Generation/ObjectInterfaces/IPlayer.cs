@@ -6,6 +6,8 @@ namespace ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces
     {
         string Id { get; }
 
+        string UserId { get; }
+
         int? Team { get; }
 
         List<IActor> KeyActorsGen { get; }

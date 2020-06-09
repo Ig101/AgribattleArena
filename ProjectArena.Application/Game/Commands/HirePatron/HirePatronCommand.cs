@@ -47,7 +47,7 @@ namespace ProjectArena.Application.Game.Commands.HirePatron
                 }
 
                 var roster = await _gameContext.Rosters.GetOneAsync(x => x.UserId == request.UserId);
-                var characters = await _gameContext.Characters.GetAsync(x => x.RosterUserId == roster.UserId);
+                var characters = await _gameContext.Characters.GetAsync(x => x.RosterId == roster.Id);
                 if (characters.Count() < 6 && request.CharacterForReplace != null)
                 {
                     throw new CannotPerformOperationException("Cannot fire character while roster is not full.");
@@ -83,7 +83,7 @@ namespace ProjectArena.Application.Game.Commands.HirePatron
                     Id = characterForReplace != null ? characterForReplace.Id : Guid.NewGuid().ToString(),
                     Deleted = false,
                     IsKeyCharacter = false,
-                    RosterUserId = roster.UserId,
+                    RosterId = roster.Id,
                     Name = request.Name.Trim(),
                     ChosenTalents = new int[0]
                 };

@@ -16,7 +16,7 @@ namespace ProjectArena.Engine
 
         Tile[][] SetupEmptyTileSet(int width, int height);
 
-        Player CreatePlayer(string id, int? team);
+        Player CreatePlayer(string id, string userId, int? team);
 
         Actor CreateActor(Player owner, string nativeName, string roleNativeName, Tile target, float? z);
 

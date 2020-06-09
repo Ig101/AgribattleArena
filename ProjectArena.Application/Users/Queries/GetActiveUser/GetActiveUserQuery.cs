@@ -50,6 +50,7 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                 {
                     roster = new Roster()
                     {
+                        Id = user.Id,
                         UserId = user.Id,
                         Experience = 0,
                         Seed = user.Id.GetHashCode(),
@@ -62,7 +63,7 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                         Id = Guid.NewGuid().ToString(),
                         Deleted = false,
                         IsKeyCharacter = true,
-                        RosterUserId = roster.UserId,
+                        RosterId = roster.Id,
                         Name = user.ViewName,
                         ChosenTalents = new int[0]
                     };
@@ -72,7 +73,7 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
                 }
                 else
                 {
-                    characters = await _gameContext.Characters.GetAsync(x => x.RosterUserId == roster.UserId && !x.Deleted);
+                    characters = await _gameContext.Characters.GetAsync(x => x.RosterId == roster.Id && !x.Deleted);
                 }
 
                 var tavern = new List<CharacterForSaleDto>();

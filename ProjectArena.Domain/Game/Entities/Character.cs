@@ -15,7 +15,7 @@ namespace ProjectArena.Domain.Game.Entities
         public bool IsKeyCharacter { get; set; }
 
         [BsonElement("r")]
-        public string RosterUserId { get; set; }
+        public string RosterId { get; set; }
 
         [BsonElement("n")]
         public string Name { get; set; }

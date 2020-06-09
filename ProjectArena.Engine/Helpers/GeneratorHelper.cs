@@ -9,7 +9,7 @@ namespace ProjectArena.Engine.Helpers
     {
         public static Player ConvertExternalPlayerFromGeneration(ISceneForSceneGenerator scene, ForExternalUse.Generation.ObjectInterfaces.IPlayer player, int? team)
         {
-            return scene.CreatePlayer(player.Id, team);
+            return scene.CreatePlayer(player.Id, player.UserId, team);
         }
 
         public static Actor ConvertExternalActorFromGeneration(ISceneForSceneGenerator scene, Player player, Tile target, ForExternalUse.Generation.ObjectInterfaces.IActor actor, float? z)

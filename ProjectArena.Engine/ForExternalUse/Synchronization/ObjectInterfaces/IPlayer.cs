@@ -7,6 +7,8 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
     {
         string Id { get; }
 
+        string UserId { get; }
+
         int? Team { get; }
 
         List<int> KeyActorsSync { get; }

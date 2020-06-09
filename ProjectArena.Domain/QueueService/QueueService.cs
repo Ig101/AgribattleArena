@@ -14,6 +14,8 @@ namespace ProjectArena.Domain.QueueService
 {
     public class QueueService : IQueueService
     {
+        private const int RandomModifier = 10000;
+
         private readonly IDictionary<GameMode, SceneModeQueue> _queues;
 
         private readonly Random _botsRandom;
@@ -86,20 +88,23 @@ namespace ProjectArena.Domain.QueueService
                     user.Time += time;
                 }
 
-                foreach (var complectingUsersItem in complectingUsers)
+                if (_bots.Count > 0)
                 {
-                    if (complectingUsersItem.Average(x => x.Time) >= queue.Mode.TimeTillBot)
+                    foreach (var complectingUsersItem in complectingUsers)
                     {
-                        while (complectingUsersItem.Count < queue.Mode.MaxPlayers)
+                        if (complectingUsersItem.Average(x => x.Time) >= queue.Mode.TimeTillBot)
                         {
-                            var chosenBot = _botsRandom.Next(_bots.Count * 10000) % _bots.Count;
-                            complectingUsersItem.Add(new UserInQueue()
+                            while (complectingUsersItem.Count < queue.Mode.MaxPlayers)
                             {
-                                UserId = _bots.Skip(chosenBot).First().BotId
-                            });
-                        }
+                                var chosenBot = _botsRandom.Next(_bots.Count * RandomModifier) % _bots.Count;
+                                complectingUsersItem.Add(new UserInQueue()
+                                {
+                                    UserId = _bots.Skip(chosenBot).First().BotId
+                                });
+                            }
 
-                        complectedUsers.Add(complectingUsersItem);
+                            complectedUsers.Add(complectingUsersItem);
+                        }
                     }
                 }
 

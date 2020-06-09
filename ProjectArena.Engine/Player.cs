@@ -13,6 +13,8 @@ namespace ProjectArena.Engine
 
         public string Id { get; }
 
+        public string UserId { get; }
+
         public List<Actor> KeyActors { get; }
 
         public int TurnsSkipped { get; private set; }
@@ -25,11 +27,12 @@ namespace ProjectArena.Engine
 
         public bool Left { get; set; }
 
-        public Player(ISceneParentRef parent, string id, int? team)
+        public Player(ISceneParentRef parent, string id, string userId, int? team)
         {
             this.Team = team;
             this.Parent = parent;
             this.Id = id;
+            this.UserId = userId;
             this.KeyActors = new List<Actor>();
             this.TurnsSkipped = 0;
             this.Status = PlayerStatus.Playing;

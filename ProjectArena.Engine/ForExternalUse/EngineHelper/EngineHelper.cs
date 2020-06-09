@@ -44,9 +44,9 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
                 startBuffs);
         }
 
-        public static IPlayer CreatePlayerForGeneration(string id, int? team, IEnumerable<IActor> keyActors)
+        public static IPlayer CreatePlayerForGeneration(string id, string userId, int? team, IEnumerable<IActor> keyActors)
         {
-            return new Synchronizers.SynchronizationObjects.Player(id, team, keyActors.ToList());
+            return new Synchronizers.SynchronizationObjects.Player(id, userId, team, keyActors.ToList());
         }
 
         public static IVarManager CreateVarManager(
