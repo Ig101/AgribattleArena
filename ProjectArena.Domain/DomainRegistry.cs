@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using AspNetCore.Identity.Mongo;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -18,14 +19,74 @@ using ProjectArena.Infrastructure.Mongo;
 
 namespace ProjectArena.Domain
 {
-    public static class DomainRegistry
+  public static class DomainRegistry
     {
+        private static IApplicationBuilder UseDomainIdentity(this IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.CreateScope();
+            var provider = scope.ServiceProvider;
+
+            var usersCollection = provider.GetRequiredService<IMongoCollection<User>>();
+            new UserConfiguration().ConfigureAsync(usersCollection).Wait();
+
+            var rolesCollection = provider.GetRequiredService<IMongoCollection<Role>>();
+            new RoleConfiguration().ConfigureAsync(rolesCollection).Wait();
+
+            var roleManager = provider.GetRequiredService<IdentityRoleManager>();
+            if (!roleManager.RoleExistsAsync("admin").Result)
+            {
+                roleManager.CreateAsync(new Role("admin")).Wait();
+            }
+
+            if (!roleManager.RoleExistsAsync("bot").Result)
+            {
+                roleManager.CreateAsync(new Role("bot")).Wait();
+            }
+
+            var userSettings = provider.GetRequiredService<IOptions<DefaultUsersSettings>>().Value;
+            var userManager = provider.GetRequiredService<IdentityUserManager>();
+
+            var rootEmail = $"{userSettings.Root.Login}@{userSettings.Root.Login}";
+            var result = userManager.FindByEmailAsync(rootEmail).Result;
+            if (userManager.FindByEmailAsync(rootEmail).Result == null)
+            {
+                var user = new User()
+                {
+                    UserName = Guid.NewGuid().ToString(),
+                    Email = rootEmail,
+                    ViewName = userSettings.Root.Login,
+                    EmailConfirmed = true
+                };
+                userManager.CreateAsync(user, userSettings.Root.Password).Wait();
+                userManager.AddToRoleAsync(user, "admin").Wait();
+            }
+
+            if (userSettings.Bots != null)
+            {
+                foreach (var bot in userSettings.Bots)
+                {
+                    var botEmail = $"{bot.Login}@{bot.Login}";
+                    if (userManager.FindByEmailAsync(botEmail).Result == null)
+                    {
+                        var user = new User()
+                        {
+                            UserName = Guid.NewGuid().ToString(),
+                            Email = botEmail,
+                            ViewName = bot.Login,
+                            EmailConfirmed = true
+                        };
+                        userManager.CreateAsync(user, bot.Password).Wait();
+                        userManager.AddToRoleAsync(user, "bot").Wait();
+                    }
+                }
+            }
+
+            return app;
+        }
+
         public static IApplicationBuilder UseDomainLayer(this IApplicationBuilder app)
         {
-            var usersCollection = app.ApplicationServices.GetRequiredService<IMongoCollection<User>>();
-            new UserConfiguration().ConfigureAsync(usersCollection).Wait();
-            var rolesCollection = app.ApplicationServices.GetRequiredService<IMongoCollection<Role>>();
-            new RoleConfiguration().ConfigureAsync(rolesCollection).Wait();
+            app.UseDomainIdentity();
 
             app.ApplicationServices.GetRequiredService<IMongoConnection>();
 

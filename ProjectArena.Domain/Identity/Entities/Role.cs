@@ -5,5 +5,9 @@ namespace ProjectArena.Domain.Identity.Entities
 {
     public class Role : MongoRole
     {
+        public Role(string name)
+            : base(name)
+        {
+        }
     }
 }
