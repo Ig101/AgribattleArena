@@ -8,6 +8,8 @@ namespace ProjectArena.Domain.BattleService.Models
     {
         public int MaxPlayers { get; set; }
 
+        public int TimeTillBot { get; set; }
+
         public ISceneGenerator Generator { get; set; }
 
         public IVarManager VarManager { get; set; }

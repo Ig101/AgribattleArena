@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.QueueService;
+using ProjectArena.Domain.QueueService.Models;
 using ProjectArena.Infrastructure.Models.Game;
 
 namespace ProjectArena.Domain.ArenaHub
@@ -30,13 +31,29 @@ namespace ProjectArena.Domain.ArenaHub
     public override Task OnConnectedAsync()
     {
         _logger.LogDebug($"{Context.UserIdentifier} connected to hub");
+        if (Context.User.IsInRole("bot"))
+        {
+            _queueService.AddBot(new BotDefinition()
+            {
+                BotId = Context.UserIdentifier
+            });
+        }
+
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception exception)
     {
         _logger.LogDebug($"{Context.UserIdentifier} disconnected from hub");
-        _queueService.Dequeue(Context.UserIdentifier);
+        if (Context.User.IsInRole("bot"))
+        {
+            _queueService.RemoveBot(Context.UserIdentifier);
+        }
+        else
+        {
+            _queueService.Dequeue(Context.UserIdentifier);
+        }
+
         return base.OnDisconnectedAsync(exception);
     }
 

@@ -15,6 +15,10 @@ namespace ProjectArena.Domain.QueueService
     public class QueueService : IQueueService
     {
         private readonly IDictionary<GameMode, SceneModeQueue> _queues;
+
+        private readonly Random _botsRandom;
+        private readonly ICollection<BotDefinition> _bots;
+
         private readonly IBattleService _battleService;
         private object _locker = new object();
 
@@ -22,27 +26,40 @@ namespace ProjectArena.Domain.QueueService
             IBattleService battleService)
         {
             _battleService = battleService;
+            _botsRandom = new Random();
+            _bots = new HashSet<BotDefinition>();
             _queues = BattleHelper.GetNewModeQueue();
+        }
+
+        public void AddBot(BotDefinition definition)
+        {
+            _bots.Add(definition);
+        }
+
+        public void RemoveBot(string id)
+        {
+            var bot = _bots.FirstOrDefault(x => x.BotId == id);
+            _bots.Remove(bot);
         }
 
         public void QueueProcessing(double time)
         {
             foreach (var queue in _queues.Values)
             {
-                var complectingActors = new List<List<UserInQueue>>();
-                var complectedActors = new List<List<UserInQueue>>();
+                var complectingUsers = new List<List<UserInQueue>>();
+                var complectedUsers = new List<List<UserInQueue>>();
                 foreach (var user in queue.Queue)
                 {
                     bool added = false;
-                    if (complectingActors.Count > 0)
+                    if (complectingUsers.Count > 0)
                     {
                         added = true;
-                        var complect = complectingActors[0];
+                        var complect = complectingUsers[0];
                         complect.Add(user);
                         if (complect.Count >= queue.Mode.MaxPlayers)
                         {
-                            complectedActors.Add(complect);
-                            complectingActors.RemoveAt(0);
+                            complectedUsers.Add(complect);
+                            complectingUsers.RemoveAt(0);
                         }
                     }
 
@@ -63,15 +80,32 @@ namespace ProjectArena.Domain.QueueService
 
                     if (!added)
                     {
-                        complectingActors.Add(new List<UserInQueue>() { user });
+                        complectingUsers.Add(new List<UserInQueue>() { user });
                     }
 
                     user.Time += time;
                 }
 
-                var allComplectedActors = complectedActors.SelectMany(actor => actor).ToList();
+                foreach (var complectingUsersItem in complectingUsers)
+                {
+                    if (complectingUsersItem.Average(x => x.Time) >= queue.Mode.TimeTillBot)
+                    {
+                        while (complectingUsersItem.Count < queue.Mode.MaxPlayers)
+                        {
+                            var chosenBot = _botsRandom.Next(_bots.Count * 10000) % _bots.Count;
+                            complectingUsersItem.Add(new UserInQueue()
+                            {
+                                UserId = _bots.Skip(chosenBot).First().BotId
+                            });
+                        }
+
+                        complectedUsers.Add(complectingUsersItem);
+                    }
+                }
+
+                var allComplectedActors = complectedUsers.SelectMany(actor => actor).ToList();
                 queue.Queue.RemoveWhere(x => allComplectedActors.Contains(x));
-                foreach (var complect in complectedActors)
+                foreach (var complect in complectedUsers)
                 {
                     Task.Run(async () => await _battleService.StartNewBattleAsync(queue.Mode, complect));
                 }
