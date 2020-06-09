@@ -29,30 +29,24 @@ namespace ProjectArena.Application.Users.Commands.VerifyEmail
                 var user = await _userManager.FindByIdAsync(request.UserId);
                 if (user == null)
                 {
-                    throw new ValidationErrorsException()
+                    throw new ValidationErrorsException(new[]
                     {
-                        Errors = new[]
+                        new HttpErrorInfo()
                         {
-                            new HttpErrorInfo()
-                            {
-                                Key = "email",
-                                Description = "User with 'Email' is not found."
-                            }
+                            Key = "email",
+                            Description = "User with 'Email' is not found."
                         }
-                    };
+                    });
                 }
 
                 var result = await _userManager.ConfirmEmailAsync(user, request.Code);
                 if (!result.Succeeded)
                 {
-                    throw new ValidationErrorsException()
+                    throw new ValidationErrorsException(result.Errors.Select(x => new HttpErrorInfo()
                     {
-                        Errors = result.Errors.Select(x => new HttpErrorInfo()
-                        {
-                        Key = x.Code,
-                        Description = x.Description
-                        })
-                    };
+                    Key = x.Code,
+                    Description = x.Description
+                    }));
                 }
 
                 return Unit.Value;

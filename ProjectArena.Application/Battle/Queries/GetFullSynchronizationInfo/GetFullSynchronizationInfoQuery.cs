@@ -28,11 +28,7 @@ namespace ProjectArena.Application.Battle.Queries.GetFullSynchronizationInfo
                     var result = _battleService.GetUserSynchronizationInfo(request.UserId);
                     if (result == null)
                     {
-                        throw new HttpException()
-                        {
-                            Error = "User is not in battle",
-                            StatusCode = 400
-                        };
+                        throw new CannotPerformOperationException("User is not in battle");
                     }
 
                     return result;

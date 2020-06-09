@@ -53,11 +53,7 @@ namespace ProjectArena.Application.Users.Commands.SendEmailVerification
                 catch (Exception e)
                 {
                     _logger.LogError(e, "Email exception");
-                    throw new HttpException()
-                    {
-                        StatusCode = 503,
-                        Error = "Cannot send email. Try again later..."
-                    };
+                    throw new ServiceUnreachableException("Cannot send email. Try again later...");
                 }
 
                 return Unit.Value;

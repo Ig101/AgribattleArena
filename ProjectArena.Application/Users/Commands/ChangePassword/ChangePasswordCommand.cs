@@ -29,30 +29,24 @@ namespace ProjectArena.Application.Users.Commands.ChangePassword
                 var user = await _userManager.FindByIdAsync(request.UserId);
                 if (user == null)
                 {
-                    throw new ValidationErrorsException()
+                    throw new ValidationErrorsException(new[]
                     {
-                        Errors = new[]
+                        new HttpErrorInfo()
                         {
-                            new HttpErrorInfo()
-                            {
-                                Key = "id",
-                                Description = "User is not found."
-                            }
+                            Key = "id",
+                            Description = "User is not found."
                         }
-                    };
+                    });
                 }
 
                 var result = await _userManager.ResetPasswordAsync(user, request.Code, request.Password);
                 if (!result.Succeeded)
                 {
-                    throw new ValidationErrorsException()
+                    throw new ValidationErrorsException(result.Errors.Select(x => new HttpErrorInfo()
                     {
-                        Errors = result.Errors.Select(x => new HttpErrorInfo()
-                        {
-                            Key = x.Code,
-                            Description = x.Description
-                        })
-                    };
+                        Key = x.Code,
+                        Description = x.Description
+                    }));
                 }
 
                 return Unit.Value;

@@ -16,7 +16,7 @@ namespace ProjectArena.Infrastructure.Mongo
 
         public bool UseTransactions { get; private set; }
 
-        public MongoConnection(IOptions<MongoConnectionSettings> connection,  IServiceProvider provider)
+        public MongoConnection(Assembly assembly, IOptions<MongoConnectionSettings> connection,  IServiceProvider provider)
         {
             var mongoUrl = new MongoUrl(connection.Value.ConnectionString);
             var databaseName = mongoUrl.DatabaseName;
@@ -24,13 +24,11 @@ namespace ProjectArena.Infrastructure.Mongo
 
             _client = new MongoClient(mongoUrl);
 
-            var types = Assembly
-                .GetExecutingAssembly()
+            var types = assembly
                 .GetTypes()
                 .Where(type => IsMongoContext(type.BaseType))
                 .ToList();
-            var configTypes = Assembly
-                .GetExecutingAssembly()
+            var configTypes = assembly
                 .GetTypes()
                 .Select(type => new
                 {

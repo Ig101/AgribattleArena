@@ -32,17 +32,14 @@ namespace ProjectArena.Application.Users.Commands.SendEmailVerification
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null)
                 {
-                    throw new ValidationErrorsException()
+                    throw new ValidationErrorsException(new[]
                     {
-                        Errors = new[]
+                        new HttpErrorInfo()
                         {
-                            new HttpErrorInfo()
-                            {
-                                Key = "email",
-                                Description = $"User with email {request.Email} is not found."
-                            }
+                            Key = "email",
+                            Description = $"User with email {request.Email} is not found."
                         }
-                    };
+                    });
                 }
 
                 await _mediator.Send(new SendEmailVerificationCommand()

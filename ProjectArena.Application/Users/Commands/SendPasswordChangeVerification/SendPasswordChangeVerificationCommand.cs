@@ -42,17 +42,14 @@ namespace ProjectArena.Application.Users.Commands.SendPasswordChangeVerification
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null)
                 {
-                    throw new ValidationErrorsException()
+                    throw new ValidationErrorsException(new[]
                     {
-                        Errors = new[]
+                        new HttpErrorInfo()
                         {
-                            new HttpErrorInfo()
-                            {
-                                Key = "email",
-                                Description = $"User with email {request.Email} is not found."
-                            }
+                            Key = "email",
+                            Description = $"User with email {request.Email} is not found."
                         }
-                    };
+                    });
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -68,11 +65,7 @@ namespace ProjectArena.Application.Users.Commands.SendPasswordChangeVerification
                 catch (Exception e)
                 {
                     _logger.LogError(e, "Email exception");
-                    throw new HttpException()
-                    {
-                        StatusCode = 503,
-                        Error = "Cannot send email. Try again later..."
-                    };
+                    throw new ServiceUnreachableException("Cannot send email. Try again later...");
                 }
 
                 return Unit.Value;

@@ -102,30 +102,18 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
                 var roster = await _gameContext.Rosters.GetOneAsync(x => x.UserId == request.UserId);
                 if (roster == null)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "User is not found",
-                        StatusCode = 404
-                    };
+                    throw new NotFoundException("User is not found");
                 }
 
                 var character = await _gameContext.Characters.GetOneAsync(x => x.Id == request.CharacterId);
                 if (character == null)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "Character is not found",
-                        StatusCode = 404
-                    };
+                    throw new NotFoundException("Character is not found");
                 }
 
                 if (character.RosterUserId != request.UserId)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "Character is not belong to user",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("Character is not belong to user");
                 }
 
                 var changedTalentPositions = request.Changes.Select(x => TalentPositionHelper.GetPositionFromCoordinates(x.X, x.Y)).ToList();
@@ -162,11 +150,7 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
                     {
                         if (change.State == talent.State)
                         {
-                            throw new HttpException()
-                            {
-                                Error = "Cannot do the same action with talent twice",
-                                StatusCode = 400
-                            };
+                            throw new CannotPerformOperationException("Cannot do the same action with talent twice");
                         }
 
                         cost--;
@@ -176,11 +160,7 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
                     {
                         if (characterTalents.Any(x => x.Position == changePosition) == change.State)
                         {
-                            throw new HttpException()
-                            {
-                                Error = "Cannot do action with talent",
-                                StatusCode = 400
-                            };
+                            throw new CannotPerformOperationException("Cannot do action with talent");
                         }
 
                         cost++;
@@ -200,29 +180,17 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
                                 (Math.Abs(change.Y - talentCoordinates.y) == 1 && change.X == talentCoordinates.x);
                         }))
                         {
-                            throw new HttpException()
-                            {
-                                Error = "Cannot pick remote talent",
-                                StatusCode = 400
-                            };
+                            throw new CannotPerformOperationException("Cannot pick remote talent");
                         }
 
                         if (changeTalent.Exceptions != null && characterTalents.Any(x => changeTalent.Exceptions.Contains(x.Id)))
                         {
-                            throw new HttpException()
-                            {
-                                Error = "Cannot add talent with unprocessible exceptions",
-                                StatusCode = 400
-                            };
+                            throw new CannotPerformOperationException("Cannot add talent with unprocessible exceptions");
                         }
 
                         if (changeTalent.Prerequisites != null && changeTalent.Prerequisites.Any(x => !characterTalents.Any(t => t.Id == x)))
                         {
-                            throw new HttpException()
-                            {
-                                Error = "Cannot add talent with unresolved prerequisites",
-                                StatusCode = 400
-                            };
+                            throw new CannotPerformOperationException("Cannot add talent with unresolved prerequisites");
                         }
 
                         talentsCount++;
@@ -270,48 +238,28 @@ namespace ProjectArena.Application.Game.Commands.ChangeCharacterTalents
                             (topTalent != null && !FindPath(topTalent, characterTalents, new List<TalentNode>())) ||
                             (bottomTalent != null && !FindPath(bottomTalent, characterTalents, new List<TalentNode>())))
                         {
-                            throw new HttpException()
-                            {
-                                Error = "Remains talents without bonds",
-                                StatusCode = 400
-                            };
+                            throw new CannotPerformOperationException("Remains talents without bonds");
                         }
                     }
 
                     if (talentsCount > _talentsMaxCount)
                     {
-                        throw new HttpException()
-                        {
-                            Error = "Extra talents",
-                            StatusCode = 400
-                        };
+                        throw new CannotPerformOperationException("Extra talents");
                     }
 
                     if (cost > roster.Experience)
                     {
-                        throw new HttpException()
-                        {
-                            Error = "Not enough money",
-                            StatusCode = 400
-                        };
+                        throw new CannotPerformOperationException("Not enough money");
                     }
 
                     if (strength < 5 || willpower < 5 || constitution < 5 || speed < 5)
                     {
-                        throw new HttpException()
-                        {
-                            Error = "Stats cannot be less than five",
-                            StatusCode = 400
-                        };
+                        throw new CannotPerformOperationException("Stats cannot be less than five");
                     }
 
                     if (skillsCount > 5)
                     {
-                        throw new HttpException()
-                        {
-                            Error = "Skills amount cannot be more than 5",
-                            StatusCode = 400
-                        };
+                        throw new CannotPerformOperationException("Skills amount cannot be more than 5");
                     }
                 }
 

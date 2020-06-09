@@ -43,60 +43,36 @@ namespace ProjectArena.Application.Game.Commands.HirePatron
             {
                 if (_queueService.IsUserInQueue(request.UserId) != null || _battleService.IsUserInBattle(request.UserId))
                 {
-                    throw new HttpException()
-                    {
-                        Error = "User cannot do that in queue or battle.",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("User cannot do that in queue or battle.");
                 }
 
                 var roster = await _gameContext.Rosters.GetOneAsync(x => x.UserId == request.UserId);
                 var characters = await _gameContext.Characters.GetAsync(x => x.RosterUserId == roster.UserId);
                 if (characters.Count() < 6 && request.CharacterForReplace != null)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "Cannot fire character while roster is not full.",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("Cannot fire character while roster is not full.");
                 }
 
                 if (characters.Count() >= 6 && request.CharacterForReplace == null)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "Need character to fire while roster is not full.",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("Need character to fire while roster is not full.");
                 }
 
                 if (request.CharacterForReplace != null && !characters.Any(x => x.Id == request.CharacterForReplace))
                 {
-                    throw new HttpException()
-                    {
-                        Error = "Firing character is not yours.",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("Firing character is not yours.");
                 }
 
                 if (roster.BoughtPatrons.Contains(request.PatronId) || request.PatronId > roster.TavernCapacity || request.PatronId < 1)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "Patron has already been hired.",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("Patron has already been hired.");
                 }
 
                 var characterForReplace = characters.FirstOrDefault(x => x.Id == request.CharacterForReplace);
 
                 if (request.CharacterForReplace != null && characterForReplace.IsKeyCharacter)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "Cannot fire key character",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("Cannot fire key character");
                 }
 
                 _gameContext.Rosters.Update(

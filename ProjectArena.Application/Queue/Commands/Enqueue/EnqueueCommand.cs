@@ -43,11 +43,7 @@ namespace ProjectArena.Application.Queue.Commands.Enqueue
                 var characters = await _gameContext.Characters.GetAsync(x => x.RosterUserId == request.UserId && !x.Deleted);
                 if (characters.Count() != 6)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "Wrong amount of characters",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("Wrong amount of characters");
                 }
 
                 var result = _queueService.Enqueue(new UserToEnqueueDto()
@@ -57,11 +53,7 @@ namespace ProjectArena.Application.Queue.Commands.Enqueue
                 });
                 if (!result)
                 {
-                    throw new HttpException()
-                    {
-                        Error = "User is already in queue",
-                        StatusCode = 400
-                    };
+                    throw new CannotPerformOperationException("User is already in queue");
                 }
 
                 return Unit.Value;

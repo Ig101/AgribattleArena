@@ -43,14 +43,11 @@ namespace ProjectArena.Application.Users.Commands.SignUp
                     user, request.Password).ConfigureAwait(false);
                 if (!result.Succeeded)
                 {
-                    throw new ValidationErrorsException()
+                    throw new ValidationErrorsException(result.Errors.Select(x => new HttpErrorInfo()
                     {
-                        Errors = result.Errors.Select(x => new HttpErrorInfo()
-                        {
-                            Key = x.Code,
-                            Description = x.Description
-                        })
-                    };
+                        Key = x.Code,
+                        Description = x.Description
+                    }));
                 }
 
                 await _mediator.Send(new SendEmailVerificationCommand()

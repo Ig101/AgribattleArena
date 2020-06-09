@@ -32,30 +32,18 @@ namespace ProjectArena.Application.Users.Commands.SignIn
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
-          throw new HttpException()
-          {
-            StatusCode = 401,
-            Error = "Wrong email or password."
-          };
+          throw new UnauthorizedException("Wrong email or password.");
         }
 
         if (!user.EmailConfirmed)
         {
-          throw new HttpException()
-          {
-            StatusCode = 403,
-            Error = "email"
-          };
+          throw new ForbiddenException("Email is not confirmed");
         }
 
         var result = await _signInManager.PasswordSignInAsync(user, request.Password, true, false);
         if (!result.Succeeded)
         {
-          throw new HttpException()
-          {
-            StatusCode = 401,
-            Error = "Wrong email or password."
-          };
+          throw new UnauthorizedException("Wrong email or password.");
         }
 
         return Unit.Value;

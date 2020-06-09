@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -25,17 +26,7 @@ namespace ProjectArena.Api.Filters
 
         public void OnException(ExceptionContext context)
         {
-            if (context.Exception is HttpException httpException)
-            {
-                _logger.LogError($"Error has been found in the {context.Exception.Source} with an error: {httpException.Error}");
-                var factory = context.HttpContext.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
-                var details = factory.CreateProblemDetails(context.HttpContext, httpException.StatusCode, httpException.Error);
-                context.Result = new ObjectResult(details)
-                {
-                    StatusCode = httpException.StatusCode
-                };
-            }
-            else if (context.Exception is ValidationErrorsException validationException)
+            if (context.Exception is ValidationErrorsException validationException)
             {
                 var errorsList = validationException.Errors
                     .Select(x => x.Key + " - " + x.Description)
@@ -56,11 +47,57 @@ namespace ProjectArena.Api.Filters
             }
             else
             {
-                _logger.LogError(context.Exception, $"Unexpected error has been found in the {context.Exception.Source}");
+                _logger.LogError(context.Exception, $"Error has been found in the {context.Exception.Source} with an error: {context.Exception.Message}");
                 var factory = context.HttpContext.RequestServices?.GetRequiredService<ProblemDetailsFactory>();
-                context.Result = new ObjectResult(factory.CreateProblemDetails(context.HttpContext, 500, null, null, context.Exception.Message))
+
+                if (context.Exception is CannotPerformOperationException exception)
                 {
-                    StatusCode = 500
+                    var details = factory.CreateProblemDetails(context.HttpContext, (int)HttpStatusCode.BadRequest, exception.Message);
+                    context.Result = new ObjectResult(details)
+                    {
+                        StatusCode = (int)HttpStatusCode.BadRequest
+                    };
+                }
+
+                if (context.Exception is UnauthorizedException)
+                {
+                    var details = factory.CreateProblemDetails(context.HttpContext, (int)HttpStatusCode.Unauthorized, context.Exception.Message);
+                    context.Result = new ObjectResult(details)
+                    {
+                        StatusCode = (int)HttpStatusCode.Unauthorized
+                    };
+                }
+
+                if (context.Exception is ForbiddenException)
+                {
+                    var details = factory.CreateProblemDetails(context.HttpContext, (int)HttpStatusCode.Forbidden, context.Exception.Message);
+                    context.Result = new ObjectResult(details)
+                    {
+                        StatusCode = (int)HttpStatusCode.Forbidden
+                    };
+                }
+
+                if (context.Exception is NotFoundException)
+                {
+                    var details = factory.CreateProblemDetails(context.HttpContext, (int)HttpStatusCode.NotFound, context.Exception.Message);
+                    context.Result = new ObjectResult(details)
+                    {
+                        StatusCode = (int)HttpStatusCode.NotFound
+                    };
+                }
+
+                if (context.Exception is ServiceUnreachableException)
+                {
+                    var details = factory.CreateProblemDetails(context.HttpContext, (int)HttpStatusCode.ServiceUnavailable, context.Exception.Message);
+                    context.Result = new ObjectResult(details)
+                    {
+                        StatusCode = (int)HttpStatusCode.ServiceUnavailable
+                    };
+                }
+
+                context.Result = new ObjectResult(factory.CreateProblemDetails(context.HttpContext, (int)HttpStatusCode.InternalServerError, null, null, context.Exception.Message))
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
                 };
             }
         }

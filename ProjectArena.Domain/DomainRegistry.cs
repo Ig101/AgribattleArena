@@ -1,8 +1,10 @@
+using System.Reflection;
 using AspNetCore.Identity.Mongo;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using ProjectArena.Domain.ArenaHub;
 using ProjectArena.Domain.BattleService;
@@ -64,7 +66,12 @@ namespace ProjectArena.Domain
                 options.LoginPath = "/api/Account/Login";
                 options.AccessDeniedPath = "/api/Account/AccessDenied";
             });
-            services.AddSingleton<IMongoConnection, MongoConnection>();
+            var domainAssembly = Assembly.GetExecutingAssembly();
+            services.AddSingleton<IMongoConnection, MongoConnection>(
+                provider => new MongoConnection(
+                    domainAssembly,
+                    provider.GetRequiredService<IOptions<MongoConnectionSettings>>(),
+                    provider));
             services.AddTransient<RegistryContext>();
             services.AddTransient<GameContext>();
             services.AddTransient<EmailSender>();

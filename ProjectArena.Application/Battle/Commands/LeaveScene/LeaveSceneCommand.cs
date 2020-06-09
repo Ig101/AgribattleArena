@@ -30,11 +30,7 @@ namespace ProjectArena.Application.Battle.Queries.GetFullSynchronizationInfo
                     var result = _battleService.LeaveScene(request.UserId, request.SceneId);
                     if (!result)
                     {
-                        throw new HttpException()
-                        {
-                            Error = "User is not in battle",
-                            StatusCode = 400
-                        };
+                        throw new CannotPerformOperationException("User is not in battle");
                     }
 
                     return Unit.Value;
