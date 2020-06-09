@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace ProjectArena.Domain.Mongo
+namespace ProjectArena.Infrastructure.Mongo
 {
     public interface IEntityConfiguration<Ttype>
     {

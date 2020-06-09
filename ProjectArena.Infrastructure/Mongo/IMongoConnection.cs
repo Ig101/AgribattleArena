@@ -1,6 +1,6 @@
 using MongoDB.Driver;
 
-namespace ProjectArena.Domain.Mongo
+namespace ProjectArena.Infrastructure.Mongo
 {
     public interface IMongoConnection
     {

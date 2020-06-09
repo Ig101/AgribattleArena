@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using ProjectArena.Domain.Mongo.Operations;
+using ProjectArena.Infrastructure.Mongo.Operations;
 
-namespace ProjectArena.Domain.Mongo
+namespace ProjectArena.Infrastructure.Mongo
 {
     public abstract class BaseMongoContext
     {

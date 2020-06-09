@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using ProjectArena.Domain.Mongo;
 using ProjectArena.Domain.Registry.Entities;
+using ProjectArena.Infrastructure.Mongo;
 
 namespace ProjectArena.Domain.Registry
 {

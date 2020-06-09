@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MongoDB.Driver;
 using ProjectArena.Domain.Identity.Entities;
-using ProjectArena.Domain.Mongo;
+using ProjectArena.Infrastructure.Mongo;
 
 namespace ProjectArena.Domain.Identity.EntityConfiguration
 {

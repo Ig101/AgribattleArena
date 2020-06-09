@@ -4,9 +4,9 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using ProjectArena.Domain.Mongo.Operations;
+using ProjectArena.Infrastructure.Mongo.Operations;
 
-namespace ProjectArena.Domain.Mongo
+namespace ProjectArena.Infrastructure.Mongo
 {
   internal class Repository<T> : IRepository<T>
     {

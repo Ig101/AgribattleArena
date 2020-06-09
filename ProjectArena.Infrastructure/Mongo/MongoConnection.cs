@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using ProjectArena.Domain.Identity.Entities;
-using ProjectArena.Domain.Identity.EntityConfiguration;
 
-namespace ProjectArena.Domain.Mongo
+namespace ProjectArena.Infrastructure.Mongo
 {
   public class MongoConnection : IMongoConnection
   {
@@ -70,12 +68,6 @@ namespace ProjectArena.Domain.Mongo
                     }
                 }
             }
-
-            // Identity
-            var usersCollection = provider.GetRequiredService<IMongoCollection<User>>();
-            new UserConfiguration().ConfigureAsync(usersCollection).Wait();
-            var rolesCollection = provider.GetRequiredService<IMongoCollection<Role>>();
-            new RoleConfiguration().ConfigureAsync(rolesCollection).Wait();
         }
 
         private bool IsMongoContext(Type type)

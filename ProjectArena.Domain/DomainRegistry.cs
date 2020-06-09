@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 using ProjectArena.Domain.ArenaHub;
 using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Identity;
 using ProjectArena.Domain.Identity.Entities;
-using ProjectArena.Domain.Mongo;
+using ProjectArena.Domain.Identity.EntityConfiguration;
 using ProjectArena.Domain.Registry;
+using ProjectArena.Infrastructure.Mongo;
 
 namespace ProjectArena.Domain
 {
@@ -18,6 +20,11 @@ namespace ProjectArena.Domain
     {
         public static IApplicationBuilder UseDomainLayer(this IApplicationBuilder app)
         {
+            var usersCollection = app.ApplicationServices.GetRequiredService<IMongoCollection<User>>();
+            new UserConfiguration().ConfigureAsync(usersCollection).Wait();
+            var rolesCollection = app.ApplicationServices.GetRequiredService<IMongoCollection<Role>>();
+            new RoleConfiguration().ConfigureAsync(rolesCollection).Wait();
+
             app.ApplicationServices.GetRequiredService<IMongoConnection>();
 
             var registry = app.ApplicationServices.GetRequiredService<RegistryContext>();

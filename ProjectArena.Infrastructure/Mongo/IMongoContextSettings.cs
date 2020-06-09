@@ -1,4 +1,4 @@
-namespace ProjectArena.Domain.Mongo
+namespace ProjectArena.Infrastructure.Mongo
 {
     public interface IMongoContextSettings
     {

@@ -16,10 +16,10 @@ using ProjectArena.Domain.ArenaHub;
 using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
-using ProjectArena.Domain.Mongo;
 using ProjectArena.Domain.QueueService;
 using ProjectArena.Domain.Registry;
 using ProjectArena.Infrastructure;
+using ProjectArena.Infrastructure.Mongo;
 using Serilog.Events;
 
 namespace ProjectArena.Api

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace ProjectArena.Domain.Mongo.Operations
+namespace ProjectArena.Infrastructure.Mongo.Operations
 {
     public class InsertOperation<T> : IOperation
     {
