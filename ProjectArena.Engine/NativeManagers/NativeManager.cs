@@ -85,9 +85,9 @@ namespace ProjectArena.Engine.NativeManagers
             skillNatives.Add(id, new SkillNative(id, InternTags(tags), defaultRange, defaultCost, defaultCd, defaultMod, availableTargets, onlyVisibleTargets, actions));
         }
 
-        public void AddTileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, IEnumerable<string> actions, IEnumerable<string> onStepActions)
+        public void AddTileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, IEnumerable<string> actions, IEnumerable<string> onStepActions)
         {
-            tileNatives.Add(id, new TileNative(id, InternTags(tags), flat, defaultHeight, unbearable, defaultMod, actions, onStepActions));
+            tileNatives.Add(id, new TileNative(id, InternTags(tags), flat, defaultHeight, unbearable, defaultMod, revealedByDefault, actions, onStepActions));
         }
 
         public ActorNative GetActorNative(string id)

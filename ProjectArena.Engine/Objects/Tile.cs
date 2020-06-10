@@ -21,6 +21,8 @@ namespace ProjectArena.Engine.Objects
 
         public TileNative Native { get; set; }
 
+        public bool Revealed { get; set; }
+
         public Tile(ISceneParentRef parent, int x, int y, TileNative native, int? height)
         {
             this.Owner = null;
@@ -30,6 +32,7 @@ namespace ProjectArena.Engine.Objects
             this.Height = height ?? native.DefaultHeight;
             this.Native = native;
             this.Affected = true;
+            this.Revealed = native.RevealedByDefault;
         }
 
         public void Update(float time)
@@ -48,6 +51,12 @@ namespace ProjectArena.Engine.Objects
             TempObject = tileObject;
             if (trigger)
             {
+                if (!Revealed)
+                {
+                    Affected = true;
+                    Revealed = true;
+                }
+
                 Native.OnStepAction?.Invoke(Parent, this);
             }
 

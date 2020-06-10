@@ -34,6 +34,8 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         string OwnerId { get; }
 
+        int? Team { get; }
+
         bool IsAlive { get; }
 
         int X { get; }
@@ -59,5 +61,7 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
         bool CanMove { get; }
 
         bool CanAct { get; }
+
+        bool HealthRevealed { get; }
     }
 }

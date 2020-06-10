@@ -21,6 +21,10 @@ namespace ProjectArena.Domain.BattleService.Helpers
 
         public const int DefaultSpeed = 25;
 
+        public const int VictoryReward = 5;
+
+        public const int DefeatReward = 2;
+
         public static string GetBattleActionMethodName(Engine.Helpers.Action? action)
         {
             return "Battle" + (action == null ? "Info" : action.ToString());
@@ -71,12 +75,12 @@ namespace ProjectArena.Domain.BattleService.Helpers
             };
         }
 
-        private static ActorDto MapActor(Engine.ForExternalUse.Synchronization.ObjectInterfaces.IActor actor)
+        private static ActorDto MapActor(Engine.ForExternalUse.Synchronization.ObjectInterfaces.IActor actor, bool ally)
         {
             return new ActorDto()
             {
                 ActionPoints = actor.ActionPoints,
-                AttackingSkill = new SkillDto()
+                AttackingSkill = ally || actor.AttackingSkill.Revealed ? new SkillDto()
                 {
                     Cd = actor.AttackingSkill.Cd,
                     Cost = actor.AttackingSkill.Cost,
@@ -94,7 +98,8 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Unbearable = actor.AttackingSkill.AvailableTargets.Unbearable,
                         Decorations = actor.AttackingSkill.AvailableTargets.Decorations
                     }
-                },
+                }
+                : null,
                 Buffs = actor.Buffs.Select(k => new BuffDto()
                 {
                     Duration = k.Duration,
@@ -106,10 +111,10 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 ExternalId = actor.ExternalId,
                 Initiative = actor.Initiative,
                 InitiativePosition = actor.InitiativePosition,
-                MaxHealth = actor.MaxHealth,
-                Health = actor.Health,
+                MaxHealth = actor.HealthRevealed || ally ? actor.MaxHealth : (int?)null,
+                Health = actor.HealthRevealed || ally ? actor.Health : (float?)null,
                 OwnerId = actor.OwnerId,
-                Skills = actor.Skills.Select(k => new SkillDto()
+                Skills = actor.Skills.Where(k => ally || k.Revealed).Select(k => new SkillDto()
                 {
                     Cd = k.Cd,
                     Cost = k.Cost,
@@ -136,16 +141,16 @@ namespace ProjectArena.Domain.BattleService.Helpers
             };
         }
 
-        private static ActiveDecorationDto MapDecoration(Engine.ForExternalUse.Synchronization.ObjectInterfaces.IActiveDecoration decoration)
+        private static ActiveDecorationDto MapDecoration(Engine.ForExternalUse.Synchronization.ObjectInterfaces.IActiveDecoration decoration, bool ally)
         {
             return new ActiveDecorationDto()
             {
                 Armor = decoration.Armor.Select(x => MapTagSynergy(x)),
-                Health = decoration.Health,
+                Health = decoration.HealthRevealed || ally ? decoration.Health : (float?)null,
                 Id = decoration.Id,
                 InitiativePosition = decoration.InitiativePosition,
                 IsAlive = decoration.IsAlive,
-                MaxHealth = decoration.MaxHealth,
+                MaxHealth = decoration.HealthRevealed || ally ? decoration.MaxHealth : (float?)null,
                 Mod = decoration.Mod,
                 NativeId = decoration.NativeId,
                 OwnerId = decoration.OwnerId,
@@ -171,12 +176,12 @@ namespace ProjectArena.Domain.BattleService.Helpers
             };
         }
 
-        private static TileDto MapTile(Engine.ForExternalUse.Synchronization.ObjectInterfaces.ITile tile)
+        private static TileDto MapTile(Engine.ForExternalUse.Synchronization.ObjectInterfaces.ITile tile, bool ally)
         {
             return new TileDto()
             {
                 Height = tile.Height,
-                NativeId = tile.NativeId,
+                NativeId = ally || tile.Revealed ? tile.NativeId : "grass",
                 OwnerId = tile.OwnerId,
                 TempActorId = tile.TempActorId,
                 X = tile.X,
@@ -185,14 +190,16 @@ namespace ProjectArena.Domain.BattleService.Helpers
             };
         }
 
-        private static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer)
+        private static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer, string userId)
         {
+            var userPlayerIds = oldSynchronizer.Players.Where(x => x.UserId == userId).Select(x => x.Id);
+            var userTeams = oldSynchronizer.Players.Where(x => x.UserId == userId && x.Team != null).Select(x => x.Team).Distinct().ToList();
             var tileSet = oldSynchronizer.TileSet;
             return new SynchronizerDto()
             {
-                ChangedActors = oldSynchronizer.ChangedActors.Select(x => MapActor(x)),
+                ChangedActors = oldSynchronizer.ChangedActors.Select(x => MapActor(x, userTeams.Contains(x.Team) || userPlayerIds.Contains(x.OwnerId))),
                 DeletedActors = oldSynchronizer.DeletedActors,
-                ChangedDecorations = oldSynchronizer.ChangedDecorations.Select(x => MapDecoration(x)),
+                ChangedDecorations = oldSynchronizer.ChangedDecorations.Select(x => MapDecoration(x, userTeams.Contains(x.Team) || userPlayerIds.Contains(x.OwnerId))),
                 DeletedDecorations = oldSynchronizer.DeletedDecorations,
                 ChangedEffects = oldSynchronizer.ChangedEffects.Select(x => MapEffect(x)),
                 DeletedEffects = oldSynchronizer.DeletedEffects,
@@ -204,7 +211,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     Team = x.Team,
                     TurnsSkipped = x.TurnsSkipped
                 }),
-                ChangedTiles = oldSynchronizer.ChangedTiles.Select(x => MapTile(x)),
+                ChangedTiles = oldSynchronizer.ChangedTiles.Select(x => MapTile(x, userTeams.Contains(x.Team) || userPlayerIds.Contains(x.OwnerId))),
                 TempActor = oldSynchronizer.TempActor,
                 TempDecoration = oldSynchronizer.TempDecoration,
                 TilesetHeight = tileSet.GetLength(1),
@@ -224,14 +231,14 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     case Engine.Helpers.PlayerStatus.Victorious:
                         synchronizer.Reward = new RewardDto()
                         {
-                            Experience = 5
+                            Experience = VictoryReward
                         };
 
                         break;
                     case Engine.Helpers.PlayerStatus.Defeated:
                         synchronizer.Reward = new RewardDto()
                         {
-                            Experience = 2
+                            Experience = DefeatReward
                         };
 
                         break;
@@ -243,9 +250,9 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return update;
         }
 
-        public static SynchronizerDto MapSynchronizer(ISyncEventArgs syncEventArgs)
+        public static SynchronizerDto MapSynchronizer(ISyncEventArgs syncEventArgs, string userId)
         {
-            var synchronizer = MapSynchronizer(syncEventArgs.SyncInfo);
+            var synchronizer = MapSynchronizer(syncEventArgs.SyncInfo, userId);
             synchronizer.Id = syncEventArgs.Scene.Id;
             synchronizer.TargetX = syncEventArgs.TargetX;
             synchronizer.TargetY = syncEventArgs.TargetY;
@@ -256,19 +263,19 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return synchronizer;
         }
 
-        public static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer, IScene scene)
+        public static SynchronizerDto MapSynchronizer(ISynchronizer oldSynchronizer, IScene scene, string userId)
         {
-            var synchronizer = MapSynchronizer(oldSynchronizer);
+            var synchronizer = MapSynchronizer(oldSynchronizer, userId);
             synchronizer.Id = scene.Id;
             synchronizer.Version = scene.Version;
             synchronizer.TurnTime = scene.RemainedTurnTime;
             return synchronizer;
         }
 
-        public static SynchronizerDto GetFullSynchronizationData(IScene scene)
+        public static SynchronizerDto GetFullSynchronizationData(IScene scene, string userId)
         {
             var synchronizer = scene.GetFullSynchronizationData();
-            return MapSynchronizer(synchronizer, scene);
+            return MapSynchronizer(synchronizer, scene, userId);
         }
     }
 }

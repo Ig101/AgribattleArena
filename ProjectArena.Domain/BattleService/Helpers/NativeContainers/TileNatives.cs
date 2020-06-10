@@ -13,6 +13,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 0,
                 false,
                 1,
+                true,
                 new string[0],
                 new string[0]);
             nativeManager.AddTileNative(
@@ -22,6 +23,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 0,
                 false,
                 1,
+                true,
                 new string[0],
                 new string[] { "AddTilePower" });
         }

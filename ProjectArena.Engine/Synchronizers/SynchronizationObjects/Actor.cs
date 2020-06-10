@@ -32,6 +32,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string OwnerId { get; }
 
+        public int? Team { get; }
+
         public List<ISkill> Skills { get; }
 
         public int ActionPointsIncome { get; }
@@ -68,6 +70,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public bool CanAct { get; }
 
+        public bool HealthRevealed { get; }
+
         public Actor(Objects.Actor actor)
         {
             this.Id = actor.Id;
@@ -80,6 +84,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Constitution = actor.Constitution;
             this.Speed = actor.Speed;
             this.OwnerId = actor.Owner?.Id;
+            this.Team = actor.Owner?.Team;
             this.Skills = actor.Skills.Select(x => (ISkill)new Skill(x)).ToList();
             this.Buffs = actor.Buffs.Select(x => (IBuff)new Buff(x)).ToList();
             this.InitiativePosition = actor.InitiativePosition;
@@ -99,6 +104,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.AttackModifiers.AddRange(actor.AttackModifiers);
             this.CanMove = actor.BuffManager.CanMove;
             this.CanAct = actor.BuffManager.CanAct;
+            this.HealthRevealed = actor.HealthRevealed;
         }
 
         public Actor(

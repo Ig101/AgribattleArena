@@ -58,7 +58,7 @@ namespace ProjectArena.Engine.Objects.Immaterial
             }
 
             Health -= amount;
-            return health <= 0;
+            return amount != 0;
         }
     }
 }

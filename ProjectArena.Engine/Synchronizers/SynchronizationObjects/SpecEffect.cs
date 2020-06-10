@@ -8,6 +8,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string OwnerId { get; }
 
+        public int? Team { get; }
+
         public bool IsAlive { get; }
 
         public int X { get; }
@@ -26,6 +28,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
         {
             this.Id = specEffect.Id;
             this.OwnerId = specEffect.Owner?.Id;
+            this.Team = specEffect.Owner?.Team;
             this.IsAlive = specEffect.IsAlive;
             this.X = specEffect.X;
             this.Y = specEffect.Y;

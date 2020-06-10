@@ -67,7 +67,7 @@ namespace ProjectArena.Domain.ArenaHub
         var userId = Context.UserIdentifier;
         var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
-        if (scene.GetPlayerActors(userId).Contains(actorId))
+        if (scene.GetUserActors(userId).Contains(actorId))
         {
             result = scene.ActorAttack(actorId, targetX, targetY);
         }
@@ -83,7 +83,7 @@ namespace ProjectArena.Domain.ArenaHub
         var userId = Context.UserIdentifier;
         var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
-        if (scene.GetPlayerActors(userId).Contains(actorId))
+        if (scene.GetUserActors(userId).Contains(actorId))
         {
             result = scene.ActorMove(actorId, targetX, targetY);
         }
@@ -99,7 +99,7 @@ namespace ProjectArena.Domain.ArenaHub
         var userId = Context.UserIdentifier;
         var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
-        if (scene.GetPlayerActors(userId).Contains(actorId))
+        if (scene.GetUserActors(userId).Contains(actorId))
         {
             result = scene.ActorCast(actorId, skillId, targetX, targetY);
         }
@@ -115,7 +115,7 @@ namespace ProjectArena.Domain.ArenaHub
         var userId = Context.UserIdentifier;
         var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
-        if (scene.GetPlayerActors(userId).Contains(actorId))
+        if (scene.GetUserActors(userId).Contains(actorId))
         {
             result = scene.ActorWait(actorId);
         }

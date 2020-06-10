@@ -19,7 +19,7 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public float InitiativePosition { get; set; }
 
-        public float Health { get; set; }
+        public float? Health { get; set; }
 
         public string OwnerId { get; set; }
 
@@ -29,7 +29,7 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public float Z { get; set; }
 
-        public int MaxHealth { get; set; }
+        public int? MaxHealth { get; set; }
 
         public int ActionPoints { get; set; }
 

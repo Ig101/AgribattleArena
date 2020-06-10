@@ -14,6 +14,7 @@ import { EndGameDeclaration } from '../models/modals/end-game-declaration.model'
 import { UserService } from 'src/app/shared/services/user.service';
 import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle-status.enum';
 import { throwIssueDeclaration } from '../natives/complex-animations/throw.animation';
+import { convertSkill } from '../helpers/scene-create.helper';
 
 @Injectable()
 export class AsciiBattleAnimationsService {
@@ -318,23 +319,28 @@ export class AsciiBattleAnimationsService {
     switch (synchronizer.action) {
       case BattleSynchronizationActionEnum.Attack:
         if (issuer) {
+          let attackingSkill = issuer.attackingSkill;
+          if (!attackingSkill) {
+            attackingSkill =
+              convertSkill(synchronizer.sync.changedActors.find(x => x.id === synchronizer.sync.actorId).attackingSkill, false);
+          }
           frames.push([]);
-          if (!onlySecondPart && issuer.attackingSkill.action?.generateIssueDeclarations) {
-            frames[0].push(...issuer.attackingSkill.action
+          if (!onlySecondPart && attackingSkill.action?.generateIssueDeclarations) {
+            frames[0].push(...attackingSkill.action
               .generateIssueDeclarations(
                 issuer,
                 this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
                 this.battleStorageService.scene,
-                issuer.attackingSkill.action));
+                attackingSkill.action));
             this.getFramesFromAction(issuer, frames);
           }
-          if (issuer.attackingSkill.action?.generateSyncDeclarations) {
-            frames[0].push(...issuer.attackingSkill.action
+          if (attackingSkill.action?.generateSyncDeclarations) {
+            frames[0].push(...attackingSkill.action
               .generateSyncDeclarations(
                 issuer,
                 this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
                 this.battleStorageService.scene,
-                issuer.attackingSkill.action));
+                attackingSkill.action));
           }
         }
         break;
@@ -347,7 +353,12 @@ export class AsciiBattleAnimationsService {
       case BattleSynchronizationActionEnum.Cast:
         if (issuer) {
           frames.push([]);
-          const skill = issuer.skills.find(x => x.id === synchronizer.sync.skillActionId);
+          let skill = issuer.skills.find(x => x.id === synchronizer.sync.skillActionId);
+          if (!skill) {
+            skill = convertSkill(synchronizer.sync.changedActors
+              .find(x => x.id === synchronizer.sync.actorId).skills
+              .find(x => x.id === synchronizer.sync.skillActionId), false);
+          }
           if (skill) {
             if (!onlySecondPart) {
               if (skill.action.generateIssueDeclarations) {
@@ -356,7 +367,7 @@ export class AsciiBattleAnimationsService {
                   issuer,
                   this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
                   this.battleStorageService.scene,
-                  issuer.attackingSkill.action));
+                  skill.action));
               }
               this.getFramesFromAction(issuer, frames);
             }
@@ -366,7 +377,7 @@ export class AsciiBattleAnimationsService {
                   issuer,
                   this.battleStorageService.scene.tiles[synchronizer.sync.targetX][synchronizer.sync.targetY],
                   this.battleStorageService.scene,
-                  issuer.attackingSkill.action));
+                  skill.action));
             }
           }
         }

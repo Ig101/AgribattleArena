@@ -17,6 +17,6 @@ namespace ProjectArena.Engine.ForExternalUse
 
         void AddSkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, Targets availableTargets, bool onlyVisibleTargets, IEnumerable<string> actions);
 
-        void AddTileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, IEnumerable<string> actions, IEnumerable<string> onStepActions);
+        void AddTileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, IEnumerable<string> actions, IEnumerable<string> onStepActions);
     }
 }

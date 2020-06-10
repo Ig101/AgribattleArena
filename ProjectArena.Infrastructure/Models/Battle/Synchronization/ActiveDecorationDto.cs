@@ -12,7 +12,7 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public float InitiativePosition { get; set; }
 
-        public float Health { get; set; }
+        public float? Health { get; set; }
 
         public string OwnerId { get; set; }
 
@@ -24,7 +24,7 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public float Z { get; set; }
 
-        public float MaxHealth { get; set; }
+        public float? MaxHealth { get; set; }
 
         public IEnumerable<TagSynergyDto> Armor { get; set; }
     }

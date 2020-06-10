@@ -10,6 +10,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string OwnerId { get; }
 
+        public int? Team { get; }
+
         public int? TempActorId { get; }
 
         public float Height { get; }
@@ -18,11 +20,14 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public bool Unbearable { get; }
 
+        public bool Revealed { get; }
+
         public Tile(Objects.Tile tile)
         {
             this.X = tile.X;
             this.Y = tile.Y;
             this.OwnerId = tile.Owner?.Id;
+            this.Team = tile.Owner?.Team;
             this.TempActorId = tile.TempObject?.Id;
             this.Height = tile.Height;
             this.NativeId = tile.Native.Id;

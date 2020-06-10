@@ -22,6 +22,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string OwnerId { get; }
 
+        public int? Team { get; }
+
         public bool IsAlive { get; }
 
         public int X { get; }
@@ -29,6 +31,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
         public int Y { get; }
 
         public float Z { get; }
+
+        public bool HealthRevealed { get; }
 
         public ActiveDecoration(Objects.ActiveDecoration decoration)
         {
@@ -41,10 +45,12 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Armor = new List<TagSynergy>();
             this.Armor.AddRange(decoration.DamageModel.Armor);
             this.OwnerId = decoration.Owner?.Id;
+            this.Team = decoration.Owner?.Team;
             this.IsAlive = decoration.IsAlive;
             this.X = decoration.X;
             this.Y = decoration.Y;
             this.Z = decoration.Z;
+            this.HealthRevealed = decoration.HealthRevealed;
         }
     }
 }

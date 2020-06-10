@@ -17,6 +17,8 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         string OwnerId { get; }
 
+        int? Team { get; }
+
         bool IsAlive { get; }
 
         int X { get; }
@@ -28,5 +30,7 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
         float MaxHealth { get; }
 
         List<TagSynergy> Armor { get; }
+
+        bool HealthRevealed { get; }
     }
 }

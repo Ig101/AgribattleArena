@@ -23,6 +23,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public bool OnlyVisibleTargets { get; }
 
+        public bool Revealed { get; }
+
         public Skill(Objects.Immaterial.Skill skill)
         {
             this.Id = skill.Id;
@@ -34,6 +36,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.PreparationTime = skill.PreparationTime;
             this.OnlyVisibleTargets = skill.Native.OnlyVisibleTargets;
             this.AvailableTargets = skill.Native.AvailableTargets;
+            this.Revealed = skill.Revealed;
         }
     }
 }

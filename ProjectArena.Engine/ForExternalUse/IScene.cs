@@ -22,6 +22,8 @@ namespace ProjectArena.Engine.ForExternalUse
 
         IEnumerable<int> GetPlayerActors(string playerId);
 
+        IEnumerable<int> GetUserActors(string userId);
+
         ISynchronizer GetFullSynchronizationData();
 
         void UpdateTime(float time);

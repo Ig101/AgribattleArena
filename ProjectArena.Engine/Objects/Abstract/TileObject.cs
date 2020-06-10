@@ -17,6 +17,8 @@ namespace ProjectArena.Engine.Objects.Abstract
 
         public ITileParentRef TempTile { get; set; }
 
+        public bool HealthRevealed { get; set; }
+
         public TileObject(ISceneParentRef parent, IPlayerParentRef owner, ITileParentRef tempTile, float z, DamageModel damageModel, TaggingNative native)
             : base(parent, owner, tempTile.X, tempTile.Y, z)
         {
@@ -25,12 +27,18 @@ namespace ProjectArena.Engine.Objects.Abstract
             this.DamageModel = damageModel;
             this.InitiativePosition += parent.GetNextRandom() / 10000f;
             this.Affected = true;
+            this.HealthRevealed = false;
         }
 
         public virtual bool Damage(float amount, IEnumerable<string> tags)
         {
             this.Affected = true;
-            this.IsAlive = this.IsAlive && !DamageModel.Damage(amount, tags);
+            if (DamageModel.Damage(amount, tags))
+            {
+                HealthRevealed = true;
+            }
+
+            this.IsAlive = this.IsAlive && DamageModel.Health > 0;
             return !this.IsAlive;
         }
 

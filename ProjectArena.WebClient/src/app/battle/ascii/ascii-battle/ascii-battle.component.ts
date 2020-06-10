@@ -394,7 +394,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             ${tile.decoration.visualization.color.b},${tile.decoration.visualization.color.a})`,
           name: tile.decoration.name,
           description: tile.decoration.description,
-          health: { current: tile.decoration.health, max: tile.decoration.maxHealth },
+          health: tile.decoration.maxHealth ? { current: tile.decoration.health, max: tile.decoration.maxHealth } : undefined,
           anotherObjects: undefined
         });
       }
@@ -730,25 +730,27 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       if ((tile.actor || tile.decoration) && !(replacement?.overflowHealth)) {
         const healthObject = tile.actor || tile.decoration;
-        const percentOfHealth = Math.max(0, Math.min(healthObject.health / healthObject.maxHealth, 1));
-        let color: Color;
-        if (percentOfHealth > 0.65) {
-          color = {r: 0, g: 255, b: 0};
-        } else if (percentOfHealth > 0.25) {
-          color = {r: 255, g: 255, b: 0};
-        } else {
-          color = {r: 255, g: 0, b: 0};
+        if (healthObject.maxHealth) {
+          const percentOfHealth = Math.max(0, Math.min(healthObject.health / healthObject.maxHealth, 1));
+          let color: Color;
+          if (percentOfHealth > 0.65) {
+            color = {r: 0, g: 255, b: 0};
+          } else if (percentOfHealth > 0.25) {
+            color = {r: 255, g: 255, b: 0};
+          } else {
+            color = {r: 255, g: 0, b: 0};
+          }
+          color = brightImpact(tile.bright, color);
+          const zoomMultiplier = Math.floor(this.battleZoom);
+          this.canvasContext.lineWidth = zoomMultiplier * 2;
+          this.canvasContext.strokeStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+          const path = new Path2D();
+          path.moveTo(canvasX + 1 + zoomMultiplier, canvasY + 1 + zoomMultiplier);
+          path.lineTo(
+            canvasX + percentOfHealth * (this.tileWidth - 2 * 1 - zoomMultiplier) + 1 + zoomMultiplier,
+            canvasY + 1 + zoomMultiplier);
+          this.canvasContext.stroke(path);
         }
-        color = brightImpact(tile.bright, color);
-        const zoomMultiplier = Math.floor(this.battleZoom);
-        this.canvasContext.lineWidth = zoomMultiplier * 2;
-        this.canvasContext.strokeStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-        const path = new Path2D();
-        path.moveTo(canvasX + 1 + zoomMultiplier, canvasY + 1 + zoomMultiplier);
-        path.lineTo(
-          canvasX + percentOfHealth * (this.tileWidth - 2 * 1 - zoomMultiplier) + 1 + zoomMultiplier,
-          canvasY + 1 + zoomMultiplier);
-        this.canvasContext.stroke(path);
       }
     }
   }

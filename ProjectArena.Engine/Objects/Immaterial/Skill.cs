@@ -28,6 +28,8 @@ namespace ProjectArena.Engine.Objects.Immaterial
 
         public IEnumerable<string> AggregatedTags => Native.Tags.Concat(parent.Tags);
 
+        public bool Revealed { get; set; }
+
         public Skill(IActorParentRef parent, SkillNative skill, float? cd, float? mod, int? cost, int? range)
             : base(parent.Parent)
         {
@@ -37,6 +39,7 @@ namespace ProjectArena.Engine.Objects.Immaterial
             this.cd = cd ?? skill.DefaultCd;
             this.Native = skill;
             this.parent = parent;
+            this.Revealed = false;
         }
 
         public void Update(float time)
@@ -104,6 +107,7 @@ namespace ProjectArena.Engine.Objects.Immaterial
                 Native.Action(parent.Parent, parent, target, this);
                 PreparationTime = cd;
                 parent.SpendActionPoints(cost);
+                Revealed = true;
                 return true;
             }
 

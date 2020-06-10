@@ -224,23 +224,34 @@ namespace ProjectArena.Domain.BattleService
 
             string actionName = BattleHelper.GetBattleActionMethodName(e.Action);
 
-            foreach (var player in e.Scene.ShortPlayers)
+            var uniqueUsers = e.Scene.ShortPlayers
+                .GroupBy(key => key.UserId, res => res, (key, res) => new
+                {
+                    UserId = key,
+                    Players = res
+                })
+                .ToList();
+
+            foreach (var userPlayers in uniqueUsers)
             {
-                if (player.Left)
+                if (userPlayers.Players.All(x => x.Left))
                 {
                     continue;
                 }
 
-                var user = battleHub.Clients.User(player.Id);
+                var user = battleHub.Clients.User(userPlayers.UserId);
                 if (user != null)
                 {
-                    var synchronizer = BattleHelper.MapSynchronizer(e);
-                    if (BattleHelper.CalculateReward(ref synchronizer, e.Scene, player.Id))
+                    var synchronizer = BattleHelper.MapSynchronizer(e, userPlayers.UserId);
+                    foreach (var player in userPlayers.Players)
                     {
-                        Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
+                        if (BattleHelper.CalculateReward(ref synchronizer, e.Scene, player.Id))
+                        {
+                            Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
+                        }
                     }
 
-                    battleHub.Clients.User(player.UserId).SendAsync(actionName, synchronizer);
+                    battleHub.Clients.User(userPlayers.UserId).SendAsync(actionName, synchronizer);
                 }
             }
         }
@@ -290,12 +301,8 @@ namespace ProjectArena.Domain.BattleService
             }
 
             var player = scene.ShortPlayers.First(x => x.UserId == userId);
-            var synchronizer = BattleHelper.GetFullSynchronizationData(scene);
-            if (BattleHelper.CalculateReward(ref synchronizer, scene, player.Id))
-            {
-                Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
-            }
-
+            var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
+            BattleHelper.CalculateReward(ref synchronizer, scene, player.Id);
             return synchronizer;
         }
 
@@ -306,12 +313,8 @@ namespace ProjectArena.Domain.BattleService
                 .Select(scene =>
                 {
                     var player = scene.ShortPlayers.First(x => x.UserId == userId);
-                    var synchronizer = BattleHelper.GetFullSynchronizationData(scene);
-                    if (BattleHelper.CalculateReward(ref synchronizer, scene, player.Id))
-                    {
-                        Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
-                    }
-
+                    var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
+                    BattleHelper.CalculateReward(ref synchronizer, scene, player.Id);
                     return synchronizer;
                 })
                 .ToList();

@@ -21,5 +21,7 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
         Targets AvailableTargets { get; }
 
         bool OnlyVisibleTargets { get; }
+
+        bool Revealed { get; }
     }
 }

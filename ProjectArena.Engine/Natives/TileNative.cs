@@ -20,7 +20,9 @@ namespace ProjectArena.Engine.Natives
 
         public float DefaultMod { get; }
 
-        public TileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, IEnumerable<string> actionNames, IEnumerable<string> onStepActionNames)
+        public bool RevealedByDefault { get; }
+
+        public TileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, IEnumerable<string> actionNames, IEnumerable<string> onStepActionNames)
             : this(
                 id,
                 tags,
@@ -28,6 +30,7 @@ namespace ProjectArena.Engine.Natives
                 defaultHeight,
                 unbearable,
                 defaultMod,
+                revealedByDefault,
                 actionNames.Select(actionName => (TileActions.Action)Delegate.CreateDelegate(
                     typeof(TileActions.Action),
                     typeof(TileActions).GetMethod(actionName, BindingFlags.Public | BindingFlags.Static))),
@@ -37,9 +40,10 @@ namespace ProjectArena.Engine.Natives
         {
         }
 
-        public TileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, IEnumerable<TileActions.Action> actions, IEnumerable<TileActions.OnStepAction> onStepActions)
+        public TileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, IEnumerable<TileActions.Action> actions, IEnumerable<TileActions.OnStepAction> onStepActions)
             : base(id, tags)
         {
+            this.RevealedByDefault = revealedByDefault;
             this.Flat = flat;
             this.DefaultHeight = defaultHeight;
             this.Unbearable = unbearable;

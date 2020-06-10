@@ -139,6 +139,11 @@ namespace ProjectArena.Engine
             return Actors.FindAll(x => x.Owner != null && x.Owner.Id == playerId).Select(x => x.Id);
         }
 
+        public IEnumerable<int> GetUserActors(string userId)
+        {
+            return Actors.FindAll(x => x.Owner != null && x.Owner.Id == userId).Select(x => x.Id);
+        }
+
         // Creation methods
         public Actor ResurrectActor(Actor actor, Tile target, int health)
         {
@@ -241,7 +246,13 @@ namespace ProjectArena.Engine
                     actor.BuffManager.RemoveTileBuffs();
                 }
 
-                Tiles[x][y].Native.OnStepAction(this, Tiles[x][y]);
+                if (!tile.Revealed)
+                {
+                    tile.Affected = true;
+                    tile.Revealed = true;
+                }
+
+                tile.Native.OnStepAction(this, Tiles[x][y]);
             }
 
             return tile;

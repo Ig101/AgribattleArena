@@ -78,6 +78,10 @@ export function convertTile(tile: SyncTile, owner: Player): Tile {
 }
 
 export function convertSkill(skill: SyncSkill, isCurrentPlayerTeam: boolean): Skill {
+  if (!skill) {
+    return undefined;
+  }
+
   let skillNative = skillNatives[skill.nativeId];
   if (!skillNative) {
     skillNative = {

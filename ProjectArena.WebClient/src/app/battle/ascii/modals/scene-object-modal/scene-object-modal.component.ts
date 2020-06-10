@@ -32,6 +32,9 @@ export class SceneObjectModalComponent implements IModal<ModalObject>, OnDestroy
     this.name = data.name;
     this.description = data.description;
     this.health = data.health;
+    if (this.health) {
+      this.health.current = Math.ceil(this.health.current);
+    }
     this.tabs = data.anotherObjects;
   }
 
