@@ -11,6 +11,7 @@ using ProjectArena.Domain.ArenaHub;
 using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.Email;
 using ProjectArena.Domain.Game;
+using ProjectArena.Domain.Game.Entities;
 using ProjectArena.Domain.Identity;
 using ProjectArena.Domain.Identity.Entities;
 using ProjectArena.Domain.Identity.EntityConfiguration;
@@ -61,6 +62,7 @@ namespace ProjectArena.Domain
                 userManager.AddToRoleAsync(user, "admin").Wait();
             }
 
+            var gameContext = provider.GetRequiredService<GameContext>();
             if (userSettings.Bots != null)
             {
                 foreach (var bot in userSettings.Bots)
@@ -68,8 +70,10 @@ namespace ProjectArena.Domain
                     var botEmail = $"{bot.Login}@{bot.Login}";
                     if (userManager.FindByEmailAsync(botEmail).Result == null)
                     {
+                        var botId = Guid.NewGuid().ToString();
                         var user = new User()
                         {
+                            Id = botId,
                             UserName = Guid.NewGuid().ToString(),
                             Email = botEmail,
                             ViewName = bot.Login,
@@ -77,9 +81,12 @@ namespace ProjectArena.Domain
                         };
                         userManager.CreateAsync(user, bot.Password).Wait();
                         userManager.AddToRoleAsync(user, "bot").Wait();
+                        gameContext.UseGlassCannonPartyBotRoster(botId);
                     }
                 }
             }
+
+            gameContext.ApplyChangesAsync().Wait();
 
             return app;
         }

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using ProjectArena.Application.Queue.Commands.Dequeue;
+using ProjectArena.Domain.BattleService;
 using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Identity;
 using ProjectArena.Domain.QueueService;
@@ -23,17 +24,17 @@ namespace ProjectArena.Application.Queue.Commands.Enqueue
 
         internal class Handler : IRequestHandler<EnqueueCommand>
         {
-            private readonly IdentityUserManager _userManager;
             private readonly IQueueService _queueService;
+            private readonly IBattleService _battleService;
             private readonly GameContext _gameContext;
 
             public Handler (
-                IdentityUserManager userManager,
                 IQueueService queueService,
+                IBattleService battleService,
                 GameContext gameContext)
             {
-                _userManager = userManager;
                 _queueService = queueService;
+                _battleService = battleService;
                 _gameContext = gameContext;
             }
 
@@ -44,6 +45,11 @@ namespace ProjectArena.Application.Queue.Commands.Enqueue
                 if (characters.Count() != 6)
                 {
                     throw new CannotPerformOperationException("Wrong amount of characters");
+                }
+
+                if (_battleService.IsUserInBattle(request.UserId))
+                {
+                    throw new CannotPerformOperationException("User is in battle");
                 }
 
                 var result = _queueService.Enqueue(new UserToEnqueueDto()

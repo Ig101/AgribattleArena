@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectArena.Application.Queue.Commands.Dequeue;
 using ProjectArena.Application.Queue.Commands.Enqueue;
+using ProjectArena.Application.Queue.Commands.EnqueueForBot;
 using ProjectArena.Application.Users.Queries.GetFullUserInfoByPrincipalQuery;
 using ProjectArena.Infrastructure.Enums;
 
@@ -26,11 +27,22 @@ namespace ProjectArena.Api.Controllers
             {
                 User = User
             });
-            await Mediator.Send(new EnqueueCommand()
+            if (User.IsInRole("bot"))
             {
-                UserId = user.Id,
-                Mode = GameMode.Patrol
-            });
+                await Mediator.Send(new EnqueueForBotCommand()
+                {
+                    UserId = user.Id
+                });
+            }
+            else
+            {
+                await Mediator.Send(new EnqueueCommand()
+                {
+                    UserId = user.Id,
+                    Mode = GameMode.Patrol
+                });
+            }
+
             return NoContent();
         }
 
