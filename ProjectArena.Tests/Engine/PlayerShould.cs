@@ -106,7 +106,7 @@ namespace ProjectArena.Tests.Engine
                             Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndGame), "EndTurn message action " + t);
                         if (tempPlayer.TurnsSkipped >= 3)
                         {
-                            Assert.That(tempPlayer.Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Defeated), "Player status " + t);
+                            Assert.That(tempPlayer.Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Left), "Player status " + t);
                         }
                         else
                         {
@@ -116,7 +116,7 @@ namespace ProjectArena.Tests.Engine
                 }
                 else
                 {
-                    Assert.That(tempPlayer.Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Defeated), "Player status");
+                    Assert.That(tempPlayer.Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Left), "Player status");
                     Assert.That(Scene.Actors.Count, Is.EqualTo(1), "Amount of actors after defeat");
                 }
 

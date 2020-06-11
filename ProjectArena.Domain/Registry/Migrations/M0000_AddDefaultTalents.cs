@@ -109,7 +109,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                     Name = "Mist Weapon",
                     Class = CharacterClass.Enchanter,
                     ClassPoints = 1,
-                    UniqueDescription = "Increases base attack damage. 50% damage of attack converts to willpower-based damage. Works with \"Marksman\".",
+                    UniqueDescription = "Heavily increases base attack damage. 50% damage of attack converts to willpower-based damage. Works with \"Marksman\".",
                     UniqueAction = "LearnMistWeapon",
                     StrengthModifier = 0,
                     WillpowerModifier = 0,

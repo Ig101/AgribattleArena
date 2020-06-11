@@ -24,7 +24,8 @@ namespace ProjectArena.Tests.Engine
         public void DefaultDamage(float amount, bool expectedState, float expectedHealth)
         {
             _damageModel = new DamageModel(500, null);
-            bool isDead = _damageModel.Damage(amount, null);
+            _damageModel.Damage(amount, null);
+            bool isDead = _damageModel.Health <= 0;
             Assert.That(isDead, Is.EqualTo(expectedState), "Deal " + amount + " damage to 500 health Actor");
             Assert.That(_damageModel.Health, Is.EqualTo(expectedHealth), "Amount of health after dealing " + amount + " damage to 500 health Actor");
         }
@@ -36,7 +37,8 @@ namespace ProjectArena.Tests.Engine
         public void HalfResistDamage(float amount, bool expectedState, float expectedHealth)
         {
             _damageModel = new DamageModel(500, new TagSynergy[] { new TagSynergy("damage", 0.5f) });
-            bool isDead = _damageModel.Damage(amount, new string[] { "damage" });
+            _damageModel.Damage(amount, new string[] { "damage" });
+            bool isDead = _damageModel.Health <= 0;
 
             Assert.That(isDead, Is.EqualTo(expectedState), "Deal " + amount + " damage to half-resist 500 health Actor");
             Assert.That(_damageModel.Health, Is.EqualTo(expectedHealth), "Amount of health after dealing " + amount + " damage to half-resist 500 health Actor");
@@ -51,7 +53,8 @@ namespace ProjectArena.Tests.Engine
             {
                 Health = 250f
             };
-            bool isDead = _damageModel.Damage(amount, new string[] { "damage" });
+            _damageModel.Damage(amount, new string[] { "damage" });
+            bool isDead = _damageModel.Health <= 0;
 
             Assert.That(isDead, Is.EqualTo(expectedState), "Deal " + amount + " damage to immune 250/500 health Actor");
             Assert.That(_damageModel.Health, Is.EqualTo(250), "Amount of health after dealing " + amount + " damage to immune 250/500 health Actor");
@@ -78,7 +81,8 @@ namespace ProjectArena.Tests.Engine
             {
                 Health = 250
             };
-            bool isDead = _damageModel.Damage(-amount, null);
+            _damageModel.Damage(-amount, null);
+            bool isDead = _damageModel.Health <= 0;
 
             Assert.That(isDead, Is.EqualTo(expectedState), "Heal 250 health Actor by " + amount);
             Assert.That(_damageModel.Health, Is.EqualTo(expectedHealth), "Amount of health after healing 250 health Actor by " + amount);

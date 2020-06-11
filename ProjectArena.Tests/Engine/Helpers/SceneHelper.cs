@@ -14,7 +14,7 @@ namespace ProjectArena.Tests.Engine.Helpers
     {
         public static IVarManager CreateVarManagerWithDefaultVars()
         {
-            IVarManager varManager = EngineHelper.CreateVarManager(80, 20, 3, 8, 5, 0.1f, 0.1f, 0.1f);
+            IVarManager varManager = EngineHelper.CreateVarManager(80, 20, 3, 8, 5, 0.1f, 0.1f, 0.1f, 0);
 
             return varManager;
         }
@@ -23,8 +23,8 @@ namespace ProjectArena.Tests.Engine.Helpers
         {
             List<IPlayer> players = new List<IPlayer>
             {
-                EngineHelper.CreatePlayerForGeneration("1", null, firstActors),
-                EngineHelper.CreatePlayerForGeneration("2", null, secondActors)
+                EngineHelper.CreatePlayerForGeneration("1", "1", null, firstActors),
+                EngineHelper.CreatePlayerForGeneration("2", "2", null, secondActors)
             };
             return players;
         }
@@ -38,7 +38,7 @@ namespace ProjectArena.Tests.Engine.Helpers
             EventHandler<ISyncEventArgs> eventHandler)
         {
             Scene scene = (Scene)EngineHelper.CreateNewScene(
-                0,
+                Guid.NewGuid(),
                 CreatePlayers(firstPlayer, secondPlayer),
                 EngineHelper.CreateTestSceneGenerator(tileSet, winConditions),
                 nativeManager,

@@ -12,17 +12,17 @@ namespace ProjectArena.Tests.Engine.Helpers
     {
         private static void AddNatives(INativeManager nativeManager)
         {
-            nativeManager.AddTileNative("test_wall", new string[] { }, false, 100, true, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h1", new string[] { }, false, 9, false, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h2", new string[] { }, false, 18, false, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h3", new string[] { }, false, 27, false, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h4", new string[] { }, false, 36, false, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h5", new string[] { }, false, -9, false, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h6", new string[] { }, false, -18, false, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h7", new string[] { }, false, -27, false, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h8", new string[] { }, false, -36, false, 1, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_effect", new string[] { }, false, 0, false, 10, new string[] { "DoDamage" }, new string[] { "DoDamageOnStep" });
-            nativeManager.AddTileNative("test_tile", new string[] { }, false, 0, false, 1, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_wall", new string[] { }, false, 100, true, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_h1", new string[] { }, false, 9, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_h2", new string[] { }, false, 18, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_h3", new string[] { }, false, 27, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_h4", new string[] { }, false, 36, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_h5", new string[] { }, false, -9, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_h6", new string[] { }, false, -18, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_h7", new string[] { }, false, -27, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_h8", new string[] { }, false, -36, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_tile_effect", new string[] { }, false, 0, false, 10, true, new string[] { "DoDamage" }, new string[] { "DoDamageOnStep" });
+            nativeManager.AddTileNative("test_tile", new string[] { }, false, 0, false, 1, true, new string[] { }, new string[] { });
             nativeManager.AddActorNative("test_actor", new string[] { "test_actor_tag" }, 0, new TagSynergy[] { new TagSynergy("test_skill_tag", 0.5f) });
             nativeManager.AddEffectNative("test_effect", new string[] { }, 0, null, 10, new string[] { "DoDamageTempTile" }, new string[] { "DoDamageTempTileDeath" });
             nativeManager.AddDecorationNative("test_decoration", new string[] { }, new TagSynergy[] { }, 100, 0, 10, new string[] { "DoSelfDamage" }, new string[] { "DoSelfDamage" });
@@ -93,11 +93,11 @@ namespace ProjectArena.Tests.Engine.Helpers
 
             IActor[] firstPlayerActors = new IActor[]
             {
-                EngineHelper.CreateActorForGeneration(Guid.Parse("10505fc7-3cdf-4c2b-bf36-4c934673a080"), "test_actor", "test_actor_attack_range", 20, 10, 20, 10, new string[] { "test_actor_skill", "test_actor_skill_range" }, 5)
+                EngineHelper.CreateActorForGeneration(Guid.Parse("10505fc7-3cdf-4c2b-bf36-4c934673a080"), "test_actor", "test_actor_attack_range", 20, 10, 20, 10, new string[] { "test_actor_skill", "test_actor_skill_range" }, 5, new string[0])
             };
             IActor[] secondPlayerActors = new IActor[]
             {
-                EngineHelper.CreateActorForGeneration(Guid.Parse("d5bd9080-cd18-475d-9a30-1a1361f99e7e"), "test_actor", "test_actor_attack", 10, 20, 10, 18, new string[] { "test_actor_skill", "test_actor_skill_range" }, 4)
+                EngineHelper.CreateActorForGeneration(Guid.Parse("d5bd9080-cd18-475d-9a30-1a1361f99e7e"), "test_actor", "test_actor_attack", 10, 20, 10, 18, new string[] { "test_actor_skill", "test_actor_skill_range" }, 4, new string[0])
             };
             return SceneHelper.CreateNewScene(nativeManager, tileSet, victory, firstPlayerActors, secondPlayerActors, eventHandler);
         }
