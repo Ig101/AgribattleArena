@@ -224,7 +224,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 1,
                 2,
                 0,
-                21,
+                25,
                 new Targets()
                 {
                     Allies = true,
@@ -239,7 +239,7 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 5,
                 3,
                 0,
-                14,
+                17,
                 new Targets()
                 {
                     Allies = true,

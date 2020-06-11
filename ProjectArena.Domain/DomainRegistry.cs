@@ -82,6 +82,13 @@ namespace ProjectArena.Domain
                         userManager.CreateAsync(user, bot.Password).Wait();
                         userManager.AddToRoleAsync(user, "bot").Wait();
                         gameContext.UseGlassCannonPartyBotRoster(botId);
+                        gameContext.UseAmbushersPartyBotRoster(botId);
+                        gameContext.UseBloodPartyBotRoster(botId);
+                        gameContext.UseDefaultPartyBotRoster(botId);
+                        gameContext.UseEnchantedPartyBotRoster(botId);
+                        gameContext.UseSummonersPartyBotRoster(botId);
+                        gameContext.UseTanksPartyBotRoster(botId);
+                        gameContext.UseUltraMobilePartyBotRoster(botId);
                     }
                 }
             }
