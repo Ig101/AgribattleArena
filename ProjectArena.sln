@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectArena.Infrastructure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectArena.Tests", "ProjectArena.Tests\ProjectArena.Tests.csproj", "{C5559C04-40EB-4596-AA7A-4518163BF0F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectArena.Content", "ProjectArena.Content\ProjectArena.Content.csproj", "{8B260010-B98B-4E66-B10C-D8608092F94A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,5 +102,17 @@ Global
 		{C5559C04-40EB-4596-AA7A-4518163BF0F5}.Release|x64.Build.0 = Release|Any CPU
 		{C5559C04-40EB-4596-AA7A-4518163BF0F5}.Release|x86.ActiveCfg = Release|Any CPU
 		{C5559C04-40EB-4596-AA7A-4518163BF0F5}.Release|x86.Build.0 = Release|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Debug|x64.Build.0 = Debug|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Debug|x86.Build.0 = Debug|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|x64.ActiveCfg = Release|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|x64.Build.0 = Release|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|x86.ActiveCfg = Release|Any CPU
+		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

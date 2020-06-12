@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using ProjectArena.Engine.Helpers;
 using ProjectArena.Engine.Helpers.DelegateLists;
+using ProjectArena.Engine.Objects;
+using ProjectArena.Engine.Objects.Immaterial;
 
 namespace ProjectArena.Engine.Natives
 {
@@ -21,24 +23,9 @@ namespace ProjectArena.Engine.Natives
 
         public bool OnlyVisibleTargets { get; }
 
-        public SkillActions.Action Action { get; }
+        public Action<ISceneParentRef, IActorParentRef, Tile, Skill> Action { get; }
 
-        public SkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, Targets availableTargets, bool onlyVisibleTargets, IEnumerable<string> actionNames)
-            : this(
-                id,
-                tags,
-                defaultRange,
-                defaultCost,
-                defaultCd,
-                defaultMod,
-                availableTargets,
-                onlyVisibleTargets,
-                actionNames.Select(actionName =>
-                    (SkillActions.Action)Delegate.CreateDelegate(typeof(SkillActions.Action), typeof(SkillActions).GetMethod(actionName, BindingFlags.Public | BindingFlags.Static))))
-        {
-        }
-
-        public SkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, Targets availableTargets, bool onlyVisibleTargets, IEnumerable<SkillActions.Action> actions)
+        public SkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, Targets availableTargets, bool onlyVisibleTargets, Action<ISceneParentRef, IActorParentRef, Tile, Skill> action)
             : base(id, tags)
         {
             this.DefaultRange = defaultRange;
@@ -47,11 +34,7 @@ namespace ProjectArena.Engine.Natives
             this.DefaultMod = defaultMod;
             this.AvailableTargets = availableTargets;
             this.OnlyVisibleTargets = onlyVisibleTargets;
-            this.Action = null;
-            foreach (SkillActions.Action action in actions)
-            {
-                this.Action += action;
-            }
+            this.Action = action;
         }
     }
 }

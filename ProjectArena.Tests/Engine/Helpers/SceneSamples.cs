@@ -5,37 +5,120 @@ using ProjectArena.Engine.ForExternalUse.EngineHelper;
 using ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces;
 using ProjectArena.Engine.ForExternalUse.Synchronization;
 using ProjectArena.Engine.Helpers;
+using ProjectArena.Engine.Objects;
 
 namespace ProjectArena.Tests.Engine.Helpers
 {
     public static class SceneSamples
     {
+        private static void DoSelfDamage(ISceneParentRef scene, ActiveDecoration activeDecoration)
+        {
+            activeDecoration.Damage(activeDecoration.Mod, activeDecoration.Native.Tags);
+        }
+
+        private static void DoDamageOnStep(ISceneParentRef parent, Tile tile)
+        {
+            DoDamage(parent, tile, 1);
+        }
+
+        private static void DoDamage(ISceneParentRef parent, Tile tile, float time)
+        {
+            if (time > 0)
+            {
+                if (tile.TempObject != null)
+                {
+                    tile.TempObject.Damage(tile.Native.DefaultMod * time, tile.Native.Tags);
+                }
+            }
+        }
+
+        private static void DoDamageTempTile(ISceneParentRef parent, SpecEffect effect, float time)
+        {
+            if (time > 0)
+            {
+                var target = parent.Tiles[effect.X][effect.Y].TempObject;
+                if (target != null)
+                {
+                    target.Damage(effect.Mod * time, effect.Native.Tags);
+                }
+            }
+        }
+
+        private static void DoDamageTempTileDeath(ISceneParentRef parent, SpecEffect effect)
+        {
+            DoDamageTempTile(parent, effect, 1);
+        }
+
+        private static void DoDamageAttack(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, ProjectArena.Engine.Objects.Immaterial.Skill skill)
+        {
+            if (targetTile.TempObject != null)
+            {
+                float mod = skill.CalculateModAttackPower(targetTile.TempObject.Native.Tags);
+                targetTile.TempObject.Damage(mod, skill.AggregatedTags);
+            }
+        }
+
+        private static void DoDamageSkill(ISceneParentRef scene, IActorParentRef owner, Tile targetTile, ProjectArena.Engine.Objects.Immaterial.Skill skill)
+        {
+            if (targetTile.TempObject != null)
+            {
+                float mod = skill.CalculateModSkillPower(targetTile.TempObject.Native.Tags);
+                targetTile.TempObject.Damage(mod, skill.AggregatedTags);
+            }
+        }
+
+        private static void AddMaxHealth(ProjectArena.Engine.Objects.Immaterial.Buffs.IBuffManagerParentRef manager, ProjectArena.Engine.Objects.Immaterial.Buffs.Buff buff)
+        {
+            manager.AdditionMaxHealth += buff.Mod;
+        }
+
+        private static void AddStats(ProjectArena.Engine.Objects.Immaterial.Buffs.IBuffManagerParentRef manager, ProjectArena.Engine.Objects.Immaterial.Buffs.Buff buff)
+        {
+            manager.AdditionMaxHealth += buff.Mod;
+            manager.AdditionStrength += buff.Mod;
+            manager.Attack.Add(new TagSynergy("test_self_tag", "test_target_tag", buff.Mod));
+            manager.Armor.Add(new TagSynergy("test_target_tag", buff.Mod));
+        }
+
+        private static void DamageSelf(ISceneParentRef scene, IActorParentRef actor, ProjectArena.Engine.Objects.Immaterial.Buffs.Buff buff, float time)
+        {
+            if (time > 0)
+            {
+                actor.Damage(buff.Mod * time, buff.Native.Tags);
+            }
+        }
+
+        private static void DamageSelfPurge(ISceneParentRef scene, IActorParentRef actor, ProjectArena.Engine.Objects.Immaterial.Buffs.Buff buff)
+        {
+            DamageSelf(scene, actor, buff, 1);
+        }
+
         private static void AddNatives(INativeManager nativeManager)
         {
-            nativeManager.AddTileNative("test_wall", new string[] { }, false, 100, true, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h1", new string[] { }, false, 9, false, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h2", new string[] { }, false, 18, false, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h3", new string[] { }, false, 27, false, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h4", new string[] { }, false, 36, false, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h5", new string[] { }, false, -9, false, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h6", new string[] { }, false, -18, false, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h7", new string[] { }, false, -27, false, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_h8", new string[] { }, false, -36, false, 1, true, new string[] { }, new string[] { });
-            nativeManager.AddTileNative("test_tile_effect", new string[] { }, false, 0, false, 10, true, new string[] { "DoDamage" }, new string[] { "DoDamageOnStep" });
-            nativeManager.AddTileNative("test_tile", new string[] { }, false, 0, false, 1, true, new string[] { }, new string[] { });
+            nativeManager.AddTileNative("test_wall", new string[0], false, 100, true, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_h1", new string[0], false, 9, false, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_h2", new string[0], false, 18, false, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_h3", new string[0], false, 27, false, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_h4", new string[0], false, 36, false, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_h5", new string[0], false, -9, false, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_h6", new string[0], false, -18, false, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_h7", new string[0], false, -27, false, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_h8", new string[0], false, -36, false, 1, true, null, null);
+            nativeManager.AddTileNative("test_tile_effect", new string[0], false, 0, false, 10, true, DoDamage, DoDamageOnStep);
+            nativeManager.AddTileNative("test_tile", new string[0], false, 0, false, 1, true, null, null);
             nativeManager.AddActorNative("test_actor", new string[] { "test_actor_tag" }, 0, new TagSynergy[] { new TagSynergy("test_skill_tag", 0.5f) });
-            nativeManager.AddEffectNative("test_effect", new string[] { }, 0, null, 10, new string[] { "DoDamageTempTile" }, new string[] { "DoDamageTempTileDeath" });
-            nativeManager.AddDecorationNative("test_decoration", new string[] { }, new TagSynergy[] { }, 100, 0, 10, new string[] { "DoSelfDamage" }, new string[] { "DoSelfDamage" });
-            nativeManager.AddSkillNative("test_actor_attack", new string[] { }, 1, 1, 0, 75, new Targets() { NotAllies = true, Allies = true, Bearable = true, Unbearable = true, Self = true }, false, new string[] { "DoDamageAttack" });
-            nativeManager.AddSkillNative("test_actor_attack_range", new string[] { }, 4, 1, 0, 12.5f, new Targets() { NotAllies = true, Allies = true, Bearable = true, Unbearable = true, Self = true }, false, new string[] { "DoDamageAttack" });
-            nativeManager.AddSkillNative("test_actor_skill", new string[] { "test_skill_tag" }, 1, 1, 0, 60, new Targets() { NotAllies = true, Allies = true, Bearable = true, Unbearable = true, Self = true }, false, new string[] { "DoDamageSkill" });
-            nativeManager.AddSkillNative("test_actor_skill_range", new string[] { }, 4, 2, 2, 10, new Targets() { NotAllies = true, Allies = true, Bearable = true, Unbearable = true, Self = true }, false, new string[] { "DoDamageSkill" });
-            nativeManager.AddBuffNative("test_buff_default", new string[] { "buff" }, false, 1, false, false, null, 1, new string[] { }, new string[] { "AddTestAttackAndArmor", "AddStrength", "AddMaxHealth" }, new string[] { "DamageSelfPurge" });
-            nativeManager.AddBuffNative("test_buff_duration", new string[] { "buff" }, false, 1, false, false, 1, 1, new string[] { }, new string[] { }, new string[] { });
-            nativeManager.AddBuffNative("test_buff_eternal", new string[] { "item" }, true, 1, false, false, null, 1, new string[] { }, new string[] { "AddMaxHealth" }, new string[] { "DamageSelfPurge" });
-            nativeManager.AddBuffNative("test_buff_multiple", new string[] { "buff" }, false, 4, false, false, null, 1, new string[] { }, new string[] { "AddMaxHealth" }, new string[] { });
-            nativeManager.AddBuffNative("test_buff_summarize", new string[] { "buff" }, false, 1, true, false, null, 1, new string[] { }, new string[] { "AddMaxHealth" }, new string[] { });
-            nativeManager.AddBuffNative("test_debuff", new string[] { "debuff" }, false, 1, false, false, null, 1, new string[] { "DamageSelf" }, new string[] { }, new string[] { "DamageSelfPurge" });
+            nativeManager.AddEffectNative("test_effect", new string[0], 0, null, 10, DoDamageTempTile, DoDamageTempTileDeath);
+            nativeManager.AddDecorationNative("test_decoration", new string[0], new TagSynergy[] { }, 100, 0, 10, DoSelfDamage, DoSelfDamage);
+            nativeManager.AddSkillNative("test_actor_attack", new string[0], 1, 1, 0, 75, new Targets() { NotAllies = true, Allies = true, Bearable = true, Unbearable = true, Self = true }, false, DoDamageAttack);
+            nativeManager.AddSkillNative("test_actor_attack_range", new string[0], 4, 1, 0, 12.5f, new Targets() { NotAllies = true, Allies = true, Bearable = true, Unbearable = true, Self = true }, false, DoDamageAttack);
+            nativeManager.AddSkillNative("test_actor_skill", new string[] { "test_skill_tag" }, 1, 1, 0, 60, new Targets() { NotAllies = true, Allies = true, Bearable = true, Unbearable = true, Self = true }, false, DoDamageSkill);
+            nativeManager.AddSkillNative("test_actor_skill_range", new string[0], 4, 2, 2, 10, new Targets() { NotAllies = true, Allies = true, Bearable = true, Unbearable = true, Self = true }, false, DoDamageSkill);
+            nativeManager.AddBuffNative("test_buff_default", new string[] { "buff" }, false, 1, false, false, null, 1, null, AddStats, DamageSelfPurge);
+            nativeManager.AddBuffNative("test_buff_duration", new string[] { "buff" }, false, 1, false, false, 1, 1, null, null, null);
+            nativeManager.AddBuffNative("test_buff_eternal", new string[] { "item" }, true, 1, false, false, null, 1, null, AddMaxHealth, DamageSelfPurge);
+            nativeManager.AddBuffNative("test_buff_multiple", new string[] { "buff" }, false, 4, false, false, null, 1, null, AddMaxHealth, null);
+            nativeManager.AddBuffNative("test_buff_summarize", new string[] { "buff" }, false, 1, true, false, null, 1, null, AddMaxHealth, null);
+            nativeManager.AddBuffNative("test_debuff", new string[] { "debuff" }, false, 1, false, false, null, 1, DamageSelf, null, DamageSelfPurge);
             nativeManager.AddRoleModelNative("test_roleModel", 10, 10, 10, 10, 4, "test_actor_attack", new string[] { "test_actor_skill" });
         }
 

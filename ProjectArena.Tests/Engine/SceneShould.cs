@@ -24,7 +24,7 @@ namespace ProjectArena.Tests.Engine
 
             Assert.That(Scene, Is.Not.Null, "Check scene object existence");
             Assert.That(SyncMessages.Count, Is.EqualTo(2), "Check messages count");
-            Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.StartGame), "Check StartGame message action");
+            Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.StartGame), "Check StartGame message action");
             Assert.That(SyncMessages[0].Version, Is.EqualTo(1), "Check version of StartGame message");
             Assert.That(SyncMessages[0].SyncInfo.TempActor, Is.Null, "Check tempActor in StartGame message");
             Assert.That(SyncMessages[0].SyncInfo.Players.Count(), Is.EqualTo(2), "Check players count in StartGame message");
@@ -33,7 +33,7 @@ namespace ProjectArena.Tests.Engine
             Assert.That(SyncMessages[0].SyncInfo.ChangedEffects.Count(), Is.EqualTo(0), "Check changedEffects count in StartGame message");
             Assert.That(SyncMessages[0].SyncInfo.ChangedTiles.Count(), Is.EqualTo(400), "Check changedTiles count in StartGame message");
             Assert.That(SyncMessages[0].SyncInfo.DeletedActors.ToList().Count, Is.EqualTo(0), "Check deletedActors count in StartGame message");
-            Assert.That(SyncMessages[1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndTurn), "Check EndTurn message action");
+            Assert.That(SyncMessages[1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.EndTurn), "Check EndTurn message action");
             Assert.That(SyncMessages[1].Version, Is.EqualTo(2), "Check version of EndTurn message");
             Assert.That(SyncMessages[1].SyncInfo.TempActor, Is.Not.Null, "Check tempActor in EndTurn message");
             Assert.That(SyncMessages[1].SyncInfo.ChangedActors.Count(), Is.EqualTo(2), "Check changedActors count in EndTurn message");

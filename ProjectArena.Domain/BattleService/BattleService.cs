@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using ProjectArena.Content;
 using ProjectArena.Domain.BattleService.Helpers;
-using ProjectArena.Domain.BattleService.Helpers.NativeContainers;
 using ProjectArena.Domain.BattleService.Models;
 using ProjectArena.Domain.Game;
 using ProjectArena.Domain.Game.Entities;
@@ -45,13 +45,7 @@ namespace ProjectArena.Domain.BattleService
         private void SetupNewNativeManager()
         {
             var nativeManager = EngineHelper.CreateNativeManager();
-            nativeManager.FillBuffNatives();
-            nativeManager.FillActorNatives();
-            nativeManager.FillSkillNatives();
-            nativeManager.FillDecorationNatives();
-            nativeManager.FillEffectNatives();
-            nativeManager.FillRoleModelNatives();
-            nativeManager.FillTileNatives();
+            nativeManager.FillNatives();
             _nativeManager = nativeManager;
         }
 

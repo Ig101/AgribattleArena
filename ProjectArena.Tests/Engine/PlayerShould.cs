@@ -50,7 +50,7 @@ namespace ProjectArena.Tests.Engine
             Scene.ActorAttack(Scene.TempTileObject.Id, tileX, 2);
             Assert.That(!deadMan.IsAlive, Is.True, "Actor killed");
             Assert.That(SyncMessages.Count, Is.EqualTo(3), "Count of syncMessages");
-            Assert.That(SyncMessages[2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndGame));
+            Assert.That(SyncMessages[2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.EndGame));
             Assert.That(Scene.Players.ToArray()[first ? 0 : 1].Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Victorious));
             Assert.That(Scene.Players.ToArray()[first ? 1 : 0].Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Defeated));
             Assert.That(Scene.Actors.Count, Is.EqualTo(1), "Count of actors");
@@ -65,8 +65,8 @@ namespace ProjectArena.Tests.Engine
             Scene.ActorAttack(actor.Id, 18, 2);
             Assert.That(actor.IsAlive, Is.False, "Actor is dead");
             Assert.That(SyncMessages.Count, Is.EqualTo(2), "SyncMessages count");
-            Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Attack));
-            Assert.That(SyncMessages[1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndGame));
+            Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Attack));
+            Assert.That(SyncMessages[1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.EndGame));
             Assert.That(Scene.Players.ToArray()[0].Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Victorious));
             Assert.That(Scene.Players.ToArray()[1].Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Defeated));
         }
@@ -99,11 +99,11 @@ namespace ProjectArena.Tests.Engine
                         skippedTurns = tempPlayer.TurnsSkipped;
                         Assert.That(i > 98, Is.False, "Cycle error " + t);
                         Assert.That(SyncMessages.Count, Is.EqualTo(2), "Count of syncMessages " + t);
-                        Assert.That(SyncMessages[^2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.SkipTurn), "SkipTurn message action " + t);
+                        Assert.That(SyncMessages[^2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.SkipTurn), "SkipTurn message action " + t);
                         Assert.That(
                             SyncMessages[^1].Action,
-                            tempPlayer.TurnsSkipped < 3 ? Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndTurn) :
-                            Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndGame), "EndTurn message action " + t);
+                            tempPlayer.TurnsSkipped < 3 ? Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.EndTurn) :
+                            Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.EndGame), "EndTurn message action " + t);
                         if (tempPlayer.TurnsSkipped >= 3)
                         {
                             Assert.That(tempPlayer.Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Left), "Player status " + t);
@@ -160,8 +160,8 @@ namespace ProjectArena.Tests.Engine
 
                         Assert.That(i > 98, Is.False, "Cycle error " + t);
                         Assert.That(SyncMessages.Count, Is.EqualTo(2), "Count of syncMessages " + t);
-                        Assert.That(SyncMessages[^2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.SkipTurn), "SkipTurn message action " + t);
-                        Assert.That(SyncMessages[^1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndTurn), "EndTurn message action " + t);
+                        Assert.That(SyncMessages[^2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.SkipTurn), "SkipTurn message action " + t);
+                        Assert.That(SyncMessages[^1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.EndTurn), "EndTurn message action " + t);
                         Assert.That(tempPlayer.Status, Is.EqualTo(ProjectArena.Engine.Helpers.PlayerStatus.Playing), "Player status " + t);
                     }
                 }

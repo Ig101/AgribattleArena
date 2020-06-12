@@ -3,15 +3,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProjectArena.Infrastructure\ProjectArena.Infrastructure.csproj"/>
-    <ProjectReference Include="..\ProjectArena.Engine\ProjectArena.Engine.csproj"/>
+    <ProjectReference Include="..\ProjectArena.Infrastructure\ProjectArena.Infrastructure.csproj" />
+    <ProjectReference Include="..\ProjectArena.Engine\ProjectArena.Engine.csproj" />
+    <ProjectReference Include="..\ProjectArena.Content\ProjectArena.Content.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2"/>
-    <PackageReference Include="MongoDB.Bson" Version="2.10.2"/>
-    <PackageReference Include="Mongo.Migration" Version="3.0.73"/>
-    <PackageReference Include="AspNetCore.Identity.Mongo" Version="6.3.5"/>
-    <PackageReference Include="MailKit" Version="2.5.1"/>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
+    <PackageReference Include="MongoDB.Bson" Version="2.10.2" />
+    <PackageReference Include="Mongo.Migration" Version="3.0.73" />
+    <PackageReference Include="AspNetCore.Identity.Mongo" Version="6.3.5" />
+    <PackageReference Include="MailKit" Version="2.5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
   </ItemGroup>
 </Project>

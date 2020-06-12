@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ProjectArena.Engine.Helpers.DelegateLists;
+using ProjectArena.Engine.Objects;
 
 namespace ProjectArena.Engine.Natives
 {
@@ -14,52 +15,23 @@ namespace ProjectArena.Engine.Natives
 
         public bool Unbearable { get; }
 
-        public TileActions.Action Action { get; }
+        public Action<ISceneParentRef, Tile, float> Action { get; }
 
-        public TileActions.OnStepAction OnStepAction { get; }
+        public Action<ISceneParentRef, Tile> OnStepAction { get; }
 
         public float DefaultMod { get; }
 
         public bool RevealedByDefault { get; }
 
-        public TileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, IEnumerable<string> actionNames, IEnumerable<string> onStepActionNames)
-            : this(
-                id,
-                tags,
-                flat,
-                defaultHeight,
-                unbearable,
-                defaultMod,
-                revealedByDefault,
-                actionNames.Select(actionName => (TileActions.Action)Delegate.CreateDelegate(
-                    typeof(TileActions.Action),
-                    typeof(TileActions).GetMethod(actionName, BindingFlags.Public | BindingFlags.Static))),
-                onStepActionNames.Select(onStepActionName => (TileActions.OnStepAction)Delegate.CreateDelegate(
-                    typeof(TileActions.OnStepAction),
-                    typeof(TileActions).GetMethod(onStepActionName, BindingFlags.Public | BindingFlags.Static))))
-        {
-        }
-
-        public TileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, IEnumerable<TileActions.Action> actions, IEnumerable<TileActions.OnStepAction> onStepActions)
+        public TileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, Action<ISceneParentRef, Tile, float> action, Action<ISceneParentRef, Tile> onStepAction)
             : base(id, tags)
         {
             this.RevealedByDefault = revealedByDefault;
             this.Flat = flat;
             this.DefaultHeight = defaultHeight;
             this.Unbearable = unbearable;
-            this.Action = null;
-            foreach (TileActions.Action action in actions)
-            {
-                this.Action += action;
-            }
-
-            this.OnStepAction = null;
-            this.OnStepAction += TileActions.PurgeTileEffects;
-            foreach (TileActions.OnStepAction action in onStepActions)
-            {
-                this.OnStepAction += action;
-            }
-
+            this.Action = action;
+            this.OnStepAction = onStepAction;
             this.DefaultMod = defaultMod;
         }
     }

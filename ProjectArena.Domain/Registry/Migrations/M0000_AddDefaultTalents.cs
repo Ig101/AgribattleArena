@@ -349,7 +349,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                     Name = "Empower",
                     Class = CharacterClass.Enchanter,
                     ClassPoints = 1,
-                    UniqueDescription = "Learns the \"Empower\" ability. Increases target's damage by 50% of willpower modifier for 3 turns. Costs 6 action points. Recharges in 4 turns.",
+                    UniqueDescription = "Learns the \"Empower\" ability. Increases target's damage by 50% of willpower modifier for 3 rounds. Costs 6 action points. Recharges in 4 turns.",
                     UniqueAction = "LearnEmpower",
                     StrengthModifier = -5,
                     WillpowerModifier = 0,

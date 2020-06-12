@@ -367,7 +367,7 @@ namespace ProjectArena.Engine
         // Updates methods
         public void StartGame()
         {
-            this.ReturnAction(this, new SyncEventArgs(this, ++Version, Helpers.Action.StartGame, GetFullSynchronizationData(true), null, null, null, null));
+            this.ReturnAction(this, new SyncEventArgs(this, ++Version, Helpers.SceneAction.StartGame, GetFullSynchronizationData(true), null, null, null, null));
             EndTurn(true);
         }
 
@@ -407,7 +407,7 @@ namespace ProjectArena.Engine
                     this.TempTileObject = newObject;
                     Update(minInitiativePosition);
                     turnStarted = this.TempTileObject.StartTurn();
-                    if (!AfterUpdateSynchronization(Helpers.Action.EndTurn, TempTileObject, null, null, null))
+                    if (!AfterUpdateSynchronization(Helpers.SceneAction.EndTurn, TempTileObject, null, null, null))
                     {
                         turnStarted = true;
                     }
@@ -419,7 +419,7 @@ namespace ProjectArena.Engine
                 else
                 {
                     turnStarted = true;
-                    AfterUpdateSynchronization(Helpers.Action.NoActorsDraw, null, null, null, null);
+                    AfterUpdateSynchronization(Helpers.SceneAction.NoActorsDraw, null, null, null, null);
                 }
             }
             while (!turnStarted);
@@ -517,7 +517,7 @@ namespace ProjectArena.Engine
                             if (player != null)
                             {
                                 player.SkipTurn();
-                                if (AfterUpdateSynchronization(Helpers.Action.SkipTurn, TempTileObject, null, null, null))
+                                if (AfterUpdateSynchronization(Helpers.SceneAction.SkipTurn, TempTileObject, null, null, null))
                                 {
                                     EndTurn();
                                 }
@@ -532,7 +532,7 @@ namespace ProjectArena.Engine
             }
         }
 
-        public bool AfterUpdateSynchronization(Helpers.Action action, TileObject actor, int? actionId, int? targetX, int? targetY)
+        public bool AfterUpdateSynchronization(Helpers.SceneAction action, TileObject actor, int? actionId, int? targetX, int? targetY)
         {
             AfterActionUpdate();
             this.ReturnAction?.Invoke(this, new SyncEventArgs(this, ++Version, action, GetSynchronizationData(true), actor?.Id, actionId, targetX, targetY));
@@ -546,7 +546,7 @@ namespace ProjectArena.Engine
                     }
                 }
 
-                this.ReturnAction?.Invoke(this, new SyncEventArgs(this, ++Version, Helpers.Action.EndGame, GetSynchronizationDataPlayersOnly(), null, null, null, null));
+                this.ReturnAction?.Invoke(this, new SyncEventArgs(this, ++Version, Helpers.SceneAction.EndGame, GetSynchronizationDataPlayersOnly(), null, null, null, null));
                 IsActive = false;
                 return false;
             }
@@ -567,7 +567,7 @@ namespace ProjectArena.Engine
             if (player.Status == PlayerStatus.Playing)
             {
                 player.Defeat(true);
-                AfterUpdateSynchronization(Helpers.Action.Leave, TempTileObject, null, null, null);
+                AfterUpdateSynchronization(Helpers.SceneAction.Leave, TempTileObject, null, null, null);
             }
 
             return true;
@@ -588,7 +588,7 @@ namespace ProjectArena.Engine
                 }
 
                 actor.Cast();
-                if (AfterUpdateSynchronization(Helpers.Action.Decoration, actor, null, null, null))
+                if (AfterUpdateSynchronization(Helpers.SceneAction.Decoration, actor, null, null, null))
                 {
                     EndTurn();
                 }
@@ -623,7 +623,7 @@ namespace ProjectArena.Engine
                                 AfterActionUpdate();
                             }
 
-                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.Action.Move, actor, null, targetX, targetY);
+                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.SceneAction.Move, actor, null, targetX, targetY);
                             if (afterActionUpdateSynchronization && !actionAvailability)
                             {
                                 EndTurn();
@@ -662,7 +662,7 @@ namespace ProjectArena.Engine
                                 AfterActionUpdate();
                             }
 
-                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.Action.Cast, actor, skillId, targetX, targetY);
+                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.SceneAction.Cast, actor, skillId, targetX, targetY);
                             if (afterActionUpdateSynchronization && !actionAvailability)
                             {
                                 EndTurn();
@@ -701,7 +701,7 @@ namespace ProjectArena.Engine
                                 AfterActionUpdate();
                             }
 
-                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.Action.Attack, actor, null, targetX, targetY);
+                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.SceneAction.Attack, actor, null, targetX, targetY);
                             if (afterActionUpdateSynchronization && !actionAvailability)
                             {
                                 EndTurn();
@@ -733,7 +733,7 @@ namespace ProjectArena.Engine
                         bool result = actor.Wait();
                         if (result)
                         {
-                            if (AfterUpdateSynchronization(Helpers.Action.Wait, actor, null, null, null))
+                            if (AfterUpdateSynchronization(Helpers.SceneAction.Wait, actor, null, null, null))
                             {
                                 EndTurn();
                             }

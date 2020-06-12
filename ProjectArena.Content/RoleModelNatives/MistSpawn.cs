@@ -1,10 +1,10 @@
 using ProjectArena.Engine.ForExternalUse;
 
-namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
+namespace ProjectArena.Content.RoleModelNatives
 {
-    public static class RoleModelNatives
+    public class MistSpawn : INative
     {
-        public static void FillRoleModelNatives(this INativeManager nativeManager)
+        public void Fill(INativeManager nativeManager)
         {
             nativeManager.AddRoleModelNative(
                 "mistspawn",

@@ -1,11 +1,11 @@
 using ProjectArena.Engine.ForExternalUse;
 using ProjectArena.Engine.Helpers;
 
-namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
+namespace ProjectArena.Content.DecorationNatives
 {
-    public static class DecorationNatives
+    public class Barrier : INative
     {
-        public static void FillDecorationNatives(this INativeManager nativeManager)
+        public void Fill(INativeManager nativeManager)
         {
             nativeManager.AddDecorationNative(
                 "barrier",
@@ -18,8 +18,8 @@ namespace ProjectArena.Domain.BattleService.Helpers.NativeContainers
                 100,
                 0,
                 0,
-                new string[0],
-                new string[0]);
+                null,
+                null);
         }
     }
 }

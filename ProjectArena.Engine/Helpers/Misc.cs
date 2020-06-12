@@ -12,7 +12,7 @@ namespace ProjectArena.Engine.Helpers
         Left
     }
 
-    public enum Action
+    public enum SceneAction
     {
         Move,
         Attack,

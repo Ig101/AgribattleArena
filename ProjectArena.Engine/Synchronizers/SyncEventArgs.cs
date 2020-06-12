@@ -6,7 +6,7 @@ namespace ProjectArena.Engine.Synchronizers
 {
     public class SyncEventArgs : EventArgs, ISyncEventArgs
     {
-        public Helpers.Action Action { get; }
+        public Helpers.SceneAction Action { get; }
 
         public int Version { get; }
 
@@ -22,7 +22,7 @@ namespace ProjectArena.Engine.Synchronizers
 
         public int? TargetY { get; }
 
-        public SyncEventArgs(IScene scene, int version, Helpers.Action action, ISynchronizer syncInfo, int? id, int? actionId, int? targetX, int? targetY)
+        public SyncEventArgs(IScene scene, int version, Helpers.SceneAction action, ISynchronizer syncInfo, int? id, int? actionId, int? targetX, int? targetY)
         {
             this.Version = version;
             this.Scene = scene;

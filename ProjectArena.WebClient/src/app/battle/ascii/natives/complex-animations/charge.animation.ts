@@ -44,7 +44,7 @@ function getPosition(issueX: number, issueY: number, targetX: number, targetY: n
   const cos = Math.cos(angle) * 0.5;
   let x = targetX;
   let y = targetY;
-  while (Math.floor(x) === targetX && Math.floor(y) === targetY) {
+  while (Math.round(x) === targetX && Math.round(y) === targetY) {
       x += cos;
       y += sin;
   }
@@ -68,8 +68,8 @@ export function chargeSyncDeclaration(issueX: number, issueY: number, targetX: n
       x = position.x;
       y = position.y;
     } else {
-      x = Math.floor(issueX + (incrementingRange * cos));
-      y = Math.floor(issueY + (incrementingRange * sin));
+      x = Math.round(issueX + (incrementingRange * cos));
+      y = Math.round(issueY + (incrementingRange * sin));
     }
     if (!impactedTiles.some(k => k.x === x && k.y === y)) {
       impactedTiles.push({x, y});

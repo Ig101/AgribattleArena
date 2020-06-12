@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ProjectArena.Engine.Helpers;
 using ProjectArena.Engine.Natives;
+using ProjectArena.Engine.Objects;
+using ProjectArena.Engine.Objects.Immaterial;
+using ProjectArena.Engine.Objects.Immaterial.Buffs;
 
 namespace ProjectArena.Engine.NativeManagers
 {
@@ -50,11 +54,11 @@ namespace ProjectArena.Engine.NativeManagers
             bool onTile,
             int? defaultDuration,
             float defaultMod,
-            IEnumerable<string> actions,
-            IEnumerable<string> appliers,
-            IEnumerable<string> onPurgeActions)
+            Action<ISceneParentRef, IActorParentRef, Buff, float> action,
+            Action<IBuffManagerParentRef, Buff> applier,
+            Action<ISceneParentRef, IActorParentRef, Buff> onPurgeAction)
         {
-            buffNatives.Add(id, new BuffNative(id, InternTags(tags), eternal, repeatable, summarizeLength, onTile, defaultDuration, defaultMod, actions, appliers, onPurgeActions));
+            buffNatives.Add(id, new BuffNative(id, InternTags(tags), eternal, repeatable, summarizeLength, onTile, defaultDuration, defaultMod, action, applier, onPurgeAction));
         }
 
         public void AddDecorationNative(
@@ -64,30 +68,72 @@ namespace ProjectArena.Engine.NativeManagers
             int defaultHealth,
             float defaultZ,
             float defaultMod,
-            IEnumerable<string> actions,
-            IEnumerable<string> onDeathActions)
+            Action<ISceneParentRef, ActiveDecoration> action,
+            Action<ISceneParentRef, ActiveDecoration> onDeathAction)
         {
-            decorationNatives.Add(id, new ActiveDecorationNative(id, InternTags(tags), defaultArmor, defaultHealth, defaultZ, defaultMod, actions, onDeathActions));
+            decorationNatives.Add(id, new ActiveDecorationNative(id, InternTags(tags), defaultArmor, defaultHealth, defaultZ, defaultMod, action, onDeathAction));
         }
 
-        public void AddEffectNative(string id, string[] tags, float defaultZ, float? defaultDuration, float defaultMod, IEnumerable<string> actions, IEnumerable<string> onDeathActions)
+        public void AddEffectNative(
+            string id,
+            string[] tags,
+            float defaultZ,
+            float? defaultDuration,
+            float defaultMod,
+            Action<ISceneParentRef, SpecEffect, float> action,
+            Action<ISceneParentRef, SpecEffect> onDeathAction)
         {
-            effectNatives.Add(id, new SpecEffectNative(id, InternTags(tags), defaultZ, defaultDuration, defaultMod, actions, onDeathActions));
+            effectNatives.Add(id, new SpecEffectNative(id, InternTags(tags), defaultZ, defaultDuration, defaultMod, action, onDeathAction));
         }
 
-        public void AddRoleModelNative(string id, int defaultStrength, int defaultWillpower, int defaultConstitution, int defaultSpeed, int defaultActionPointsIncome, string attackingSkill, string[] skills)
+        public void AddRoleModelNative(
+            string id,
+            int defaultStrength,
+            int defaultWillpower,
+            int defaultConstitution,
+            int defaultSpeed,
+            int defaultActionPointsIncome,
+            string attackingSkill,
+            string[] skills)
         {
-            roleModelNatives.Add(id, new RoleModelNative(this, id, defaultStrength, defaultWillpower, defaultConstitution, defaultSpeed, defaultActionPointsIncome, attackingSkill, skills));
+            roleModelNatives.Add(id, new RoleModelNative(
+                this,
+                id,
+                defaultStrength,
+                defaultWillpower,
+                defaultConstitution,
+                defaultSpeed,
+                defaultActionPointsIncome,
+                attackingSkill,
+                skills));
         }
 
-        public void AddSkillNative(string id, string[] tags, int defaultRange, int defaultCost, float defaultCd, float defaultMod, Targets availableTargets, bool onlyVisibleTargets, IEnumerable<string> actions)
+        public void AddSkillNative(
+            string id,
+            string[] tags,
+            int defaultRange,
+            int defaultCost,
+            float defaultCd,
+            float defaultMod,
+            Targets availableTargets,
+            bool onlyVisibleTargets,
+            Action<ISceneParentRef, IActorParentRef, Tile, Skill> action)
         {
-            skillNatives.Add(id, new SkillNative(id, InternTags(tags), defaultRange, defaultCost, defaultCd, defaultMod, availableTargets, onlyVisibleTargets, actions));
+            skillNatives.Add(id, new SkillNative(id, InternTags(tags), defaultRange, defaultCost, defaultCd, defaultMod, availableTargets, onlyVisibleTargets, action));
         }
 
-        public void AddTileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, IEnumerable<string> actions, IEnumerable<string> onStepActions)
+        public void AddTileNative(
+            string id,
+            string[] tags,
+            bool flat,
+            int defaultHeight,
+            bool unbearable,
+            float defaultMod,
+            bool revealedByDefault,
+            Action<ISceneParentRef, Tile, float> action,
+            Action<ISceneParentRef, Tile> onStepAction)
         {
-            tileNatives.Add(id, new TileNative(id, InternTags(tags), flat, defaultHeight, unbearable, defaultMod, revealedByDefault, actions, onStepActions));
+            tileNatives.Add(id, new TileNative(id, InternTags(tags), flat, defaultHeight, unbearable, defaultMod, revealedByDefault, action, onStepAction));
         }
 
         public ActorNative GetActorNative(string id)

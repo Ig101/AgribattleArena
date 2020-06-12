@@ -40,7 +40,7 @@ namespace ProjectArena.Tests.Engine
             Assert.That(Scene.ActorWait(Scene.TempTileObject.Id), Is.True, "Actor second turn");
             Assert.That(SyncMessages.Count, Is.EqualTo(6), "Amount of syncMessages second turn");
             Assert.That(_decoration.DamageModel.Health, Is.EqualTo(90), "Health second turn");
-            Assert.That(SyncMessages[4].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Decoration), "Decoration action");
+            Assert.That(SyncMessages[4].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Decoration), "Decoration action");
             for (int i = 0; i < 6; i++)
             {
                 Assert.That(SyncMessages[i].SyncInfo.ChangedDecorations.Count(), Is.EqualTo(i == 2 ? 0 : 1), "Check message decorations " + i);
@@ -60,7 +60,7 @@ namespace ProjectArena.Tests.Engine
             }
 
             Assert.That(i > 400, Is.False, "Cycle error");
-            Assert.That(SyncMessages[^2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Decoration), "Decoration action");
+            Assert.That(SyncMessages[^2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Decoration), "Decoration action");
             Assert.That(SyncMessages[^2].SyncInfo.DeletedDecorations.Count(), Is.EqualTo(1), "Decoration killed");
             Assert.That(SyncMessages[^2].SyncInfo.DeletedDecorations.ToArray()[0], Is.EqualTo(_decoration.Id), "Decoration killed id");
         }

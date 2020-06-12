@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using ProjectArena.Engine.Helpers;
 using ProjectArena.Engine.Helpers.DelegateLists;
+using ProjectArena.Engine.Objects;
 
 namespace ProjectArena.Engine.Natives
 {
@@ -17,26 +18,9 @@ namespace ProjectArena.Engine.Natives
 
         public float DefaultMod { get; }
 
-        public ActiveDecorationActions.Action Action { get; set; }
+        public Action<ISceneParentRef, ActiveDecoration> Action { get; set; }
 
-        public ActiveDecorationActions.Action OnDeathAction { get; set; }
-
-        public ActiveDecorationNative(string id, string[] tags, TagSynergy[] defaultArmor, int defaultHealth, float defaultZ, float defaultMod, IEnumerable<string> actionNames, IEnumerable<string> onDeathActionNames)
-            : this(
-                id,
-                tags,
-                defaultArmor,
-                defaultHealth,
-                defaultZ,
-                defaultMod,
-                actionNames.Select(actionName => (ActiveDecorationActions.Action)Delegate.CreateDelegate(
-                    typeof(ActiveDecorationActions.Action),
-                    typeof(ActiveDecorationActions).GetMethod(actionName, BindingFlags.Public | BindingFlags.Static))),
-                onDeathActionNames.Select(actionName => (ActiveDecorationActions.Action)Delegate.CreateDelegate(
-                    typeof(ActiveDecorationActions.Action),
-                    typeof(ActiveDecorationActions).GetMethod(actionName, BindingFlags.Public | BindingFlags.Static))))
-        {
-        }
+        public Action<ISceneParentRef, ActiveDecoration> OnDeathAction { get; set; }
 
         public ActiveDecorationNative(
             string id,
@@ -45,25 +29,16 @@ namespace ProjectArena.Engine.Natives
             int defaultHealth,
             float defaultZ,
             float defaultMod,
-            IEnumerable<ActiveDecorationActions.Action> actions,
-            IEnumerable<ActiveDecorationActions.Action> onDeathActions)
+            Action<ISceneParentRef, ActiveDecoration> action,
+            Action<ISceneParentRef, ActiveDecoration> onDeathAction)
             : base(id, tags)
         {
             this.DefaultArmor = defaultArmor;
             this.DefaultHealth = defaultHealth;
             this.DefaultZ = defaultZ;
             this.DefaultMod = defaultMod;
-            this.Action = null;
-            foreach (ActiveDecorationActions.Action action in actions)
-            {
-                this.Action += action;
-            }
-
-            this.OnDeathAction = null;
-            foreach (ActiveDecorationActions.Action action in onDeathActions)
-            {
-                this.OnDeathAction += action;
-            }
+            this.Action = action;
+            this.OnDeathAction = onDeathAction;
         }
     }
 }

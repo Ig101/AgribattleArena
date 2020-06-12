@@ -16,7 +16,7 @@ namespace ProjectArena.Tests.Engine
 
         private void EndTurnAssertion(int id, bool nextIsNotSame)
         {
-            Assert.That(SyncMessages[^1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.EndTurn), "EndTurn message action");
+            Assert.That(SyncMessages[^1].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.EndTurn), "EndTurn message action");
             if (nextIsNotSame)
             {
                 Assert.That(Scene.TempTileObject.Id, Is.Not.EqualTo(id), "Another actor is acting ");
@@ -135,7 +135,7 @@ namespace ProjectArena.Tests.Engine
             Assert.That(SyncMessages.Count, Is.EqualTo(available ? 1 : 0), "SyncMessages count");
             if (available)
             {
-                Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Move), "Move action");
+                Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Move), "Move action");
                 Assert.That(SyncMessages[0].TargetX, Is.EqualTo(targetX), "Move targetX");
                 Assert.That(SyncMessages[0].TargetY, Is.EqualTo(targetY), "Move targetY");
             }
@@ -244,7 +244,7 @@ namespace ProjectArena.Tests.Engine
             Assert.That(SyncMessages.Count, Is.EqualTo(success ? 1 : 0), "Amount of sync messages");
             if (success)
             {
-                Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Attack), "Attack action");
+                Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Attack), "Attack action");
                 Assert.That(SyncMessages[0].SyncInfo.ChangedActors.Count(), Is.EqualTo(2), "Amount of changed actors");
             }
 
@@ -295,7 +295,7 @@ namespace ProjectArena.Tests.Engine
                 Assert.That(Scene.TempTileObject.Id, i < endTurn ? Is.EqualTo(_actor.Id) : Is.Not.EqualTo(_actor.Id), "Turn of which player");
                 if (i <= endTurn)
                 {
-                    Assert.That(SyncMessages[i].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Attack), "Attack action");
+                    Assert.That(SyncMessages[i].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Attack), "Attack action");
                 }
 
                 if (i == endTurn)
@@ -329,7 +329,7 @@ namespace ProjectArena.Tests.Engine
                     Assert.That(SyncMessages.Count, Is.EqualTo(i < 2 ? i + 1 : 4), "Amount of sync messages " + i);
                     if (i <= 2)
                     {
-                        Assert.That(SyncMessages[i].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Cast), "Cast action " + i);
+                        Assert.That(SyncMessages[i].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Cast), "Cast action " + i);
                         Assert.That(SyncMessages[i].SkillActionId, Is.EqualTo(skillId), "Skill id " + i);
                         Assert.That(SyncMessages[i].SyncInfo.ChangedActors.Count(), Is.EqualTo(i < 1 ? 2 : 1), "Amount of changed actors " + i);
                     }
@@ -388,7 +388,7 @@ namespace ProjectArena.Tests.Engine
         {
             Scene.ActorWait(_actor.Id);
             Assert.That(_actor.ActionPoints, Is.EqualTo(4 - points), "Amount of action points after Wait");
-            Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.Action.Wait), "Action of Wait message");
+            Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Wait), "Action of Wait message");
             Assert.That(SyncMessages[0].SyncInfo.ChangedActors.Count(), Is.EqualTo(0), "Count of changed actors");
             EndTurnAssertion(_actor.Id, true);
         }

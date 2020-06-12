@@ -2,7 +2,7 @@
 {
     public interface ISyncEventArgs
     {
-        Helpers.Action Action { get; }
+        Helpers.SceneAction Action { get; }
 
         int Version { get; }
 

@@ -25,7 +25,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
 
         public const int DefeatReward = 2;
 
-        public static string GetBattleActionMethodName(Engine.Helpers.Action? action)
+        public static string GetBattleActionMethodName(Engine.Helpers.SceneAction? action)
         {
             return "Battle" + (action == null ? "Info" : action.ToString());
         }
