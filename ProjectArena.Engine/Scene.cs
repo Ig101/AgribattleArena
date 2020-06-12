@@ -93,6 +93,7 @@ namespace ProjectArena.Engine
         {
             this.IsActive = true;
             this.Id = id;
+            this.PassedTime = 0;
             this.GameRandom = new Random(seed);
             this.NativeManager = (INativeManager)nativeManager;
             this.VarManager = (IVarManager)varManager;

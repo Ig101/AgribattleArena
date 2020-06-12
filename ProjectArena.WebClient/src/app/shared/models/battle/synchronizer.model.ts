@@ -8,6 +8,7 @@ import { Reward } from './reward.model';
 export interface Synchronizer {
   id: string;
   version: number;
+  roundsPassed: number;
   actorId?: number;
   skillActionId?: number;
   targetX?: number;

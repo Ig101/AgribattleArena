@@ -9,6 +9,8 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public int Version { get; set; }
 
+        public float RoundsPassed { get; set; }
+
         public int? ActorId { get; set; }
 
         public int? SkillActionId { get; set; }

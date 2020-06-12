@@ -254,6 +254,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
         {
             var synchronizer = MapSynchronizer(syncEventArgs.SyncInfo, userId);
             synchronizer.Id = syncEventArgs.Scene.Id;
+            synchronizer.RoundsPassed = syncEventArgs.Scene.PassedTime;
             synchronizer.TargetX = syncEventArgs.TargetX;
             synchronizer.TargetY = syncEventArgs.TargetY;
             synchronizer.SkillActionId = syncEventArgs.SkillActionId;
@@ -267,6 +268,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
         {
             var synchronizer = MapSynchronizer(oldSynchronizer, userId);
             synchronizer.Id = scene.Id;
+            synchronizer.RoundsPassed = scene.PassedTime;
             synchronizer.Version = scene.Version;
             synchronizer.TurnTime = scene.RemainedTurnTime;
             return synchronizer;
