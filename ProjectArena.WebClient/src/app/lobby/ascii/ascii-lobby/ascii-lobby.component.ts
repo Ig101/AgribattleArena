@@ -116,7 +116,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get interfaceShift() {
-    return 374 / this.zoom;
+    return 362 / this.zoom;
   }
 
   constructor(

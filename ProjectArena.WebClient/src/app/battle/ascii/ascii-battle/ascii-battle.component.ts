@@ -67,7 +67,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private tileWidthInternal = 0;
   private tileHeightInternal = 30;
-  readonly defaultWidth = 1530;
+  readonly defaultWidth = 1600;
   readonly defaultHeight = 1080;
   readonly defaultAspectRatio = this.defaultWidth / this.defaultHeight;
 
@@ -193,7 +193,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get interfaceShift() {
-    return 374 / this.zoom;
+    return 362 / this.zoom;
   }
 
   get userName() {

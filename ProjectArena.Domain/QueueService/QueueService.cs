@@ -52,11 +52,10 @@ namespace ProjectArena.Domain.QueueService
                 var complectedUsers = new List<List<UserInQueue>>();
                 foreach (var user in queue.Queue)
                 {
-                    bool added = false;
-                    if (complectingUsers.Count > 0)
+                    var complect = complectingUsers
+                        .FirstOrDefault(x => !x.Any(complectingUser => complectingUser.UserId == user.UserId));
+                    if (complect != null)
                     {
-                        added = true;
-                        var complect = complectingUsers[0];
                         complect.Add(user);
                         if (complect.Count >= queue.Mode.MaxPlayers)
                         {
@@ -64,23 +63,7 @@ namespace ProjectArena.Domain.QueueService
                             complectingUsers.RemoveAt(0);
                         }
                     }
-
-                    // TODO When there will be logic
-                    /*for (int j = 0; j < complectingActors.Count; j++)
-                    {
-                        var complect = complectingActors[j];
-                        complect.Add(user);
-                        if (complect.Count >= queue.Mode.MaxPlayers)
-                        {
-                            complectedActors.Add(complect);
-                            complectingActors.RemoveAt(j);
-                        }
-
-                        added = true;
-                        break;
-                    }*/
-
-                    if (!added)
+                    else
                     {
                         complectingUsers.Add(new List<UserInQueue>() { user });
                     }
@@ -133,7 +116,7 @@ namespace ProjectArena.Domain.QueueService
         public bool Enqueue(UserToEnqueueDto user)
         {
             var targetQueue = _queues[user.Mode];
-            if (targetQueue.Queue.Any(x => x.UserId == user.UserId))
+            if (!targetQueue.Mode.AllowMultiEnqueue && targetQueue.Queue.Any(x => x.UserId == user.UserId))
             {
                 return false;
             }

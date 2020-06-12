@@ -41,7 +41,7 @@ namespace ProjectArena.Engine.SceneGenerators
 
         public void GenerateNewScene(ISceneForSceneGenerator scene, IEnumerable<IPlayer> players, int seed)
         {
-            var width = 26;
+            var width = 28;
             var height = 16;
             Tile[][] sceneTiles = scene.SetupEmptyTileSet(width, height);
             for (int x = 0; x < sceneTiles.Length; x++)

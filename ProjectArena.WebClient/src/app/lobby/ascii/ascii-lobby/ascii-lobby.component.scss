@@ -12,8 +12,8 @@
   }
   .info-container {
     position: fixed;
-    left: calc(100% - 374px);
-    width: 374px;
+    left: calc(100% - 362px);
+    width: 362px;
     height: 100%;
     top: 0px;
     display: flex;
@@ -29,6 +29,7 @@
     }
     .window {
       margin: 12px;
+      margin-left: 0px;
       padding: 12px;
     }
     .patrol {

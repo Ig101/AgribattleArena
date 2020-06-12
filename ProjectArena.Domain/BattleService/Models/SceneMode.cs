@@ -10,6 +10,8 @@ namespace ProjectArena.Domain.BattleService.Models
 
         public int TimeTillBot { get; set; }
 
+        public bool AllowMultiEnqueue { get; set; }
+
         public ISceneGenerator Generator { get; set; }
 
         public IVarManager VarManager { get; set; }
