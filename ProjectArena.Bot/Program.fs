@@ -1,25 +1,29 @@
 ﻿// Learn more about F# at http://fsharp.org
 
 open System
-open ProjectArena.Bot.Domain.GameState.SceneStateProcessor
 open ProjectArena.Bot.Models.States
 open ProjectArena.Bot.Models.Dtos
+open ProjectArena.Bot.Worker.Worker
 
 [<EntryPoint>]
 let main argv =
 
-    let processor (scene: Scene, synchronizers) (action, synchronizer: SynchronizerDto) =
+    let processor (scene: SceneWithMetaData) (message: IncomingSynchronizationMessage) =
+        let newContent = match scene.Content with
+                         | Some c -> {
+                             c with RoundsPassed = c.RoundsPassed + message.Synchronizer.RoundsPassed
+                            }
+                         | None -> { RoundsPassed = message.Synchronizer.RoundsPassed }
         let newScene = { scene with
-                           RoundsPassed = scene.RoundsPassed + synchronizer.RoundsPassed
+                           Content = Some newContent
                        }
-        printfn "Action %A for scene %s with new time %A. New scene: %A" action scene.Id synchronizer.RoundsPassed newScene
-        (newScene, synchronizers)
+        printfn "Action %A for scene %s with new time %A. New scene: %A" message.Action scene.SceneId message.Synchronizer.RoundsPassed newScene
+        newScene
 
-    let finalProcessor (scene: Scene) =
-        printfn "Scene %s processing ended" scene.Id
-        scene.Id
+    let finalProcessor (scene: SceneWithMetaData) =
+        printfn "Scene %s processing ended" scene.SceneId
+        scene.SceneId
 
-    let sceneState = globalSceneState
     seq {
         while true do
             Console.ReadLine()
@@ -32,5 +36,5 @@ let main argv =
                      | _ -> EndTurn
         (action, strings.[1], time))
     |> Seq.fold(fun res (action, sceneId, time) ->
-        addMessageToState sceneState processor finalProcessor (action, {Id = sceneId; RoundsPassed = time})
+        addMessageToGlobalState processor finalProcessor { Action = action; Synchronizer = {Id = sceneId; RoundsPassed = time} }
         res + 1) 0
