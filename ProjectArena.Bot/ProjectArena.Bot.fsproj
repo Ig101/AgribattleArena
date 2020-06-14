@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectArena.Infrastructure\ProjectArena.Infrastructure.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Helpers/AsyncHelper.fs"/>
+    <Compile Include="Models/Dtos/SynchronizerDto.fs"/>
+    <Compile Include="Models/States/Scene.fs"/>
+    <Compile Include="Models/States/SynchronizationAction.fs"/>
+    <Compile Include="Domain/GameSignalRConnection/SignalRConnection.fs"/>
+    <Compile Include="Domain/GameSignalRConnection/SynchronizerHubSubscription.fs"/>
+    <Compile Include="Domain/GameSignalRConnection/UnitHubSubscription.fs"/>
+    <Compile Include="Domain/GameState/SceneState.fs"/>
+    <Compile Include="Domain/GameState/SceneStateProcessor.fs"/>
+    <Compile Include="Program.fs"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.7.2"/>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
+    <PackageReference Include="FSharp.Data.Json" Version="1.0.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.5"/>
+    <PackageReference Include="Http.fs" Version="5.4.0"/>
+    <PackageReference Include="FSharp.Control.AsyncSeq" Version="2.0.24"/>
+  </ItemGroup>
+</Project>
