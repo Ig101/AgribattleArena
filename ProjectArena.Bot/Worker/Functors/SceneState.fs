@@ -6,8 +6,8 @@ open ProjectArena.Bot.Models.States
 open System.Threading
 
 type SceneState =
-    {
-        Dict: Dictionary<string, AutoResetEvent * IncomingSynchronizationMessage>
+    private {
+        Dict: IDictionary<string, AutoResetEvent * IncomingSynchronizationMessage>
         CancellationFunction: IncomingSynchronizationMessage -> bool
     }
 

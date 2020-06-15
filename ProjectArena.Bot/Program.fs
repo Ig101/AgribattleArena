@@ -36,5 +36,5 @@ let main argv =
                      | _ -> EndTurn
         (action, strings.[1], time))
     |> Seq.fold(fun res (action, sceneId, time) ->
-        addMessageToGlobalState processor finalProcessor { Action = action; Synchronizer = {Id = sceneId; RoundsPassed = time} }
+        sendMessageToGlobalState processor finalProcessor { Action = action; Synchronizer = {Id = sceneId; RoundsPassed = time} }
         res + 1) 0

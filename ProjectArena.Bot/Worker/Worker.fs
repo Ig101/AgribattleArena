@@ -8,22 +8,22 @@ open System.Threading
 open System.Threading.Tasks
 open ProjectArena.Bot.Worker.Functors
 
-let globalSceneState =
-    SceneState.Unit (fun message -> message.Action = EndGame || message.Action = NoActorsDraw)
+let sendMessageToGlobalState = 
+    let globalSceneState =
+        SceneState.Unit (fun message -> message.Action = EndGame || message.Action = NoActorsDraw)
 
-let addMessageToState
-    (sceneState: SceneState)
-    (processor: SceneWithMetaData -> IncomingSynchronizationMessage -> SceneWithMetaData)
-    (resultProcessor: SceneWithMetaData -> string)
-    (synchronizer: IncomingSynchronizationMessage) =
+    let sendMessageToState
+        (sceneState: SceneState)
+        (processor: SceneWithMetaData -> IncomingSynchronizationMessage -> SceneWithMetaData)
+        (resultProcessor: SceneWithMetaData -> string)
+        (synchronizer: IncomingSynchronizationMessage) =
 
-    synchronizer
-    |> sceneState.SendAndReturnProcessorIfCreated
-    |> Option.iter (
-        AsyncSeq.fold processor { SceneId = synchronizer.Synchronizer.Id; Content = None; SynchronizersInQueue = []}
-        >> Async.map resultProcessor
-        >> Async.map sceneState.RemoveScene
-        >> Async.Start
-    )
-
-let addMessageToGlobalState = addMessageToState globalSceneState
+        synchronizer
+        |> sceneState.SendAndReturnProcessorIfCreated
+        |> Option.iter (
+            AsyncSeq.fold processor { SceneId = synchronizer.Synchronizer.Id; Content = None; SynchronizersInQueue = []}
+            >> Async.map resultProcessor
+            >> Async.map sceneState.RemoveScene
+            >> Async.Start
+        )
+    sendMessageToState globalSceneState
