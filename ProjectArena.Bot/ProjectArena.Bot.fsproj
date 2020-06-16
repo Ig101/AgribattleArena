@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="Helpers/AsyncHelper.fs" />
     <Compile Include="Models/Dtos/SynchronizerDto.fs" />
+    <Compile Include="Models/NeuralModels/NeuralModel.fs" />
     <Compile Include="Models/States/Scene.fs" />
     <Compile Include="Models/States/SynchronizationAction.fs" />
     <Compile Include="Models/States/IncomingSynchronizationMessage.fs" />
@@ -16,8 +17,12 @@
     <Compile Include="Domain/GameSignalRConnection/SignalRConnection.fs" />
     <Compile Include="Domain/GameSignalRConnection/SynchronizerHubSubscription.fs" />
     <Compile Include="Domain/GameSignalRConnection/UnitHubSubscription.fs" />
+    <Compile Include="Domain/BotMongoContext/Entities/NeuralModel.fs" />
+    <Compile Include="Domain/BotMongoContext/BotContext.fs" />
+    <Compile Include="Domain/BotMongoContext/DBNeuralModel.fs" />
     <Compile Include="Worker/Functors/SceneState.fs" />
-    <Compile Include="Worker/Worker.fs" />
+    <Compile Include="Worker/SceneStateWorker.fs" />
+    <Compile Include="Worker/Processors/SceneProcessor.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,101 @@
+namespace ProjectArena.Bot.Worker.Functors
+open System.Collections.Generic
+open FSharp.Control
+open ProjectArena.Bot.Models.Dtos
+open ProjectArena.Bot.Models.States
+open System.Threading
+
+type SceneStateWorker =
+    private {
+        SceneIdWithSubscribeAndReceiveHandlesAndMessage: IDictionary<string, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>
+        CancellationFunction: IncomingSynchronizationMessage -> bool
+        SubscribeHandle: AutoResetEvent
+        ExtraSubscribeHandle: AutoResetEvent
+        ReceiveHandle: AutoResetEvent
+        Locker: obj
+        mutable SubscriptionObject: AsyncSeq<IncomingSynchronizationMessage> option
+        mutable ActiveSubscriptions: int
+    }
+
+    member private this.TryGetNewScene() =
+        this.SubscriptionObject
+        |> Option.map(fun sub ->
+            this.SubscriptionObject <- None
+            this.ReceiveHandle.Set() |> ignore
+            sub)
+
+    member private this.RemoveScene sceneId =
+        let subscribeHandle, receiveHandle, _ = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.[sceneId]
+        this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.Remove sceneId |> ignore
+        subscribeHandle.Dispose()
+        receiveHandle.Dispose()
+
+    member this.SendNewMessage message =
+        async {
+            let sceneId = message.Synchronizer.Id
+            let queueGettingSuccess = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.ContainsKey sceneId
+            match queueGettingSuccess with
+            | false -> 
+                do! Async.AwaitWaitHandle this.ReceiveHandle |> Async.Ignore
+                let subscribeHandle = new AutoResetEvent false
+                let receiveHandle = new AutoResetEvent false
+                this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.Add(sceneId, (subscribeHandle, receiveHandle, message))
+                let seq = asyncSeq {
+                    let mutable stateCheck = true
+                    while stateCheck do
+                        do! Async.AwaitWaitHandle subscribeHandle |> Async.Ignore
+                        let _, _, message = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.[sceneId]
+                        stateCheck <- not (message |> this.CancellationFunction)
+                        receiveHandle.Set() |> ignore
+                        yield message
+                    this.RemoveScene sceneId
+                }
+                this.SubscriptionObject <- Some seq
+                this.SubscribeHandle.Set() |> ignore
+                this.ExtraSubscribeHandle.Set() |> ignore
+                subscribeHandle.Set() |> ignore
+            | true ->
+                let subscribeHandle, receiveHandle, _ = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.[sceneId]
+                do! Async.AwaitWaitHandle receiveHandle |> Async.Ignore
+                this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.[sceneId] <- (subscribeHandle, receiveHandle, message)
+                subscribeHandle.Set() |> ignore
+        } |> Async.Start
+        ()
+
+    member this.GetNextNewScene() =
+        Interlocked.Add(ref this.ActiveSubscriptions, 1) |> ignore
+        async {
+            let mutable scene = None
+            let tryGetNewScene() =
+                scene <- this.TryGetNewScene()
+            while scene = None do
+                do! Async.AwaitWaitHandle this.SubscribeHandle |> Async.Ignore
+                lock this.Locker tryGetNewScene
+            Interlocked.Add(ref this.ActiveSubscriptions, -1) |> ignore
+            return scene.Value
+        }
+
+    member this.GetNextNewExtraScene() =
+        async {
+            let mutable scene = None
+            let tryGetNewScene() =
+                scene <- this.TryGetNewScene()
+            while scene = None do
+                do! Async.AwaitWaitHandle this.ExtraSubscribeHandle |> Async.Ignore
+                while this.ActiveSubscriptions > 0 do
+                    do! Async.AwaitWaitHandle this.ExtraSubscribeHandle |> Async.Ignore
+                lock this.Locker tryGetNewScene
+            return scene.Value
+        }
+
+    static member Unit =
+        {
+            SceneIdWithSubscribeAndReceiveHandlesAndMessage = Dictionary<string, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>() 
+            CancellationFunction = fun message -> message.Action = EndGame
+            SubscribeHandle = new AutoResetEvent false
+            ExtraSubscribeHandle = new AutoResetEvent false
+            ReceiveHandle = new AutoResetEvent false
+            SubscriptionObject = None
+            ActiveSubscriptions = 0
+            Locker = new obj()
+        }

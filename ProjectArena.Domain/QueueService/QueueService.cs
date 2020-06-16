@@ -71,11 +71,11 @@ namespace ProjectArena.Domain.QueueService
                     user.Time += time;
                 }
 
-                if (_bots.Count > 0)
+                if (_bots.Count > 0 && queue.Mode.TimeTillBot.HasValue)
                 {
                     foreach (var complectingUsersItem in complectingUsers)
                     {
-                        if (complectingUsersItem.Average(x => x.Time) >= queue.Mode.TimeTillBot)
+                        if (complectingUsersItem.Average(x => x.Time) >= queue.Mode.TimeTillBot.Value)
                         {
                             while (complectingUsersItem.Count < queue.Mode.MaxPlayers)
                             {
