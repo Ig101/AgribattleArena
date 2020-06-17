@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using ProjectArena.Infrastructure.Mongo.Operations;
 
 namespace ProjectArena.Infrastructure.Mongo
@@ -27,6 +28,16 @@ namespace ProjectArena.Infrastructure.Mongo
         public async Task<Tprojection> GetOneAsync<Tprojection>(Expression<Func<T, bool>> filter, Expression<Func<T, Tprojection>> projection, CancellationToken token = default)
         {
             return await _collection.Find(filter).Project(projection).FirstOrDefaultAsync(token);
+        }
+
+        public async Task<T> GetRandomOneAsync(Expression<Func<T, bool>> filter, CancellationToken token = default)
+        {
+            return await _collection.AsQueryable().Where(filter).Sample(1).FirstOrDefaultAsync(token);
+        }
+
+        public async Task<Tprojection> GetRandomOneAsync<Tprojection>(Expression<Func<T, bool>> filter, Expression<Func<T, Tprojection>> projection, CancellationToken token = default)
+        {
+            return await _collection.AsQueryable().Where(filter).Select(projection).Sample(1).FirstOrDefaultAsync(token);
         }
 
         public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> filter, CancellationToken token = default)

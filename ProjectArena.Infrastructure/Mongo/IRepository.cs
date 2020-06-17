@@ -13,6 +13,10 @@ namespace ProjectArena.Infrastructure.Mongo
 
         Task<Tprojection> GetOneAsync<Tprojection>(Expression<Func<T, bool>> filter, Expression<Func<T, Tprojection>> projection, CancellationToken token = default);
 
+        Task<T> GetRandomOneAsync(Expression<Func<T, bool>> filter, CancellationToken token = default);
+
+        Task<Tprojection> GetRandomOneAsync<Tprojection>(Expression<Func<T, bool>> filter, Expression<Func<T, Tprojection>> projection, CancellationToken token = default);
+
         Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> filter, CancellationToken token = default);
 
         Task<IEnumerable<Tprojection>> GetAsync<Tprojection>(Expression<Func<T, bool>> filter, Expression<Func<T, Tprojection>> projection, CancellationToken token = default);
