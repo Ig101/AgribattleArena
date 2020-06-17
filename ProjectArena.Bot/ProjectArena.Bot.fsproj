@@ -18,11 +18,11 @@
     <Compile Include="Domain/GameSignalRConnection/SynchronizerHubSubscription.fs" />
     <Compile Include="Domain/GameSignalRConnection/UnitHubSubscription.fs" />
     <Compile Include="Domain/BotMongoContext/Entities/NeuralModel.fs" />
+    <Compile Include="Domain/BotMongoContext/Projections/NeuralModelDefinition.fs" />
     <Compile Include="Domain/BotMongoContext/BotContext.fs" />
     <Compile Include="Domain/BotMongoContext/DBNeuralModel.fs" />
-    <Compile Include="Worker/Functors/SceneState.fs" />
-    <Compile Include="Worker/SceneStateWorker.fs" />
-    <Compile Include="Worker/Processors/SceneProcessor.fs" />
+    <Compile Include="Domain/SceneStateWorker/SceneStateWorker.fs" />
+    <Compile Include="Processors/SceneProcessor.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

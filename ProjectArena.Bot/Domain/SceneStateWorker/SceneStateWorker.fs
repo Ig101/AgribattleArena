@@ -1,4 +1,4 @@
-namespace ProjectArena.Bot.Worker.Functors
+namespace ProjectArena.Bot.SceneStateWorker
 open System.Collections.Generic
 open FSharp.Control
 open ProjectArena.Bot.Models.Dtos
