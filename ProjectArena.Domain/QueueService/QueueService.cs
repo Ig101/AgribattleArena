@@ -54,7 +54,7 @@ namespace ProjectArena.Domain.QueueService
                 {
                     var complect = complectingUsers
                         .FirstOrDefault(x => !x.Any(complectingUser => complectingUser.UserId == user.UserId));
-                    if (complect != null)
+                    if (complect != null && !complect.Any(x => x.UserId == user.UserId))
                     {
                         complect.Add(user);
                         if (complect.Count >= queue.Mode.MaxPlayers)
