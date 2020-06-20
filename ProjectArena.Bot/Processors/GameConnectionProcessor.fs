@@ -9,7 +9,10 @@ open Microsoft.AspNetCore.SignalR.Client
 open FSharp.Control
 
 let private authorize (configuration: ApiConfiguration) =
-    authorize configuration |> Async.RunSynchronously
+    printfn "Authorizing..."
+    configuration.Host
+    |> authorize configuration.Login configuration.Password
+    |> Async.RunSynchronously
     configuration
 
 let private generateExtraConsumer (worker: SceneStateWorker) (token: CancellationToken) =
@@ -30,6 +33,7 @@ let private subscribe (worker: SceneStateWorker) (hubConnection: HubConnection) 
     hubConnection
 
 let private initializeHubConnection (configuration: ApiConfiguration) =
+    printfn "Loading Connection..."
     let worker = SceneStateWorker.Unit()
     let tokenSource = new CancellationTokenSource()
     generateExtraConsumer worker tokenSource.Token
@@ -43,6 +47,7 @@ let setupGameConnection (configuration: RawConfigurationWithStorageConnection) =
         configuration.Api
         |> authorize
         |> initializeHubConnection
+    printfn "Loading finished."
     {
         Learning = configuration.Learning
         ApiHost = configuration.Api.Host

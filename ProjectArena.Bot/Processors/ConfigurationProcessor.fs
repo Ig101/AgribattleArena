@@ -20,6 +20,7 @@ let private build (builder: IConfigurationBuilder) =
     builder.Build()
 
 let setupConfiguration() =
+    printfn "Loading configuration..."
     let environment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
     let configuration =
         newConfigurationBuilder()

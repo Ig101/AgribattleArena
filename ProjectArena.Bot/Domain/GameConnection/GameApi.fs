@@ -1,5 +1,4 @@
 module ProjectArena.Bot.Domain.GameConnection.GameApi
-open ProjectArena.Bot.Models.Configuration
 open HttpFs.Client
 open Newtonsoft.Json
 open Newtonsoft.Json.Serialization
@@ -63,15 +62,15 @@ let private post<'Output> url : Async<'Output option> =
             return None
     }
 
-let authorize (configuration: ApiConfiguration) =
+let authorize (login: string) (password: string) (host: string) =
     async {
         let mutable content = None
         let request = {
-            Email = configuration.Login
-            Password = configuration.Password
+            Email = login
+            Password = password
         }
         while content = None do
-            let! result = postBody<SignInRequestDto, unit> (sprintf "%s/api/auth/signin" configuration.Host, request)
+            let! result = postBody<SignInRequestDto, unit> (sprintf "%s/api/auth/signin" host, request)
             match result with
             | None ->
                 printfn "Unsuccessful authorization call. Try again after 5 seconds"
