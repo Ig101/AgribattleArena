@@ -7,7 +7,6 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/ProjectArena.Api/ProjectArena.Api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +18,6 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/ProjectArena.Api/ProjectArena.Api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +30,6 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/ProjectArena.Api/ProjectArena.Api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

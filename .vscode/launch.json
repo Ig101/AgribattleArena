@@ -4,7 +4,20 @@
    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
    "version": "0.2.0",
    "configurations": [
-       
+        {
+            "name": ".NET Core Launch (bot)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ProjectArena.Bot/bin/Debug/netcoreapp3.1/ProjectArena.Bot.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/ProjectArena.Bot",
+            "stopAtEntry": false,
+            "console": "externalTerminal",
+            "env": {
+                    "NETCORE_ENVIRONMENT": "Development"
+                }
+        },
         {
             "name": ".NET Core Launch (dev)",
             "type": "coreclr",

@@ -13,26 +13,31 @@ let private postBody<'Input, 'Output> (url, body: 'Input) : Async<'Output option
         let jsonSettings = JsonSerializerSettings();
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
         let serializedBody = JsonConvert.SerializeObject(body, jsonSettings)
-        use! response = 
-            Request.createUrl Post url
-            |> Request.setHeader (ContentType {
-                typ = "application"
-                subtype = "json"
-                charset = Some Encoding.UTF8
-                boundary = None
-            })
-            |> Request.body (BodyString serializedBody)
-            |> getResponse
-            |> Alt.toAsync
-        let success = response.statusCode < 300
-        match success with
-        | true ->
-            let! content =
-                Response.readBodyAsString(response)
-                |> Job.toAsync
-            return Some (JsonConvert.DeserializeObject<'Output> content)
-        | false ->
-            printfn "Exited post operation with %d status code." response.statusCode
+        try
+            use! response = 
+                Request.createUrl Post url
+                |> Request.setHeader (ContentType {
+                    typ = "application"
+                    subtype = "json"
+                    charset = Some Encoding.UTF8
+                    boundary = None
+                })
+                |> Request.body (BodyString serializedBody)
+                |> getResponse
+                |> Alt.toAsync
+            let success = response.statusCode < 300
+            match success with
+            | true ->
+                let! content =
+                    Response.readBodyAsString(response)
+                    |> Job.toAsync
+                return Some (JsonConvert.DeserializeObject<'Output> content)
+            | false ->
+                printfn "Exited post operation with %d status code." response.statusCode
+                return None
+        with
+        | e ->
+            printfn "Exception on post operation: %A" e.Message
             return None
     }
 
@@ -40,25 +45,30 @@ let private post<'Output> url : Async<'Output option> =
     async {
         let jsonSettings = JsonSerializerSettings();
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
-        use! response = 
-            Request.createUrl Post url
-            |> Request.setHeader (ContentType {
-                typ = "application"
-                subtype = "json"
-                charset = Some Encoding.UTF8
-                boundary = None
-            })
-            |> getResponse
-            |> Alt.toAsync
-        let success = response.statusCode < 300
-        match success with
-        | true ->
-            let! content =
-                Response.readBodyAsString(response)
-                |> Job.toAsync
-            return Some (JsonConvert.DeserializeObject<'Output> content)
-        | false ->
-            printfn "Exited post operation with %d status code." response.statusCode
+        try
+            use! response = 
+                Request.createUrl Post url
+                |> Request.setHeader (ContentType {
+                    typ = "application"
+                    subtype = "json"
+                    charset = Some Encoding.UTF8
+                    boundary = None
+                })
+                |> getResponse
+                |> Alt.toAsync
+            let success = response.statusCode < 300
+            match success with
+            | true ->
+                let! content =
+                    Response.readBodyAsString(response)
+                    |> Job.toAsync
+                return Some (JsonConvert.DeserializeObject<'Output> content)
+            | false ->
+                printfn "Exited post operation with %d status code." response.statusCode
+                return None
+        with
+        | e ->
+            printfn "Exception on post operation: %A" e.Message
             return None
     }
 
@@ -66,25 +76,30 @@ let private get<'Output> url : Async<'Output option> =
     async {
         let jsonSettings = JsonSerializerSettings();
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
-        use! response = 
-            Request.createUrl Post url
-            |> Request.setHeader (ContentType {
-                typ = "application"
-                subtype = "json"
-                charset = Some Encoding.UTF8
-                boundary = None
-            })
-            |> getResponse
-            |> Alt.toAsync
-        let success = response.statusCode < 300
-        match success with
-        | true ->
-            let! content =
-                Response.readBodyAsString(response)
-                |> Job.toAsync
-            return Some (JsonConvert.DeserializeObject<'Output> content)
-        | false ->
-            printfn "Exited get operation with %d status code." response.statusCode
+        try
+            use! response = 
+                Request.createUrl Post url
+                |> Request.setHeader (ContentType {
+                    typ = "application"
+                    subtype = "json"
+                    charset = Some Encoding.UTF8
+                    boundary = None
+                })
+                |> getResponse
+                |> Alt.toAsync
+            let success = response.statusCode < 300
+            match success with
+            | true ->
+                let! content =
+                    Response.readBodyAsString(response)
+                    |> Job.toAsync
+                return Some (JsonConvert.DeserializeObject<'Output> content)
+            | false ->
+                printfn "Exited get operation with %d status code." response.statusCode
+                return None
+        with
+        | e ->
+            printfn "Exception on get operation: %A" e.Message
             return None
     }
 
