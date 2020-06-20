@@ -75,5 +75,5 @@ let setupGameConnection (configuration: RawConfigurationWithStorageConnection) =
     }
 
 let dispose (configuration: Configuration) =
-    configuration.Hub.DisposeAsync() |> Async.AwaitTask |> Async.RunSynchronously
+    configuration.Hub.DisposeAsync().Wait()
     ()

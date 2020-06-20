@@ -40,8 +40,8 @@ let setupConfiguration() =
         Api = {
             Host = configuration.GetValue<string>("Api:Host")
             HubPath = configuration.GetValue<string>("Api:HubPath")
-            Login = configuration.GetValue<string>("Learning:Login")
-            Password = configuration.GetValue<string>("Learning:Password")
+            Login = configuration.GetValue<string>("Api:Login")
+            Password = configuration.GetValue<string>("Api:Password")
         }
         Storage = {
             ConnectionString = configuration.GetValue<string>("Storage:ConnectionString")
