@@ -9,20 +9,32 @@
   <ItemGroup>
     <Compile Include="Helpers/AsyncHelper.fs" />
     <Compile Include="Models/Dtos/SynchronizerDto.fs" />
+    <Compile Include="Models/Dtos/SignInRequestDto.fs" />
     <Compile Include="Models/NeuralModels/NeuralModel.fs" />
     <Compile Include="Models/States/Scene.fs" />
     <Compile Include="Models/States/SynchronizationAction.fs" />
     <Compile Include="Models/States/IncomingSynchronizationMessage.fs" />
     <Compile Include="Models/States/SceneWithMetaData.fs" />
-    <Compile Include="Domain/GameSignalRConnection/SignalRConnection.fs" />
-    <Compile Include="Domain/GameSignalRConnection/SynchronizerHubSubscription.fs" />
-    <Compile Include="Domain/GameSignalRConnection/UnitHubSubscription.fs" />
+    <Compile Include="Domain/GameConnection/SignalRConnection.fs" />
+    <Compile Include="Domain/GameConnection/GameApi.fs" />
     <Compile Include="Domain/BotMongoContext/Entities/NeuralModel.fs" />
-    <Compile Include="Domain/BotMongoContext/Projections/NeuralModelDefinition.fs" />
     <Compile Include="Domain/BotMongoContext/BotContext.fs" />
     <Compile Include="Domain/BotMongoContext/DBNeuralModel.fs" />
     <Compile Include="Domain/SceneStateWorker/SceneStateWorker.fs" />
+    <Compile Include="Models/Configuration/LearningConfiguration.fs" />
+    <Compile Include="Models/Configuration/ApiConfiguration.fs" />
+    <Compile Include="Models/Configuration/StorageConfiguration.fs" />
+    <Compile Include="Models/Configuration/RawConfiguration.fs" />
+    <Compile Include="Models/Configuration/RawConfigurationWithStorageConnection.fs" />
+    <Compile Include="Models/Configuration/Configuration.fs" />
+    <Compile Include="Processors/NeuralProcessor.fs" />
+    <Compile Include="Processors/SelectionProcessor.fs" />
     <Compile Include="Processors/SceneProcessor.fs" />
+    <Compile Include="Processors/BreedingProcessor.fs" />
+    <Compile Include="Processors/LearningProcessor.fs" />
+    <Compile Include="Processors/GameConnectionProcessor.fs" />
+    <Compile Include="Processors/StorageSetupProcessor.fs" />
+    <Compile Include="Processors/ConfigurationProcessor.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -32,5 +44,9 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.5" />
     <PackageReference Include="Http.fs" Version="5.4.0" />
     <PackageReference Include="FSharp.Control.AsyncSeq" Version="2.0.24" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.5" />
   </ItemGroup>
 </Project>

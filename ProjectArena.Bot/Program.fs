@@ -1,9 +1,13 @@
 ﻿// Learn more about F# at http://fsharp.org
 
-open System
-open ProjectArena.Bot.Models.States
-open ProjectArena.Bot.Models.Dtos
+open ProjectArena.Bot.Processors.ConfigurationProcessor
+open ProjectArena.Bot.Processors.StorageSetupProcessor
+open ProjectArena.Bot.Processors.GameConnectionProcessor
 
 [<EntryPoint>]
 let main argv =
+    let worker =
+        setupConfiguration()
+        |> setupStorage
+        |> setupGameConnection
     0

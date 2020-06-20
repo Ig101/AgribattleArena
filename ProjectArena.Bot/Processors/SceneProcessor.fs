@@ -1,1 +1,1 @@
-module Processors.SceneProcessor
+module ProjectArena.Bot.Processors.SceneProcessor

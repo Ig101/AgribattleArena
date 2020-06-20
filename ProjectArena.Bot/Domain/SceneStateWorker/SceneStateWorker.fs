@@ -1,4 +1,4 @@
-namespace ProjectArena.Bot.SceneStateWorker
+namespace ProjectArena.Bot.Domain.SceneStateWorker
 open System.Collections.Generic
 open FSharp.Control
 open ProjectArena.Bot.Models.Dtos
@@ -88,7 +88,7 @@ type SceneStateWorker =
             return scene.Value
         }
 
-    static member Unit =
+    static member Unit() =
         {
             SceneIdWithSubscribeAndReceiveHandlesAndMessage = Dictionary<string, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>() 
             CancellationFunction = fun message -> message.Action = EndGame
