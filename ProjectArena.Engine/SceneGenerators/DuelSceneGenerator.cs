@@ -8,7 +8,6 @@ using ProjectArena.Engine.Objects;
 
 namespace ProjectArena.Engine.SceneGenerators
 {
-    // TODO Implement
     public class DuelSceneGenerator : ISceneGenerator, ForExternalUse.Generation.ISceneGenerator
     {
         public Scene.DefeatConditionMethod DefeatCondition

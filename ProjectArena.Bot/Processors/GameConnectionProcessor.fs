@@ -7,6 +7,9 @@ open ProjectArena.Bot.Domain.SceneStateWorker
 open ProjectArena.Bot.Models.States
 open Microsoft.AspNetCore.SignalR.Client
 open FSharp.Control
+open ProjectArena.Infrastructure.Mongo
+open ProjectArena.Bot.Domain.BotMongoContext
+open ProjectArena.Bot.Processors.SceneCreationProcessor
 
 let private authorize (configuration: ApiConfiguration) =
     printfn "Authorizing..."
@@ -15,11 +18,20 @@ let private authorize (configuration: ApiConfiguration) =
     |> Async.RunSynchronously
     configuration
 
-let private generateExtraConsumer (worker: SceneStateWorker) (token: CancellationToken) =
+let private generateExtraConsumer (storageConnection: IMongoConnection) (worker: SceneStateWorker) (token: CancellationToken) =
     async {
         while not token.IsCancellationRequested do
+            printfn "Waiting for new extra scene."
             let! newSceneSequence = worker.GetNextNewExtraScene()
-            newSceneSequence |> AsyncSeq.toListSynchronously |> ignore // TODO Process newSceneSequence
+            let context = BotContext storageConnection
+            let! neuralModel =
+                context.NeuralModels.GetRandomOneAsync(fun _ -> true)
+                |> Async.AwaitTask
+            printfn "Extra scene found. Model id: %s." neuralModel.Id
+            do!
+                newSceneSequence
+                |> (processCreatedSceneSequence neuralModel)
+                |> Async.Ignore
         return ()
     } |> Async.Start
 
@@ -32,11 +44,15 @@ let private subscribe (worker: SceneStateWorker) (hubConnection: HubConnection) 
     )
     hubConnection
 
-let private initializeHubConnection (configuration: ApiConfiguration) =
-    printfn "Loading Connection..."
+let private initializeWorker (storageConnection: IMongoConnection) (configuration: ApiConfiguration) =
+    printfn "Loading Worker..."
     let worker = SceneStateWorker.Unit()
     let tokenSource = new CancellationTokenSource()
-    generateExtraConsumer worker tokenSource.Token
+    generateExtraConsumer storageConnection worker tokenSource.Token
+    (worker, tokenSource, configuration)
+
+let private initializeHubConnection (worker: SceneStateWorker, tokenSource: CancellationTokenSource, configuration: ApiConfiguration) =
+    printfn "Loading Connection..."
     let connection =
         openConnection tokenSource (sprintf "%s/%s" configuration.Host configuration.HubPath)
         |> subscribe worker 
@@ -46,6 +62,7 @@ let setupGameConnection (configuration: RawConfigurationWithStorageConnection) =
     let worker, tokenSource, hub =
         configuration.Api
         |> authorize
+        |> initializeWorker configuration.Storage
         |> initializeHubConnection
     printfn "Loading finished."
     {
@@ -56,3 +73,7 @@ let setupGameConnection (configuration: RawConfigurationWithStorageConnection) =
         Worker = worker
         WorkerCancellationToken = tokenSource.Token
     }
+
+let dispose (configuration: Configuration) =
+    configuration.Hub.DisposeAsync() |> Async.AwaitTask |> Async.RunSynchronously
+    ()

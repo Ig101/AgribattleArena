@@ -47,6 +47,7 @@ type SceneStateWorker =
                         match waitingSuccess with
                         | false ->
                             stateCheck <- false
+                            receiveHandle.Set() |> ignore
                         | true ->
                             let _, _, message = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.[sceneId]
                             stateCheck <- not (message |> this.CancellationFunction)

@@ -3,8 +3,10 @@ open System
 open System.Threading.Tasks
 open System.Threading
 
-let rand = Random()
-
-let randomSleep =
-    let ms = rand.Next(100,1000)
-    Thread.Sleep ms
+let processSequenceAsynchronously (func: 'a -> Async<'b>) (sequence: 'a seq)  : Async<'b seq> =
+    let tasks =
+        sequence
+        |> Seq.map (func >> Async.StartAsTask)
+    Task.WhenAll tasks
+    |> Async.AwaitTask
+    |> Async.map Seq.ofArray

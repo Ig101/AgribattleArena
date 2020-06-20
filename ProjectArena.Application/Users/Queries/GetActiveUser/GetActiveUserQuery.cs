@@ -90,7 +90,6 @@ namespace ProjectArena.Application.Users.Queries.GetActiveUser
 
                 var talents = await _registryContext.TalentMap.GetAsync(x => true);
 
-                // TODO NativeId calculation by talents
                 return new ActiveUserDto()
                 {
                     Name = user.ViewName,

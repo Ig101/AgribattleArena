@@ -468,7 +468,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           const currentActionSquare = this.battleStorageService.availableActionSquares
           ?.find(s => s.x === x && s.y === y && s.type);
           if (currentActionSquare) {
-            // TODO cast spells
             if (this.currentSkillId) {
               this.arenaHub.orderCast(
                 this.battleStorageService.scene.id,
@@ -1054,7 +1053,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     const currentPlayer = action.sync.players.find(x => x.id === this.userService.user.id);
     switch (action.action) {
       case BattleSynchronizationActionEnum.StartGame:
-        // TODO Add some introducing animations
         this.restoreScene(action.sync);
         if (!this.loadingFinished) {
           this.processNextActionFromQueue();
