@@ -18,15 +18,17 @@ let private authorize (configuration: ApiConfiguration) =
     |> Async.RunSynchronously
     configuration
 
+let private getRandomNeuralModel (connection: IMongoConnection) =
+    let context = BotContext connection
+    context.NeuralModels.GetRandomOneAsync(fun _ -> true)
+    |> Async.AwaitTask
+
 let private generateExtraConsumer (storageConnection: IMongoConnection) (worker: SceneStateWorker) (token: CancellationToken) =
     async {
         while not token.IsCancellationRequested do
             printfn "Waiting for new extra scene."
             let! newSceneSequence = worker.GetNextNewExtraScene()
-            let context = BotContext storageConnection
-            let! neuralModel =
-                context.NeuralModels.GetRandomOneAsync(fun _ -> true)
-                |> Async.AwaitTask
+            let! neuralModel = getRandomNeuralModel storageConnection
             printfn "Extra scene found. Model id: %s." neuralModel.Id
             do!
                 newSceneSequence

@@ -9,11 +9,14 @@ open ProjectArena.Bot.Domain.BotMongoContext.Entities
 open ProjectArena.Bot.Processors.SceneCreationProcessor
 open System.Threading.Tasks
 open ProjectArena.Bot.Helpers.AsyncHelper
+open ProjectArena.Infrastructure.Mongo
 
-let private getModelsFromStorage (context: BotContext) =
+let private getModelsFromStorage (connection: IMongoConnection) =
+    let context = BotContext(connection);
     context.NeuralModels.GetAsync (fun _ -> true) |> Async.AwaitTask
 
-let private refillTableWithNewModels (context: BotContext) (models: NeuralModel seq) =
+let private refillTableWithNewModels (connection: IMongoConnection) (models: NeuralModel seq) =
+    let context = BotContext(connection);
     context.NeuralModels.Delete(fun _ -> true)
     context.NeuralModels.Insert(models)
     context.ApplyChangesAsync() |> Async.AwaitTask
@@ -22,13 +25,12 @@ let startLearning (configuration:Configuration) =
     async {
         while not configuration.WorkerCancellationToken.IsCancellationRequested do
             printfn "Learning cycle started."
-            let context = BotContext(configuration.Storage);
             do!
-                getModelsFromStorage context
+                getModelsFromStorage configuration.Storage
                 |> Async.map (breed configuration)
                 |> Async.bind (processSequenceAsynchronously (processScene configuration))
                 |> Async.map (select configuration)
-                |> Async.bind (refillTableWithNewModels context)
+                |> Async.bind (refillTableWithNewModels configuration.Storage)
             printfn "Learning cycle finished."
         printfn "Learning aborted due to unexpected error."
     } |> Async.Start
