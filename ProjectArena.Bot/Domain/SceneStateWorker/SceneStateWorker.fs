@@ -43,11 +43,15 @@ type SceneStateWorker =
                 let seq = asyncSeq {
                     let mutable stateCheck = true
                     while stateCheck do
-                        do! Async.AwaitWaitHandle subscribeHandle |> Async.Ignore
-                        let _, _, message = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.[sceneId]
-                        stateCheck <- not (message |> this.CancellationFunction)
-                        receiveHandle.Set() |> ignore
-                        yield message
+                        let! waitingSuccess = Async.AwaitWaitHandle (subscribeHandle, 240000)
+                        match waitingSuccess with
+                        | false ->
+                            stateCheck <- false
+                        | true ->
+                            let _, _, message = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.[sceneId]
+                            stateCheck <- not (message |> this.CancellationFunction)
+                            receiveHandle.Set() |> ignore
+                            yield message
                     this.RemoveScene sceneId
                 }
                 this.SubscriptionObject <- Some seq

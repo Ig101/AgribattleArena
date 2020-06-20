@@ -32,6 +32,20 @@ namespace ProjectArena.Api.Controllers
             }));
         }
 
+        [HttpGet("{sceneId}")]
+        public async Task<IActionResult> GetSynchronizationInfoAsync(Guid sceneId)
+        {
+            var user = await Mediator.Send(new GetFullUserInfoByPrincipalQuery()
+            {
+                User = User
+            });
+
+            return Ok(await Mediator.Send(new GetFullSynchronizationInfoQuery()
+            {
+                UserId = user.Id
+            }));
+        }
+
         [HttpDelete("{sceneId}")]
         public async Task<IActionResult> LeaveBattleAsync(Guid sceneId)
         {
@@ -40,7 +54,7 @@ namespace ProjectArena.Api.Controllers
                 User = User
             });
 
-            return Ok(await Mediator.Send(new LeaveSceneCommand()
+            return Ok(await Mediator.Send(new GetFullSynchronizationInfoQuery()
             {
                 UserId = user.Id,
                 SceneId = sceneId

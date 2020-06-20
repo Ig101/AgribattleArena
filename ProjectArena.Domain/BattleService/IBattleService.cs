@@ -18,7 +18,7 @@ namespace ProjectArena.Domain.BattleService
 
         bool IsUserInBattle(string userId);
 
-        SynchronizerDto GetUserSynchronizationInfo(string userId);
+        SynchronizerDto GetUserSynchronizationInfo(string userId, Guid? sceneId);
 
         IEnumerable<SynchronizerDto> GetAllUserSynchronizationInfos(string userId);
 

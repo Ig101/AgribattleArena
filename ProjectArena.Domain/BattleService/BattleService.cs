@@ -286,9 +286,12 @@ namespace ProjectArena.Domain.BattleService
             await gameContext.ApplyChangesAsync();
         }
 
-        public SynchronizerDto GetUserSynchronizationInfo(string userId)
+        public SynchronizerDto GetUserSynchronizationInfo(string userId, Guid? sceneId)
         {
-            var scene = _scenes.FirstOrDefault(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && x.Id == userId && !x.Left) != null);
+            var scene = _scenes
+                .FirstOrDefault(scene => scene.IsActive &&
+                    (sceneId == null || sceneId == scene.Id) &&
+                    scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
             if (scene == null)
             {
                 return null;

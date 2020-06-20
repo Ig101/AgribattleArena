@@ -1,6 +1,4 @@
-﻿// Learn more about F# at http://fsharp.org
-
-open ProjectArena.Bot.Processors.ConfigurationProcessor
+﻿open ProjectArena.Bot.Processors.ConfigurationProcessor
 open ProjectArena.Bot.Processors.StorageSetupProcessor
 open ProjectArena.Bot.Processors.GameConnectionProcessor
 

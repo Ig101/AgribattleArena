@@ -10,6 +10,8 @@ namespace ProjectArena.Application.Battle.Queries.GetFullSynchronizationInfo
 {
     public class GetFullSynchronizationInfoQuery : IRequest<SynchronizerDto>
     {
+        public Guid? SceneId { get; set; }
+
         public string UserId { get; set; }
 
         internal class Handler : IRequestHandler<GetFullSynchronizationInfoQuery, SynchronizerDto>
@@ -25,7 +27,7 @@ namespace ProjectArena.Application.Battle.Queries.GetFullSynchronizationInfo
             {
                 return Task.Run(() =>
                 {
-                    var result = _battleService.GetUserSynchronizationInfo(request.UserId);
+                    var result = _battleService.GetUserSynchronizationInfo(request.UserId, request.SceneId);
                     if (result == null)
                     {
                         throw new CannotPerformOperationException("User is not in battle");

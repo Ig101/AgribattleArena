@@ -62,6 +62,32 @@ let private post<'Output> url : Async<'Output option> =
             return None
     }
 
+let private get<'Output> url : Async<'Output option> =
+    async {
+        let jsonSettings = JsonSerializerSettings();
+        jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
+        use! response = 
+            Request.createUrl Post url
+            |> Request.setHeader (ContentType {
+                typ = "application"
+                subtype = "json"
+                charset = Some Encoding.UTF8
+                boundary = None
+            })
+            |> getResponse
+            |> Alt.toAsync
+        let success = response.statusCode < 300
+        match success with
+        | true ->
+            let! content =
+                Response.readBodyAsString(response)
+                |> Job.toAsync
+            return Some (JsonConvert.DeserializeObject<'Output> content)
+        | false ->
+            printfn "Exited get operation with %d status code." response.statusCode
+            return None
+    }
+
 let authorize (login: string) (password: string) (host: string) =
     async {
         let mutable content = None
@@ -91,3 +117,6 @@ let enqueue (host: string) =
             | _ -> content <- result
         return content.Value
     }
+
+let getSceneSynchronizer (host: string) (sceneId: Guid) =
+    get<SynchronizerDto> (sprintf "%s/api/battle/%s" host (sceneId.ToString()))
