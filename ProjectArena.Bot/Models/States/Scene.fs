@@ -5,7 +5,7 @@ open System
 type Scene = {
     Id: Guid
     Version: int
-    RoundsPassed: float
+    RoundsPassed: float32
     TempActor: ActorDto option
     TempDecoration: ActiveDecorationDto option
     Players: PlayerDto seq

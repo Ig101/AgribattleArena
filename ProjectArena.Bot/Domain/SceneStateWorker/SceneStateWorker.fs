@@ -34,13 +34,17 @@ type SceneStateWorker =
     member this.SendNewMessage message =
         async {
             let sceneId = message.Synchronizer.Id
-            let queueGettingSuccess = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.ContainsKey sceneId
+            let queueGettingSuccess = lock this.Locker (fun () ->
+                let queueGettingSuccess = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.ContainsKey sceneId
+                if not queueGettingSuccess then
+                    let subscribeHandle = new AutoResetEvent false
+                    let receiveHandle = new AutoResetEvent false
+                    this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.Add(sceneId, (subscribeHandle, receiveHandle, message))
+                queueGettingSuccess)
             match queueGettingSuccess with
             | false -> 
                 do! Async.AwaitWaitHandle this.ReceiveHandle |> Async.Ignore
-                let subscribeHandle = new AutoResetEvent false
-                let receiveHandle = new AutoResetEvent false
-                this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.Add(sceneId, (subscribeHandle, receiveHandle, message))
+                let subscribeHandle, receiveHandle, _ = this.SceneIdWithSubscribeAndReceiveHandlesAndMessage.[sceneId]
                 let seq = asyncSeq {
                     let mutable stateCheck = true
                     while stateCheck do
@@ -100,7 +104,7 @@ type SceneStateWorker =
             CancellationFunction = fun message -> message.Action = EndGame
             SubscribeHandle = new AutoResetEvent false
             ExtraSubscribeHandle = new AutoResetEvent false
-            ReceiveHandle = new AutoResetEvent false
+            ReceiveHandle = new AutoResetEvent true
             SubscriptionObject = None
             ActiveSubscriptions = 0
             Locker = new obj()

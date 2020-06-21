@@ -18,5 +18,4 @@ export interface SpecEffect {
   y: number;
   z: number;
   duration?: number;
-  mod: number;
 }

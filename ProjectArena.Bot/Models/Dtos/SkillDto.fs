@@ -4,9 +4,9 @@ type SkillDto = {
     Id: int
     Range: int
     NativeId: string
-    Cd: float
+    Cd: float32
     Cost: int
-    PreparationTime: float
+    PreparationTime: float32
     AvailableTargets: TargetsDto
     OnlyVisibleTargets: bool
 }

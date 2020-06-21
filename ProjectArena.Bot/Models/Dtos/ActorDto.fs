@@ -8,15 +8,15 @@ type ActorDto = {
     AttackingSkill: SkillDto option
     Skills: SkillDto seq
     Buffs: BuffDto seq
-    InitiativePosition: float
-    Health: float option
+    InitiativePosition: float32
+    Health: float32 option
     OwnerId: string option
     X: int
     Y: int
-    Z: float
+    Z: float32
     MaxHealth: int option
     ActionPoints: int
-    Initiative: float
+    Initiative: float32
     CanMove: bool
     CanAct: bool
 }

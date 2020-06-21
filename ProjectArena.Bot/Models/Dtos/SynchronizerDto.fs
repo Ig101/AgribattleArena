@@ -4,12 +4,12 @@ open System
 type SynchronizerDto = {
     Id: Guid
     Version: int
-    RoundsPassed: float
+    RoundsPassed: float32
     ActorId: int option
     SkillActionId: int option
     TargetX: int option
     TargetY: int option
-    TurnTime: float
+    TurnTime: float32
     TempActor: int option
     TempDecoration: int option
     Players: PlayerDto seq

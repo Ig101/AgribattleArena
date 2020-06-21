@@ -142,7 +142,7 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
     });
   }
   actor.initiativePosition = syncActor.initiativePosition;
-  const iniHealth = Math.floor(actor.health);
+  const iniHealth = Math.floor(actor.health || syncActor.maxHealth);
   const newHealth = Math.floor(syncActor.health);
   if (newHealth !== iniHealth) {
     difference = getActorDifference(actor, syncActor, difference);
@@ -186,9 +186,8 @@ export function synchronizeDecoration(decoration: ActiveDecoration, syncDecorati
   if (owner) {
     decoration.owner = owner;
   }
-  decoration.mod = syncDecoration.mod;
   decoration.initiativePosition = syncDecoration.initiativePosition;
-  const iniHealth = Math.floor(decoration.health);
+  const iniHealth = Math.floor(decoration.health || syncDecoration.maxHealth);
   const newHealth = Math.floor(syncDecoration.health);
   if (newHealth !== iniHealth) {
     difference = getDecorationDifference(decoration, syncDecoration, difference);
@@ -204,7 +203,6 @@ export function synchronizeDecoration(decoration: ActiveDecoration, syncDecorati
   decoration.y = syncDecoration.y;
   decoration.z = syncDecoration.z;
   decoration.maxHealth = syncDecoration.maxHealth;
-  decoration.armor = syncDecoration.armor;
   return difference;
 }
 
@@ -217,5 +215,4 @@ export function synchronizeEffect(effect: SpecEffect, syncEffect: SyncSpecEffect
   effect.y = syncEffect.y;
   effect.z = syncEffect.z;
   effect.duration = syncEffect.duration;
-  effect.mod = syncEffect.mod;
 }

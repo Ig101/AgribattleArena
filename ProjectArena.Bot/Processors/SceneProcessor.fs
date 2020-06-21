@@ -65,36 +65,52 @@ let private mergeSceneWithSynchronizer (scene: Scene) (synchronizer: Synchronize
         TilesetHeight = synchronizer.TilesetHeight
     }
 
-let private createScene (apiHost: string) (synchronizer: SynchronizerDto) = async {
+let private createScene (configuration: Configuration) (synchronizer: SynchronizerDto) = async {
     match synchronizer.Version with
     | 1 ->
         return Some (generateSceneFromSynchronizer synchronizer)
     | _ ->
-        let! realSynchronizer = getSceneSynchronizer apiHost synchronizer.Id
+        let! realSynchronizer = getSceneSynchronizer configuration.User.AuthCookie configuration.ApiHost synchronizer.Id
         return realSynchronizer |> Option.map generateSceneFromSynchronizer
 }
 
-let private mergeScene (apiHost: string) (synchronizer: SynchronizerDto) (scene: Scene) = async {
+let private mergeScene (configuration: Configuration) (synchronizer: SynchronizerDto) (scene: Scene) = async {
     match synchronizer.Version - scene.Version with
     | 1 ->
         return Some (mergeSceneWithSynchronizer scene synchronizer)
     | diff when diff > 1 ->
-        let! realSynchronizer = getSceneSynchronizer apiHost synchronizer.Id
+        let! realSynchronizer = getSceneSynchronizer configuration.User.AuthCookie configuration.ApiHost synchronizer.Id
         return realSynchronizer |> Option.map generateSceneFromSynchronizer
     | _ ->
         return None
 }
 
-let private tryMergeScene (apiHost: string) (synchronizer: SynchronizerDto) (sceneOpt: Scene option) =
+let private tryMergeScene (configuration: Configuration) (synchronizer: SynchronizerDto) (sceneOpt: Scene option) =
     match sceneOpt with
-    | Some scene -> mergeScene apiHost synchronizer scene
-    | None -> createScene apiHost synchronizer
+    | Some scene -> mergeScene configuration synchronizer scene
+    | None -> createScene configuration synchronizer
 
 let private chooseModel (userId: string) (model: NeuralModel, spareModel: NeuralModel) (scene: Scene) (playerId: string) =
     let index = scene.Players |> Seq.filter (fun p -> p.UserId = userId) |> Seq.findIndex (fun p -> p.Id = playerId)
     match index with
     | 0 -> (model, scene)
     | _ -> (spareModel, scene)
+
+let private chooseMeaningfulActionsOnly (message: IncomingSynchronizationMessage) (scene: Scene) =
+    match message.Synchronizer.ActorId with
+    | None -> Some scene
+    | Some actingActor ->
+        match message.Synchronizer.TempActor with
+        | None -> Some scene
+        | Some tempActor ->
+            let actorOpt = message.Synchronizer.ChangedActors |> Seq.tryFind (fun a -> a.Id = tempActor)
+            match actorOpt with
+            | None -> None
+            | Some actor ->
+                if message.Action = Wait || (actingActor = tempActor && ((not actor.CanAct && not actor.CanMove) || actor.ActionPoints <= 0)) then
+                    None
+                else 
+                    Some scene
 
 let private tryGetActingModel (userId: string) (model: NeuralModel, spareModel: NeuralModel) (scene: Scene) =
     match scene.TempActor with
@@ -107,15 +123,14 @@ let private tryGetActingModel (userId: string) (model: NeuralModel, spareModel: 
         | Some owner when owner.UserId = userId -> Some (owner.Id |> chooseModel userId (model, spareModel) scene)
         | _ -> None
 
-
-
 let sceneMessageProcessor (configuration: Configuration) (model: NeuralModel, spareModel: NeuralModel) (sceneOpt: Scene option) (message: IncomingSynchronizationMessage ) = async {
     let! newSceneOpt =
         sceneOpt
-        |> tryMergeScene configuration.ApiHost message.Synchronizer;
+        |> tryMergeScene configuration message.Synchronizer;
     
     newSceneOpt
-    |> Option.bind (tryGetActingModel configuration.UserId (model, spareModel))
+    |> Option.bind (chooseMeaningfulActionsOnly message)
+    |> Option.bind (tryGetActingModel configuration.User.UserId (model, spareModel))
     |> Option.map (actOnScene configuration.Hub)
     |> ignore
     match newSceneOpt with

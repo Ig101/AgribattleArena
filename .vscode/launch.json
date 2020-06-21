@@ -13,7 +13,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/ProjectArena.Bot",
             "stopAtEntry": false,
-            "console": "internalConsole",
+            "console": "externalTerminal",
             "env": {
                     "NETCORE_ENVIRONMENT": "Development"
                 }

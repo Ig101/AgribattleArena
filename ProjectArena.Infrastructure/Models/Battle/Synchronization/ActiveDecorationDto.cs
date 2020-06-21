@@ -8,8 +8,6 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public string NativeId { get; set; }
 
-        public float Mod { get; set; }
-
         public float InitiativePosition { get; set; }
 
         public float? Health { get; set; }
@@ -25,7 +23,5 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
         public float Z { get; set; }
 
         public float? MaxHealth { get; set; }
-
-        public IEnumerable<TagSynergyDto> Armor { get; set; }
     }
 }

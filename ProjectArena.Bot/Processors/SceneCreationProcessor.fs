@@ -25,7 +25,7 @@ let processScene (configuration: Configuration) (model: NeuralModel) = async {
     let! spareNeuralModel = getRandomNeuralModel configuration.Storage
     if (configuration.Learning.IsLearning) then
         printfn "Enqueueing..."
-        do! enqueue configuration.ApiHost
+        do! enqueue configuration.User.AuthCookie configuration.ApiHost
         printfn "Enqueue completed"
     printfn "Waiting for new scene for learning. Model id: %s" model.Id
     let! newSceneSequence = configuration.Worker.GetNextNewScene()

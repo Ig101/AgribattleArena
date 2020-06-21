@@ -13,7 +13,6 @@ export interface ActiveDecoration {
   onDeathAction: ActionAnimation;
   active: boolean;
 
-  mod: number;
   initiativePosition: number;
   health: number;
   owner: Player;
@@ -22,5 +21,4 @@ export interface ActiveDecoration {
   y: number;
   z: number;
   maxHealth: number;
-  armor: TagSynergy[];
 }

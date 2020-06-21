@@ -5,33 +5,47 @@ open ProjectArena.Bot.Models.States
 open ProjectArena.Bot.Models.Dtos
 open System.Threading
 open System
+open Microsoft.AspNetCore.Http.Connections.Client
+open System.Net
+open Microsoft.Extensions.Logging
+open ProjectArena.Bot.Helpers.MappingHelper
 
+let private fillHubOptions (auth: string) (url: string) (options: HttpConnectionOptions) =
+    options.Cookies <- CookieContainer()
+    options.Cookies.Add(Uri(url), Cookie("Authorization", auth))
+    ()
 
-let openConnection (tokenSource: CancellationTokenSource) (url: string) =
+let createConnection (tokenSource: CancellationTokenSource) (auth: string) (url: string) =
     let connection =
         HubConnectionBuilder()
-            .WithUrl(url)
+            .WithUrl(url, fillHubOptions auth url)
+            .WithAutomaticReconnect()
+            .ConfigureLogging(fun logging -> 
+                logging.AddConsole().SetMinimumLevel(LogLevel.Error) |> ignore)
             .Build()
     connection.add_Closed(fun error ->
         printfn "Hub connection is lost"
-        tokenSource.Cancel()
         Task.CompletedTask)
     connection.On("BattleSynchronizationError", fun () ->
         printfn "Synchronization error") |> ignore
     connection
 
+let startConnection (connection: HubConnection) =
+    connection.StartAsync() |> Async.AwaitTask |> Async.RunSynchronously
+    connection
+
 let subscribeOnScene (connection: HubConnection) (func: (SynchronizationAction * SynchronizerDto) -> unit) =
-    connection.On("BattleStartGame", fun (synchronizer: SynchronizerDto) -> func(StartGame, synchronizer)) |> ignore
-    connection.On("BattleMove", fun (synchronizer: SynchronizerDto) -> func(Move, synchronizer)) |> ignore
-    connection.On("BattleAttack", fun (synchronizer: SynchronizerDto) -> func(Attack, synchronizer)) |> ignore
-    connection.On("BattleCast", fun (synchronizer: SynchronizerDto) -> func(Cast, synchronizer)) |> ignore
-    connection.On("BattleWait", fun (synchronizer: SynchronizerDto) -> func(Wait, synchronizer)) |> ignore
-    connection.On("BattleDecoration", fun (synchronizer: SynchronizerDto) -> func(Decoration, synchronizer)) |> ignore
-    connection.On("BattleEndTurn", fun (synchronizer: SynchronizerDto) -> func(EndTurn, synchronizer)) |> ignore
-    connection.On("BattleEndGame", fun (synchronizer: SynchronizerDto) -> func(EndGame, synchronizer)) |> ignore
-    connection.On("BattleSkipTurn", fun (synchronizer: SynchronizerDto) -> func(SkipTurn, synchronizer)) |> ignore
-    connection.On("BattleLeave", fun (synchronizer: SynchronizerDto) -> func(Leave, synchronizer)) |> ignore
-    connection.On("BattleNoActorsDraw", fun (synchronizer: SynchronizerDto) -> func(NoActorsDraw, synchronizer)) |> ignore
+    connection.On("BattleStartGame", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(StartGame, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleMove", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Move, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleAttack", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Attack, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleCast", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Cast, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleWait", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Wait, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleDecoration", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Decoration, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleEndTurn", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(EndTurn, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleEndGame", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(EndGame, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleSkipTurn", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(SkipTurn, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleLeave", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Leave, mapSynchronizer synchronizer)) |> ignore
+    connection.On("BattleNoActorsDraw", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(NoActorsDraw, mapSynchronizer synchronizer)) |> ignore
 
 let orderAttack (connection: HubConnection) (sceneId: Guid, actorId: int, targetX: int, targetY: int) =
     connection.SendAsync("OrderAttackAsync", sceneId, actorId, targetX, targetY) |> Async.AwaitTask |> Async.Start

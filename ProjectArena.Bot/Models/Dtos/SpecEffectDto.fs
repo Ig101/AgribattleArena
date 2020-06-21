@@ -6,8 +6,7 @@ type SpecEffectDto = {
     IsAlive: bool
     X: int
     Y: int
-    Z: float
-    Duration: float option
-    Mod: float
+    Z: float32
+    Duration: float32 option
     NativeId: string
 }

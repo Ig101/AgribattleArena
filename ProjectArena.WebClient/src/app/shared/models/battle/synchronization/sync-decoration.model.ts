@@ -3,7 +3,6 @@ import { TagSynergy } from '../tag-synergy.model';
 export interface SyncDecoration {
   id: number;
   nativeId: string;
-  mod: number;
   initiativePosition: number;
   health: number;
   ownerId?: string;
@@ -12,5 +11,4 @@ export interface SyncDecoration {
   y: number;
   z: number;
   maxHealth: number;
-  armor: TagSynergy[];
 }

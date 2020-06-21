@@ -6,6 +6,5 @@ export interface SyncSpecEffect {
   y: number;
   z: number;
   duration?: number;
-  mod: number;
   nativeId: string;
 }

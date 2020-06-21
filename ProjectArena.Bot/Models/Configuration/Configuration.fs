@@ -6,7 +6,7 @@ open System.Threading
 
 type Configuration = {
     Learning: LearningConfiguration
-    UserId: string
+    User: UserConfiguration
     ApiHost: string
     Hub: HubConnection
     Storage: IMongoConnection

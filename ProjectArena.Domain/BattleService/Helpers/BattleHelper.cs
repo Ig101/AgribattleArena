@@ -30,16 +30,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
             return "Battle" + (action == null ? "Info" : action.ToString());
         }
 
-        private static TagSynergyDto MapTagSynergy(Engine.Helpers.TagSynergy model)
-        {
-            return new TagSynergyDto()
-            {
-                SelfTag = model.SelfTag,
-                TargetTag = model.TargetTag,
-                Mod = model.Mod
-            };
-        }
-
         public static IDictionary<GameMode, SceneModeQueue> GetNewModeQueue()
         {
             return new Dictionary<GameMode, SceneModeQueue>()
@@ -147,13 +137,11 @@ namespace ProjectArena.Domain.BattleService.Helpers
         {
             return new ActiveDecorationDto()
             {
-                Armor = decoration.Armor.Select(x => MapTagSynergy(x)),
                 Health = decoration.HealthRevealed || ally ? decoration.Health : (float?)null,
                 Id = decoration.Id,
                 InitiativePosition = decoration.InitiativePosition,
                 IsAlive = decoration.IsAlive,
                 MaxHealth = decoration.HealthRevealed || ally ? decoration.MaxHealth : (float?)null,
-                Mod = decoration.Mod,
                 NativeId = decoration.NativeId,
                 OwnerId = decoration.OwnerId,
                 X = decoration.X,
@@ -169,7 +157,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 Duration = effect.Duration,
                 Id = effect.Id,
                 IsAlive = effect.IsAlive,
-                Mod = effect.Mod,
                 NativeId = effect.NativeId,
                 OwnerId = effect.OwnerId,
                 X = effect.X,

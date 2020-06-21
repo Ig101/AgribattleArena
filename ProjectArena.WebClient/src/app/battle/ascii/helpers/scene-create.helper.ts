@@ -217,7 +217,6 @@ export function convertDecoration(decoration: SyncDecoration, owner: Player, isC
       cloneActionAnimation(native.onDeathAction) :
       cloneActionAnimation(native.enemyOnDeathAction),
     active: native.active,
-    mod: decoration.mod,
     initiativePosition: decoration.initiativePosition,
     health: decoration.health,
     owner,
@@ -225,8 +224,7 @@ export function convertDecoration(decoration: SyncDecoration, owner: Player, isC
     x: decoration.x,
     y: decoration.y,
     z: decoration.z,
-    maxHealth: decoration.maxHealth,
-    armor: decoration.armor
+    maxHealth: decoration.maxHealth
   };
 }
 
@@ -266,7 +264,6 @@ export function convertEffect(effect: SyncSpecEffect, owner: Player, isCurrentPl
     x: effect.x,
     y: effect.y,
     z: effect.z,
-    duration: effect.duration,
-    mod: effect.mod
+    duration: effect.duration
   };
 }
