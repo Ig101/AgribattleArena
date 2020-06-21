@@ -147,6 +147,7 @@ export class ArenaHubService {
 
   private registerBattleSynchronizationAction(action: BattleSynchronizationActionEnum, sync: Synchronizer) {
     const synchronizationObject = { action, sync };
+    console.log(synchronizationObject);
     this.battleSynchronizationActionsList.push(synchronizationObject);
     this.battleSynchronizationActionsList.sort((a, b) => a.sync.version - b.sync.version);
     this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;
@@ -158,7 +159,7 @@ export class ArenaHubService {
 
     this.addNewListener(BATTLE_SYNC_ERROR, () => this.synchronizationErrorState.next(true) );
     this.addNewListener(BATTLE_START_GAME, (synchronizer: Synchronizer) => {
-      const currentPlayer = synchronizer.players.find(x => x.id === this.userId);
+      const currentPlayer = synchronizer.players.find(x => x.userId === this.userId);
       const loadingScene = {
         tiles: new Array<LoadingTile[]>(synchronizer.tilesetWidth),
         width: synchronizer.tilesetWidth,

@@ -205,7 +205,7 @@ namespace ProjectArena.Domain.BattleService
                 })
                 .ToList();
 
-                players.Add(EngineHelper.CreatePlayerForGeneration(roster.Id, id, null, playerActors));
+                players.Add(EngineHelper.CreatePlayerForGeneration(Guid.NewGuid().ToString(), id, null, playerActors));
             }
 
             var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), SynchronizationInfoEventHandler);
@@ -241,7 +241,7 @@ namespace ProjectArena.Domain.BattleService
                     {
                         if (BattleHelper.CalculateReward(ref synchronizer, e.Scene, player.Id))
                         {
-                            Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.Id));
+                            Task.Run(async () => await PayRewardAsync(synchronizer.Reward, player.UserId));
                         }
                     }
 
@@ -267,7 +267,7 @@ namespace ProjectArena.Domain.BattleService
         {
             foreach (var scene in _scenes)
             {
-                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && x.Id == userId && !x.Left) != null)
+                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
                 {
                     return true;
                 }
@@ -276,14 +276,18 @@ namespace ProjectArena.Domain.BattleService
             return false;
         }
 
-        private async Task PayRewardAsync(RewardDto reward, string playerId)
+        private async Task PayRewardAsync(RewardDto reward, string userId)
         {
             var gameContext = _serviceProvider.GetRequiredService<GameContext>();
-            var roster = await gameContext.Rosters.GetOneAsync(x => x.Id == playerId);
-            gameContext.Rosters.Update(
-                x => x.Id == playerId,
-                Builders<Roster>.Update.Set(x => x.Experience, Math.Min(roster.Experience + reward.Experience, MaxExperience)));
-            await gameContext.ApplyChangesAsync();
+            var rosters = await gameContext.Rosters.GetAsync(x => x.UserId == userId);
+            if (rosters.Count() == 1)
+            {
+                var roster = rosters.First();
+                gameContext.Rosters.Update(
+                    x => x.Id == roster.Id,
+                    Builders<Roster>.Update.Set(x => x.Experience, Math.Min(roster.Experience + reward.Experience, MaxExperience)));
+                await gameContext.ApplyChangesAsync();
+            }
         }
 
         public SynchronizerDto GetUserSynchronizationInfo(string userId, Guid? sceneId)

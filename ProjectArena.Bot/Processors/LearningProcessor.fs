@@ -34,3 +34,4 @@ let startLearning (configuration:Configuration) =
             printfn "Learning cycle finished."
         printfn "Learning aborted due to unexpected error."
     } |> Async.Start
+    configuration

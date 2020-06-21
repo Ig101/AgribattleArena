@@ -34,8 +34,8 @@ let setupConfiguration() =
             IsLearning = configuration.GetValue<bool>("Learning:IsLearning")
             ModelsAmount = configuration.GetValue<int>("Learning:ModelsAmount")
             SuccessfulModelsAmount = configuration.GetValue<int>("Learning:SuccessfulModelsAmount")
-            LearningMutationProbability = configuration.GetValue<double>("Learning:LearningMutationProbability")
-            WorkingMutationProbability = configuration.GetValue<double>("Learning:WorkingMutationProbability")
+            LearningMutationProbability = configuration.GetValue<float>("Learning:LearningMutationProbability")
+            WorkingMutationProbability = configuration.GetValue<float>("Learning:WorkingMutationProbability")
         }
         Api = {
             Host = configuration.GetValue<string>("Api:Host")

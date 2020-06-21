@@ -4,6 +4,6 @@ type LearningConfiguration = {
     IsLearning: bool
     ModelsAmount: int
     SuccessfulModelsAmount: int
-    LearningMutationProbability: double
-    WorkingMutationProbability: double
+    LearningMutationProbability: float
+    WorkingMutationProbability: float
 }

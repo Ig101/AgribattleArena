@@ -315,7 +315,7 @@ export class AsciiBattleAnimationsService {
       undefined;
     const frames: AnimationFrame[][] = [];
     this.pending = false;
-    const currentPlayer = synchronizer.sync.players.find(x => x.id === this.userService.user.id);
+    const currentPlayer = synchronizer.sync.players.find(x => x.userId === this.userService.user.id);
     switch (synchronizer.action) {
       case BattleSynchronizationActionEnum.Attack:
         if (issuer) {

@@ -31,7 +31,7 @@ export class MenuModalComponent implements OnInit, OnDestroy, IModal<any> {
   componentSizeEnum = ComponentSizeEnum;
 
   get isPlaying() {
-    return this.battleStorageService.players.find(x => x.id === this.userService.user.id).status === BattlePlayerStatusEnum.Playing;
+    return this.battleStorageService.players.find(x => x.userId === this.userService.user.id).status === BattlePlayerStatusEnum.Playing;
   }
 
   constructor(

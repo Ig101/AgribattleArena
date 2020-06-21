@@ -8,6 +8,8 @@ namespace ProjectArena.Engine
     {
         string Id { get; }
 
+        string UserId { get; }
+
         int? Team { get; }
 
         List<Actor> KeyActors { get; }

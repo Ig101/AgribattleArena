@@ -4,10 +4,11 @@ open FSharp.Control
 open ProjectArena.Bot.Models.Dtos
 open ProjectArena.Bot.Models.States
 open System.Threading
+open System
 
 type SceneStateWorker =
     private {
-        SceneIdWithSubscribeAndReceiveHandlesAndMessage: IDictionary<string, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>
+        SceneIdWithSubscribeAndReceiveHandlesAndMessage: IDictionary<Guid, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>
         CancellationFunction: IncomingSynchronizationMessage -> bool
         SubscribeHandle: AutoResetEvent
         ExtraSubscribeHandle: AutoResetEvent
@@ -95,7 +96,7 @@ type SceneStateWorker =
 
     static member Unit() =
         {
-            SceneIdWithSubscribeAndReceiveHandlesAndMessage = Dictionary<string, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>() 
+            SceneIdWithSubscribeAndReceiveHandlesAndMessage = Dictionary<Guid, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>() 
             CancellationFunction = fun message -> message.Action = EndGame
             SubscribeHandle = new AutoResetEvent false
             ExtraSubscribeHandle = new AutoResetEvent false

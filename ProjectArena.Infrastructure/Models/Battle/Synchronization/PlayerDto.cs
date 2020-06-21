@@ -7,6 +7,8 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
     {
         public string Id { get; set; }
 
+        public string UserId { get; set; }
+
         public int? Team { get; set; }
 
         public IEnumerable<int> KeyActorsSync { get; set; }

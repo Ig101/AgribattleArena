@@ -142,7 +142,7 @@ namespace ProjectArena.Engine
 
         public IEnumerable<int> GetUserActors(string userId)
         {
-            return Actors.FindAll(x => x.Owner != null && x.Owner.Id == userId).Select(x => x.Id);
+            return Actors.FindAll(x => x.Owner != null && x.Owner.UserId == userId).Select(x => x.Id);
         }
 
         // Creation methods

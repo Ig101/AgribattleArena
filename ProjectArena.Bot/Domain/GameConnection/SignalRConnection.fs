@@ -4,6 +4,7 @@ open System.Threading.Tasks
 open ProjectArena.Bot.Models.States
 open ProjectArena.Bot.Models.Dtos
 open System.Threading
+open System
 
 
 let openConnection (tokenSource: CancellationTokenSource) (url: string) =
@@ -16,8 +17,7 @@ let openConnection (tokenSource: CancellationTokenSource) (url: string) =
         tokenSource.Cancel()
         Task.CompletedTask)
     connection.On("BattleSynchronizationError", fun () ->
-        printfn "Synchronization error"
-        tokenSource.Cancel()) |> ignore
+        printfn "Synchronization error") |> ignore
     connection
 
 let subscribeOnScene (connection: HubConnection) (func: (SynchronizationAction * SynchronizerDto) -> unit) =
@@ -32,3 +32,15 @@ let subscribeOnScene (connection: HubConnection) (func: (SynchronizationAction *
     connection.On("BattleSkipTurn", fun (synchronizer: SynchronizerDto) -> func(SkipTurn, synchronizer)) |> ignore
     connection.On("BattleLeave", fun (synchronizer: SynchronizerDto) -> func(Leave, synchronizer)) |> ignore
     connection.On("BattleNoActorsDraw", fun (synchronizer: SynchronizerDto) -> func(NoActorsDraw, synchronizer)) |> ignore
+
+let orderAttack (connection: HubConnection) (sceneId: Guid, actorId: int, targetX: int, targetY: int) =
+    connection.SendAsync("OrderAttackAsync", sceneId, actorId, targetX, targetY) |> Async.AwaitTask |> Async.Start
+    
+let orderMove (connection: HubConnection) (sceneId: Guid, actorId: int, targetX: int, targetY: int) =
+    connection.SendAsync("OrderMoveAsync", sceneId, actorId, targetX, targetY) |> Async.AwaitTask |> Async.Start
+
+let orderCast (connection: HubConnection) (sceneId: Guid, actorId: int, skillId: int, targetX: int, targetY: int) =
+    connection.SendAsync("OrderCastAsync", sceneId, actorId, skillId, targetX, targetY) |> Async.AwaitTask |> Async.Start
+    
+let orderWait (connection: HubConnection) (sceneId: Guid, actorId: int) =
+    connection.SendAsync("OrderWaitAsync", sceneId, actorId) |> Async.AwaitTask |> Async.Start

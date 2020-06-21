@@ -30,9 +30,10 @@ export class AsciiBattleSynchronizerService {
     // Players
     let currentPlayer: Player;
     this.battleStorageService.players = synchronizer.players.map(player => {
-      const isCurrentPlayer = player.id === this.userService.user.id;
+      const isCurrentPlayer = player.userId === this.userService.user.id;
       const newPlayer = {
         id: player.id,
+        userId: player.userId,
         team: player.team,
         name: isCurrentPlayer ? this.userService.user.name : 'Mistspawn gang',
         keyActors: player.keyActorsSync,
@@ -136,7 +137,7 @@ export class AsciiBattleSynchronizerService {
       player.status = syncPlayer.status;
       player.team = syncPlayer.team;
       player.turnsSkipped = syncPlayer.turnsSkipped;
-      if (player.id === this.userService.user.id) {
+      if (player.userId === this.userService.user.id) {
         currentPlayer = player;
       }
     }

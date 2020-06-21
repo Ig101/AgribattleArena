@@ -3,6 +3,7 @@ import { Actor } from './scene/actor.model';
 
 export interface Player {
   id: string;
+  userId: string;
   team?: number;
   name: string;
   keyActors: number[];

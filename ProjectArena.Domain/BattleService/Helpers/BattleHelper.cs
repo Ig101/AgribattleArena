@@ -208,6 +208,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 Players = oldSynchronizer.Players.Select(x => new PlayerDto()
                 {
                     Id = x.Id,
+                    UserId = x.UserId,
                     KeyActorsSync = x.KeyActorsSync,
                     Status = (PlayerStatus)(int)x.Status,
                     Team = x.Team,

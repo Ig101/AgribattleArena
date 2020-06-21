@@ -42,7 +42,8 @@ namespace ProjectArena.Api.Controllers
 
             return Ok(await Mediator.Send(new GetFullSynchronizationInfoQuery()
             {
-                UserId = user.Id
+                UserId = user.Id,
+                SceneId = sceneId
             }));
         }
 
@@ -54,7 +55,7 @@ namespace ProjectArena.Api.Controllers
                 User = User
             });
 
-            return Ok(await Mediator.Send(new GetFullSynchronizationInfoQuery()
+            return Ok(await Mediator.Send(new LeaveSceneCommand()
             {
                 UserId = user.Id,
                 SceneId = sceneId

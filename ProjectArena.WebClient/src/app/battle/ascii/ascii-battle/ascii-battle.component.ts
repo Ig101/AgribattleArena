@@ -118,7 +118,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   get canAct() {
     return !this.blocked && !this.specificActionResponseForWait && this.actionsQueue.length === 0 &&
       this.battleStorageService.turnTime > 0 &&
-      this.battleStorageService.currentActor?.owner?.id === this.userService.user.id &&
+      this.battleStorageService.currentActor?.owner?.userId === this.userService.user.id &&
       this.receivingMessagesFromHubAllowed &&
       !this.specificActionResponseForWait;
   }
@@ -166,7 +166,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get isMyTurn() {
-    return this.battleStorageService?.currentActor?.owner?.id === this.userService?.user.id;
+    return this.battleStorageService?.currentActor?.owner?.userId === this.userService?.user.id;
   }
 
   get currentActorColor() {
@@ -692,7 +692,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       ) {
         if (tile.actor) {
           let color = heightImpact(tile.actor.z, tile.actor === this.battleStorageService.currentActor &&
-            this.battleStorageService.currentActor.owner?.id === this.userService.user.id ?
+            this.battleStorageService.currentActor.owner?.userId === this.userService.user.id ?
             {r: 255, g: 255, b: 0, a: tile.actor.visualization.color.a} :
             tile.actor.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.actor.z) : color);
@@ -1050,7 +1050,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       onlySecondPart = true;
     }
-    const currentPlayer = action.sync.players.find(x => x.id === this.userService.user.id);
+    const currentPlayer = action.sync.players.find(x => x.userId === this.userService.user.id);
     switch (action.action) {
       case BattleSynchronizationActionEnum.StartGame:
         this.restoreScene(action.sync);
