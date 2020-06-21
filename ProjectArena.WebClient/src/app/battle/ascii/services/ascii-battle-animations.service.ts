@@ -218,9 +218,13 @@ export class AsciiBattleAnimationsService {
             if (tile.x >= 0 && tile.y >= 0 &&
               tile.x < this.battleStorageService.scene.width &&
               tile.y < this.battleStorageService.scene.height) {
-              const compareTile = tiles[tile.x][tile.y];
+              const neededRow = tiles[tile.x];
+              if (!neededRow) {
+                continue;
+              }
+              const compareTile = neededRow[tile.y];
               if (!compareTile || compareTile.priority < tile.priority) {
-                tiles[tile.x][tile.y] = tile;
+                neededRow[tile.y] = tile;
               }
             }
           }
