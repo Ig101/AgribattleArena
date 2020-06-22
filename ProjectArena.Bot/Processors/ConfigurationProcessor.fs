@@ -1,7 +1,10 @@
 module ProjectArena.Bot.Processors.ConfigurationProcessor
 open System
 open Microsoft.Extensions.Configuration
+open Microsoft.Extensions.Logging
+open Serilog
 open ProjectArena.Bot.Models.Configuration
+open Serilog.Events
 
 let private newConfigurationBuilder() =
     let builder = ConfigurationBuilder() :> IConfigurationBuilder
@@ -19,8 +22,11 @@ let private addEnvironmentVariables (builder: IConfigurationBuilder) =
 let private build (builder: IConfigurationBuilder) =
     builder.Build()
 
+let private setupLogger level =
+    let logger = LoggerConfiguration().Enrich.FromLogContext().WriteTo.Console().MinimumLevel.Is(level).CreateLogger()
+    LoggerFactory.Create(fun builder -> builder.AddSerilog(logger) |> ignore).CreateLogger<unit>()
+
 let setupConfiguration() =
-    printfn "Loading configuration..."
     let environment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
     let configuration =
         newConfigurationBuilder()
@@ -38,6 +44,7 @@ let setupConfiguration() =
             WorkingMutationProbability = configuration.GetValue<float>("Learning:WorkingMutationProbability")
             TimeTillSurrender = configuration.GetValue<float32>("Learning:TimeTillSurrender")
         }
+        Logger = setupLogger(configuration.GetValue<LogEventLevel>("Logger:Level"))
         Api = {
             Host = configuration.GetValue<string>("Api:Host")
             HubPath = configuration.GetValue<string>("Api:HubPath")

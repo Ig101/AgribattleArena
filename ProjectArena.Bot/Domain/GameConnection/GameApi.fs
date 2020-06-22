@@ -8,8 +8,9 @@ open System
 open ProjectArena.Bot.Models.Dtos
 open System.Threading.Tasks
 open ProjectArena.Bot.Helpers.MappingHelper
+open Microsoft.Extensions.Logging
 
-let private delete<'Output> (auth: string) url : Async<'Output option> =
+let private delete<'Output> (logger: ILogger<unit>) (auth: string) url : Async<'Output option> =
     async {
         let jsonSettings = JsonSerializerSettings();
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
@@ -33,15 +34,15 @@ let private delete<'Output> (auth: string) url : Async<'Output option> =
                     |> Job.toAsync
                 return Some (JsonConvert.DeserializeObject<'Output> content)
             | false ->
-                printfn "Exited delete operation with %d status code." response.statusCode
+                logger.LogError (sprintf "Exited delete operation with %d status code." response.statusCode)
                 return None
         with
         | e ->
-            printfn "Exception on delete operation: %A" e.Message
+            logger.LogError (sprintf "Exception on delete operation: %A" e.Message)
             return None
     }
 
-let private post<'Output> (auth: string) url : Async<'Output option> =
+let private post<'Output> (logger: ILogger<unit>) (auth: string) url : Async<'Output option> =
     async {
         let jsonSettings = JsonSerializerSettings();
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
@@ -65,15 +66,15 @@ let private post<'Output> (auth: string) url : Async<'Output option> =
                     |> Job.toAsync
                 return Some (JsonConvert.DeserializeObject<'Output> content)
             | false ->
-                printfn "Exited post operation with %d status code." response.statusCode
+                logger.LogError (sprintf "Exited post operation with %d status code." response.statusCode)
                 return None
         with
         | e ->
-            printfn "Exception on post operation: %A" e.Message
+            logger.LogError (sprintf "Exception on post operation: %A" e.Message)
             return None
     }
 
-let private get<'Output> (auth: string) url : Async<'Output option> =
+let private get<'Output> (logger: ILogger<unit>) (auth: string) url : Async<'Output option> =
     async {
         let jsonSettings = JsonSerializerSettings();
         jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
@@ -97,15 +98,15 @@ let private get<'Output> (auth: string) url : Async<'Output option> =
                     |> Job.toAsync
                 return Some (JsonConvert.DeserializeObject<'Output> content)
             | false ->
-                printfn "Exited get operation with %d status code." response.statusCode
+                logger.LogError (sprintf "Exited get operation with %d status code." response.statusCode)
                 return None
         with
         | e ->
-            printfn "Exception on get operation: %A" e.Message
+            logger.LogError (sprintf "Exception on get operation: %A" e.Message)
             return None
     }
 
-let private authorizeInternal (url, body: 'Input) : Async<string option> = async {
+let private authorizeInternal (logger: ILogger<unit>) (url, body: 'Input) : Async<string option> = async {
     let jsonSettings = JsonSerializerSettings();
     jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
     let serializedBody = JsonConvert.SerializeObject(body, jsonSettings)
@@ -127,56 +128,56 @@ let private authorizeInternal (url, body: 'Input) : Async<string option> = async
             let auth = response.cookies.["Authorization"]
             return Some auth
         | false ->
-            printfn "Exited post operation with %d status code." response.statusCode
+            logger.LogError (sprintf "Exited post operation with %d status code." response.statusCode)
             return None
     with
     | e ->
-        printfn "Exception on post operation: %A" e.Message
+        logger.LogError (sprintf "Exception on post operation: %A" e.Message)
         return None
 }
 
-let authorize (login: string) (password: string) (host: string) = async {
+let authorize (logger: ILogger<unit>) (login: string) (password: string) (host: string) = async {
     let mutable content = None
     let request = {
         Email = login
         Password = password
     }
     while content = None do
-        let! result = authorizeInternal (sprintf "%s/api/auth/signin" host, request)
+        let! result = authorizeInternal logger (sprintf "%s/api/auth/signin" host, request)
         match result with
         | None ->
-            printfn "Unsuccessful authorization call. Try again after 5 seconds"
+            logger.LogError (sprintf "Unsuccessful authorization call. Try again after 5 seconds")
             do! Task.Delay 5000
         | _ -> content <- result
     return content.Value
 }
 
-let enqueue (auth: string) (host: string) = async {
+let enqueue (logger: ILogger<unit>) (auth: string) (host: string) = async {
     let mutable content = None
     while content = None do
-        let! result = post<unit> auth (sprintf "%s/api/queue" host)
+        let! result = post<unit> logger auth (sprintf "%s/api/queue" host)
         match result with
         | None ->
-            printfn "Unsuccessful enqueue call. Try again after 5 seconds"
+            logger.LogError (sprintf "Unsuccessful enqueue call. Try again after 5 seconds")
             do! Task.Delay 5000
         | _ -> content <- result
     return content.Value
 }
 
-let getSceneSynchronizer (auth: string) (host: string) (sceneId: Guid) =
-    get<ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto> auth (sprintf "%s/api/battle/%s" host (sceneId.ToString()))
+let getSceneSynchronizer (logger: ILogger<unit>) (auth: string) (host: string) (sceneId: Guid) =
+    get logger auth (sprintf "%s/api/battle/%s" host (sceneId.ToString()))
     |> Async.map ( Option.map mapSynchronizer )
 
-let leaveBattle (auth: string) (host: string) (sceneId: Guid) =
-    delete<unit> auth (sprintf "%s/api/battle/%s" host (sceneId.ToString()))
+let leaveBattle (logger: ILogger<unit>) (auth: string) (host: string) (sceneId: Guid) =
+    delete<unit> logger auth (sprintf "%s/api/battle/%s" host (sceneId.ToString()))
 
-let getUserInfo (auth: string) (host: string) = async {
+let getUserInfo (logger: ILogger<unit>) (auth: string) (host: string) = async {
     let mutable content = None
     while content = None do
-        let! result = get<UserDto> auth (sprintf "%s/api/user" host)
+        let! result = get<UserDto> logger auth (sprintf "%s/api/user" host)
         match result with
         | None ->
-            printfn "Unsuccessful get user call. Try again after 5 seconds"
+            logger.LogError (sprintf "Unsuccessful get user call. Try again after 5 seconds")
             do! Task.Delay 5000
         | _ -> content <- result
     return content.Value

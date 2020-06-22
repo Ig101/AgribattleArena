@@ -6,6 +6,7 @@ open ProjectArena.Bot.Models.Dtos
 open ProjectArena.Bot.Models.Configuration
 open ProjectArena.Bot.Processors.NeuralProcessor
 open ProjectArena.Infrastructure.Enums
+open Microsoft.Extensions.Logging
 
 let private findActor (actors: ActorDto seq) (idOpt: int option) =
     idOpt |> Option.bind (fun id -> actors |> Seq.tryFind (fun a -> a.Id = id))
@@ -71,7 +72,7 @@ let private createScene (configuration: Configuration) (synchronizer: Synchroniz
     | 1 ->
         return Some (generateSceneFromSynchronizer synchronizer)
     | _ ->
-        let! realSynchronizer = getSceneSynchronizer configuration.User.AuthCookie configuration.ApiHost synchronizer.Id
+        let! realSynchronizer = getSceneSynchronizer configuration.Logger configuration.User.AuthCookie configuration.ApiHost synchronizer.Id
         return realSynchronizer |> Option.map generateSceneFromSynchronizer
 }
 
@@ -80,7 +81,7 @@ let private mergeScene (configuration: Configuration) (synchronizer: Synchronize
     | 1 ->
         return Some (mergeSceneWithSynchronizer scene synchronizer)
     | diff when diff > 1 ->
-        let! realSynchronizer = getSceneSynchronizer configuration.User.AuthCookie configuration.ApiHost synchronizer.Id
+        let! realSynchronizer = getSceneSynchronizer configuration.Logger configuration.User.AuthCookie configuration.ApiHost synchronizer.Id
         return realSynchronizer |> Option.map generateSceneFromSynchronizer
     | _ ->
         return None
@@ -124,8 +125,7 @@ let private leaveIfTooLong (configuration: Configuration) (lastSynchronizer: Syn
     match currentPlayer.Status with
     | PlayerStatus.Playing when scene.RoundsPassed < configuration.Learning.TimeTillSurrender -> Some scene
     | PlayerStatus.Playing ->
-        printfn "leaving"
-        leaveBattle configuration.User.AuthCookie configuration.ApiHost scene.Id |> Async.map (ignore) |> Async.Start
+        leaveBattle configuration.Logger configuration.User.AuthCookie configuration.ApiHost scene.Id |> Async.map (ignore) |> Async.Start
         if (currentPlayers |> Seq.length = 1) then
             configuration.Worker.Leave lastSynchronizer
         None
@@ -153,9 +153,9 @@ let sceneMessageProcessor (configuration: Configuration) (model: NeuralModel, sp
     | _ -> return newSceneOpt
 }
 
-let tryCalculatePerformance (sceneOpt: Scene option) =
+let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene option) =
     let calculatePerformance (scene: Scene) =
-        printfn "Finished scene %A" scene.Id
+        configuration.Logger.LogInformation (sprintf "Finished scene %A" scene.Id)
         // TODO Performance calculation
         1.0
     match sceneOpt with

@@ -1,36 +1,31 @@
 module ProjectArena.Bot.Processors.AuthorizationProcessor
-open System.Threading
+open Microsoft.Extensions.Logging
 open ProjectArena.Bot.Models.Configuration
-open ProjectArena.Bot.Domain.GameConnection.SignalRConnection
 open ProjectArena.Bot.Domain.GameConnection.GameApi
-open ProjectArena.Bot.Domain.SceneStateWorker
-open ProjectArena.Bot.Models.States
-open Microsoft.AspNetCore.SignalR.Client
 open FSharp.Control
-open ProjectArena.Infrastructure.Mongo
 
-let private authorize (configuration: ApiConfiguration) =
-    printfn "Authorizing..."
+let private authorize (configuration: RawConfigurationWithStorageConnection) =
+    configuration.Logger.LogInformation "Authorizing..."
     let auth =
-        configuration.Host
-        |> authorize configuration.Login configuration.Password
+        configuration.Api.Host
+        |> authorize configuration.Logger configuration.Api.Login configuration.Api.Password
         |> Async.RunSynchronously
-    (configuration, auth)
+    auth
   
-let private getUserId (configuration: ApiConfiguration, auth: string) =
-    printfn "Loading User info..."
+let private getUserId (configuration: RawConfigurationWithStorageConnection) (auth: string) =
+    configuration.Logger.LogInformation "Loading User info..."
     let userId =
-        configuration.Host
-        |> getUserInfo auth
+        configuration.Api.Host
+        |> getUserInfo configuration.Logger auth
         |> Async.RunSynchronously
     (auth, userId.Id)
 
 let setupAuthorization (configuration: RawConfigurationWithStorageConnection) =
     let auth, userId =
-        configuration.Api
-        |> authorize
-        |> getUserId
+        authorize configuration
+        |> getUserId configuration
     {
+        Logger = configuration.Logger
         Learning = configuration.Learning
         ApiHost = configuration.Api.Host
         HubPath = configuration.Api.HubPath

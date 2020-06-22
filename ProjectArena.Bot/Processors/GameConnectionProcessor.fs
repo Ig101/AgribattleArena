@@ -2,12 +2,10 @@ module ProjectArena.Bot.Processors.GameConnectionProcessor
 open System.Threading
 open ProjectArena.Bot.Models.Configuration
 open ProjectArena.Bot.Domain.GameConnection.SignalRConnection
-open ProjectArena.Bot.Domain.GameConnection.GameApi
 open ProjectArena.Bot.Domain.SceneStateWorker
 open ProjectArena.Bot.Models.States
 open Microsoft.AspNetCore.SignalR.Client
-open FSharp.Control
-open ProjectArena.Infrastructure.Mongo
+open Microsoft.Extensions.Logging
 
 let private subscribe (worker: SceneStateWorker) (hubConnection: HubConnection) =
     subscribeOnScene hubConnection (fun (action, synchronizer) ->
@@ -18,16 +16,16 @@ let private subscribe (worker: SceneStateWorker) (hubConnection: HubConnection) 
     )
     hubConnection
 
-let private initializeWorker () =
-    printfn "Loading Worker..."
-    let worker = SceneStateWorker.Unit()
+let private initializeWorker (configuration: RawConfigurationWithStorageAndUser) () =
+    configuration.Logger.LogInformation "Loading Worker..."
+    let worker = SceneStateWorker.Create configuration.Logger
     let tokenSource = new CancellationTokenSource()
     (worker, tokenSource)
 
-let private initializeHubConnection (host: string, hubPath: string) (auth: string) (worker: SceneStateWorker, tokenSource: CancellationTokenSource) =
-    printfn "Loading Connection..."
+let private initializeHubConnection (configuration: RawConfigurationWithStorageAndUser) (worker: SceneStateWorker, tokenSource: CancellationTokenSource) =
+    configuration.Logger.LogInformation "Loading Connection..."
     let connection =
-        createConnection tokenSource auth (sprintf "%s/%s" host hubPath)
+        createConnection configuration.Logger tokenSource configuration.User.AuthCookie (sprintf "%s/%s" configuration.ApiHost configuration.HubPath)
         |> subscribe worker 
         |> startConnection
     (worker, tokenSource, connection)
@@ -35,10 +33,11 @@ let private initializeHubConnection (host: string, hubPath: string) (auth: strin
 let setupGameConnection (configuration: RawConfigurationWithStorageAndUser) =
     let worker, tokenSource, hub =
         ()
-        |> initializeWorker
-        |> initializeHubConnection (configuration.ApiHost, configuration.HubPath) configuration.User.AuthCookie
-    printfn "Loading finished."
+        |> initializeWorker configuration
+        |> initializeHubConnection configuration
+    configuration.Logger.LogInformation "Loading finished."
     {
+        Logger = configuration.Logger
         Learning = configuration.Learning
         ApiHost = configuration.ApiHost
         User = configuration.User

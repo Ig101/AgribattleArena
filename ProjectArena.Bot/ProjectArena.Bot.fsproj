@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProjectArena.Infrastructure\ProjectArena.Infrastructure.csproj"/>
@@ -65,5 +66,7 @@
     <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.1.3"/>
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.5"/>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.5"/>
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
   </ItemGroup>
 </Project>

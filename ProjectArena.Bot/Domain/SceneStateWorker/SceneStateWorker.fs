@@ -5,9 +5,11 @@ open ProjectArena.Bot.Models.Dtos
 open ProjectArena.Bot.Models.States
 open System.Threading
 open System
+open Microsoft.Extensions.Logging
 
 type SceneStateWorker =
     private {
+        Logger: ILogger<unit>
         SceneIdWithSubscribeAndReceiveHandlesAndMessage: IDictionary<Guid, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>
         CancellationFunction: IncomingSynchronizationMessage -> bool
         SubscribeHandle: AutoResetEvent
@@ -60,7 +62,7 @@ type SceneStateWorker =
                             yield message
                     this.RemoveScene sceneId
                 }
-                printfn "New scene found. Id: %A" sceneId
+                this.Logger.LogInformation (sprintf "New scene found. Id: %A" sceneId)
                 this.SubscriptionObject <- Some seq
                 this.SubscribeHandle.Set() |> ignore
                 this.ExtraSubscribeHandle.Set() |> ignore
@@ -109,8 +111,9 @@ type SceneStateWorker =
             Synchronizer = lastSynchronizer
         })
 
-    static member Unit() =
+    static member Create (logger: ILogger<unit>) =
         {
+            Logger = logger
             SceneIdWithSubscribeAndReceiveHandlesAndMessage = Dictionary<Guid, AutoResetEvent * AutoResetEvent * IncomingSynchronizationMessage>() 
             CancellationFunction = fun message -> message.Action = EndGame
             SubscribeHandle = new AutoResetEvent false

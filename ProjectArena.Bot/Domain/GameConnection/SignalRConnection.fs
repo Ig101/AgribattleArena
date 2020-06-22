@@ -15,7 +15,7 @@ let private fillHubOptions (auth: string) (url: string) (options: HttpConnection
     options.Cookies.Add(Uri(url), Cookie("Authorization", auth))
     ()
 
-let createConnection (tokenSource: CancellationTokenSource) (auth: string) (url: string) =
+let createConnection (logger: ILogger<unit>) (tokenSource: CancellationTokenSource) (auth: string) (url: string) =
     let connection =
         HubConnectionBuilder()
             .WithUrl(url, fillHubOptions auth url)
@@ -24,10 +24,10 @@ let createConnection (tokenSource: CancellationTokenSource) (auth: string) (url:
                 logging.AddConsole().SetMinimumLevel(LogLevel.Error) |> ignore)
             .Build()
     connection.add_Closed(fun error ->
-        printfn "Hub connection is lost"
+        logger.LogError (sprintf "Hub connection is lost")
         Task.CompletedTask)
     connection.On("BattleSynchronizationError", fun () ->
-        printfn "Synchronization error") |> ignore
+        logger.LogError (sprintf "Synchronization error")) |> ignore
     connection
 
 let startConnection (connection: HubConnection) =
