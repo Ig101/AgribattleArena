@@ -60,6 +60,7 @@ type SceneStateWorker =
                             yield message
                     this.RemoveScene sceneId
                 }
+                printfn "New scene found. Id: %A" sceneId
                 this.SubscriptionObject <- Some seq
                 this.SubscribeHandle.Set() |> ignore
                 this.ExtraSubscribeHandle.Set() |> ignore
@@ -96,12 +97,17 @@ type SceneStateWorker =
                 scene <- this.TryGetNewScene()
             while scene = None do
                 do! Async.AwaitWaitHandle this.ExtraSubscribeHandle |> Async.Ignore
-                printfn "Active subs: %d" this.ActiveSubscriptions
                 while this.ActiveSubscriptions > 0 do
                     do! Async.AwaitWaitHandle this.ExtraSubscribeHandle |> Async.Ignore
                 lock this.Locker tryGetNewScene
             return scene.Value
         }
+
+    member this.Leave(lastSynchronizer: SynchronizerDto) =
+        this.SendNewMessage({
+            Action = EndGame
+            Synchronizer = lastSynchronizer
+        })
 
     static member Unit() =
         {

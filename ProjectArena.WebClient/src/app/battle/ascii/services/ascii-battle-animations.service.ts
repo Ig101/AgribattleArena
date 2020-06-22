@@ -52,9 +52,9 @@ export class AsciiBattleAnimationsService {
         });
         this.skippedFlag = false;
       }
-      if (actor.healthChange) {
-        switch (synchronizer.action) {
-          case BattleSynchronizationActionEnum.SkipTurn:
+      switch (synchronizer.action) {
+        case BattleSynchronizationActionEnum.SkipTurn:
+          if (actor.isDead) {
             actorFloats.push({
               text: '*flee*',
               color: { r: 255, g: 255, b: 0, a: 1 },
@@ -63,8 +63,10 @@ export class AsciiBattleAnimationsService {
               y: actor.y,
               height: 0
             });
-            break;
-          case BattleSynchronizationActionEnum.Leave:
+          }
+          break;
+        case BattleSynchronizationActionEnum.Leave:
+          if (actor.isDead) {
             actorFloats.push({
               text: '*flee*',
               color: { r: 255, g: 255, b: 0, a: 1 },
@@ -73,8 +75,10 @@ export class AsciiBattleAnimationsService {
               y: actor.y,
               height: 0
             });
-            break;
-          default:
+          }
+          break;
+        default:
+          if (actor.healthChange) {
             actorFloats.push({
               text: (actor.healthChange > 0 ? '+' : '') + actor.healthChange.toString(),
               color: actor.healthChange > 0 ? { r: 0, g: 255, b: 0, a: 1 } : { r: 255, g: 0, b: 0, a: 1 },
@@ -83,8 +87,17 @@ export class AsciiBattleAnimationsService {
               y: actor.y,
               height: 0
             });
-            break;
-        }
+          } else if (actor.isDead) {
+            actorFloats.push({
+              text: '*dead*',
+              color: { r: 255, g: 0, b: 0, a: 1 },
+              time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
+              x: actor.x,
+              y: actor.y,
+              height: 0
+            });
+          }
+          break;
       }
       for (const buff of actor.newBuffs) {
         actorFloats.push({

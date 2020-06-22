@@ -9,6 +9,38 @@ open ProjectArena.Bot.Models.Dtos
 open System.Threading.Tasks
 open ProjectArena.Bot.Helpers.MappingHelper
 
+let private delete<'Output> (auth: string) url : Async<'Output option> =
+    async {
+        let jsonSettings = JsonSerializerSettings();
+        jsonSettings.ContractResolver <- CamelCasePropertyNamesContractResolver()
+        try
+            use! response = 
+                Request.createUrl Delete url
+                |> Request.setHeader (ContentType {
+                    typ = "application"
+                    subtype = "json"
+                    charset = Some Encoding.UTF8
+                    boundary = None
+                })
+                |> Request.cookie(Cookie.create("Authorization", auth))
+                |> getResponse
+                |> Alt.toAsync
+            let success = response.statusCode < 300
+            match success with
+            | true ->
+                let! content =
+                    Response.readBodyAsString(response)
+                    |> Job.toAsync
+                return Some (JsonConvert.DeserializeObject<'Output> content)
+            | false ->
+                printfn "Exited delete operation with %d status code." response.statusCode
+                return None
+        with
+        | e ->
+            printfn "Exception on delete operation: %A" e.Message
+            return None
+    }
+
 let private post<'Output> (auth: string) url : Async<'Output option> =
     async {
         let jsonSettings = JsonSerializerSettings();
@@ -134,6 +166,9 @@ let enqueue (auth: string) (host: string) = async {
 let getSceneSynchronizer (auth: string) (host: string) (sceneId: Guid) =
     get<ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto> auth (sprintf "%s/api/battle/%s" host (sceneId.ToString()))
     |> Async.map ( Option.map mapSynchronizer )
+
+let leaveBattle (auth: string) (host: string) (sceneId: Guid) =
+    delete<unit> auth (sprintf "%s/api/battle/%s" host (sceneId.ToString()))
 
 let getUserInfo (auth: string) (host: string) = async {
     let mutable content = None

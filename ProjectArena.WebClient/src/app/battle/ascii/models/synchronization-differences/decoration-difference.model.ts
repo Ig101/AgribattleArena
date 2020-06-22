@@ -5,5 +5,6 @@ export interface DecorationDifference {
   y: number;
   decoration: ActiveDecoration;
   healthChange: number;
+  isDead: boolean;
   changedPosition: boolean;
 }

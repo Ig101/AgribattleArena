@@ -22,7 +22,7 @@ namespace ProjectArena.Domain.QueueService
         private readonly ICollection<BotDefinition> _bots;
 
         private readonly IBattleService _battleService;
-        private object _locker = new object();
+        private readonly object _locker = new object();
 
         public QueueService(
             IBattleService battleService)

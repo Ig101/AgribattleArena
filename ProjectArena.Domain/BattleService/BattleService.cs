@@ -30,6 +30,7 @@ namespace ProjectArena.Domain.BattleService
         private const int RandomModifier = 10000;
         private const int MaxExperience = 1000000;
 
+        private readonly object _locker = new object();
         private readonly IServiceProvider _serviceProvider;
         private readonly IList<IScene> _scenes;
         private readonly Random _random;
@@ -209,7 +210,10 @@ namespace ProjectArena.Domain.BattleService
             }
 
             var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), SynchronizationInfoEventHandler);
-            _scenes.Add(scene);
+            lock (_locker)
+            {
+                _scenes.Add(scene);
+            }
         }
 
         private void SynchronizationInfoEventHandler(object sender, ISyncEventArgs e)
@@ -257,8 +261,11 @@ namespace ProjectArena.Domain.BattleService
                 _scenes[i].UpdateTime((float)seconds);
                 if (!_scenes[i].IsActive)
                 {
-                    _scenes.RemoveAt(i);
-                    i--;
+                    lock (_locker)
+                    {
+                        _scenes.RemoveAt(i);
+                        i--;
+                    }
                 }
             }
         }

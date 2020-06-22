@@ -6,6 +6,7 @@ export interface ActorDifference {
   y: number;
   actor: Actor;
   healthChange: number;
+  isDead: boolean;
   newBuffs: Buff[];
   removedBuffs: Buff[];
   endedTurn: boolean;

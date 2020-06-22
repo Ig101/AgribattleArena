@@ -12,7 +12,7 @@ let initializeRandomNeuralModel() =
     }
 
 let actOnScene (hub: HubConnection) (model: NeuralModel, scene: Scene) =
-    printfn "doAction with Model: %A" model.Id
+   // printfn "doAction with Model: %A" model.Id
     scene.TempActor
     |> Option.map(fun a -> orderWait hub (scene.Id, a.Id))
     |> ignore

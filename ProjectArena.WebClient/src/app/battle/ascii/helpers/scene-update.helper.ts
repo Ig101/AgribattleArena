@@ -98,7 +98,8 @@ function getActorDifference(actor: Actor, syncActor: SyncActor, difference: Acto
       newBuffs: [],
       removedBuffs: [],
       endedTurn: false,
-      changedPosition: false
+      changedPosition: false,
+      isDead: false
     };
   }
   return difference;
@@ -175,7 +176,8 @@ function getDecorationDifference(decoration: ActiveDecoration, syncDecoration: S
       y: syncDecoration.y,
       decoration,
       healthChange: 0,
-      changedPosition: false
+      changedPosition: false,
+      isDead: false
     };
   }
   return difference;

@@ -5,6 +5,7 @@ open ProjectArena.Bot.Models.States
 open ProjectArena.Bot.Models.Dtos
 open ProjectArena.Bot.Models.Configuration
 open ProjectArena.Bot.Processors.NeuralProcessor
+open ProjectArena.Infrastructure.Enums
 
 let private findActor (actors: ActorDto seq) (idOpt: int option) =
     idOpt |> Option.bind (fun id -> actors |> Seq.tryFind (fun a -> a.Id = id))
@@ -90,12 +91,6 @@ let private tryMergeScene (configuration: Configuration) (synchronizer: Synchron
     | Some scene -> mergeScene configuration synchronizer scene
     | None -> createScene configuration synchronizer
 
-let private chooseModel (userId: string) (model: NeuralModel, spareModel: NeuralModel) (scene: Scene) (playerId: string) =
-    let index = scene.Players |> Seq.filter (fun p -> p.UserId = userId) |> Seq.findIndex (fun p -> p.Id = playerId)
-    match index with
-    | 0 -> (model, scene)
-    | _ -> (spareModel, scene)
-
 let private chooseMeaningfulActionsOnly (message: IncomingSynchronizationMessage) (scene: Scene) =
     match message.Synchronizer.ActorId with
     | None -> Some scene
@@ -112,7 +107,7 @@ let private chooseMeaningfulActionsOnly (message: IncomingSynchronizationMessage
                 else 
                     Some scene
 
-let private tryGetActingModel (userId: string) (model: NeuralModel, spareModel: NeuralModel) (scene: Scene) =
+let private tryGetActingModel (userId: string) (scene: Scene) =
     match scene.TempActor with
     | None -> None
     | Some actor ->
@@ -120,17 +115,37 @@ let private tryGetActingModel (userId: string) (model: NeuralModel, spareModel: 
             actor.OwnerId
             |> Option.map (fun ownerId -> scene.Players |> Seq.find (fun p -> p.Id = ownerId))
         match ownerOpt with
-        | Some owner when owner.UserId = userId -> Some (owner.Id |> chooseModel userId (model, spareModel) scene)
+        | Some owner when owner.UserId = userId -> Some scene
         | _ -> None
+
+let private leaveIfTooLong (configuration: Configuration) (lastSynchronizer: SynchronizerDto) (scene: Scene) =
+    let currentPlayers = scene.Players |> Seq.filter (fun p -> p.UserId = configuration.User.UserId)
+    let currentPlayer = currentPlayers |> Seq.head
+    match currentPlayer.Status with
+    | PlayerStatus.Playing when scene.RoundsPassed < configuration.Learning.TimeTillSurrender -> Some scene
+    | PlayerStatus.Playing ->
+        printfn "leaving"
+        leaveBattle configuration.User.AuthCookie configuration.ApiHost scene.Id |> Async.map (ignore) |> Async.Start
+        if (currentPlayers |> Seq.length = 1) then
+            configuration.Worker.Leave lastSynchronizer
+        None
+    | _ -> None
+
+let private chooseModel (userId: string) (model: NeuralModel, spareModel: NeuralModel) (scene: Scene) =
+    let index = scene.Players |> Seq.filter (fun p -> p.UserId = userId) |> Seq.findIndex (fun p -> p.Id = scene.TempActor.Value.OwnerId.Value)
+    match index with
+    | 0 -> (model, scene)
+    | _ -> (spareModel, scene)
 
 let sceneMessageProcessor (configuration: Configuration) (model: NeuralModel, spareModel: NeuralModel) (sceneOpt: Scene option) (message: IncomingSynchronizationMessage ) = async {
     let! newSceneOpt =
         sceneOpt
         |> tryMergeScene configuration message.Synchronizer;
-    
     newSceneOpt
     |> Option.bind (chooseMeaningfulActionsOnly message)
-    |> Option.bind (tryGetActingModel configuration.User.UserId (model, spareModel))
+    |> Option.bind (tryGetActingModel configuration.User.UserId)
+    |> Option.bind (leaveIfTooLong configuration message.Synchronizer)
+    |> Option.map (chooseModel configuration.User.UserId (model, spareModel))
     |> Option.map (actOnScene configuration.Hub)
     |> ignore
     match newSceneOpt with

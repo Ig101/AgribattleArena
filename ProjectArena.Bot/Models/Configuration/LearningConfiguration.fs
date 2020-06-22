@@ -6,4 +6,5 @@ type LearningConfiguration = {
     SuccessfulModelsAmount: int
     LearningMutationProbability: float
     WorkingMutationProbability: float
+    TimeTillSurrender: float32
 }

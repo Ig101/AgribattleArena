@@ -115,7 +115,7 @@ namespace ProjectArena.Domain.ArenaHub
         var userId = Context.UserIdentifier;
         var scene = _battleService.GetUserScene(userId, sceneId);
         bool result = false;
-        if (scene.GetUserActors(userId).Contains(actorId))
+        if (scene != null && scene.GetUserActors(userId).Contains(actorId))
         {
             result = scene.ActorWait(actorId);
         }

@@ -233,7 +233,8 @@ export class AsciiBattleSynchronizerService {
           newBuffs: [],
           removedBuffs: [],
           endedTurn: false,
-          changedPosition: false
+          changedPosition: false,
+          isDead: true
         });
         removeFromArray(this.battleStorageService.scene.actors, actor);
         if (this.battleStorageService.scene.tiles[actor.x][actor.y].actor === actor) {
@@ -249,7 +250,8 @@ export class AsciiBattleSynchronizerService {
           y: decoration.y,
           decoration: undefined,
           healthChange: -Math.ceil(decoration.health),
-          changedPosition: false
+          changedPosition: false,
+          isDead: true
         });
         removeFromArray(this.battleStorageService.scene.decorations, decoration);
         if (this.battleStorageService.scene.tiles[decoration.x][decoration.y].decoration === decoration) {
@@ -280,7 +282,8 @@ export class AsciiBattleSynchronizerService {
             newBuffs: [],
             removedBuffs: [],
             endedTurn: true,
-            changedPosition: false
+            changedPosition: false,
+            isDead: false
           };
           differences.actors.push(difference);
         } else {
