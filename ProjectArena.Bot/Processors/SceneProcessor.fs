@@ -7,10 +7,10 @@ open ProjectArena.Bot.Models.Configuration
 open ProjectArena.Bot.Processors.NeuralProcessor
 
 let private findActor (actors: ActorDto seq) (idOpt: int option) =
-    idOpt |> Option.map (fun id -> actors |> Seq.find (fun a -> a.Id = id))
+    idOpt |> Option.bind (fun id -> actors |> Seq.tryFind (fun a -> a.Id = id))
 
 let private findDecoration (decorations: ActiveDecorationDto seq) (idOpt: int option) =
-    idOpt |> Option.map (fun id -> decorations |> Seq.find (fun a -> a.Id = id))
+    idOpt |> Option.bind (fun id -> decorations |> Seq.tryFind (fun a -> a.Id = id))
 
 let private generateSceneFromSynchronizer (synchronizer: SynchronizerDto) =
     {
@@ -140,6 +140,7 @@ let sceneMessageProcessor (configuration: Configuration) (model: NeuralModel, sp
 
 let tryCalculatePerformance (sceneOpt: Scene option) =
     let calculatePerformance (scene: Scene) =
+        printfn "Finished scene %A" scene.Id
         // TODO Performance calculation
         1.0
     match sceneOpt with

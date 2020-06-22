@@ -13,7 +13,7 @@ let main argv =
     |> setupAuthorization
     |> setupGameConnection
     |> startExtraProcessing
-    // |> startLearning  TODO Return after extra processing tests
+    |> startLearning
     |> ignore
     Console.ReadLine() |> ignore
     0
