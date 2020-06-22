@@ -36,6 +36,6 @@ namespace ProjectArena.Engine.ForExternalUse
 
         bool ActorWait(int actorId);
 
-        bool LeaveScene(string playerId);
+        bool LeaveScene(string userId);
     }
 }

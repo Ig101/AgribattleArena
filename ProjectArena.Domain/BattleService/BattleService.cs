@@ -341,7 +341,7 @@ namespace ProjectArena.Domain.BattleService
                 return false;
             }
 
-            return scene.LeaveScene(scene.ShortPlayers.First(x => x.UserId == userId).Id);
+            return scene.LeaveScene(userId);
         }
     }
 }

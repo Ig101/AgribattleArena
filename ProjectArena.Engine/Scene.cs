@@ -555,22 +555,31 @@ namespace ProjectArena.Engine
         }
 
         // Actions methods
-        public bool LeaveScene(string playerId)
+        public bool LeaveScene(string userId)
         {
-            var player = this.players.FirstOrDefault(x => x.Id == playerId);
-            if (player == null || player.Left)
+            var players = this.players.Where(x => x.UserId == userId).ToList();
+            var success = false;
+            var needNewAction = false;
+            foreach (var player in players)
             {
-                return false;
+                if (!player.Left)
+                {
+                    success = true;
+                    player.Left = true;
+                    if (player.Status == PlayerStatus.Playing)
+                    {
+                        needNewAction = true;
+                        player.Defeat(true);
+                    }
+                }
             }
 
-            player.Left = true;
-            if (player.Status == PlayerStatus.Playing)
+            if (needNewAction)
             {
-                player.Defeat(true);
                 AfterUpdateSynchronization(Helpers.SceneAction.Leave, TempTileObject, null, null, null);
             }
 
-            return true;
+            return success;
         }
 
         private void ApplyActionAfterSkipping()

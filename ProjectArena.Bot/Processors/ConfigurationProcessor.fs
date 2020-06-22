@@ -43,6 +43,9 @@ let setupConfiguration() =
             LearningMutationProbability = configuration.GetValue<float>("Learning:LearningMutationProbability")
             WorkingMutationProbability = configuration.GetValue<float>("Learning:WorkingMutationProbability")
             TimeTillSurrender = configuration.GetValue<float32>("Learning:TimeTillSurrender")
+            VictoryPerformanceCoefficient = configuration.GetValue<float>("Learning:VictoryPerformanceCoefficient")
+            EnemyPowerPerformanceCoefficient = configuration.GetValue<float>("Learning:EnemyPowerPerformanceCoefficient")
+            PlayerPowerPerformanceCoefficient = configuration.GetValue<float>("Learning:PlayerPowerPerformanceCoefficient")
         }
         Logger = setupLogger(configuration.GetValue<LogEventLevel>("Logger:Level"))
         Api = {

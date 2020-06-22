@@ -119,15 +119,14 @@ let private tryGetActingModel (userId: string) (scene: Scene) =
         | Some owner when owner.UserId = userId -> Some scene
         | _ -> None
 
-let private leaveIfTooLong (configuration: Configuration) (lastSynchronizer: SynchronizerDto) (scene: Scene) =
+let private leaveIfTooLong (configuration: Configuration) (message: IncomingSynchronizationMessage) (scene: Scene) =
     let currentPlayers = scene.Players |> Seq.filter (fun p -> p.UserId = configuration.User.UserId)
     let currentPlayer = currentPlayers |> Seq.head
     match currentPlayer.Status with
-    | PlayerStatus.Playing when scene.RoundsPassed < configuration.Learning.TimeTillSurrender -> Some scene
+    | PlayerStatus.Playing when scene.RoundsPassed < configuration.Learning.TimeTillSurrender || message.Action = EndGame -> Some scene
     | PlayerStatus.Playing ->
         leaveBattle configuration.Logger configuration.User.AuthCookie configuration.ApiHost scene.Id |> Async.map (ignore) |> Async.Start
-        if (currentPlayers |> Seq.length = 1) then
-            configuration.Worker.Leave lastSynchronizer
+        configuration.Worker.Leave message.Synchronizer
         None
     | _ -> None
 
@@ -144,7 +143,7 @@ let sceneMessageProcessor (configuration: Configuration) (model: NeuralModel, sp
     newSceneOpt
     |> Option.bind (chooseMeaningfulActionsOnly message)
     |> Option.bind (tryGetActingModel configuration.User.UserId)
-    |> Option.bind (leaveIfTooLong configuration message.Synchronizer)
+    |> Option.bind (leaveIfTooLong configuration message)
     |> Option.map (chooseModel configuration.User.UserId (model, spareModel))
     |> Option.map (actOnScene configuration.Hub)
     |> ignore
@@ -154,10 +153,34 @@ let sceneMessageProcessor (configuration: Configuration) (model: NeuralModel, sp
 }
 
 let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene option) =
+    let calculateVictoryPerformance (scene: Scene, performance: float) =
+        let testingPlayer = scene.Players |> Seq.find (fun p -> p.UserId = configuration.User.UserId)
+        let newPerformance = match testingPlayer.Status with
+                             | PlayerStatus.Victorious -> performance + configuration.Learning.VictoryPerformanceCoefficient
+                             | _ -> performance
+        (scene, newPerformance, testingPlayer.Id)
+    let calculatePlayerPowerPerformance (scene: Scene, performance: float, playerId: string) =
+        let newPerformance =
+            scene.Actors
+            |> Seq.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = playerId)
+            |> Seq.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
+            |> fun v -> performance + configuration.Learning.PlayerPowerPerformanceCoefficient * (v / 6.0)
+        (scene, newPerformance, playerId)
+    let calculateEnemyPowerPerformance (scene: Scene, performance: float, playerId: string) =
+        let opponent = scene.Players |> Seq.find (fun p -> p.Id <> playerId)
+        let newPerformance =
+            scene.Actors
+            |> Seq.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = opponent.Id)
+            |> Seq.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
+            |> fun v -> performance + configuration.Learning.PlayerPowerPerformanceCoefficient * (1.0 - v / 6.0)
+        (scene, newPerformance, playerId)
     let calculatePerformance (scene: Scene) =
-        configuration.Logger.LogInformation (sprintf "Finished scene %A" scene.Id)
-        // TODO Performance calculation
-        1.0
+        let _, performance, _ =
+            calculateVictoryPerformance (scene, 0.0)
+            |> calculatePlayerPowerPerformance
+            |> calculateEnemyPowerPerformance
+        configuration.Logger.LogInformation (sprintf "Finished scene %A with performance %A" scene.Id performance)
+        performance
     match sceneOpt with
     | Some scene -> calculatePerformance scene
     | None -> 0.0
