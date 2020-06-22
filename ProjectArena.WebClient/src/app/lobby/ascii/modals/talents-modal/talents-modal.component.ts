@@ -163,6 +163,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    clearInterval(this.drawingTimer);
     this.hintEvent.unsubscribe();
     this.closeEvent.unsubscribe();
   }

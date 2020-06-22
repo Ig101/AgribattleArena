@@ -181,6 +181,7 @@ export class TavernComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    clearInterval(this.drawingTimer);
     this.userChangedSubscription.unsubscribe();
   }
 

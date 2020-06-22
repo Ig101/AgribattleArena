@@ -268,6 +268,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    clearInterval(this.drawingTimer);
     this.onCloseSubscription.unsubscribe();
     this.arenaActionsSubscription.unsubscribe();
     this.synchronizationErrorSubscription.unsubscribe();

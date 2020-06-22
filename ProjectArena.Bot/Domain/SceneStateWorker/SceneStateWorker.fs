@@ -73,15 +73,19 @@ type SceneStateWorker =
         ()
 
     member this.GetNextNewScene() =
-        Interlocked.Add(ref this.ActiveSubscriptions, 1) |> ignore
+        let incrementActiveSubs() =
+            this.ActiveSubscriptions <- this.ActiveSubscriptions + 1
+        let decrementActiveSubs() =
+            this.ActiveSubscriptions <- this.ActiveSubscriptions - 1
         async {
+            lock this.Locker incrementActiveSubs
             let mutable scene = None
             let tryGetNewScene() =
                 scene <- this.TryGetNewScene()
             while scene = None do
                 do! Async.AwaitWaitHandle this.SubscribeHandle |> Async.Ignore
                 lock this.Locker tryGetNewScene
-            Interlocked.Add(ref this.ActiveSubscriptions, -1) |> ignore
+            lock this.Locker decrementActiveSubs
             return scene.Value
         }
 
@@ -92,6 +96,7 @@ type SceneStateWorker =
                 scene <- this.TryGetNewScene()
             while scene = None do
                 do! Async.AwaitWaitHandle this.ExtraSubscribeHandle |> Async.Ignore
+                printfn "Active subs: %d" this.ActiveSubscriptions
                 while this.ActiveSubscriptions > 0 do
                     do! Async.AwaitWaitHandle this.ExtraSubscribeHandle |> Async.Ignore
                 lock this.Locker tryGetNewScene
