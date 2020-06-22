@@ -1,6 +1,10 @@
 :host {
   @import '../../auth.module.scss';
 
+  .title {
+    margin-bottom: 12px;
+  }
+
   .password {
     margin-bottom: 4px;
   }
