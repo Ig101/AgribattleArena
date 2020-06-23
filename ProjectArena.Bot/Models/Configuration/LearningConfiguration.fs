@@ -2,10 +2,10 @@ namespace ProjectArena.Bot.Models.Configuration
 
 type LearningConfiguration = {
     IsLearning: bool
+    BatchSize: int
     ModelsAmount: int
     SuccessfulModelsAmount: int
-    LearningMutationProbability: float
-    WorkingMutationProbability: float
+    MutationProbability: float
     TimeTillSurrender: float32
 
     VictoryPerformanceCoefficient: float

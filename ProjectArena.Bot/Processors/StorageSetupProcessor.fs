@@ -9,6 +9,7 @@ open ProjectArena.Bot.Domain.BotMongoContext
 open ProjectArena.Bot.Processors.NeuralCreationProcessor
 open ProjectArena.Bot.Domain.BotMongoContext.Entities
 open System
+open MongoDB.Driver
 
 let private setConnectionStringSettings (configuration: StorageConfiguration) =
     let connectionSettings = MongoConnectionSettings();
@@ -34,10 +35,13 @@ let private initializeDefaultModels (configuration: RawConfiguration) connection
     configuration.Logger.LogInformation "Loading default models..."
     let random = Random()
     let context = BotContext(connection)
-    let modelsAmount =
-        context.NeuralModelDefinitions.CountAsync(fun m -> m.Key).Result
+    let nonKeyIds = context.NeuralModelDefinitions.GetAsync(fun m -> not m.Key).Result |> Seq.map (fun m -> m.Id) |> Seq.toList
+    context.NeuralModels.Delete(Builders<NeuralModel>.Filter.In ((fun m -> m.Id), nonKeyIds))
+    context.NeuralModelDefinitions.Delete( Builders<NeuralModelDefinition>.Filter.In ((fun m -> m.Id), nonKeyIds))
+    context.ApplyChangesAsync().Wait()
+    
+    let modelsAmount = context.NeuralModelDefinitions.CountAsync(fun m -> m.Key).Result
 
-    printfn "%d" configuration.Learning.SuccessfulModelsAmount;
     [1..configuration.Learning.SuccessfulModelsAmount - modelsAmount]
     |> List.map(fun _ ->
         let model = initializeRandomNeuralModel random configuration.Learning

@@ -38,10 +38,10 @@ let setupConfiguration() =
     {
         RawConfiguration.Learning = {
             IsLearning = configuration.GetValue<bool>("Learning:IsLearning")
+            BatchSize = configuration.GetValue<int>("Learning:BatchSize")
             ModelsAmount = configuration.GetValue<int>("Learning:ModelsAmount")
             SuccessfulModelsAmount = configuration.GetValue<int>("Learning:SuccessfulModelsAmount")
-            LearningMutationProbability = configuration.GetValue<float>("Learning:LearningMutationProbability")
-            WorkingMutationProbability = configuration.GetValue<float>("Learning:WorkingMutationProbability")
+            MutationProbability = configuration.GetValue<float>("Learning:MutationProbability")
             TimeTillSurrender = configuration.GetValue<float32>("Learning:TimeTillSurrender")
             
             VictoryPerformanceCoefficient = configuration.GetValue<float>("Learning:VictoryPerformanceCoefficient")

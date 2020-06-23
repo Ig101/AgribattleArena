@@ -34,8 +34,8 @@ let startLearning (configuration:Configuration) =
             configuration.Logger.LogInformation "Learning cycle started."
             do!
                 getModelsFromStorage configuration
-                |> Async.map (breed configuration)
-                |> Async.bind (processSequenceAsynchronously (processScene configuration))
+                |> Async.bind (breed configuration)
+                |> Async.bind (processSequenceAsynchronously configuration.Learning.BatchSize (processScene configuration))
                 |> Async.map (select configuration)
                 |> Async.bind (refillTableWithNewModels configuration)
             configuration.Logger.LogInformation "Learning cycle finished."

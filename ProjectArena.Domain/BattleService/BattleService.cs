@@ -256,12 +256,12 @@ namespace ProjectArena.Domain.BattleService
 
         public void EngineTimeProcessing(double seconds)
         {
-            for (int i = 0; i < _scenes.Count; i++)
+            lock (_locker)
             {
-                _scenes[i].UpdateTime((float)seconds);
-                if (!_scenes[i].IsActive)
+                for (int i = 0; i < _scenes.Count; i++)
                 {
-                    lock (_locker)
+                    _scenes[i].UpdateTime((float)seconds);
+                    if (!_scenes[i].IsActive)
                     {
                         _scenes.RemoveAt(i);
                         i--;
@@ -272,11 +272,14 @@ namespace ProjectArena.Domain.BattleService
 
         public bool IsUserInBattle(string userId)
         {
-            foreach (var scene in _scenes)
+            lock (_locker)
             {
-                if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
+                foreach (var scene in _scenes)
                 {
-                    return true;
+                    if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -299,10 +302,15 @@ namespace ProjectArena.Domain.BattleService
 
         public SynchronizerDto GetUserSynchronizationInfo(string userId, Guid? sceneId)
         {
-            var scene = _scenes
-                .FirstOrDefault(scene => scene.IsActive &&
-                    (sceneId == null || sceneId == scene.Id) &&
-                    scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
+            IScene scene;
+            lock (_locker)
+            {
+                scene = _scenes
+                    .FirstOrDefault(scene => scene.IsActive &&
+                        (sceneId == null || sceneId == scene.Id) &&
+                        scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
+            }
+
             if (scene == null)
             {
                 return null;
@@ -316,21 +324,27 @@ namespace ProjectArena.Domain.BattleService
 
         public IEnumerable<SynchronizerDto> GetAllUserSynchronizationInfos(string userId)
         {
-            return _scenes
-                .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
-                .Select(scene =>
-                {
-                    var player = scene.ShortPlayers.First(x => x.UserId == userId);
-                    var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
-                    BattleHelper.CalculateReward(ref synchronizer, scene, player.Id);
-                    return synchronizer;
-                })
-                .ToList();
+            lock (_locker)
+            {
+                return _scenes
+                    .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
+                    .Select(scene =>
+                    {
+                        var player = scene.ShortPlayers.First(x => x.UserId == userId);
+                        var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
+                        BattleHelper.CalculateReward(ref synchronizer, scene, player.Id);
+                        return synchronizer;
+                    })
+                    .ToList();
+            }
         }
 
         public IScene GetUserScene(string userId, Guid sceneId)
         {
-            return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
+            lock (_locker)
+            {
+                return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
+            }
         }
 
         public bool LeaveScene(string userId, Guid sceneId)

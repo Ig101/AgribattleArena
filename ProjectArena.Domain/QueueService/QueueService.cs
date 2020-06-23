@@ -142,16 +142,19 @@ namespace ProjectArena.Domain.QueueService
 
         public UserInQueueDto IsUserInQueue(string userId)
         {
-            return _queues
-                .Select(
-                    x => x.Value.Queue.FirstOrDefault(member => member.UserId == userId)?.Time == null ? (UserInQueueDto)null : new UserInQueueDto()
-                    {
-                        Mode = x.Key,
-                        Time = (int)x.Value.Queue.FirstOrDefault(member => member.UserId == userId).Time
-                    })
-                .Where(
-                    x => x != null)
-                .FirstOrDefault();
+            lock (_locker)
+            {
+                return _queues
+                    .Select(
+                        x => x.Value.Queue.FirstOrDefault(member => member.UserId == userId)?.Time == null ? (UserInQueueDto)null : new UserInQueueDto()
+                        {
+                            Mode = x.Key,
+                            Time = (int)x.Value.Queue.FirstOrDefault(member => member.UserId == userId).Time
+                        })
+                    .Where(
+                        x => x != null)
+                    .FirstOrDefault();
+            }
         }
     }
 }

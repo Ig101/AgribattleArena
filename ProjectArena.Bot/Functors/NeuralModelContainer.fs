@@ -22,6 +22,11 @@ type NeuralModelContainer =
 
     member this.GetId () = this.Id
 
+    member this.Bind (func: NeuralModel -> NeuralModelContainer) = async {
+        let! model = this.Unpack()
+        return func (model)
+    }
+
     member this.Unpack () = async {
         match this.NeuralModel with
         | Some model -> return model

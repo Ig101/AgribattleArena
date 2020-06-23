@@ -28,4 +28,4 @@ let getCommandInputNeuronNames () =
 
 let getHiddenNeuronNames (identifier: char) (amount: int) =
     [1..amount]
-    |> List.map (fun digit -> sprintf "%A%i" identifier digit)
+    |> List.map (fun digit -> sprintf "%s%i" (identifier.ToString()) digit)
