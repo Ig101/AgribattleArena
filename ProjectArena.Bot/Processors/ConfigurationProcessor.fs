@@ -50,6 +50,7 @@ let setupConfiguration() =
             
             MagnifyingHiddenNeuronsCount = configuration.GetValue<int>("Learning:MagnifyingHiddenNeuronsCount")
             CommandHiddenNeuronsCount = configuration.GetValue<int>("Learning:CommandHiddenNeuronsCount")
+            ActivationDivider = configuration.GetValue<float>("Learning:ActivationDivider")
         }
         LazyNeuralModels = configuration.GetValue<bool>("LazyNeuralModels")
         Logger = setupLogger(configuration.GetValue<LogEventLevel>("Logger:Level"))

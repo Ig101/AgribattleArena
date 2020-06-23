@@ -29,9 +29,9 @@ let convertCommandNeuronToAction (neuron: Neuron) =
         let y = Int32.Parse (neuron.Name.Substring (2, 1))
         let command = neuron.Name.Substring 3
         match command with
-        | "m" -> Some (Move (x, y))
-        | _ -> Some (Cast (skillsWithShortNames.[command], x, y))
-    | _ -> None    
+        | "m" -> Move (x, y)
+        | _ -> Cast (skillsWithShortNames.[command], x, y)
+    | _ -> raise (ArgumentException())
 
 let convertMagnifyingNeuronToAction (neuron: Neuron) =
     let typeSymbol = neuron.Name.[0]
@@ -39,9 +39,9 @@ let convertMagnifyingNeuronToAction (neuron: Neuron) =
     | 'm' ->
         let x = Int32.Parse (neuron.Name.Substring (1, 1))
         let y = Int32.Parse (neuron.Name.Substring (2, 1))
-        Some (Proceed (x, y))
-    | 'w' -> Some Wait
-    | _ -> None
+        Proceed (x, y)
+    | 'w' -> Wait
+    | _ -> raise (ArgumentException())
 
     
 let private getCommandOutputNeuronNamesFromPosition (x: int, y: int) =

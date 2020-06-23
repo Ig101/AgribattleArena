@@ -14,4 +14,5 @@ type LearningConfiguration = {
     
     MagnifyingHiddenNeuronsCount: int
     CommandHiddenNeuronsCount: int
+    ActivationDivider: float
 }
