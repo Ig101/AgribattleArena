@@ -10,6 +10,7 @@ let private initializeLayer (random: Random) inputs outputs =
     outputs
     |> List.map (fun name -> {
         Output = name
+        Shift = random.NextDouble()
         Inputs = inputs |> List.map (fun input -> { Input = input; Weight = random.NextDouble() })
     })
 

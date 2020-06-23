@@ -6,6 +6,7 @@ open ProjectArena.Bot.Functors
 open FSharp.Control
 open ProjectArena.Bot.Domain.BotMongoContext.EntityModels
 open ProjectArena.Bot.Domain.BotMongoContext
+open Microsoft.Extensions.Logging
 
 let private commitNewModel (configuration: Configuration) (model: NeuralModel) = async {
     let context = BotContext(configuration.Storage)
@@ -32,8 +33,15 @@ let private processInput (configuration: Configuration) (random: Random) (father
 
 let private processOutput (configuration: Configuration) (random: Random) (father: NeuralLayer) (output: NeuralOutputGroup) =
     let fatherOutput = father.Outputs |> Seq.find (fun o -> o.Output = output.Output)
+    let shiftValue =
+        match random.NextDouble() with
+        | v when v < configuration.Learning.MutationProbability -> random.NextDouble()
+        | _ -> match random.NextDouble() with
+               | v when v < 0.5 -> fatherOutput.Shift
+               | _ -> output.Shift
     {
         Output = output.Output
+        Shift = shiftValue
         Inputs = output.Inputs |> Seq.map (processInput configuration random fatherOutput)
     }
 
@@ -70,6 +78,7 @@ let private breedOne (configuration: Configuration) (random: Random) (models: Ne
 
 let breed (configuration: Configuration) (models: NeuralModelContainer seq) =
     let random = Random()
+    configuration.Logger.LogInformation (sprintf "Breeding...")
     [1..configuration.Learning.ModelsAmount]
         |> AsyncSeq.ofSeq
         |> AsyncSeq.mapAsync (fun _ -> async {
