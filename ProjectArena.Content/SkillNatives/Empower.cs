@@ -10,6 +10,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "empower",
+                "empower",
+                "empower",
                 new[] { "target", "buff", "magic", "pure" },
                 8,
                 6,

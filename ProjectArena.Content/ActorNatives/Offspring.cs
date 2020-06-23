@@ -7,8 +7,10 @@ namespace ProjectArena.Content.ActorNatives
         public void Fill(INativeManager nativeManager)
         {
             nativeManager.AddActorNative(
-                "mistspawn",
-                new[] { "organic", "intelligent", "controlled" },
+                "offspring",
+                "offspring",
+                "mistoffspring",
+                new[] { "organic", "controlled" },
                 0,
                 new Engine.Helpers.TagSynergy[0]);
         }

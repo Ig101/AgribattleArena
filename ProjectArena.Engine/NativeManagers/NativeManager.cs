@@ -40,9 +40,9 @@ namespace ProjectArena.Engine.NativeManagers
             return newTags;
         }
 
-        public void AddActorNative(string id, string[] tags, float defaultZ, TagSynergy[] armor)
+        public void AddActorNative(string id, string defaultVisualization, string defaultEnemyVisualization, string[] tags, float defaultZ, TagSynergy[] armor)
         {
-            actorNatives.Add(id, new ActorNative(id, InternTags(tags), defaultZ, armor));
+            actorNatives.Add(id, new ActorNative(id, defaultVisualization, defaultEnemyVisualization, InternTags(tags), defaultZ, armor));
         }
 
         public void AddBuffNative(
@@ -63,6 +63,7 @@ namespace ProjectArena.Engine.NativeManagers
 
         public void AddDecorationNative(
             string id,
+            string defaultVisualization,
             string[] tags,
             TagSynergy[] defaultArmor,
             int defaultHealth,
@@ -71,11 +72,12 @@ namespace ProjectArena.Engine.NativeManagers
             Action<ISceneParentRef, ActiveDecoration> action,
             Action<ISceneParentRef, ActiveDecoration> onDeathAction)
         {
-            decorationNatives.Add(id, new ActiveDecorationNative(id, InternTags(tags), defaultArmor, defaultHealth, defaultZ, defaultMod, action, onDeathAction));
+            decorationNatives.Add(id, new ActiveDecorationNative(id, defaultVisualization, InternTags(tags), defaultArmor, defaultHealth, defaultZ, defaultMod, action, onDeathAction));
         }
 
         public void AddEffectNative(
             string id,
+            string defaultVisualization,
             string[] tags,
             float defaultZ,
             float? defaultDuration,
@@ -83,7 +85,7 @@ namespace ProjectArena.Engine.NativeManagers
             Action<ISceneParentRef, SpecEffect, float> action,
             Action<ISceneParentRef, SpecEffect> onDeathAction)
         {
-            effectNatives.Add(id, new SpecEffectNative(id, InternTags(tags), defaultZ, defaultDuration, defaultMod, action, onDeathAction));
+            effectNatives.Add(id, new SpecEffectNative(id, defaultVisualization, InternTags(tags), defaultZ, defaultDuration, defaultMod, action, onDeathAction));
         }
 
         public void AddRoleModelNative(
@@ -110,6 +112,8 @@ namespace ProjectArena.Engine.NativeManagers
 
         public void AddSkillNative(
             string id,
+            string defaultVisualization,
+            string defaultEnemyVisualization,
             string[] tags,
             int defaultRange,
             int defaultCost,
@@ -119,7 +123,7 @@ namespace ProjectArena.Engine.NativeManagers
             bool onlyVisibleTargets,
             Action<ISceneParentRef, IActorParentRef, Tile, Skill> action)
         {
-            skillNatives.Add(id, new SkillNative(id, InternTags(tags), defaultRange, defaultCost, defaultCd, defaultMod, availableTargets, onlyVisibleTargets, action));
+            skillNatives.Add(id, new SkillNative(id, defaultVisualization, defaultEnemyVisualization, InternTags(tags), defaultRange, defaultCost, defaultCd, defaultMod, availableTargets, onlyVisibleTargets, action));
         }
 
         public void AddTileNative(

@@ -11,7 +11,6 @@ export const decorationNatives: { [id: string]: DecorationNative } = {
       color: {r: 174, g: 92, b: 0, a: 1}
     },
     action: undefined,
-    onDeathAction: undefined,
-    alternativeForm: false,
+    onDeathAction: undefined
   }
 };

@@ -10,6 +10,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "wand",
+                "wand",
+                "wand",
                 new[] { "damage", "target", "weapon", "magic", "pure", "ranged", "direct" },
                 4,
                 3,

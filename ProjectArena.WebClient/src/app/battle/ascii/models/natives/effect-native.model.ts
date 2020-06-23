@@ -8,12 +8,4 @@ export interface EffectNative {
   action: ActionAnimation;
   onActionEffectAnimation: ActionAnimation;
   onDeathAction: ActionAnimation;
-
-  alternativeForm: boolean;
-  enemyName?: string;
-  enemyDescription?: string;
-  enemyVisualization?: Visualization;
-  enemyAction?: ActionAnimation;
-  enemyOnActionEffectAnimation?: ActionAnimation;
-  enemyOnDeathAction?: ActionAnimation;
 }

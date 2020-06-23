@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ProjectArena.Engine.Helpers.DelegateLists;
 using ProjectArena.Engine.Objects;
 
 namespace ProjectArena.Engine.Natives
 {
     public class SpecEffectNative : TaggingNative
     {
+        public string DefaultVisualisation { get; }
+
         public float DefaultZ { get; }
 
         public float? DefaultDuration { get; }
@@ -21,6 +22,7 @@ namespace ProjectArena.Engine.Natives
 
         public SpecEffectNative(
             string id,
+            string defaultVisualization,
             string[] tags,
             float defaultZ,
             float? defaultDuration,
@@ -29,6 +31,7 @@ namespace ProjectArena.Engine.Natives
             Action<ISceneParentRef, SpecEffect> onDeathAction)
             : base(id, tags)
         {
+            this.DefaultVisualisation = defaultVisualization;
             this.DefaultZ = defaultZ;
             this.DefaultDuration = defaultDuration;
             this.DefaultMod = defaultMod;

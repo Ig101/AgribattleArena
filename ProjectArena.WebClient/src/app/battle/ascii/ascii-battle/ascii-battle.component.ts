@@ -1104,6 +1104,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private endGame(declaration: EndGameDeclaration) {
     this.blocked = true;
+    this.battleStorageService.shownEnd = true;
     if (this.battleStorageService.openedModal) {
       this.battleStorageService.openedModal.close();
     }

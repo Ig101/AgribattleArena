@@ -4,6 +4,8 @@
     {
         int Id { get; }
 
+        string Visualization { get; }
+
         string OwnerId { get; }
 
         bool IsAlive { get; }

@@ -21,6 +21,7 @@ export class AsciiBattleStorageService {
 
   endDeclaration: EndGameDeclaration;
   ended: boolean;
+  shownEnd: boolean;
 
   floatingTextTime = 1000;
   floatingTextSpeed = 0.07;
@@ -69,7 +70,7 @@ export class AsciiBattleStorageService {
   }
 
   setTurnTime(time: number) {
-    this.turnTime = time - 2;
+    this.turnTime = time;
   }
 
   clear() {
@@ -86,6 +87,7 @@ export class AsciiBattleStorageService {
     this.currentAnimations = undefined;
     this.floatingTexts = [];
     this.ended = false;
+    this.shownEnd = false;
     this.endDeclaration = undefined;
   }
 }

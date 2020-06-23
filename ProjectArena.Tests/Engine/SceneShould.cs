@@ -46,8 +46,8 @@ namespace ProjectArena.Tests.Engine
         {
             Scene = SceneSamples.CreateSimpleScene(this.EventHandler, false);
             Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).ChangePosition(Scene.Tiles[17][2], true);
-            Scene.CreateEffect(Scene.Players.First(), "test_effect", Scene.Tiles[1][2], null, 2, null);
-            Scene.CreateDecoration(Scene.Players.First(), "test_decoration", Scene.Tiles[4][4], null, null, null, null);
+            Scene.CreateEffect(Scene.Players.First(), "test_effect", Scene.Tiles[1][2], null, null, 2, null);
+            Scene.CreateDecoration(Scene.Players.First(), "test_decoration", Scene.Tiles[4][4], null, null, null, null, null);
             ISynchronizer synchronizer = new Synchronizer(
                 Scene.TempTileObject,
                 Scene.Players.ToList(),

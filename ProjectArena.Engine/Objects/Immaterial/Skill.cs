@@ -14,6 +14,10 @@ namespace ProjectArena.Engine.Objects.Immaterial
         private readonly int cost;
         private readonly int range;
 
+        public string Visualization { get; set; }
+
+        public string EnemyVisualization { get; set; }
+
         public int Range => range + (range > 1 ? parent.BuffManager.SkillRange : 0);
 
         public SkillNative Native { get; }
@@ -30,9 +34,11 @@ namespace ProjectArena.Engine.Objects.Immaterial
 
         public bool Revealed { get; set; }
 
-        public Skill(IActorParentRef parent, SkillNative skill, float? cd, float? mod, int? cost, int? range)
+        public Skill(IActorParentRef parent, SkillNative skill, string visualization, string enemyVisualization, float? cd, float? mod, int? cost, int? range)
             : base(parent.Parent)
         {
+            this.Visualization = visualization ?? skill.DefaultVisualization;
+            this.EnemyVisualization = enemyVisualization ?? skill.DefaultEnemyVisualization;
             this.range = range ?? skill.DefaultRange;
             this.Mod = mod ?? skill.DefaultMod;
             this.cost = cost ?? skill.DefaultCost;

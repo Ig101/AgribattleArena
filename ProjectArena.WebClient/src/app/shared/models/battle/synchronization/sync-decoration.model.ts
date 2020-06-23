@@ -2,7 +2,7 @@ import { TagSynergy } from '../tag-synergy.model';
 
 export interface SyncDecoration {
   id: number;
-  nativeId: string;
+  visualization: string;
   initiativePosition: number;
   health: number;
   ownerId?: string;

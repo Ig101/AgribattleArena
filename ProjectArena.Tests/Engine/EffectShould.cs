@@ -17,7 +17,7 @@ namespace ProjectArena.Tests.Engine
         {
             SyncMessages = new List<ISyncEventArgs>();
             Scene = SceneSamples.CreateSimpleScene(this.EventHandler, false);
-            _effect = Scene.CreateEffect(Scene.Players.First(), "test_effect", Scene.Tiles[1][2], null, 2, null);
+            _effect = Scene.CreateEffect(Scene.Players.First(), "test_effect", Scene.Tiles[1][2], null, null, 2, null);
             SyncMessages.Clear();
         }
 

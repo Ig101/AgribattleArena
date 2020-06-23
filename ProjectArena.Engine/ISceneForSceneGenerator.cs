@@ -18,13 +18,13 @@ namespace ProjectArena.Engine
 
         Player CreatePlayer(string id, string userId, int? team);
 
-        Actor CreateActor(Player owner, string nativeName, string roleNativeName, Tile target, float? z);
+        Actor CreateActor(Player owner, string nativeName, string roleNativeName, Tile target, string visualization, string enemyVisualization, float? z);
 
-        Actor CreateActor(Player owner, Guid? externalId, string nativeName, RoleModelNative roleModel, Tile target, float? z);
+        Actor CreateActor(Player owner, Guid? externalId, string nativeName, RoleModelNative roleModel, Tile target, string visualization, string enemyVisualization, float? z);
 
-        ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, TagSynergy[] armor, float? z, int? health, float? mod);
+        ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, TagSynergy[] armor, string visualization, float? z, int? health, float? mod);
 
-        SpecEffect CreateEffect(Player owner, string nativeName, Tile target, float? z, float? duration, float? mod);
+        SpecEffect CreateEffect(Player owner, string nativeName, Tile target, string visualization, float? z, float? duration, float? mod);
 
         Tile CreateTile(string nativeName, int x, int y, int? height);
     }

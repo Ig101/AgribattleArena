@@ -12,7 +12,7 @@
   <div *ngIf="timer && timer <= 15 && timer > 0" class="timer text-font-inactive">
     {{timer | number:'1.0-0'}}
   </div>
-  <div *ngIf="timer && timer <= 0" class="timer text-font-inactive">
+  <div *ngIf="timer !== undefined && timer <= 0" class="timer text-font-inactive">
     Ending...
   </div>
 </div>

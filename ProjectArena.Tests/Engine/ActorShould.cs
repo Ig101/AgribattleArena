@@ -81,7 +81,7 @@ namespace ProjectArena.Tests.Engine
         [Test]
         public void CreateNewActor()
         {
-            Actor actor = Scene.CreateActor(null, "test_actor", "test_roleModel", Scene.Tiles[4][4], null);
+            Actor actor = Scene.CreateActor(null, "test_actor", "test_roleModel", Scene.Tiles[4][4], null, null, null);
             Assert.That(Scene.Actors.Count, Is.EqualTo(3), "Count of actors");
             Assert.That(actor.Strength, Is.EqualTo(10), "Strength");
             Assert.That(actor.Willpower, Is.EqualTo(10), "Willpower");

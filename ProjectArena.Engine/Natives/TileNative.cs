@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ProjectArena.Engine.Helpers.DelegateLists;
 using ProjectArena.Engine.Objects;
 
 namespace ProjectArena.Engine.Natives

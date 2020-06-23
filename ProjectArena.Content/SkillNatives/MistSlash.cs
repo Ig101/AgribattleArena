@@ -10,6 +10,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "mistSlash",
+                "mistSlash",
+                "mistSlash",
                 new[] { "damage", "target", "weapon", "magic", "pure", "melee", "physic" },
                 1,
                 2,

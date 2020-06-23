@@ -10,6 +10,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "mistpact",
+                "mistpact",
+                "mistsummon",
                 new[] { "target", "summon", "magic", "pure" },
                 1,
                 2,
@@ -22,7 +24,7 @@ namespace ProjectArena.Content.SkillNatives
                 false,
                 (scene, owner, targetTile, skill) =>
                 {
-                    scene.CreateActor(owner.Owner as Player, "mistspawn", "mistspawn", targetTile, null);
+                    scene.CreateActor(owner.Owner as Player, "mistspawn", "mistspawn", targetTile, null, null, null);
                 });
         }
     }

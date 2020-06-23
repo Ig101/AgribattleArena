@@ -20,6 +20,10 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string NativeId { get; }
 
+        public string Visualization { get; }
+
+        public string EnemyVisualization { get; }
+
         public ISkill AttackingSkill { get; }
 
         public int Strength { get; }
@@ -75,6 +79,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
         public Actor(Objects.Actor actor)
         {
             this.Id = actor.Id;
+            this.Visualization = actor.Visualization;
+            this.EnemyVisualization = actor.EnemyVisualization;
             this.ExternalId = actor.ExternalId;
             this.NativeId = actor.Native.Id;
             this.AttackingSkill = new Skill(actor.AttackingSkill);

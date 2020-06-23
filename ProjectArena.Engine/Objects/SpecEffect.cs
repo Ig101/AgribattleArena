@@ -8,15 +8,18 @@ namespace ProjectArena.Engine.Objects
     {
         public bool Affected { get; set; }
 
+        public string Visualization { get; set; }
+
         public float? Duration { get; set; }
 
         public float Mod { get; set; }
 
         public SpecEffectNative Native { get; set; }
 
-        public SpecEffect(ISceneParentRef parent, IPlayerParentRef owner, int x, int y, float? z, SpecEffectNative native, float? duration, float? mod)
+        public SpecEffect(ISceneParentRef parent, IPlayerParentRef owner, int x, int y, string visualization, float? z, SpecEffectNative native, float? duration, float? mod)
             : base(parent, owner, x, y, z ?? native.DefaultZ)
         {
+            this.Visualization = visualization ?? native.DefaultVisualisation;
             this.Duration = duration ?? native.DefaultDuration ?? null;
             this.Native = native;
             this.Mod = mod ?? native.DefaultMod;

@@ -8,6 +8,8 @@ namespace ProjectArena.Content.ActorNatives
         {
             nativeManager.AddActorNative(
                 "mistcaller",
+                "mistcaller",
+                "mage",
                 new[] { "organic", "intelligent" },
                 0,
                 new Engine.Helpers.TagSynergy[0]);

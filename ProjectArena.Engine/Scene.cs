@@ -181,40 +181,40 @@ namespace ProjectArena.Engine
             return player;
         }
 
-        public Actor CreateActor(Player owner, string nativeName, string roleNativeName, Tile target, float? z)
+        public Actor CreateActor(Player owner, string nativeName, string roleNativeName, Tile target, string visualization, string enemyVisualization, float? z)
         {
-            return CreateActor(owner, null, nativeName, NativeManager.GetRoleModelNative(roleNativeName), target, z);
+            return CreateActor(owner, null, nativeName, NativeManager.GetRoleModelNative(roleNativeName), target, visualization, enemyVisualization, z);
         }
 
-        public Actor CreateActor(Player owner, Guid? externalId, string nativeName, RoleModelNative roleModel, Tile target, float? z)
+        public Actor CreateActor(Player owner, Guid? externalId, string nativeName, RoleModelNative roleModel, Tile target, string visualization, string enemyVisualization, float? z)
         {
             if (target.TempObject != null)
             {
                 return null;
             }
 
-            Actor actor = new Actor(this, owner, externalId, target, z, NativeManager.GetActorNative(nativeName), roleModel);
+            Actor actor = new Actor(this, owner, externalId, target, visualization, enemyVisualization, z, NativeManager.GetActorNative(nativeName), roleModel);
             Actors.Add(actor);
             target.ChangeTempObject(actor, true);
             return actor;
         }
 
-        public ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, TagSynergy[] armor, float? z, int? health, float? mod)
+        public ActiveDecoration CreateDecoration(Player owner, string nativeName, Tile target, TagSynergy[] armor, string visualization, float? z, int? health, float? mod)
         {
             if (target.TempObject != null)
             {
                 return null;
             }
 
-            ActiveDecoration decoration = new ActiveDecoration(this, owner, target, z, health, armor, NativeManager.GetDecorationNative(nativeName), mod);
+            ActiveDecoration decoration = new ActiveDecoration(this, owner, target, visualization, z, health, armor, NativeManager.GetDecorationNative(nativeName), mod);
             Decorations.Add(decoration);
             target.ChangeTempObject(decoration, true);
             return decoration;
         }
 
-        public SpecEffect CreateEffect(Player owner, string nativeName, Tile target, float? z, float? duration, float? mod)
+        public SpecEffect CreateEffect(Player owner, string nativeName, Tile target, string visualization, float? z, float? duration, float? mod)
         {
-            SpecEffect effect = new SpecEffect(this, owner, target.X, target.Y, z, NativeManager.GetEffectNative(nativeName), duration, mod);
+            SpecEffect effect = new SpecEffect(this, owner, target.X, target.Y, visualization, z, NativeManager.GetEffectNative(nativeName), duration, mod);
             SpecEffects.Add(effect);
             return effect;
         }

@@ -5,8 +5,4 @@ export interface ActorNative {
   name: string;
   description: string;
   visualization: Visualization;
-
-  enemyName: string;
-  enemyDescription: string;
-  enemyVisualization: Visualization;
 }

@@ -12,6 +12,10 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         string NativeId { get; }
 
+        string Visualization { get; }
+
+        string EnemyVisualization { get; }
+
         ISkill AttackingSkill { get; }
 
         int Strength { get; }

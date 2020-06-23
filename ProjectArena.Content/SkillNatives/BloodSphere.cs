@@ -10,6 +10,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "bloodsphere",
+                "bloodsphere",
+                "mistsphere",
                 new[] { "damage", "target", "magic", "blood", "ranged", "direct" },
                 5,
                 3,

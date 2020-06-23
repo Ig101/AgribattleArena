@@ -15,7 +15,7 @@ let private mapSkill (skill: ProjectArena.Infrastructure.Models.Battle.Synchroni
     {
         SkillDto.Id = skill.Id
         Range = skill.Range
-        NativeId = skill.NativeId
+        Visualization = skill.Visualization
         Cd = skill.Cd
         Cost = skill.Cost
         PreparationTime = skill.PreparationTime
@@ -41,7 +41,7 @@ let private mapActor (actor: ProjectArena.Infrastructure.Models.Battle.Synchroni
     {
         ActorDto.Id = actor.Id
         ExternalId = actor.ExternalId |> Option.ofNullable
-        NativeId = actor.NativeId
+        Visualization = actor.Visualization
         AttackingSkill = actor.AttackingSkill |> Option.ofObj |> Option.map mapSkill
         Skills = actor.Skills |> Seq.map mapSkill |> Seq.toList
         Buffs = actor.Buffs |> Seq.map mapBuff |> Seq.toList
@@ -61,7 +61,7 @@ let private mapActor (actor: ProjectArena.Infrastructure.Models.Battle.Synchroni
 let private mapDecoration (decoration: ProjectArena.Infrastructure.Models.Battle.Synchronization.ActiveDecorationDto) =
     {
         ActiveDecorationDto.Id = decoration.Id
-        NativeId = decoration.NativeId
+        Visualization = decoration.Visualization
         InitiativePosition = decoration.InitiativePosition
         Health = decoration.Health |> Option.ofNullable
         OwnerId = decoration.OwnerId |> Option.ofObj
@@ -81,7 +81,7 @@ let private mapEffect (effect: ProjectArena.Infrastructure.Models.Battle.Synchro
         Y = effect.Y
         Z = effect.Z
         Duration = effect.Duration |> Option.ofNullable
-        NativeId = effect.NativeId
+        Visualization = effect.Visualization
     }
 
 let private mapTile (tile: ProjectArena.Infrastructure.Models.Battle.Synchronization.TileDto) =

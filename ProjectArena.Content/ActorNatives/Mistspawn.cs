@@ -7,8 +7,10 @@ namespace ProjectArena.Content.ActorNatives
         public void Fill(INativeManager nativeManager)
         {
             nativeManager.AddActorNative(
-                "ranger",
-                new[] { "organic", "intelligent" },
+                "mistspawn",
+                "tamedspawn",
+                "lesserspawn",
+                new[] { "organic", "intelligent", "controlled" },
                 0,
                 new Engine.Helpers.TagSynergy[0]);
         }

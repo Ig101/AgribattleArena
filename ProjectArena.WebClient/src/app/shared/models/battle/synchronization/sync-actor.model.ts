@@ -5,7 +5,7 @@ import { TagSynergy } from '../tag-synergy.model';
 export interface SyncActor {
   id: number;
   externalId?: string;
-  nativeId: string;
+  visualization: string;
   attackingSkill: SyncSkill;
   skills: SyncSkill[];
   buffs: SyncBuff[];

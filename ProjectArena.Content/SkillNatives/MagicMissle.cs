@@ -10,6 +10,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "magicMissle",
+                "magicMissle",
+                "magicMissle",
                 new[] { "damage", "target", "magic", "pure", "ranged", "direct" },
                 5,
                 3,

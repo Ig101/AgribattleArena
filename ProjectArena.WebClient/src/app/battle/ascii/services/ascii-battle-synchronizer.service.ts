@@ -63,7 +63,7 @@ export class AsciiBattleSynchronizerService {
     for (const actor of synchronizer.changedActors) {
       const owner = this.battleStorageService.players.find(x => x.id === actor.ownerId);
       const character = actor.externalId ? this.userService.user.roster.find(x => x.id === actor.externalId) : undefined;
-      const newActor = convertActor(actor, owner, owner && currentPlayer.team === owner?.team, character?.name);
+      const newActor = convertActor(actor, owner, character?.name);
       for (const buff of newActor.buffs) {
         buff.passiveAnimation?.doSomethingWithBearer(buff.passiveAnimation, newActor);
       }
@@ -75,7 +75,7 @@ export class AsciiBattleSynchronizerService {
     const decorations: ActiveDecoration[] = [];
     for (const decoration of synchronizer.changedDecorations) {
       const owner = this.battleStorageService.players.find(x => x.id === decoration.ownerId);
-      const newDecoration = convertDecoration(decoration, owner, owner && currentPlayer.team === owner?.team);
+      const newDecoration = convertDecoration(decoration, owner);
       tiles[newDecoration.x][newDecoration.y].decoration = newDecoration;
       decorations.push(newDecoration);
     }
@@ -84,7 +84,7 @@ export class AsciiBattleSynchronizerService {
     const effects: SpecEffect[] = [];
     for (const specEffect of synchronizer.changedEffects) {
       const owner = this.battleStorageService.players.find(x => x.id === specEffect.ownerId);
-      const newEffect = convertEffect(specEffect, owner, owner && currentPlayer.team === owner?.team);
+      const newEffect = convertEffect(specEffect, owner);
       tiles[newEffect.x][newEffect.y].specEffects.push(newEffect);
       tiles[newEffect.x][newEffect.y].specEffects.sort((a, b) => b.z - a.z);
       effects.push(newEffect);
@@ -156,7 +156,7 @@ export class AsciiBattleSynchronizerService {
       if (!actor) {
         owner = this.battleStorageService.players.find(x => x.id === syncActor.ownerId);
         const character = this.userService.user.roster.find(x => x.id === syncActor.externalId);
-        const newActor = convertActor(syncActor, owner, owner && currentPlayer.team === owner?.team, character?.name);
+        const newActor = convertActor(syncActor, owner, character?.name);
         this.battleStorageService.scene.tiles[newActor.x][newActor.y].actor = newActor;
         this.battleStorageService.scene.actors.push(newActor);
         continue;
@@ -180,7 +180,7 @@ export class AsciiBattleSynchronizerService {
       const decoration = this.battleStorageService.scene.decorations.find(x => x.id === syncDecoration.id);
       if (!decoration) {
         owner = this.battleStorageService.players.find(x => x.id === syncDecoration.ownerId);
-        const newDecoration = convertDecoration(syncDecoration, owner, owner && currentPlayer.team === owner?.team);
+        const newDecoration = convertDecoration(syncDecoration, owner);
         this.battleStorageService.scene.tiles[newDecoration.x][newDecoration.y].decoration = newDecoration;
         this.battleStorageService.scene.decorations.push(newDecoration);
         continue;
@@ -204,7 +204,7 @@ export class AsciiBattleSynchronizerService {
       const effect = this.battleStorageService.scene.effects.find(x => x.id === syncEffect.id);
       if (!effect) {
         owner = this.battleStorageService.players.find(x => x.id === syncEffect.ownerId);
-        const newEffect = convertEffect(syncEffect, owner, owner && currentPlayer.team === owner?.team);
+        const newEffect = convertEffect(syncEffect, owner);
         this.battleStorageService.scene.tiles[newEffect.x][newEffect.y].specEffects.push(newEffect);
         this.battleStorageService.scene.tiles[newEffect.x][newEffect.y].specEffects.sort((a, b) => b.z - a.z);
         this.battleStorageService.scene.effects.push(newEffect);

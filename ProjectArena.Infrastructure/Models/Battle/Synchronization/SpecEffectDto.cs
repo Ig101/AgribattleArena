@@ -16,6 +16,6 @@
 
         public float? Duration { get; set; }
 
-        public string NativeId { get; set; }
+        public string Visualization { get; set; }
     }
 }

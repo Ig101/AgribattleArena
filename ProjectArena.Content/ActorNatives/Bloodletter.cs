@@ -8,6 +8,8 @@ namespace ProjectArena.Content.ActorNatives
         {
             nativeManager.AddActorNative(
                 "bloodletter",
+                "bloodletter",
+                "ritualist",
                 new[] { "organic", "intelligent" },
                 0,
                 new Engine.Helpers.TagSynergy[0]);

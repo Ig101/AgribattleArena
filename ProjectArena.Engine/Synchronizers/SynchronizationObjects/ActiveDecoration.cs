@@ -10,6 +10,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string NativeId { get; }
 
+        public string Visualization { get; }
+
         public float Mod { get; }
 
         public float InitiativePosition { get; }
@@ -37,6 +39,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
         public ActiveDecoration(Objects.ActiveDecoration decoration)
         {
             this.Id = decoration.Id;
+            this.Visualization = decoration.Visualization;
             this.NativeId = decoration.Native.Id;
             this.Mod = decoration.Mod;
             this.InitiativePosition = decoration.InitiativePosition;

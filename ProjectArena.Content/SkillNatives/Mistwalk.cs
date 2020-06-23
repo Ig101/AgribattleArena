@@ -9,6 +9,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "mistwalk",
+                "mistwalk",
+                "mistwalk",
                 new[] { "target", "movement", "magic", "alteration" },
                 5,
                 1,

@@ -10,6 +10,10 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         string NativeId { get; }
 
+        string Visualization { get; }
+
+        string EnemyVisualization { get; }
+
         float Cd { get; }
 
         float Mod { get; }

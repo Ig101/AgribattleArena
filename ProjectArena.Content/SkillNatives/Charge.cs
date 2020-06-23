@@ -11,6 +11,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "charge",
+                "charge",
+                "charge",
                 new[] { "damage", "target", "movement", "control", "weapon", "direct", "physic" },
                 4,
                 4,

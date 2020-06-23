@@ -18,6 +18,10 @@ namespace ProjectArena.Engine.Objects
 
         public string[] Tags => native.Tags;
 
+        public string Visualization { get; set; }
+
+        public string EnemyVisualization { get; set; }
+
         public int SelfStrength { get; }
 
         public int SelfWillpower { get; }
@@ -70,10 +74,12 @@ namespace ProjectArena.Engine.Objects
 
         public List<TagSynergy> AttackModifiers => BuffManager.Attack;
 
-        public Actor(ISceneParentRef parent, IPlayerParentRef owner, Guid? externalId, ITileParentRef tempTile, float? z, ActorNative native, RoleModelNative roleModelNative)
+        public Actor(ISceneParentRef parent, IPlayerParentRef owner, Guid? externalId, ITileParentRef tempTile, string visualization, string enemyVisualization, float? z, ActorNative native, RoleModelNative roleModelNative)
             : base(parent, owner, tempTile, z ?? native.DefaultZ, new DamageModel(), native)
         {
             this.varManager = parent.VarManager;
+            this.Visualization = visualization ?? native.DefaultVisualization;
+            this.EnemyVisualization = enemyVisualization ?? native.DefaultEnemyVisualization;
             this.ExternalId = externalId;
             this.native = native;
             this.SelfStrength = roleModelNative.DefaultStrength;
@@ -85,10 +91,10 @@ namespace ProjectArena.Engine.Objects
             this.Skills = new List<Skill>();
             foreach (SkillNative skill in roleModelNative.Skills)
             {
-                Skills.Add(new Skill(this, skill, null, null, null, null));
+                Skills.Add(new Skill(this, skill, null, null, null, null, null, null));
             }
 
-            this.AttackingSkill = new Skill(this, roleModelNative.AttackingSkill, 0, null, null, null);
+            this.AttackingSkill = new Skill(this, roleModelNative.AttackingSkill, null, null, 0, null, null, null);
             this.BuffManager = new BuffManager(this);
             this.InitiativePosition += 1f / this.Initiative;
             this.DamageModel.SetupRoleModel(this);
@@ -171,9 +177,9 @@ namespace ProjectArena.Engine.Objects
             return skill;
         }
 
-        public Skill AddSkill(string native, float? cd, float? mod, int? cost, int? range)
+        public Skill AddSkill(string native, string visualization, string enemyVisualization, float? cd, float? mod, int? cost, int? range)
         {
-            return AddSkill(new Skill(this, Parent.NativeManager.GetSkillNative(native), cd, mod, cost, range));
+            return AddSkill(new Skill(this, Parent.NativeManager.GetSkillNative(native), visualization, enemyVisualization, cd, mod, cost, range));
         }
 
         public Skill RemoveSkill(Skill skill)

@@ -24,8 +24,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return strikeSyncDeclaration(tile.x, tile.y);
       },
-    },
-    alternativeForm: false
+    }
   },
   mistSlash: {
     name: 'Mist Slash',
@@ -37,8 +36,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return strikeSyncDeclaration(tile.x, tile.y);
       },
-    },
-    alternativeForm: false
+    }
   },
   magicMissle: {
     name: 'Magic missle',
@@ -50,8 +48,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return strikeSyncDeclaration(tile.x, tile.y);
       },
-    },
-    alternativeForm: false
+    }
   },
   charge: {
     name: 'Charge',
@@ -64,8 +61,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return chargeSyncDeclaration(issuer.x, issuer.y, tile.x, tile.y, issuer.visualization.char, issuer.visualization.color);
       },
-    },
-    alternativeForm: false
+    }
   },
   warden: {
     name: 'Warden',
@@ -77,8 +73,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return strikeSyncDeclaration(tile.x, tile.y);
       },
-    },
-    alternativeForm: false
+    }
   },
   shot: {
     name: 'Shot',
@@ -90,8 +85,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return strikeSyncDeclaration(tile.x, tile.y);
       },
-    },
-    alternativeForm: false
+    }
   },
   mistShot: {
     name: 'Mist Shot',
@@ -103,8 +97,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return strikeSyncDeclaration(tile.x, tile.y);
       },
-    },
-    alternativeForm: false
+    }
   },
   mistwalk: {
     name: 'Mistwalk',
@@ -114,8 +107,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return instantSyncDeclaration(issuer.x, issuer.y, tile.x, tile.y, {r: 100, g: 100, b: 255, a: 1});
       },
-    },
-    alternativeForm: false
+    }
   },
   powerplace: {
     name: 'Place of power',
@@ -128,8 +120,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return architectSummonSyncDeclaration(tile.x, tile.y, {r: 140, g: 140, b: 255, a: 1});
       }
-    },
-    alternativeForm: false
+    }
   },
   barrier: {
     name: 'Barrier',
@@ -141,8 +132,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return architectSummonSyncDeclaration(tile.x, tile.y, {r: 174, g: 92, b: 0, a: 1});
       }
-    },
-    alternativeForm: false
+    }
   },
   wand: {
     name: 'Wand',
@@ -154,8 +144,7 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return undirectDamageSyncDeclaration(tile.x, tile.y, '*', {r: 80, g: 220, b: 255, a: 1});
       },
-    },
-    alternativeForm: false
+    }
   },
   mistpact: {
     name: 'Mist pact',
@@ -167,10 +156,12 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return summonSyncDeclaration(tile.x, tile.y, { r: 135, g: 100, b: 255, a: 1 });
       },
-    },
-    alternativeForm: true,
-    enemyName: 'Mist pact',
-    enemyAction: {
+    }
+  },
+  mistsummon: {
+    name: 'Mist pact',
+    description: 'Summons lesser mist spawn that fights for you.',
+    action: {
       generateIssueDeclarations: (issuer, tile) => {
         return summonIssueAnimation(issuer.x, issuer.y, tile.x, tile.y, { r: 10, g: 10, b: 135, a: 1 }, { r: 6, g: 6, b: 16});
       },
@@ -189,17 +180,19 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return strikeSyncDeclaration(tile.x, tile.y);
       },
-    },
-    alternativeForm: true,
-    enemyName: 'Blood sphere',
-    enemyAction: {
+    }
+  },
+  mistsphere: {
+    name: 'Blood sphere',
+    description: 'Throws an infused with blood magic missle to the target that deals medium damage. Costs 10 health.',
+    action: {
       generateIssueDeclarations: (issuer, tile) => {
         return throwIssueDeclaration(issuer.x, issuer.y, tile.x, tile.y, '*', {r: 55, g: 55, b: 255});
       },
       generateSyncDeclarations: (issuer, tile) => {
         return strikeSyncDeclaration(tile.x, tile.y);
       },
-    },
+    }
   },
   offspring: {
     name: 'Offspring',
@@ -212,10 +205,13 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return summonSyncDeclaration(tile.x, tile.y, { r: 255, g: 0, b: 0, a: 1 });
       },
-    },
-    alternativeForm: true,
-    enemyName: 'Offspring',
-    enemyAction: {
+    }
+  },
+  mistoffspring: {
+    name: 'Offspring',
+    description: `Creates entity from caster\'s blood using 20% of health.
+      Can attack and sacrifice itself transferring all health to the target. Doesn\'t have intelligence by self.`,
+    action: {
       generateIssueDeclarations: (issuer, tile) => {
         return summonIssueAnimation(issuer.x, issuer.y, tile.x, tile.y, { r: 10, g: 10, b: 135, a: 1 }, { r: 6, g: 6, b: 16});
       },
@@ -233,9 +229,11 @@ export const skillNatives: { [id: string]: SkillNative } = {
         return instantSyncDeclaration(issuer.x, issuer.y, tile.x, tile.y, {r: 255, g: 0, b: 0, a: 1});
       },
     },
-    alternativeForm: true,
-    enemyName: 'Sacrifice',
-    enemyAction: {
+  },
+  mistsacrifice: {
+    name: 'Sacrifice',
+    description: 'Transfers all health to the target. Doesn\'t work on structures and mechanisms.',
+    action: {
       generateIssueDeclarations: undefined,
       generateSyncDeclarations: (issuer, tile) => {
         return instantSyncDeclaration(issuer.x, issuer.y, tile.x, tile.y, {r: 55, g: 55, b: 255, a: 1});
@@ -252,7 +250,6 @@ export const skillNatives: { [id: string]: SkillNative } = {
       generateSyncDeclarations: (issuer, tile) => {
         return buffSyncDeclaration(tile.x, tile.y, {r: 80, g: 220, b: 255, a: 1});
       },
-    },
-    alternativeForm: false
+    }
   }
 };

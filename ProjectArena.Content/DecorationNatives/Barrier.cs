@@ -9,6 +9,7 @@ namespace ProjectArena.Content.DecorationNatives
         {
             nativeManager.AddDecorationNative(
                 "barrier",
+                "barrier",
                 new string[] { "construction" },
                 new TagSynergy[]
                 {

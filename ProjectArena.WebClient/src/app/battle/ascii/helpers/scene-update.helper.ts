@@ -108,7 +108,7 @@ function getActorDifference(actor: Actor, syncActor: SyncActor, difference: Acto
 export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPlayerTeam: boolean, owner?: Player): ActorDifference {
   let difference: ActorDifference;
   if (actor.attackingSkill?.id !== syncActor.attackingSkill?.id) {
-    actor.attackingSkill = convertSkill(syncActor.attackingSkill, isCurrentPlayerTeam);
+    actor.attackingSkill = convertSkill(syncActor.attackingSkill);
   } else if (actor.attackingSkill) {
     synchronizeSkill(actor.attackingSkill, syncActor.attackingSkill);
   }
@@ -119,7 +119,7 @@ export function synchronizeActor(actor: Actor, syncActor: SyncActor, isCurrentPl
         synchronizeSkill(skill, x);
         return skill;
       } else {
-        return convertSkill(x, isCurrentPlayerTeam);
+        return convertSkill(x);
       }
     });
   }

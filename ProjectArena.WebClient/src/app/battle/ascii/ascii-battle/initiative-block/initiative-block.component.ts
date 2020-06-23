@@ -15,7 +15,7 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
   @Output() rightClick = new EventEmitter<{x: number, y: number}>();
 
   get timer() {
-    return this.battleStorageService.turnTime;
+    return this.battleStorageService.shownEnd ? undefined : this.battleStorageService.turnTime;
   }
 
   firstActor: InitiativePortrait;

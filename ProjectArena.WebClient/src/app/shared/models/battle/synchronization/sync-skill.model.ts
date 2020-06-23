@@ -3,7 +3,7 @@ import { Targets } from '../targets.model';
 export interface SyncSkill {
   id: number;
   range: number;
-  nativeId: string;
+  visualization: string;
   cd: number;
   cost: number;
   preparationTime: number;

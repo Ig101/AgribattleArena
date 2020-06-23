@@ -339,7 +339,7 @@ export class AsciiBattleAnimationsService {
           let attackingSkill = issuer.attackingSkill;
           if (!attackingSkill) {
             attackingSkill =
-              convertSkill(synchronizer.sync.changedActors.find(x => x.id === synchronizer.sync.actorId).attackingSkill, false);
+              convertSkill(synchronizer.sync.changedActors.find(x => x.id === synchronizer.sync.actorId).attackingSkill);
           }
           frames.push([]);
           if (!onlySecondPart && attackingSkill.action?.generateIssueDeclarations) {
@@ -374,7 +374,7 @@ export class AsciiBattleAnimationsService {
           if (!skill) {
             skill = convertSkill(synchronizer.sync.changedActors
               .find(x => x.id === synchronizer.sync.actorId).skills
-              .find(x => x.id === synchronizer.sync.skillActionId), false);
+              .find(x => x.id === synchronizer.sync.skillActionId));
           }
           if (skill) {
             if (!onlySecondPart) {

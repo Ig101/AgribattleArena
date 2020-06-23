@@ -10,6 +10,8 @@ namespace ProjectArena.Content.SkillNatives
         {
            nativeManager.AddSkillNative(
                 "barrier",
+                "barrier",
+                "barrier",
                 new[] { "target", "decoration", "magic", "alteration" },
                 4,
                 4,
@@ -22,7 +24,7 @@ namespace ProjectArena.Content.SkillNatives
                 false,
                 (scene, owner, targetTile, skill) =>
                 {
-                    scene.CreateDecoration(owner.Owner as Player, "barrier", targetTile, null, null, null, null);
+                    scene.CreateDecoration(owner.Owner as Player, "barrier", targetTile, null, null, null, null, null);
                 });
         }
     }

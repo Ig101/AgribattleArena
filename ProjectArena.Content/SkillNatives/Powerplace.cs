@@ -9,6 +9,8 @@ namespace ProjectArena.Content.SkillNatives
         {
            nativeManager.AddSkillNative(
                 "powerplace",
+                "powerplace",
+                "powerplace",
                 new[] { "target", "tile", "buff", "magic", "alteration" },
                 4,
                 6,

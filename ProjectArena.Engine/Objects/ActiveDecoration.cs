@@ -9,11 +9,14 @@ namespace ProjectArena.Engine.Objects
     {
         public new ActiveDecorationNative Native => (ActiveDecorationNative)base.Native;
 
+        public string Visualization { get; set; }
+
         public float Mod { get; set; }
 
-        public ActiveDecoration(ISceneParentRef parent, IPlayerParentRef owner, ITileParentRef tempTile, float? z, int? maxHealth, TagSynergy[] armor, ActiveDecorationNative native, float? mod)
+        public ActiveDecoration(ISceneParentRef parent, IPlayerParentRef owner, ITileParentRef tempTile, string visualization, float? z, int? maxHealth, TagSynergy[] armor, ActiveDecorationNative native, float? mod)
             : base(parent, owner, tempTile, z ?? native.DefaultZ, new DamageModel(maxHealth ?? native.DefaultHealth, armor ?? native.DefaultArmor), native)
         {
+            this.Visualization = visualization ?? native.DefaultVisualisation;
             this.Mod = mod ?? native.DefaultMod;
             this.InitiativePosition += 1;
         }

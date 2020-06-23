@@ -9,6 +9,8 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         string NativeId { get; }
 
+        string Visualization { get; }
+
         float Mod { get; }
 
         float InitiativePosition { get; }

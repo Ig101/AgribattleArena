@@ -11,6 +11,10 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public string NativeId { get; }
 
+        public string Visualization { get; }
+
+        public string EnemyVisualization { get; }
+
         public float Cd { get; }
 
         public float Mod { get; }
@@ -28,6 +32,8 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
         public Skill(Objects.Immaterial.Skill skill)
         {
             this.Id = skill.Id;
+            this.Visualization = skill.Visualization;
+            this.EnemyVisualization = skill.EnemyVisualization;
             this.Range = skill.Range;
             this.NativeId = skill.Native.Id;
             this.Cd = skill.Cd;

@@ -9,6 +9,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "sacrifice",
+                "sacrifice",
+                "mistsacrifice",
                 new[] { "target", "heal", "magic", "blood" },
                 1,
                 1,

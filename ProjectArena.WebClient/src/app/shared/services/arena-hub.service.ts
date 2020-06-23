@@ -177,27 +177,19 @@ export class ArenaHubService {
         };
       }
       for (const actor of synchronizer.changedActors) {
-        const actorNative = actorNatives[actor.nativeId];
+        const actorNative = actorNatives[actor.visualization];
         const owner = synchronizer.players.find(x => x.id === actor.ownerId);
-        loadingScene.tiles[actor.x][actor.y].char = currentPlayer.team === owner?.team ?
-          actorNative.visualization.char :
-          actorNative.enemyVisualization.char;
+        loadingScene.tiles[actor.x][actor.y].char = actorNative.visualization.char;
         loadingScene.tiles[actor.x][actor.y].color = heightImpact(actor.z, brightImpact(loadingScene.tiles[actor.x][actor.y].bright,
-          currentPlayer.team === owner?.team ?
-          actorNative.visualization.color :
-          actorNative.enemyVisualization.color));
+        actorNative.visualization.color));
       }
       for (const decoration of synchronizer.changedDecorations) {
-        const decorationNative = decorationNatives[decoration.nativeId];
+        const decorationNative = decorationNatives[decoration.visualization];
         const owner = synchronizer.players.find(x => x.id === decoration.ownerId);
-        loadingScene.tiles[decoration.x][decoration.y].char = currentPlayer.team === owner?.team ?
-          decorationNative.visualization.char :
-          decorationNative.enemyVisualization.char;
+        loadingScene.tiles[decoration.x][decoration.y].char = decorationNative.visualization.char;
         loadingScene.tiles[decoration.x][decoration.y].color = heightImpact(decoration.z,
           brightImpact(loadingScene.tiles[decoration.x][decoration.y].bright,
-          currentPlayer.team === owner?.team ?
-          decorationNative.visualization.color :
-          decorationNative.enemyVisualization.color));
+          decorationNative.visualization.color));
       }
       this.prepareForBattleNotifier.next(loadingScene);
       this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.StartGame, synchronizer);

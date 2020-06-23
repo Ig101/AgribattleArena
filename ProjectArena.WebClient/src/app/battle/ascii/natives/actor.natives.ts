@@ -7,10 +7,12 @@ export const actorNatives: {[id: string]: ActorNative} = {
     visualization: {
       char: '@',
       color: { r: 160, g: 160, b: 160, a: 1 }
-    },
-    enemyName: 'Spawn',
-    enemyDescription: 'Blue mist soldier',
-    enemyVisualization: {
+    }
+  },
+  spawn: {
+    name: 'Spawn',
+    description: 'Blue mist soldier',
+    visualization: {
       char: 'S',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
@@ -21,10 +23,12 @@ export const actorNatives: {[id: string]: ActorNative} = {
     visualization: {
       char: '@',
       color: { r: 165, g: 66, b: 0, a: 1 }
-    },
-    enemyName: 'Carver',
-    enemyDescription: 'Blue mist support',
-    enemyVisualization: {
+    }
+  },
+  carver: {
+    name: 'Carver',
+    description: 'Blue mist support',
+    visualization: {
       char: 'C',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
@@ -35,10 +39,12 @@ export const actorNatives: {[id: string]: ActorNative} = {
     visualization: {
       char: '@',
       color: { r: 255, g: 0, b: 0, a: 1 }
-    },
-    enemyName: 'Ritualist',
-    enemyDescription: 'Blue mist mage',
-    enemyVisualization: {
+    }
+  },
+  ritualist: {
+    name: 'Ritualist',
+    description: 'Blue mist mage',
+    visualization: {
       char: 'R',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
@@ -49,10 +55,12 @@ export const actorNatives: {[id: string]: ActorNative} = {
     visualization: {
       char: '@',
       color: { r: 255, g: 40, b: 255, a: 1 }
-    },
-    enemyName: 'Blacksmith',
-    enemyDescription: 'Blue mist support',
-    enemyVisualization: {
+    }
+  },
+  blacksmith: {
+    name: 'Blacksmith',
+    description: 'Blue mist support',
+    visualization: {
       char: 'B',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
@@ -63,10 +71,12 @@ export const actorNatives: {[id: string]: ActorNative} = {
     visualization: {
       char: '@',
       color: { r: 255, g: 132, b: 0, a: 1 }
-    },
-    enemyName: 'Fencer',
-    enemyDescription: 'Blue mist warrior',
-    enemyVisualization: {
+    }
+  },
+  fencer: {
+    name: 'Fencer',
+    description: 'Blue mist warrior',
+    visualization: {
       char: 'F',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
@@ -78,9 +88,11 @@ export const actorNatives: {[id: string]: ActorNative} = {
       char: '@',
       color: { r: 135, g: 100, b: 255, a: 1 }
     },
-    enemyName: 'Mage',
-    enemyDescription: 'Blue mist mage',
-    enemyVisualization: {
+  },
+  mage: {
+    name: 'Mage',
+    description: 'Blue mist mage',
+    visualization: {
       char: 'M',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
@@ -91,27 +103,31 @@ export const actorNatives: {[id: string]: ActorNative} = {
     visualization: {
       char: '@',
       color: { r: 0, g: 255, b: 0, a: 1 }
-    },
-    enemyName: 'Impaler',
-    enemyDescription: 'Blue mist warrior',
-    enemyVisualization: {
+    }
+  },
+  impaler: {
+    name: 'Impaler',
+    description: 'Blue mist warrior',
+    visualization: {
       char: 'I',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
   },
-  mistspawn: {
+  tamedspawn: {
     name: 'Tamed mistspawn',
     description: 'Lesser spawn of blue mist',
     visualization: {
       char: 's',
       color: { r: 135, g: 100, b: 255, a: 1 }
-    },
-    enemyName: 'Lesser mistspawn',
-    enemyDescription: 'Lesser spawn of blue miste',
-    enemyVisualization: {
+    }
+  },
+  lesserspawn: {
+    name: 'Lesser mistspawn',
+    description: 'Lesser spawn of blue miste',
+    visualization: {
       char: 's',
       color: { r: 55, g: 55, b: 255, a: 1 }
-    },
+    }
   },
   offspring: {
     name: 'Blood offspring',
@@ -119,12 +135,14 @@ export const actorNatives: {[id: string]: ActorNative} = {
     visualization: {
       char: 'o',
       color: { r: 255, g: 0, b: 0, a: 1 }
-    },
-    enemyName: 'Mist offspring',
-    enemyDescription: 'Living entity infused with blood',
-    enemyVisualization: {
+    }
+  },
+  mistoffspring: {
+    name: 'Mist offspring',
+    description: 'Living entity infused with mist',
+    visualization: {
       char: 'o',
       color: { r: 55, g: 55, b: 255, a: 1 }
-    },
+    }
   }
 };

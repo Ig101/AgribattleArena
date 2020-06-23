@@ -10,6 +10,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "warden",
+                "warden",
+                "warden",
                 new[] { "damage", "target", "physic", "ranged", "direct" },
                 3,
                 3,

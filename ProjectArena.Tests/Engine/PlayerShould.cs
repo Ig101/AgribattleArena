@@ -43,7 +43,7 @@ namespace ProjectArena.Tests.Engine
             Actor deadMan = (Actor)Scene.Tiles[tileX][2].TempObject;
             if (spawn)
             {
-                Scene.CreateActor(Scene.Players.ToArray()[0], "test_actor", "test_roleModel", Scene.Tiles[4][4], null);
+                Scene.CreateActor(Scene.Players.ToArray()[0], "test_actor", "test_roleModel", Scene.Tiles[4][4], null, null, null);
             }
 
             Scene.ActorAttack(Scene.TempTileObject.Id, tileX, 2);

@@ -20,6 +20,8 @@ namespace ProjectArena.Engine.Helpers
                 actor.NativeId,
                 new RoleModelNative(scene.NativeManager, null, actor.Strength, actor.Willpower, actor.Constitution, actor.Speed, actor.ActionPointsIncome, actor.AttackingSkillName, actor.SkillNames.ToArray()),
                 target,
+                null,
+                null,
                 z);
             if (actor.StartBuffs != null)
             {

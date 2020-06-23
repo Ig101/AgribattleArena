@@ -19,7 +19,7 @@ namespace ProjectArena.Tests.Engine
             Scene = SceneSamples.CreateSimpleScene(this.EventHandler, false);
             Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).Kill();
             Scene.ActorWait(Scene.TempTileObject.Id);
-            _decoration = Scene.CreateDecoration(Scene.Players.First(), "test_decoration", Scene.Tiles[4][4], null, null, null, null);
+            _decoration = Scene.CreateDecoration(Scene.Players.First(), "test_decoration", Scene.Tiles[4][4], null, null, null, null, null);
             SyncMessages.Clear();
         }
 

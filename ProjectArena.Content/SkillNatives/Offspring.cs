@@ -12,6 +12,8 @@ namespace ProjectArena.Content.SkillNatives
         {
             nativeManager.AddSkillNative(
                 "offspring",
+                "offspring",
+                "mistoffspring",
                 new[] { "target", "summon", "magic", "blood" },
                 1,
                 2,
@@ -43,6 +45,8 @@ namespace ProjectArena.Content.SkillNatives
                                 "sacrifice"
                             }),
                         targetTile,
+                        null,
+                        null,
                         null);
                     owner.Damage(mod * scene.VarManager.ConstitutionMod, skill.AggregatedTags);
                 });

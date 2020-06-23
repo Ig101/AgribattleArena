@@ -4,8 +4,4 @@ export interface SkillNative {
   name: string;
   description: string;
   action: TwoPhaseActionAnimation;
-
-  alternativeForm: boolean;
-  enemyName?: string;
-  enemyAction?: TwoPhaseActionAnimation;
 }

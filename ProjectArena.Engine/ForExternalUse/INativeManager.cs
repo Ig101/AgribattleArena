@@ -9,7 +9,7 @@ namespace ProjectArena.Engine.ForExternalUse
 {
     public interface INativeManager
     {
-        void AddActorNative(string id, string[] tags, float defaultZ, TagSynergy[] armor);
+        void AddActorNative(string id, string defaultVisualization, string defaultEnemyVisualization, string[] tags, float defaultZ, TagSynergy[] armor);
 
         void AddBuffNative(
             string id,
@@ -26,6 +26,7 @@ namespace ProjectArena.Engine.ForExternalUse
 
         void AddDecorationNative(
             string id,
+            string defaultVisualization,
             string[] tags,
             TagSynergy[] defaultArmor,
             int defaultHealth,
@@ -36,6 +37,7 @@ namespace ProjectArena.Engine.ForExternalUse
 
         void AddEffectNative(
             string id,
+            string defaultVisualization,
             string[] tags,
             float defaultZ,
             float? defaultDuration,
@@ -55,6 +57,8 @@ namespace ProjectArena.Engine.ForExternalUse
 
         void AddSkillNative(
             string id,
+            string defaultVisualization,
+            string defaultEnemyVisualization,
             string[] tags,
             int defaultRange,
             int defaultCost,
