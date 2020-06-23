@@ -37,6 +37,7 @@ let setupGameConnection (configuration: RawConfigurationWithStorageAndUser) =
         |> initializeHubConnection configuration
     configuration.Logger.LogInformation "Loading finished."
     {
+        LazyNeuralModels = configuration.LazyNeuralModels
         Logger = configuration.Logger
         Learning = configuration.Learning
         ApiHost = configuration.ApiHost

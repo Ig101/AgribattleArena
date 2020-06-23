@@ -20,6 +20,11 @@ namespace ProjectArena.Infrastructure.Mongo
             _operations = operationsCollection;
         }
 
+        public async Task<int> CountAsync(Expression<Func<T, bool>> filter, CancellationToken token = default)
+        {
+            return (int)await _collection.CountDocumentsAsync(filter, null, token);
+        }
+
         public async Task<T> GetOneAsync(Expression<Func<T, bool>> filter, CancellationToken token = default)
         {
             return await _collection.Find(filter).FirstOrDefaultAsync(token);
@@ -97,6 +102,11 @@ namespace ProjectArena.Infrastructure.Mongo
         public void Delete(Expression<Func<T, bool>> filter)
         {
             _operations.Enqueue(new DeleteOperation<T>(_collection, filter));
+        }
+
+        public void Delete(FilterDefinition<T> filter)
+        {
+            _operations.Enqueue(new DeleteFilterOperation<T>(_collection, filter));
         }
     }
 }

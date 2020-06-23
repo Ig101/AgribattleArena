@@ -6,3 +6,4 @@ type BotContext(connection:IMongoConnection) =
     inherit BaseMongoContext(connection)
 
     member this.NeuralModels = base.InitializeRepository<NeuralModel>();
+    member this.NeuralModelDefinitions = base.InitializeRepository<NeuralModelDefinition>();

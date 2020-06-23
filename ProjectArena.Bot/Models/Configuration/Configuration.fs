@@ -8,6 +8,7 @@ open Microsoft.Extensions.Logging
 type Configuration = {
     Logger: ILogger<unit>
     Learning: LearningConfiguration
+    LazyNeuralModels: bool
     User: UserConfiguration
     ApiHost: string
     Hub: HubConnection

@@ -5,68 +5,86 @@
     <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProjectArena.Infrastructure\ProjectArena.Infrastructure.csproj"/>
+    <ProjectReference Include="..\ProjectArena.Infrastructure\ProjectArena.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models/Dtos/TargetsDto.fs"/>
-    <Compile Include="Models/Dtos/SkillDto.fs"/>
-    <Compile Include="Models/Dtos/BuffDto.fs"/>
-    <Compile Include="Models/Dtos/ActorDto.fs"/>
-    <Compile Include="Models/Dtos/PlayerDto.fs"/>
-    <Compile Include="Models/Dtos/ActiveDecorationDto.fs"/>
-    <Compile Include="Models/Dtos/SpecEffectDto.fs"/>
-    <Compile Include="Models/Dtos/TileDto.fs"/>
-    <Compile Include="Models/Dtos/SynchronizerDto.fs"/>
-    <Compile Include="Models/Dtos/SignInRequestDto.fs"/>
-    <Compile Include="Models/Dtos/UserDto.fs"/>
-    <Compile Include="Models/States/Scene.fs"/>
-    <Compile Include="Models/States/SynchronizationAction.fs"/>
-    <Compile Include="Models/States/IncomingSynchronizationMessage.fs"/>
-    <Compile Include="Models/Configuration/LearningConfiguration.fs"/>
-    <Compile Include="Models/Configuration/ApiConfiguration.fs"/>
-    <Compile Include="Models/Configuration/UserConfiguration.fs"/>
-    <Compile Include="Models/Configuration/StorageConfiguration.fs"/>
-    <Compile Include="Models/Configuration/RawConfiguration.fs"/>
-    <Compile Include="Models/Configuration/RawConfigurationWithStorageConnection.fs"/>
-    <Compile Include="Models/Configuration/RawConfigurationWithStorageAndUser.fs"/>
-    <Compile Include="Helpers/AsyncHelper.fs"/>
-    <Compile Include="Helpers/MappingHelper.fs"/>
-    <Compile Include="Domain/GameConnection/SignalRConnection.fs"/>
-    <Compile Include="Domain/GameConnection/GameApi.fs"/>
-    <Compile Include="Domain/BotMongoContext/Entities/NeuralModel.fs"/>
-    <Compile Include="Domain/BotMongoContext/BotContext.fs"/>
-    <Compile Include="Domain/SceneStateWorker/SceneStateWorker.fs"/>
-    <Compile Include="Models/Configuration/Configuration.fs"/>
-    <Compile Include="Processors/NeuralProcessor.fs"/>
-    <Compile Include="Processors/SceneProcessor.fs"/>
-    <Compile Include="Processors/SelectionProcessor.fs"/>
-    <Compile Include="Processors/SceneCreationProcessor.fs"/>
-    <Compile Include="Processors/BreedingProcessor.fs"/>
-    <Compile Include="Processors/LearningProcessor.fs"/>
-    <Compile Include="Processors/ExtraProcessor.fs"/>
-    <Compile Include="Processors/GameConnectionProcessor.fs"/>
-    <Compile Include="Processors/AuthorizationProcessor.fs"/>
-    <Compile Include="Processors/StorageSetupProcessor.fs"/>
-    <Compile Include="Processors/ConfigurationProcessor.fs"/>
-    <Compile Include="Program.fs"/>
-    <Content Include="appsettings.json"/>
-    <Content Include="appsettings.*.json"/>
+    <Compile Include="Models/Dtos/TargetsDto.fs" />
+    <Compile Include="Models/Dtos/SkillDto.fs" />
+    <Compile Include="Models/Dtos/BuffDto.fs" />
+    <Compile Include="Models/Dtos/ActorDto.fs" />
+    <Compile Include="Models/Dtos/PlayerDto.fs" />
+    <Compile Include="Models/Dtos/ActiveDecorationDto.fs" />
+    <Compile Include="Models/Dtos/SpecEffectDto.fs" />
+    <Compile Include="Models/Dtos/TileDto.fs" />
+    <Compile Include="Models/Dtos/SynchronizerDto.fs" />
+    <Compile Include="Models/Dtos/SignInRequestDto.fs" />
+    <Compile Include="Models/Dtos/UserDto.fs" />
+    <Compile Include="Models/States/Scene.fs" />
+    <Compile Include="Models/States/SynchronizationAction.fs" />
+    <Compile Include="Models/States/IncomingSynchronizationMessage.fs" />
+    <Compile Include="Models/Neural/ActionNeuronType.fs" />
+    <Compile Include="Models/Neural/MagnifyingActionNeuronType.fs" />
+    <Compile Include="Models/Neural/CellNeuronType.fs" />
+    <Compile Include="Models/Neural/KeyNeuronType.fs" />
+    <Compile Include="Models/Neural/SelfNeuronType.fs" />
+    <Compile Include="Models/Neural/Neuron.fs" />
+    <Compile Include="Helpers/AsyncHelper.fs" />
+    <Compile Include="Helpers/MappingHelper.fs" />
+    <Compile Include="Helpers/Neural/CellsHelper.fs" />
+    <Compile Include="Helpers/Neural/KeyHelper.fs" />
+    <Compile Include="Helpers/Neural/OutputHelper.fs" />
+    <Compile Include="Helpers/Neural/SelfHelper.fs" />
+    <Compile Include="Helpers/Neural/NeuralHelper.fs" />
+    <Compile Include="Domain/GameConnection/SignalRConnection.fs" />
+    <Compile Include="Domain/GameConnection/GameApi.fs" />
+    <Compile Include="Domain/BotMongoContext/EntityModels/NeuralBond.fs" />
+    <Compile Include="Domain/BotMongoContext/EntityModels/NeuralOutputGroup.fs" />
+    <Compile Include="Domain/BotMongoContext/EntityModels/NeuralLayer.fs" />
+    <Compile Include="Domain/BotMongoContext/EntityModels/NeuralNetwork.fs" />
+    <Compile Include="Domain/BotMongoContext/Entities/NeuralModel.fs" />
+    <Compile Include="Domain/BotMongoContext/Entities/NeuralModelDefinition.fs" />
+    <Compile Include="Domain/BotMongoContext/BotContext.fs" />
+    <Compile Include="Domain/SceneStateWorker/SceneStateWorker.fs" />
+    <Compile Include="Models/Configuration/LearningConfiguration.fs" />
+    <Compile Include="Models/Configuration/ApiConfiguration.fs" />
+    <Compile Include="Models/Configuration/UserConfiguration.fs" />
+    <Compile Include="Models/Configuration/StorageConfiguration.fs" />
+    <Compile Include="Models/Configuration/RawConfiguration.fs" />
+    <Compile Include="Models/Configuration/RawConfigurationWithStorageConnection.fs" />
+    <Compile Include="Models/Configuration/RawConfigurationWithStorageAndUser.fs" />
+    <Compile Include="Models/Configuration/Configuration.fs" />
+    <Compile Include="Functors/NeuralModelContainer.fs" />
+    <Compile Include="Processors/NeuralProcessor.fs" />
+    <Compile Include="Processors/NeuralCreationProcessor.fs" />
+    <Compile Include="Processors/SceneProcessor.fs" />
+    <Compile Include="Processors/SelectionProcessor.fs" />
+    <Compile Include="Processors/SceneCreationProcessor.fs" />
+    <Compile Include="Processors/BreedingProcessor.fs" />
+    <Compile Include="Processors/LearningProcessor.fs" />
+    <Compile Include="Processors/ExtraProcessor.fs" />
+    <Compile Include="Processors/GameConnectionProcessor.fs" />
+    <Compile Include="Processors/AuthorizationProcessor.fs" />
+    <Compile Include="Processors/StorageSetupProcessor.fs" />
+    <Compile Include="Processors/ConfigurationProcessor.fs" />
+    <Compile Include="Program.fs" />
+    <Content Include="appsettings.json" />
+    <Content Include="appsettings.*.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.7.2"/>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
-    <PackageReference Include="FSharp.Data.Json" Version="1.0.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.5"/>
-    <PackageReference Include="Http.fs" Version="5.4.0"/>
-    <PackageReference Include="FSharp.Control.AsyncSeq" Version="2.0.24"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.5"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.5"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.5"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.5"/>
-    <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.1.3"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.5"/>
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.5"/>
-    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1"/>
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
+    <PackageReference Include="FSharp.Core" Version="4.7.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="FSharp.Data.Json" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.5" />
+    <PackageReference Include="Http.fs" Version="5.4.0" />
+    <PackageReference Include="FSharp.Control.AsyncSeq" Version="2.0.24" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.5" />
+    <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.5" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
   </ItemGroup>
 </Project>

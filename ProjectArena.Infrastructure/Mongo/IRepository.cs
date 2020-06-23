@@ -9,6 +9,8 @@ namespace ProjectArena.Infrastructure.Mongo
 {
     public interface IRepository<T>
     {
+        Task<int> CountAsync(Expression<Func<T, bool>> filter, CancellationToken token = default);
+
         Task<T> GetOneAsync(Expression<Func<T, bool>> filter, CancellationToken token = default);
 
         Task<Tprojection> GetOneAsync<Tprojection>(Expression<Func<T, bool>> filter, Expression<Func<T, Tprojection>> projection, CancellationToken token = default);
@@ -38,5 +40,7 @@ namespace ProjectArena.Infrastructure.Mongo
         void ReplaceOne(Expression<Func<T, bool>> filter, T obj, bool isUpsert = false);
 
         void Delete(Expression<Func<T, bool>> filter);
+
+        void Delete(FilterDefinition<T> filter);
     }
 }

@@ -6,8 +6,9 @@ open ProjectArena.Bot.Models.Configuration
 open Microsoft.Extensions.Options
 open Microsoft.Extensions.Logging
 open ProjectArena.Bot.Domain.BotMongoContext
-open ProjectArena.Bot.Processors.NeuralProcessor
+open ProjectArena.Bot.Processors.NeuralCreationProcessor
 open ProjectArena.Bot.Domain.BotMongoContext.Entities
+open System
 
 let private setConnectionStringSettings (configuration: StorageConfiguration) =
     let connectionSettings = MongoConnectionSettings();
@@ -30,22 +31,23 @@ let private setStorageConnection variables =
     MongoConnection (Assembly.GetExecutingAssembly(), connectionSettings, provider) :> IMongoConnection
 
 let private initializeDefaultModels (configuration: RawConfiguration) connection: IMongoConnection =
-    let insertNewModels (context: BotContext) (models: NeuralModel seq) =
-        match models |> Seq.length with
-        | 0 -> ()
-        | _ -> 
-            context.NeuralModels.Insert models
-            context.ApplyChangesAsync().Wait()
-
     configuration.Logger.LogInformation "Loading default models..."
+    let random = Random()
     let context = BotContext(connection)
     let modelsAmount =
-        context.NeuralModels.GetAsync(fun _ -> true).Result
-        |> Seq.length
+        context.NeuralModelDefinitions.CountAsync(fun m -> m.Key).Result
 
+    printfn "%d" configuration.Learning.SuccessfulModelsAmount;
     [1..configuration.Learning.SuccessfulModelsAmount - modelsAmount]
-    |> Seq.map(fun _ -> initializeRandomNeuralModel())
-    |> insertNewModels context
+    |> List.map(fun _ ->
+        let model = initializeRandomNeuralModel random configuration.Learning
+        context.NeuralModels.InsertOne model
+        context.NeuralModelDefinitions.InsertOne {
+            Id = model.Id
+            Key = true
+        }
+        context.ApplyChangesAsync().Wait())
+    |> ignore
 
     connection
 
@@ -56,6 +58,7 @@ let setupStorage (configuration: RawConfiguration) =
         |> initializeDefaultModels configuration
     {
         RawConfigurationWithStorageConnection.Learning = configuration.Learning
+        LazyNeuralModels = configuration.LazyNeuralModels
         Logger = configuration.Logger
         Api = configuration.Api
         Storage = mongoConnection

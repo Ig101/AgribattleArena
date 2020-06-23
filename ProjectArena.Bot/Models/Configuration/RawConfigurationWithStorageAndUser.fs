@@ -5,6 +5,7 @@ open Microsoft.Extensions.Logging
 type RawConfigurationWithStorageAndUser = {
     Logger: ILogger<unit>
     Learning: LearningConfiguration
+    LazyNeuralModels: bool
     User: UserConfiguration
     ApiHost: string
     HubPath: string

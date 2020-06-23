@@ -8,8 +8,9 @@ open ProjectArena.Infrastructure.Mongo
 open ProjectArena.Bot.Domain.BotMongoContext
 open ProjectArena.Bot.Processors.SceneProcessor
 open Microsoft.Extensions.Logging
+open ProjectArena.Bot.Functors
 
-let processCreatedSceneSequence (configuration: Configuration) (model: NeuralModel, spareModel: NeuralModel) (sequence: AsyncSeq<IncomingSynchronizationMessage>) = async {
+let processCreatedSceneSequence (configuration: Configuration) (model: NeuralModelContainer, spareModel: NeuralModelContainer) (sequence: AsyncSeq<IncomingSynchronizationMessage>) = async {
     let! performance =
         sequence
         |> AsyncSeq.foldAsync (sceneMessageProcessor configuration (model, spareModel)) None
@@ -17,17 +18,18 @@ let processCreatedSceneSequence (configuration: Configuration) (model: NeuralMod
     return (model, performance)
 }
 
-let getRandomNeuralModel (connection: IMongoConnection) =
-    let context = BotContext connection
-    context.NeuralModels.GetRandomOneAsync(fun _ -> true)
+let getRandomNeuralModel (configuration: Configuration) =
+    let context = BotContext configuration.Storage
+    context.NeuralModelDefinitions.GetRandomOneAsync(fun m -> m.Key)
     |> Async.AwaitTask
+    |> Async.map (fun result -> NeuralModelContainer.Pack configuration result.Id)
 
-let processScene (configuration: Configuration) (model: NeuralModel) = async {
-    let! spareNeuralModel = getRandomNeuralModel configuration.Storage
+let processScene (configuration: Configuration) (model: NeuralModelContainer) = async {
+    let! spareNeuralModel = getRandomNeuralModel configuration
     if (configuration.Learning.IsLearning) then
         configuration.Logger.LogInformation "Enqueueing..."
         do! enqueue configuration.Logger configuration.User.AuthCookie configuration.ApiHost
-    configuration.Logger.LogInformation (sprintf "Waiting for new scene for learning. Model id: %s" model.Id)
+    configuration.Logger.LogInformation (sprintf "Waiting for new scene for learning. Model id: %s" (model.GetId()))
     let! newSceneSequence = configuration.Worker.GetNextNewScene()
     let! result = processCreatedSceneSequence configuration (model, spareNeuralModel) newSceneSequence
     return result

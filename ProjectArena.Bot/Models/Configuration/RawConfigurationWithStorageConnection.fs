@@ -5,6 +5,7 @@ open Microsoft.Extensions.Logging
 type RawConfigurationWithStorageConnection = {
     Logger: ILogger<unit>
     Learning: LearningConfiguration
+    LazyNeuralModels: bool
     Api: ApiConfiguration
     Storage: IMongoConnection
 }

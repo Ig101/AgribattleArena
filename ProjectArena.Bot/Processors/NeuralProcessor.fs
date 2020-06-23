@@ -1,18 +1,18 @@
 module ProjectArena.Bot.Processors.NeuralProcessor
 open System
 open ProjectArena.Bot.Domain.BotMongoContext.Entities
+open ProjectArena.Bot.Domain.BotMongoContext.EntityModels
 open ProjectArena.Bot.Models.States
 open Microsoft.AspNetCore.SignalR.Client
 open ProjectArena.Bot.Domain.GameConnection.SignalRConnection
+open ProjectArena.Bot.Models.Configuration
+open ProjectArena.Bot.Helpers.Neural.NeuralHelper
+open ProjectArena.Bot.Domain.BotMongoContext
+open ProjectArena.Bot.Functors
 
-let initializeRandomNeuralModel() =
-    // TODO Setup neural models with random
-    {
-        NeuralModel.Id = Guid.NewGuid().ToString()
-    }
-
-let actOnScene (hub: HubConnection) (model: NeuralModel, scene: Scene) =
+let actOnScene (configuration: Configuration) (model: NeuralModelContainer, scene: Scene) = async {
+    let! workingModel = model.Unpack()
     scene.TempActor
-    |> Option.map(fun a -> orderWait hub (scene.Id, a.Id))
+    |> Option.map(fun a -> orderWait configuration.Hub (scene.Id, a.Id))
     |> ignore
-    
+}

@@ -7,7 +7,11 @@ type LearningConfiguration = {
     LearningMutationProbability: float
     WorkingMutationProbability: float
     TimeTillSurrender: float32
+
     VictoryPerformanceCoefficient: float
     EnemyPowerPerformanceCoefficient: float
     PlayerPowerPerformanceCoefficient: float
+    
+    MagnifyingHiddenNeuronsCount: int
+    CommandHiddenNeuronsCount: int
 }

@@ -7,6 +7,7 @@ open ProjectArena.Bot.Models.Configuration
 open ProjectArena.Bot.Processors.NeuralProcessor
 open ProjectArena.Infrastructure.Enums
 open Microsoft.Extensions.Logging
+open ProjectArena.Bot.Functors
 
 let private findActor (actors: ActorDto seq) (idOpt: int option) =
     idOpt |> Option.bind (fun id -> actors |> Seq.tryFind (fun a -> a.Id = id))
@@ -130,23 +131,25 @@ let private leaveIfTooLong (configuration: Configuration) (message: IncomingSync
         None
     | _ -> None
 
-let private chooseModel (userId: string) (model: NeuralModel, spareModel: NeuralModel) (scene: Scene) =
+let private chooseModel (userId: string) (model, spareModel) (scene: Scene) =
     let index = scene.Players |> Seq.filter (fun p -> p.UserId = userId) |> Seq.findIndex (fun p -> p.Id = scene.TempActor.Value.OwnerId.Value)
     match index with
     | 0 -> (model, scene)
     | _ -> (spareModel, scene)
 
-let sceneMessageProcessor (configuration: Configuration) (model: NeuralModel, spareModel: NeuralModel) (sceneOpt: Scene option) (message: IncomingSynchronizationMessage ) = async {
+let sceneMessageProcessor (configuration: Configuration) (model: NeuralModelContainer, spareModel: NeuralModelContainer) (sceneOpt: Scene option) (message: IncomingSynchronizationMessage ) = async {
     let! newSceneOpt =
         sceneOpt
-        |> tryMergeScene configuration message.Synchronizer;
-    newSceneOpt
-    |> Option.bind (chooseMeaningfulActionsOnly message)
-    |> Option.bind (tryGetActingModel configuration.User.UserId)
-    |> Option.bind (leaveIfTooLong configuration message)
-    |> Option.map (chooseModel configuration.User.UserId (model, spareModel))
-    |> Option.map (actOnScene configuration.Hub)
-    |> ignore
+        |> tryMergeScene configuration message.Synchronizer
+    let actionModelOpt = 
+        newSceneOpt
+        |> Option.bind (chooseMeaningfulActionsOnly message)
+        |> Option.bind (tryGetActingModel configuration.User.UserId)
+        |> Option.bind (leaveIfTooLong configuration message)
+        |> Option.map (chooseModel configuration.User.UserId (model, spareModel))
+    match actionModelOpt with
+    | Some actionModel -> do! actOnScene configuration actionModel
+    | None -> ()
     match newSceneOpt with
     | None -> return sceneOpt
     | _ -> return newSceneOpt

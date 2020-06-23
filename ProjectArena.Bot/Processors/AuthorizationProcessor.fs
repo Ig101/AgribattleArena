@@ -25,6 +25,7 @@ let setupAuthorization (configuration: RawConfigurationWithStorageConnection) =
         authorize configuration
         |> getUserId configuration
     {
+        LazyNeuralModels = configuration.LazyNeuralModels
         Logger = configuration.Logger
         Learning = configuration.Learning
         ApiHost = configuration.Api.Host
