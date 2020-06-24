@@ -164,25 +164,24 @@ let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene opti
     let calculatePlayerPowerPerformance (scene: Scene, performance: float, playerId: string) =
         let newPerformance =
             scene.Actors
-            |> Seq.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = playerId)
-            |> Seq.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
+            |> Seq.toList
+            |> List.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = playerId)
+            |> List.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
             |> fun v -> performance + configuration.Learning.PlayerPowerPerformanceCoefficient * (v / 6.0)
         (scene, newPerformance, playerId)
     let calculateEnemyPowerPerformance (scene: Scene, performance: float, playerId: string) =
-        let opponent = scene.Players |> Seq.find (fun p -> p.Id <> playerId)
+        let opponent = scene.Players |> Seq.toList |> List.find (fun p -> p.Id <> playerId)
         let newPerformance =
             scene.Actors
-            |> Seq.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = opponent.Id)
-            |> Seq.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
+            |> Seq.toList
+            |> List.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = opponent.Id)
+            |> List.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
             |> fun v -> performance + configuration.Learning.PlayerPowerPerformanceCoefficient * (1.0 - v / 6.0)
-        (scene, newPerformance, playerId)
+        newPerformance
     let calculatePerformance (scene: Scene) =
-        let _, performance, _ =
-            calculateVictoryPerformance (scene, 0.0)
-            |> calculatePlayerPowerPerformance
-            |> calculateEnemyPowerPerformance
-        configuration.Logger.LogInformation (sprintf "Finished scene %A with performance %A" scene.Id performance)
-        performance
+        calculateVictoryPerformance (scene, 0.0)
+        |> calculatePlayerPowerPerformance
+        |> calculateEnemyPowerPerformance
     match sceneOpt with
     | Some scene -> calculatePerformance scene
     | None -> 0.0

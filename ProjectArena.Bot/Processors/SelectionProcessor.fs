@@ -7,7 +7,7 @@ open Microsoft.Extensions.Logging
 let select (configuration: Configuration) (modelIdsWithPerformance: (NeuralModelContainer * float) seq): NeuralModelContainer seq =
     let _, maxScore = modelIdsWithPerformance |> Seq.maxBy (fun (_, v) -> v)
     let averageScore = modelIdsWithPerformance |> Seq.averageBy (fun (_, v) -> v)
-    configuration.Logger.LogInformation (sprintf "Selection... Max performance: %f. Average performance: %f" maxScore averageScore)
+    configuration.Logger.LogInformation (sprintf "Selection... Max performance: %f. Average performance: %f. All models: %A" maxScore averageScore modelIdsWithPerformance)
     modelIdsWithPerformance
     |> Seq.sortByDescending (fun (_, key) -> key)
     |> Seq.take (configuration.Learning.SuccessfulModelsAmount)

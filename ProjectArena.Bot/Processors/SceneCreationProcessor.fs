@@ -11,10 +11,10 @@ open Microsoft.Extensions.Logging
 open ProjectArena.Bot.Functors
 
 let processCreatedSceneSequence (configuration: Configuration) (model: NeuralModelContainer, spareModel: NeuralModelContainer) (sequence: AsyncSeq<IncomingSynchronizationMessage>) = async {
-    let! performance =
+    let! result =
         sequence
         |> AsyncSeq.foldAsync (sceneMessageProcessor configuration (model, spareModel)) None
-        |> Async.map (tryCalculatePerformance configuration)
+    let performance = result |> tryCalculatePerformance configuration
     return (model, performance)
 }
 

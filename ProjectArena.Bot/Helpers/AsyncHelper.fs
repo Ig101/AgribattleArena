@@ -3,13 +3,13 @@ open System
 open System.Threading.Tasks
 open System.Threading
 
-let processSequenceAsynchronously (maxTasks: int) (func: 'a -> Async<'b>) (sequence: 'a seq)  : Async<'b seq> = async {
+let processSequenceAsynchronously (maxTasks: int) (func: 'a -> Async<'b>) (sequence: 'a seq)  : Async<'b list> = async {
     let mutable queue = sequence |> Seq.toList
     let mutable hasTasksToProcess = true
-    let mutable tasks = []
+    let mutable tasks: Task<'b> list = []
+    let mutable results = []
     while hasTasksToProcess do
-        let unfinishedTasks = tasks |> List.filter (fun (t: Task<'b>) -> not t.IsCompleted)
-        let neededCount = maxTasks - unfinishedTasks.Length
+        let neededCount = maxTasks - tasks.Length
         let newTasksFromQueue = match neededCount with
                                 | c when c < queue.Length -> queue |> List.take c
                                 | _ ->
@@ -20,9 +20,11 @@ let processSequenceAsynchronously (maxTasks: int) (func: 'a -> Async<'b>) (seque
             newTasksFromQueue
             |> List.map (func >> Async.StartAsTask)
         tasks <- tasks |> List.append startedTasks
-        do! Task.WhenAny tasks
-    let! results =
+        do! Task.WhenAny tasks |> Async.AwaitTask |> Async.Ignore
+        results <- tasks |> List.filter (fun t -> t.IsCompleted) |> List.map (fun t -> t.Result) |> List.append results
+        tasks <- tasks |> List.filter (fun t -> not t.IsCompleted)
+    let! remainedResults =
         Task.WhenAll tasks
         |> Async.AwaitTask
-    return results |> Seq.ofArray
+    return remainedResults |> Seq.append results |> Seq.toList
 }

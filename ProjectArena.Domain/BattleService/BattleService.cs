@@ -32,8 +32,8 @@ namespace ProjectArena.Domain.BattleService
 
         private readonly object _locker = new object();
         private readonly IServiceProvider _serviceProvider;
-        private readonly IList<IScene> _scenes;
         private readonly Random _random;
+        private IEnumerable<IScene> _scenes;
         private INativeManager _nativeManager;
 
         public BattleService(IServiceProvider serviceProvider)
@@ -212,7 +212,7 @@ namespace ProjectArena.Domain.BattleService
             var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), SynchronizationInfoEventHandler);
             lock (_locker)
             {
-                _scenes.Add(scene);
+                _scenes = _scenes.Append(scene).ToList();
             }
         }
 
@@ -258,32 +258,19 @@ namespace ProjectArena.Domain.BattleService
         {
             lock (_locker)
             {
-                for (int i = 0; i < _scenes.Count; i++)
+                var newScenes = _scenes
+                .Where(scene =>
                 {
-                    _scenes[i].UpdateTime((float)seconds);
-                    if (!_scenes[i].IsActive)
-                    {
-                        _scenes.RemoveAt(i);
-                        i--;
-                    }
-                }
+                    scene.UpdateTime((float)seconds);
+                    return scene.IsActive;
+                })
+                .ToList();
             }
         }
 
         public bool IsUserInBattle(string userId)
         {
-            lock (_locker)
-            {
-                foreach (var scene in _scenes)
-                {
-                    if (scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return _scenes.Any(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
         }
 
         private async Task PayRewardAsync(RewardDto reward, string userId)
@@ -303,13 +290,10 @@ namespace ProjectArena.Domain.BattleService
         public SynchronizerDto GetUserSynchronizationInfo(string userId, Guid? sceneId)
         {
             IScene scene;
-            lock (_locker)
-            {
-                scene = _scenes
-                    .FirstOrDefault(scene => scene.IsActive &&
-                        (sceneId == null || sceneId == scene.Id) &&
-                        scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
-            }
+            scene = _scenes
+                .FirstOrDefault(scene => scene.IsActive &&
+                    (sceneId == null || sceneId == scene.Id) &&
+                    scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
 
             if (scene == null)
             {
@@ -324,27 +308,21 @@ namespace ProjectArena.Domain.BattleService
 
         public IEnumerable<SynchronizerDto> GetAllUserSynchronizationInfos(string userId)
         {
-            lock (_locker)
-            {
-                return _scenes
-                    .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
-                    .Select(scene =>
-                    {
-                        var player = scene.ShortPlayers.First(x => x.UserId == userId);
-                        var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
-                        BattleHelper.CalculateReward(ref synchronizer, scene, player.Id);
-                        return synchronizer;
-                    })
-                    .ToList();
-            }
+            return _scenes
+                .Where(scene => scene.IsActive && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null)
+                .Select(scene =>
+                {
+                    var player = scene.ShortPlayers.First(x => x.UserId == userId);
+                    var synchronizer = BattleHelper.GetFullSynchronizationData(scene, userId);
+                    BattleHelper.CalculateReward(ref synchronizer, scene, player.Id);
+                    return synchronizer;
+                })
+                .ToList();
         }
 
         public IScene GetUserScene(string userId, Guid sceneId)
         {
-            lock (_locker)
-            {
-                return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
-            }
+            return _scenes.FirstOrDefault(scene => scene.IsActive && sceneId == scene.Id && scene.ShortPlayers.FirstOrDefault(x => x.UserId == userId && !x.Left) != null);
         }
 
         public bool LeaveScene(string userId, Guid sceneId)
