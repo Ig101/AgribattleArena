@@ -6,6 +6,8 @@
 
         public int Range { get; set; }
 
+        public string NativeId { get; set; }
+
         public string Visualization { get; set; }
 
         public float Cd { get; set; }

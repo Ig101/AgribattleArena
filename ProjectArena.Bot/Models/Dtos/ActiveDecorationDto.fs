@@ -2,6 +2,7 @@ namespace ProjectArena.Bot.Models.Dtos
 
 type ActiveDecorationDto = {
     Id: int
+    NativeId: string
     Visualization: string
     InitiativePosition: float32
     Health: float32 option

@@ -15,6 +15,7 @@ let private mapSkill (skill: ProjectArena.Infrastructure.Models.Battle.Synchroni
     {
         SkillDto.Id = skill.Id
         Range = skill.Range
+        NativeId = skill.NativeId
         Visualization = skill.Visualization
         Cd = skill.Cd
         Cost = skill.Cost
@@ -25,7 +26,7 @@ let private mapSkill (skill: ProjectArena.Infrastructure.Models.Battle.Synchroni
             NotAllies = skill.AvailableTargets.NotAllies
             Bearable = skill.AvailableTargets.Bearable
             Unbearable = skill.AvailableTargets.Unbearable
-            Decoration = skill.AvailableTargets.Decorations
+            Decorations = skill.AvailableTargets.Decorations
         }
         OnlyVisibleTargets = skill.OnlyVisibleTargets
     }
@@ -41,6 +42,7 @@ let private mapActor (actor: ProjectArena.Infrastructure.Models.Battle.Synchroni
     {
         ActorDto.Id = actor.Id
         ExternalId = actor.ExternalId |> Option.ofNullable
+        NativeId = actor.NativeId
         Visualization = actor.Visualization
         AttackingSkill = actor.AttackingSkill |> Option.ofObj |> Option.map mapSkill
         Skills = actor.Skills |> Seq.map mapSkill |> Seq.toList
@@ -61,6 +63,7 @@ let private mapActor (actor: ProjectArena.Infrastructure.Models.Battle.Synchroni
 let private mapDecoration (decoration: ProjectArena.Infrastructure.Models.Battle.Synchronization.ActiveDecorationDto) =
     {
         ActiveDecorationDto.Id = decoration.Id
+        NativeId = decoration.NativeId
         Visualization = decoration.Visualization
         InitiativePosition = decoration.InitiativePosition
         Health = decoration.Health |> Option.ofNullable
@@ -81,6 +84,7 @@ let private mapEffect (effect: ProjectArena.Infrastructure.Models.Battle.Synchro
         Y = effect.Y
         Z = effect.Z
         Duration = effect.Duration |> Option.ofNullable
+        NativeId = effect.NativeId
         Visualization = effect.Visualization
     }
 

@@ -6,5 +6,5 @@ type TargetsDto = {
     NotAllies: bool
     Bearable: bool
     Unbearable: bool
-    Decoration: bool
+    Decorations: bool
 }

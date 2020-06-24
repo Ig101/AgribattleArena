@@ -9,6 +9,8 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public Guid? ExternalId { get; set; }
 
+        public string NativeId { get; set; }
+
         public string Visualization { get; set; }
 
         public SkillDto AttackingSkill { get; set; }

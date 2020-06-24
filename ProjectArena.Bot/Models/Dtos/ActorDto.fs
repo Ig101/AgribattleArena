@@ -4,6 +4,7 @@ open System
 type ActorDto = {
     Id: int
     ExternalId: Guid option
+    NativeId: string
     Visualization: string
     AttackingSkill: SkillDto option
     Skills: SkillDto seq

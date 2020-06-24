@@ -8,5 +8,6 @@ type SpecEffectDto = {
     Y: int
     Z: float32
     Duration: float32 option
+    NativeId: string
     Visualization: string
 }

@@ -8,7 +8,3 @@ type SelfNeuronType =
     | Mobile
     | Tough
     | ActionPoints
-    | Ranger
-    | Summoner
-    | Buffer
-    | Melee

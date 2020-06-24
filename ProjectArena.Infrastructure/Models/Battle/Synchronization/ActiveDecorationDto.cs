@@ -6,6 +6,8 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
     {
         public int Id { get; set; }
 
+        public string NativeId { get; set; }
+
         public string Visualization { get; set; }
 
         public float InitiativePosition { get; set; }

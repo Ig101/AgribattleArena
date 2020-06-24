@@ -21,26 +21,26 @@ let private skillsWithShortNames =
         "wa", "warden"
     ] |> Map.ofList
 
-let convertCommandNeuronToAction (neuron: Neuron) =
+let convertCommandNeuronToAction (shiftX: int, shiftY: int) (neuron: Neuron) =
     let typeSymbol = neuron.Name.[0]
     match typeSymbol with
     | 'o' ->
-        let x = Int32.Parse (neuron.Name.Substring (1, 1))
-        let y = Int32.Parse (neuron.Name.Substring (2, 1))
+        let x = Int32.Parse (neuron.Name.Substring (1, 1)) + shiftX
+        let y = Int32.Parse (neuron.Name.Substring (2, 1)) + shiftY
         let command = neuron.Name.Substring 3
         match command with
-        | "m" -> Move (x, y)
-        | _ -> Cast (skillsWithShortNames.[command], x, y)
+        | "m" -> (Move (x, y), neuron.Value)
+        | _ -> (Cast (skillsWithShortNames.[command], x, y), neuron.Value)
     | _ -> raise (ArgumentException())
 
 let convertMagnifyingNeuronToAction (neuron: Neuron) =
     let typeSymbol = neuron.Name.[0]
     match typeSymbol with
     | 'm' ->
-        let x = Int32.Parse (neuron.Name.Substring (1, 1))
-        let y = Int32.Parse (neuron.Name.Substring (2, 1))
-        Proceed (x, y)
-    | 'w' -> Wait
+        let x = (Int32.Parse (neuron.Name.Substring (1, 1))) * 4
+        let y = (Int32.Parse (neuron.Name.Substring (2, 1))) * 4
+        (Proceed (x, y), neuron.Value)
+    | 'w' -> (Wait, neuron.Value)
     | _ -> raise (ArgumentException())
 
     

@@ -1,13 +1,23 @@
 module ProjectArena.Bot.Helpers.Neural.SelfHelper
 open ProjectArena.Bot.Models.Neural
 open ProjectArena.Bot.Models.States
+open ProjectArena.Bot.Helpers.SceneHelper
 
-let private getSelfValue (shift: int * int) (t: SelfNeuronType) (scene: Scene) =
-    // TODO implement calculation
-    1.0
+let private getSelfValue (shiftX: int, shiftY: int) (t: SelfNeuronType) (scene: Scene) =
+    scene |> tryGetCurrentActorAndHisOwner
+    |> Option.map (fun (actor, owner) ->
+        match t with
+        | XShift -> getXShift shiftX (Some actor)
+        | YShift -> getYShift shiftY (Some actor)
+        | Vulnerable -> getVulnerable (Some actor)
+        | Damaged -> getDamaged (Some actor)
+        | Mobile -> getMobile (Some actor)
+        | Tough -> getTough (Some actor)
+        | ActionPoints -> float actor.ActionPoints / 8.0
+    ) |> Option.defaultValue 0.0
 
 let getSelfNeuron (shift: int * int) (scene: Scene option) =
-    [ XShift; YShift; Vulnerable; Damaged; Mobile; Tough; ActionPoints; Ranger; Summoner; Buffer; Melee ]
+    [ XShift; YShift; Vulnerable; Damaged; Mobile; Tough; ActionPoints ]
     |> List.map (fun t ->
         let modifier = match t with
                        | XShift -> "x"
@@ -17,10 +27,6 @@ let getSelfNeuron (shift: int * int) (scene: Scene option) =
                        | Mobile -> "m"
                        | Tough -> "t"
                        | ActionPoints -> "a"
-                       | Ranger -> "r"
-                       | Summoner -> "s"
-                       | Buffer -> "b"
-                       | Melee -> "e"
         {
             Name = sprintf "s%s" modifier
             Value = scene |> Option.map (getSelfValue shift t) |> Option.defaultValue 0.0

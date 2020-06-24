@@ -31,7 +31,6 @@ let private initializeOutputCommandLayer (random: Random) (configuration: Learni
     |> initializeLayer random (getHiddenNeuronNames 'h' configuration.CommandHiddenNeuronsCount)
 
 let initializeRandomNeuralModel (random: Random) (configuration: LearningConfiguration) =
-    // TODO Setup neural models with random
     {
         NeuralModel.Id = Guid.NewGuid().ToString()
         MagnifyingNetwork = {

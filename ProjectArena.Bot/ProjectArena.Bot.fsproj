@@ -30,6 +30,8 @@
     <Compile Include="Models/Neural/Neuron.fs" />
     <Compile Include="Helpers/AsyncHelper.fs" />
     <Compile Include="Helpers/MappingHelper.fs" />
+    <Compile Include="Helpers/SceneHelper.fs" />
+    <Compile Include="Helpers/ActionsHelper.fs" />
     <Compile Include="Helpers/Neural/CellsHelper.fs" />
     <Compile Include="Helpers/Neural/KeyHelper.fs" />
     <Compile Include="Helpers/Neural/OutputHelper.fs" />

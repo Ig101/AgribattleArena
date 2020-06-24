@@ -5,6 +5,7 @@ open ProjectArena.Bot.Helpers.Neural.CellsHelper
 open ProjectArena.Bot.Helpers.Neural.KeyHelper
 open ProjectArena.Bot.Helpers.Neural.SelfHelper
 open ProjectArena.Bot.Helpers.Neural.OutputHelper
+open System.Diagnostics
 
 let getMagnifyingInputNeurons sceneOpt  =
     getMagnifyingCellsInputNeurons sceneOpt
