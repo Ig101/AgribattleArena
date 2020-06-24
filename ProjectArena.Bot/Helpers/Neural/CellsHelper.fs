@@ -4,6 +4,7 @@ open ProjectArena.Bot.Models.Neural
 open ProjectArena.Bot.Models.States
 open ProjectArena.Bot.Models.Dtos
 open ProjectArena.Bot.Helpers.SceneHelper
+open System.Diagnostics
 
 let actorShare = 0.6
 let massActorShare = 0.8
@@ -137,10 +138,10 @@ let private getMagnifyingCellValue (x: int, y: int, t: CellNeuronType) (actorAnd
     )
     let tiles, _, _, _ = tilesInfo
     match t with
-    | Dangerous -> calculateSectorDangerousParam scene tilesInfo actorAndOwner
-    | Friendly -> calculateSectorFriendlyParam scene tilesInfo actorAndOwner
-    | Unbearable -> tiles |> List.averageBy calculateCellUnbearableParam
-    | Active -> tiles |> List.averageBy (fun tile -> match tile.TempActorId.IsSome with | true -> 1.0 | false -> 0.0)
+        | Dangerous -> calculateSectorDangerousParam scene tilesInfo actorAndOwner
+        | Friendly -> calculateSectorFriendlyParam scene tilesInfo actorAndOwner
+        | Unbearable -> tiles |> List.averageBy calculateCellUnbearableParam
+        | Active -> tiles |> List.averageBy (fun tile -> match tile.TempActorId.IsSome with | true -> 1.0 | false -> 0.0)
 
 let private getCommandCellValue (shiftX: int, shiftY: int) (x: int, y: int, t: CellNeuronType) (actorAndOwner) (scene: Scene) =
     getParticularCellValue (shiftX + x, shiftY + y, t) scene actorAndOwner

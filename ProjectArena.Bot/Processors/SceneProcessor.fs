@@ -43,16 +43,16 @@ let private mergeSceneWithSynchronizer (scene: Scene) (synchronizer: Synchronize
 
     let actors =
         synchronizer.ChangedActors
-        |> Seq.append (scene.Actors |> Seq.filter (actorsFilter synchronizer.ChangedActors synchronizer.DeletedActors))
+        |> Seq.append (scene.Actors |> Seq.filter (actorsFilter synchronizer.ChangedActors synchronizer.DeletedActors)) |> Seq.toList
     let decorations =
         synchronizer.ChangedDecorations
-        |> Seq.append (scene.Decorations |> Seq.filter (decorationsFilter synchronizer.ChangedDecorations synchronizer.DeletedDecorations))
+        |> Seq.append (scene.Decorations |> Seq.filter (decorationsFilter synchronizer.ChangedDecorations synchronizer.DeletedDecorations)) |> Seq.toList
     let effects =
         synchronizer.ChangedEffects
-        |> Seq.append (scene.Effects |> Seq.filter (effectsFilter synchronizer.ChangedEffects synchronizer.DeletedEffects))
+        |> Seq.append (scene.Effects |> Seq.filter (effectsFilter synchronizer.ChangedEffects synchronizer.DeletedEffects)) |> Seq.toList
     let tiles =
         synchronizer.ChangedTiles
-        |> Seq.append (scene.Tiles |> Seq.filter (tilesFilter synchronizer.ChangedTiles))
+        |> Seq.append (scene.Tiles |> Seq.filter (tilesFilter synchronizer.ChangedTiles)) |> Seq.toList
     {
         Id = synchronizer.Id
         Version = synchronizer.Version
@@ -121,8 +121,7 @@ let private tryGetActingModel (userId: string) (scene: Scene) =
         | _ -> None
 
 let private leaveIfTooLong (configuration: Configuration) (message: IncomingSynchronizationMessage) (scene: Scene) =
-    let currentPlayers = scene.Players |> Seq.filter (fun p -> p.UserId = configuration.User.UserId)
-    let currentPlayer = currentPlayers |> Seq.head
+    let currentPlayer = scene.Players |> Seq.filter (fun p -> p.UserId = configuration.User.UserId) |> Seq.head
     match currentPlayer.Status with
     | PlayerStatus.Playing when scene.RoundsPassed < configuration.Learning.TimeTillSurrender || message.Action = EndGame -> Some scene
     | PlayerStatus.Playing ->
