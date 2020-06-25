@@ -30,12 +30,12 @@ let getActorPower (actor: ActorDto) =
                          | _ -> Math.Max (0.0, 1.0 - (float (actor.Skills |> Seq.minBy (fun s -> s.PreparationTime)).PreparationTime) / 3.0)
     match actor.ExternalId with
     | Some _ ->
-        healthCoefficient + initiativeCoefficient + cdsCoefficient
+        (healthCoefficient + initiativeCoefficient + cdsCoefficient) / 3.0
     | None ->
         let attackCoefficient = match actor.AttackingSkill with
                                 | Some skill -> Math.Min (1.0, (float skill.Range) / 5.0 + 0.6)
                                 | None -> 1.0
-        attackCoefficient * maxHealth / 100.0 * (healthCoefficient + initiativeCoefficient + cdsCoefficient)
+        attackCoefficient * maxHealth / 100.0 * (healthCoefficient + initiativeCoefficient + cdsCoefficient) / 3.0
 
 
 
