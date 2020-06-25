@@ -78,11 +78,13 @@ let getVulnerable (actor: ActorDto option) =
 let getMobile (actor: ActorDto option) =
     actor
     |> Option.map (fun a ->
-        a.Skills
-        |> Seq.append (a.AttackingSkill |> Option.map (fun s -> [s]) |> Option.defaultValue [])
-        |> Seq.map (fun s -> float s.Range / float s.Cost)
-        |> Seq.max
-        |> normalize
+        match a.Skills |> Seq.length with
+        | 0 -> 0.5
+        | _ -> a.Skills
+            |> Seq.append (a.AttackingSkill |> Option.map (fun s -> [s]) |> Option.defaultValue [])
+            |> Seq.map (fun s -> float s.Range / float s.Cost)
+            |> Seq.max
+            |> normalize
         )
     |> Option.defaultValue 0.0
 
