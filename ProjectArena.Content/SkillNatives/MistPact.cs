@@ -14,14 +14,12 @@ namespace ProjectArena.Content.SkillNatives
                 "mistsummon",
                 new[] { "target", "summon", "magic", "pure" },
                 1,
-                2,
                 8,
                 1,
                 new Targets()
                 {
                     Bearable = true
                 },
-                false,
                 (scene, owner, targetTile, skill) =>
                 {
                     scene.CreateActor(owner.Owner as Player, "mistspawn", "mistspawn", targetTile, null, null, null);

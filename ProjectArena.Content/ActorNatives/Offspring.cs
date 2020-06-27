@@ -12,7 +12,10 @@ namespace ProjectArena.Content.ActorNatives
                 "mistoffspring",
                 new[] { "organic", "controlled" },
                 0,
-                new Engine.Helpers.TagSynergy[0]);
+                new Engine.Helpers.TagSynergy[0],
+                null,
+                null,
+                null);
         }
     }
 }

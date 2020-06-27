@@ -12,7 +12,10 @@ namespace ProjectArena.Content.ActorNatives
                 "lesserspawn",
                 new[] { "organic", "intelligent", "controlled" },
                 0,
-                new Engine.Helpers.TagSynergy[0]);
+                new Engine.Helpers.TagSynergy[0],
+                null,
+                null,
+                null);
         }
     }
 }

@@ -14,7 +14,6 @@ namespace ProjectArena.Content.SkillNatives
                 "warden",
                 new[] { "damage", "target", "physic", "ranged", "direct" },
                 3,
-                3,
                 4,
                 50,
                 new Targets()
@@ -25,7 +24,6 @@ namespace ProjectArena.Content.SkillNatives
                     Bearable = true,
                     Decorations = true
                 },
-                true,
                 (scene, owner, targetTile, skill) =>
                 {
                     targetTile.DoDamageAttack(skill);

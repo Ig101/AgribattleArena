@@ -14,7 +14,6 @@ namespace ProjectArena.Content.SkillNatives
                 "mistsphere",
                 new[] { "damage", "target", "magic", "blood", "ranged", "direct" },
                 5,
-                3,
                 0,
                 40,
                 new Targets()
@@ -25,7 +24,6 @@ namespace ProjectArena.Content.SkillNatives
                     Bearable = true,
                     Decorations = true
                 },
-                true,
                 (scene, owner, targetTile, skill) =>
                 {
                     owner.Damage(10, skill.AggregatedTags);

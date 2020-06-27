@@ -14,7 +14,6 @@ namespace ProjectArena.Content.SkillNatives
                 "empower",
                 new[] { "target", "buff", "magic", "pure" },
                 8,
-                6,
                 4,
                 0.5f,
                 new Targets()
@@ -23,7 +22,6 @@ namespace ProjectArena.Content.SkillNatives
                     NotAllies = true,
                     Self = true
                 },
-                true,
                 (scene, owner, targetTile, skill) =>
                 {
                     var mod = owner.SkillPower;

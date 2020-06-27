@@ -15,7 +15,6 @@ namespace ProjectArena.Content.SkillNatives
                 "charge",
                 new[] { "damage", "target", "movement", "control", "weapon", "direct", "physic" },
                 4,
-                4,
                 3,
                 10,
                 new Targets()
@@ -25,7 +24,6 @@ namespace ProjectArena.Content.SkillNatives
                     Bearable = true,
                     Decorations = true
                 },
-                true,
                 (scene, owner, targetTile, skill) =>
                 {
                     targetTile.DoDamageAttack(skill);
@@ -45,7 +43,7 @@ namespace ProjectArena.Content.SkillNatives
                         y += sin;
                     }
 
-                    owner.ChangePosition(scene.Tiles[(int)Math.Round(x, MidpointRounding.AwayFromZero)][(int)Math.Round(y, MidpointRounding.AwayFromZero)], true);
+                    owner.ChangePosition(scene.Tiles[(int)Math.Round(x, MidpointRounding.AwayFromZero)][(int)Math.Round(y, MidpointRounding.AwayFromZero)]);
                 });
         }
     }

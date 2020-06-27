@@ -14,7 +14,6 @@ namespace ProjectArena.Content.SkillNatives
                 "wand",
                 new[] { "damage", "target", "weapon", "magic", "pure", "ranged", "direct" },
                 4,
-                3,
                 0,
                 20,
                 new Targets()
@@ -23,7 +22,6 @@ namespace ProjectArena.Content.SkillNatives
                     NotAllies = true,
                     Decorations = true
                 },
-                false,
                 (scene, owner, targetTile, skill) =>
                 {
                     targetTile.DoDamageSkill(skill);

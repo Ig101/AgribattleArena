@@ -14,7 +14,6 @@ namespace ProjectArena.Content.SkillNatives
                 "magicMissle",
                 new[] { "damage", "target", "magic", "pure", "ranged", "direct" },
                 5,
-                3,
                 4,
                 40,
                 new Targets()
@@ -25,7 +24,6 @@ namespace ProjectArena.Content.SkillNatives
                     Bearable = true,
                     Decorations = true
                 },
-                true,
                 (scene, owner, targetTile, skill) =>
                 {
                     targetTile.DoDamageSkill(skill);

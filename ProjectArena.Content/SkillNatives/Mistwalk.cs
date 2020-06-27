@@ -13,17 +13,15 @@ namespace ProjectArena.Content.SkillNatives
                 "mistwalk",
                 new[] { "target", "movement", "magic", "alteration" },
                 5,
-                1,
                 5,
                 0,
                 new Targets()
                 {
                     Bearable = true
                 },
-                false,
                 (scene, owner, targetTile, skill) =>
                 {
-                    owner.ChangePosition(targetTile, true);
+                    owner.ChangePosition(targetTile);
                 });
         }
     }

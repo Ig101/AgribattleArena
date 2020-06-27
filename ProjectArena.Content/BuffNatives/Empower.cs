@@ -12,10 +12,8 @@ namespace ProjectArena.Content.BuffNatives
                 false,
                 1,
                 false,
-                false,
                 2,
                 1,
-                null,
                 (manager, buff) =>
                 {
                     manager.AttackPower += buff.Mod;

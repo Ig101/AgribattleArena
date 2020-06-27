@@ -16,14 +16,12 @@ namespace ProjectArena.Content.SkillNatives
                 "mistoffspring",
                 new[] { "target", "summon", "magic", "blood" },
                 1,
-                2,
                 4,
                 0.2f,
                 new Targets()
                 {
                     Bearable = true
                 },
-                false,
                 (scene, owner, targetTile, skill) =>
                 {
                     var mod = (int)Math.Ceiling(owner.Constitution * skill.Mod);
@@ -38,12 +36,8 @@ namespace ProjectArena.Content.SkillNatives
                             2,
                             mod,
                             30,
-                            6,
                             "slash",
-                            new string[]
-                            {
-                                "sacrifice"
-                            }),
+                            new string[0]),
                         targetTile,
                         null,
                         null,

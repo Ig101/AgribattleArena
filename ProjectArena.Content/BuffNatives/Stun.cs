@@ -12,10 +12,8 @@ namespace ProjectArena.Content.BuffNatives
                 false,
                 1,
                 false,
-                false,
                 1,
                 0,
-                null,
                 (manager, buff) =>
                 {
                     manager.CanMove = false;

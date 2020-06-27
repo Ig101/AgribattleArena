@@ -13,7 +13,6 @@ namespace ProjectArena.Content.SkillNatives
                 "powerplace",
                 new[] { "target", "tile", "buff", "magic", "alteration" },
                 4,
-                6,
                 2,
                 0,
                 new Targets()
@@ -24,7 +23,6 @@ namespace ProjectArena.Content.SkillNatives
                     Decorations = true,
                     Self = true
                 },
-                false,
                 (scene, owner, targetTile, skill) =>
                 {
                     scene.ChangeTile("powerplace", targetTile.X, targetTile.Y, targetTile.Height, owner.Owner);

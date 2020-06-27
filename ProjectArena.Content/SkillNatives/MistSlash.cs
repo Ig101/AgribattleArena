@@ -14,7 +14,6 @@ namespace ProjectArena.Content.SkillNatives
                 "mistSlash",
                 new[] { "damage", "target", "weapon", "magic", "pure", "melee", "physic" },
                 1,
-                2,
                 0,
                 25,
                 new Targets()
@@ -23,7 +22,6 @@ namespace ProjectArena.Content.SkillNatives
                     NotAllies = true,
                     Decorations = true,
                 },
-                true,
                 (scene, owner, targetTile, skill) =>
                 {
                     targetTile.DoDamageAttack(skill);

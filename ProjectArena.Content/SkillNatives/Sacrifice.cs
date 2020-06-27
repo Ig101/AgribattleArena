@@ -13,7 +13,6 @@ namespace ProjectArena.Content.SkillNatives
                 "mistsacrifice",
                 new[] { "target", "heal", "magic", "blood" },
                 1,
-                1,
                 0,
                 -1,
                 new Targets()
@@ -22,7 +21,6 @@ namespace ProjectArena.Content.SkillNatives
                     NotAllies = true,
                     Decorations = true
                 },
-                true,
                 (scene, owner, targetTile, skill) =>
                 {
                     targetTile.TempObject.Damage(skill.Mod * owner.DamageModel.Health, skill.AggregatedTags);

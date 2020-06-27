@@ -14,12 +14,9 @@ namespace ProjectArena.Content.TileNatives
                 0,
                 false,
                 1,
-                true,
                 null,
-                (scene, tile) =>
-                {
-                    tile.AddBuff("tilepower", tile.Native.DefaultMod);
-                });
+                null,
+                null);
         }
     }
 }
