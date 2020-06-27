@@ -5,7 +5,7 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 {
     public class Buff : IdObject
     {
-        public IBuffManagerParentRef Manager { get; }
+        public BuffManager Manager { get; }
 
         public BuffNative Native { get; }
 
@@ -13,7 +13,7 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 
         public float? Duration { get; set; }
 
-        public Buff(IBuffManagerParentRef manager, BuffNative native, float? mod, float? duration)
+        public Buff(BuffManager manager, BuffNative native, float? mod, float? duration)
             : base(manager.Parent.Parent)
         {
             this.Mod = mod ?? native.DefaultMod;
@@ -22,14 +22,12 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
             this.Manager = manager;
         }
 
-        public void Update(float time)
+        public void Update()
         {
             if (Duration != null)
             {
-                Duration -= time;
+                Duration -= 1;
             }
-
-            Native.Action?.Invoke(Parent, Manager.Parent, this, time);
         }
 
         public void Purge()

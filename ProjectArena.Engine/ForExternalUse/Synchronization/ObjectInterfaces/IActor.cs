@@ -28,11 +28,7 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         List<ISkill> Skills { get; }
 
-        int ActionPointsIncome { get; }
-
         List<IBuff> Buffs { get; }
-
-        float InitiativePosition { get; }
 
         float Health { get; }
 
@@ -49,8 +45,6 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
         float Z { get; }
 
         int MaxHealth { get; }
-
-        int ActionPoints { get; }
 
         float SkillPower { get; }
 

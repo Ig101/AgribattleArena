@@ -20,8 +20,6 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public bool Unbearable { get; }
 
-        public bool Revealed { get; }
-
         public Tile(Objects.Tile tile)
         {
             this.X = tile.X;

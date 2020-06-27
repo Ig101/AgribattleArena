@@ -21,7 +21,5 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
         int? Team { get; }
 
         bool Unbearable { get; }
-
-        bool Revealed { get; }
     }
 }

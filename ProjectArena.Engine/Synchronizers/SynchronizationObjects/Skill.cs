@@ -19,13 +19,9 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public float Mod { get; }
 
-        public int Cost { get; }
-
         public float PreparationTime { get; }
 
         public Targets AvailableTargets { get; }
-
-        public bool OnlyVisibleTargets { get; }
 
         public bool Revealed { get; }
 
@@ -38,9 +34,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.NativeId = skill.Native.Id;
             this.Cd = skill.Cd;
             this.Mod = skill.Mod;
-            this.Cost = skill.Cost;
             this.PreparationTime = skill.PreparationTime;
-            this.OnlyVisibleTargets = skill.Native.OnlyVisibleTargets;
             this.AvailableTargets = skill.Native.AvailableTargets;
             this.Revealed = skill.Revealed;
         }

@@ -5,19 +5,19 @@ using ProjectArena.Engine.Objects;
 
 namespace ProjectArena.Engine
 {
-    public class Player : IPlayerParentRef, ForExternalUse.IPlayerShort
+    public class Player : ForExternalUse.IPlayerShort
     {
         public int? Team { get; }
 
-        public ISceneParentRef Parent { get; }
+        public Scene Parent { get; }
 
         public string Id { get; }
 
         public string UserId { get; }
 
-        public List<Actor> KeyActors { get; }
+        public Actor PlayerActor { get; }
 
-        public int TurnsSkipped { get; private set; }
+        public List<Actor> KeyActors { get; }
 
         public PlayerStatus Status { get; set; }
 
@@ -27,32 +27,15 @@ namespace ProjectArena.Engine
 
         public bool Left { get; set; }
 
-        public Player(ISceneParentRef parent, string id, string userId, int? team)
+        public Player(Scene parent, string id, string userId, int? team)
         {
             this.Team = team;
             this.Parent = parent;
             this.Id = id;
             this.UserId = userId;
             this.KeyActors = new List<Actor>();
-            this.TurnsSkipped = 0;
             this.Status = PlayerStatus.Playing;
             this.Left = false;
-        }
-
-        public void SkipTurn()
-        {
-            TurnsSkipped++;
-        }
-
-        public bool ActThisTurn()
-        {
-            if (TurnsSkipped > 0)
-            {
-                TurnsSkipped = 0;
-                return true;
-            }
-
-            return false;
         }
 
         public void Defeat(bool leave)

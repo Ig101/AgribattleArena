@@ -28,7 +28,6 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
             int constitution,
             int speed,
             IEnumerable<string> skillNames,
-            int actionPointsIncome,
             IEnumerable<string> startBuffs)
         {
             return new Synchronizers.SynchronizationObjects.Actor(
@@ -40,7 +39,6 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
                 constitution,
                 speed,
                 skillNames,
-                actionPointsIncome,
                 startBuffs);
         }
 
@@ -50,10 +48,6 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
         }
 
         public static IVarManager CreateVarManager(
-            float turnTimeLimit,
-            float turnTimeLimitAfterSkip,
-            int skippedTurnsLimit,
-            int maxActionPoints,
             int constitutionMod,
             float willpowerMod,
             float strengthMod,
@@ -61,10 +55,6 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
             float minimumInitiative)
         {
             return new VarManagers.VarManager(
-                turnTimeLimit,
-                turnTimeLimitAfterSkip,
-                skippedTurnsLimit,
-                maxActionPoints,
                 constitutionMod,
                 willpowerMod,
                 strengthMod,

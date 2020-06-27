@@ -4,7 +4,7 @@
     {
         private bool isAlive;
 
-        public IPlayerParentRef Owner { get; set; }
+        public Player Owner { get; set; }
 
         public bool IsAlive
         {
@@ -30,7 +30,7 @@
 
         public float Z { get; set; }
 
-        public GameObject(ISceneParentRef parent, IPlayerParentRef owner, int x, int y, float z)
+        public GameObject(Scene parent, Player owner, int x, int y, float z)
             : base(parent)
         {
             this.Owner = owner;
@@ -39,8 +39,6 @@
             this.Y = y;
             this.Z = parent.Tiles[x][y].Height + z;
         }
-
-        public abstract void Update(float time);
 
         public abstract void OnDeathAction();
     }

@@ -10,13 +10,17 @@ using ProjectArena.Engine.VarManagers;
 
 namespace ProjectArena.Engine.Objects
 {
-    public class Actor : TileObject, IActorParentRef, IActorDamageModelRef
+    public class Actor : TileObject
     {
-        private readonly ActorNative native;
         private readonly IVarManager varManager;
-        private int actionPoints;
 
-        public string[] Tags => native.Tags;
+        public OrderModel Order { get; set; }
+
+        public new ActorNative Native => (ActorNative)base.Native;
+
+        public bool Acted { get; set; }
+
+        public string[] Tags => Native.Tags;
 
         public string Visualization { get; set; }
 
@@ -29,8 +33,6 @@ namespace ProjectArena.Engine.Objects
         public int SelfConstitution { get; }
 
         public int SelfSpeed { get; }
-
-        public int SelfActionPointsIncome { get; private set; }
 
         public Guid? ExternalId { get; }
 
@@ -48,16 +50,6 @@ namespace ProjectArena.Engine.Objects
 
         public int MaxHealth => (Constitution * varManager.ConstitutionMod) + BuffManager.MaxHealth;
 
-        public int ActionPointsIncome
-        {
-            get { return SelfActionPointsIncome + BuffManager.ActionPointsIncome; } set { SelfActionPointsIncome = value; }
-        }
-
-        public int ActionPoints
-        {
-            get { return actionPoints; } set { actionPoints = value > varManager.MaxActionPoints ? varManager.MaxActionPoints : value < 0 ? 0 : value; }
-        }
-
         public float SkillPower => (Willpower * varManager.WillpowerMod) + BuffManager.SkillPower;
 
         public float AttackPower => (Strength * varManager.StrengthMod) + BuffManager.AttackPower;
@@ -74,19 +66,19 @@ namespace ProjectArena.Engine.Objects
 
         public List<TagSynergy> AttackModifiers => BuffManager.Attack;
 
-        public Actor(ISceneParentRef parent, IPlayerParentRef owner, Guid? externalId, ITileParentRef tempTile, string visualization, string enemyVisualization, float? z, ActorNative native, RoleModelNative roleModelNative)
+        public Action<Scene, Actor> OnCastAction => Native.OnCastAction + BuffManager.OnCastAction;
+
+        public Actor(Scene parent, Player owner, Guid? externalId, Tile tempTile, string visualization, string enemyVisualization, float? z, ActorNative native, RoleModelNative roleModelNative)
             : base(parent, owner, tempTile, z ?? native.DefaultZ, new DamageModel(), native)
         {
             this.varManager = parent.VarManager;
             this.Visualization = visualization ?? native.DefaultVisualization;
             this.EnemyVisualization = enemyVisualization ?? native.DefaultEnemyVisualization;
             this.ExternalId = externalId;
-            this.native = native;
             this.SelfStrength = roleModelNative.DefaultStrength;
             this.SelfWillpower = roleModelNative.DefaultWillpower;
             this.SelfConstitution = roleModelNative.DefaultConstitution;
             this.SelfSpeed = roleModelNative.DefaultSpeed;
-            this.SelfActionPointsIncome = roleModelNative.DefaultActionPointsIncome;
             this.DefaultArmor = native.Armor.ToArray();
             this.Skills = new List<Skill>();
             foreach (SkillNative skill in roleModelNative.Skills)
@@ -96,70 +88,55 @@ namespace ProjectArena.Engine.Objects
 
             this.AttackingSkill = new Skill(this, roleModelNative.AttackingSkill, null, null, 0, null, null, null);
             this.BuffManager = new BuffManager(this);
-            this.InitiativePosition += 1f / this.Initiative;
             this.DamageModel.SetupRoleModel(this);
         }
 
-        public override void Update(float time)
+        public void Update()
         {
-            this.InitiativePosition -= time;
-            if (time > 0)
+            Acted = false;
+            Affected = true;
+            if (Order != null)
             {
-                this.Affected = true;
+                Order.Intended = false;
             }
 
-            BuffManager.Update(time);
+            BuffManager.Update();
             foreach (Skill skill in Skills)
             {
-                skill.Update(time);
+                skill.Update();
             }
         }
 
         public bool Attack(Tile target)
         {
-            return AttackingSkill.Cast(target);
+            var result = AttackingSkill.Cast(target);
+            if (result)
+            {
+                Acted = true;
+            }
+
+            return result;
         }
 
         public bool Cast(int id, Tile target)
         {
             Skill skill = Skills.Find(x => x.Id == id);
-            return skill.Cast(target);
-        }
+            var result = skill.Cast(target);
+            if (result)
+            {
+                Acted = true;
+            }
 
-        public bool Wait()
-        {
-            return true;
+            return result;
         }
 
         public bool Move(Tile target)
         {
             if (target.TempObject == null && !target.Native.Unbearable && Math.Abs(target.Height - this.TempTile.Height) < 10 &&
-                BuffManager.CanMove && ((target.X == X && Math.Abs(target.Y - Y) == 1) ||
-                (target.Y == Y && Math.Abs(target.X - X) == 1)))
+                BuffManager.CanMove && Math.Abs(target.X - X) <= 1 && Math.Abs(target.Y - Y) <= 1 && target != this.TempTile)
             {
-                ChangePosition(target, true);
-                SpendActionPoints(1);
+                ChangePosition(target);
                 return true;
-            }
-
-            return false;
-        }
-
-        public override void EndTurn()
-        {
-            if (Parent.TempTileObject == this)
-            {
-                this.InitiativePosition += 1f / this.Initiative;
-            }
-        }
-
-        public override bool StartTurn()
-        {
-            if (Parent.TempTileObject == this)
-            {
-                this.Affected = true;
-                this.ActionPoints += ActionPointsIncome;
-                return CheckActionAvailability();
             }
 
             return false;
@@ -167,7 +144,16 @@ namespace ProjectArena.Engine.Objects
 
         public override void OnDeathAction()
         {
+            TempTile.Native.OnDeathAction?.Invoke(Parent, TempTile, this);
+            Native.OnDeathAction?.Invoke(Parent, this);
+            BuffManager.OnDeathAction?.Invoke(Parent, this);
             BuffManager.RemoveAllBuffs(false);
+        }
+
+        public override void OnHitAction(float amount)
+        {
+            Native.OnHitAction?.Invoke(Parent, this, amount);
+            BuffManager.OnHitAction?.Invoke(Parent, this, amount);
         }
 
         public Skill AddSkill(Skill skill)
@@ -194,26 +180,45 @@ namespace ProjectArena.Engine.Objects
             return RemoveSkill(Skills.Find(x => x.Id == id));
         }
 
-        public void SpendActionPoints(int amount)
-        {
-            this.ActionPoints -= amount;
-            this.Affected = true;
-        }
-
-        private bool CheckStunnedState()
-        {
-            if (!BuffManager.CanAct && !BuffManager.CanMove)
-            {
-                this.actionPoints = 0;
-                return true;
-            }
-
-            return false;
-        }
-
         public bool CheckActionAvailability()
         {
-            return this.IsAlive && this.ActionPoints > 0 && !CheckStunnedState();
+            return this.IsAlive && this.Acted && BuffManager.CanAct;
+        }
+
+        public bool CheckMoveAvailability()
+        {
+            return this.IsAlive && BuffManager.CanMove;
+        }
+
+        public void SetOrderModel(bool intended, int? skillId, int x, int y)
+        {
+            var skill = skillId.HasValue ? Skills.FirstOrDefault(s => s.Id == skillId) : null;
+            if (Order == null)
+            {
+                Order = new OrderModel(intended, skill, x, y);
+            }
+            else
+            {
+                Order.Intended = intended;
+                Order.Skill = skill;
+                Order.X = x;
+                Order.Y = y;
+            }
+        }
+
+        public void SetOrderModel(bool intended, int? skillId, TileObject target)
+        {
+            var skill = skillId.HasValue ? Skills.FirstOrDefault(s => s.Id == skillId) : null;
+            if (Order == null)
+            {
+                Order = new OrderModel(intended, skill, target);
+            }
+            else
+            {
+                Order.Intended = intended;
+                Order.Skill = skill;
+                Order.Target = target;
+            }
         }
     }
 }

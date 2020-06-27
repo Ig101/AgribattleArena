@@ -2,11 +2,11 @@
 {
     public abstract class IdObject
     {
-        public ISceneParentRef Parent { get; }
+        public Scene Parent { get; }
 
         public int Id { get; }
 
-        public IdObject(ISceneParentRef parent)
+        public IdObject(Scene parent)
         {
             this.Parent = parent;
             this.Id = parent.GetNextId();

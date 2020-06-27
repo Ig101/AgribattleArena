@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ProjectArena.Engine.Helpers;
 using ProjectArena.Engine.Natives;
 using ProjectArena.Engine.Objects.Immaterial;
@@ -11,21 +12,18 @@ namespace ProjectArena.Engine.Objects.Abstract
 
         public TaggingNative Native { get; }
 
-        public float InitiativePosition { get; set; }
-
         public DamageModel DamageModel { get; }
 
-        public ITileParentRef TempTile { get; set; }
+        public Tile TempTile { get; set; }
 
         public bool HealthRevealed { get; set; }
 
-        public TileObject(ISceneParentRef parent, IPlayerParentRef owner, ITileParentRef tempTile, float z, DamageModel damageModel, TaggingNative native)
+        public TileObject(Scene parent, Player owner, Tile tempTile, float z, DamageModel damageModel, TaggingNative native)
             : base(parent, owner, tempTile.X, tempTile.Y, z)
         {
             this.Native = native;
             this.TempTile = tempTile;
             this.DamageModel = damageModel;
-            this.InitiativePosition += parent.GetNextRandom() / 10000f;
             this.Affected = true;
             this.HealthRevealed = false;
         }
@@ -33,7 +31,9 @@ namespace ProjectArena.Engine.Objects.Abstract
         public virtual bool Damage(float amount, IEnumerable<string> tags)
         {
             this.Affected = true;
-            if (DamageModel.Damage(amount, tags))
+            var realAmount = DamageModel.Damage(amount, tags);
+            OnHitAction(realAmount);
+            if (realAmount != 0)
             {
                 HealthRevealed = true;
             }
@@ -47,22 +47,20 @@ namespace ProjectArena.Engine.Objects.Abstract
             this.IsAlive = false;
         }
 
-        public void ChangePosition(Tile target, bool changeHeight)
+        public void ChangePosition(Tile target)
         {
             float heightChange = target.Height - this.TempTile.Height;
             this.Affected = true;
             this.TempTile.Affected = true;
             target.Affected = true;
             this.TempTile.RemoveTempObject();
-            target.ChangeTempObject(this, true);
+            target.ChangeTempObject(this);
             this.TempTile = target;
             this.X = target.X;
             this.Y = target.Y;
             this.Z += heightChange;
         }
 
-        public abstract void EndTurn();
-
-        public abstract bool StartTurn();
+        public abstract void OnHitAction(float amount);
     }
 }

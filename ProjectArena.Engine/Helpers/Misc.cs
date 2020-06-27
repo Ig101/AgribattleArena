@@ -14,17 +14,13 @@ namespace ProjectArena.Engine.Helpers
 
     public enum SceneAction
     {
-        Move,
         Attack,
         Cast,
-        Wait,
-        Decoration,
+        Unsuccess,
         EndTurn,
         EndGame,
-        SkipTurn,
-        Leave,
         StartGame,
-        NoActorsDraw
+        Leave
     }
 
     public static class Misc

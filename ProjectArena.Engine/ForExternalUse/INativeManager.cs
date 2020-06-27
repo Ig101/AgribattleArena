@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ProjectArena.Engine.Helpers;
 using ProjectArena.Engine.Objects;
+using ProjectArena.Engine.Objects.Abstract;
 using ProjectArena.Engine.Objects.Immaterial;
 using ProjectArena.Engine.Objects.Immaterial.Buffs;
 
@@ -9,7 +10,16 @@ namespace ProjectArena.Engine.ForExternalUse
 {
     public interface INativeManager
     {
-        void AddActorNative(string id, string defaultVisualization, string defaultEnemyVisualization, string[] tags, float defaultZ, TagSynergy[] armor);
+        void AddActorNative(
+            string id,
+            string defaultVisualization,
+            string defaultEnemyVisualization,
+            string[] tags,
+            float defaultZ,
+            TagSynergy[] armor,
+            Action<Scene, Actor, float> onHitAction,
+            Action<Scene, Actor> onCastAction,
+            Action<Scene, Actor> onDeathAction);
 
         void AddBuffNative(
             string id,
@@ -17,12 +27,10 @@ namespace ProjectArena.Engine.ForExternalUse
             bool eternal,
             int repeatable,
             bool summarizeLength,
-            bool onTile,
             int? defaultDuration,
             float defaultMod,
-            Action<ISceneParentRef, IActorParentRef, Buff, float> action,
-            Action<IBuffManagerParentRef, Buff> applier,
-            Action<ISceneParentRef, IActorParentRef, Buff> onPurgeAction);
+            Action<BuffManager, Buff> applier,
+            Action<Scene, Actor, Buff> onPurgeAction);
 
         void AddDecorationNative(
             string id,
@@ -32,18 +40,8 @@ namespace ProjectArena.Engine.ForExternalUse
             int defaultHealth,
             float defaultZ,
             float defaultMod,
-            Action<ISceneParentRef, ActiveDecoration> action,
-            Action<ISceneParentRef, ActiveDecoration> onDeathAction);
-
-        void AddEffectNative(
-            string id,
-            string defaultVisualization,
-            string[] tags,
-            float defaultZ,
-            float? defaultDuration,
-            float defaultMod,
-            Action<ISceneParentRef, SpecEffect, float> action,
-            Action<ISceneParentRef, SpecEffect> onDeathAction);
+            Action<Scene, ActiveDecoration, float> onHitAction,
+            Action<Scene, ActiveDecoration> onDeathAction);
 
         void AddRoleModelNative(
             string id,
@@ -51,7 +49,6 @@ namespace ProjectArena.Engine.ForExternalUse
             int defaultWillpower,
             int defaultConstitution,
             int defaultSpeed,
-            int defaultActionPointsIncome,
             string attackingSkill,
             string[] skills);
 
@@ -61,12 +58,10 @@ namespace ProjectArena.Engine.ForExternalUse
             string defaultEnemyVisualization,
             string[] tags,
             int defaultRange,
-            int defaultCost,
             float defaultCd,
             float defaultMod,
             Targets availableTargets,
-            bool onlyVisibleTargets,
-            Action<ISceneParentRef, IActorParentRef, Tile, Skill> action);
+            Action<Scene, Actor, Tile, Skill> action);
 
         void AddTileNative(
             string id,
@@ -75,8 +70,8 @@ namespace ProjectArena.Engine.ForExternalUse
             int defaultHeight,
             bool unbearable,
             float defaultMod,
-            bool revealedByDefault,
-            Action<ISceneParentRef, Tile, float> action,
-            Action<ISceneParentRef, Tile> onStepAction);
+            Action<Scene, Tile, TileObject> onCreateAction,
+            Action<Scene, Tile> onActionAction,
+            Action<Scene, Tile, TileObject> onDeathAction);
     }
 }

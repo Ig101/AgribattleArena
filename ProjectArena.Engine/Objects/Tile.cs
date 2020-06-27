@@ -3,13 +3,13 @@ using ProjectArena.Engine.Objects.Abstract;
 
 namespace ProjectArena.Engine.Objects
 {
-    public class Tile : ITileParentRef
+    public class Tile
     {
-        public IPlayerParentRef Owner { get; set; }
+        public Player Owner { get; set; }
 
         public bool Affected { get; set; }
 
-        public ISceneParentRef Parent { get; }
+        public Scene Parent { get; }
 
         public TileObject TempObject { get; private set; }
 
@@ -21,9 +21,7 @@ namespace ProjectArena.Engine.Objects
 
         public TileNative Native { get; set; }
 
-        public bool Revealed { get; set; }
-
-        public Tile(ISceneParentRef parent, int x, int y, TileNative native, int? height)
+        public Tile(Scene parent, int x, int y, TileNative native, int? height)
         {
             this.Owner = null;
             this.Parent = parent;
@@ -32,34 +30,16 @@ namespace ProjectArena.Engine.Objects
             this.Height = height ?? native.DefaultHeight;
             this.Native = native;
             this.Affected = true;
-            this.Revealed = native.RevealedByDefault;
         }
 
-        public void Update(float time)
-        {
-            Native.Action?.Invoke(Parent, this, time);
-        }
-
-        public bool ChangeTempObject(TileObject tileObject, bool trigger)
+        public bool ChangeTempObject(TileObject tileObject)
         {
             if (TempObject != null)
             {
                 return false;
             }
 
-            Affected = true;
             TempObject = tileObject;
-            if (trigger)
-            {
-                if (!Revealed)
-                {
-                    Affected = true;
-                    Revealed = true;
-                }
-
-                Native.OnStepAction?.Invoke(Parent, this);
-            }
-
             return true;
         }
 
@@ -68,11 +48,6 @@ namespace ProjectArena.Engine.Objects
             if (TempObject == null)
             {
                 return false;
-            }
-
-            if (this.TempObject is Actor actor)
-            {
-                actor.BuffManager.RemoveTileBuffs();
             }
 
             TempObject = null;

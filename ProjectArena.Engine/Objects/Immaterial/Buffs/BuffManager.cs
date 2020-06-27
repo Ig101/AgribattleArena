@@ -5,7 +5,7 @@ using ProjectArena.Engine.Helpers;
 
 namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 {
-    public class BuffManager : IBuffManagerParentRef
+    public class BuffManager
     {
         private float strength;
         private float willpower;
@@ -82,22 +82,14 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 
             set
             {
-                float oldInitiative = Parent.Initiative;
                 speed = value;
-                float newInitiative = Parent.Initiative;
                 if (Parent.Speed <= 0)
                 {
                     Parent.DamageModel.Health = 0;
                     Parent.IsAlive = false;
                 }
-                else
-                {
-                    Parent.InitiativePosition *= oldInitiative / newInitiative;
-                }
             }
         }
-
-        public float AdditionActionPointsIncome { get; set; }
 
         public float AdditionMaxHealth
         {
@@ -132,24 +124,11 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 
             set
             {
-                float oldInitiative = Parent.Initiative;
                 Initiative = value;
-                float newInitiative = Parent.Initiative;
-                if (Parent.Speed <= 0)
-                {
-                    Parent.DamageModel.Health = 0;
-                    Parent.IsAlive = false;
-                }
-                else
-                {
-                    Parent.InitiativePosition *= oldInitiative / newInitiative;
-                }
             }
         }
 
         public int SkillCd { get; set; }
-
-        public int SkillCost { get; set; }
 
         public int SkillRange { get; set; }
 
@@ -157,7 +136,7 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 
         public bool CanAct { get; set; }
 
-        public IActorParentRef Parent { get; set; }
+        public Actor Parent { get; set; }
 
         public float Initiative { get; private set; }
 
@@ -166,8 +145,6 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
         public float SkillPower { get; set; }
 
         public int MaxHealth => (int)maxHealth;
-
-        public int ActionPointsIncome => (int)AdditionActionPointsIncome;
 
         public int Strength => (int)strength;
 
@@ -181,9 +158,15 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
 
         public List<TagSynergy> Attack { get; }
 
+        public Action<Scene, Actor, float> OnHitAction { get; set; }
+
+        public Action<Scene, Actor> OnCastAction { get; set; }
+
+        public Action<Scene, Actor> OnDeathAction { get; set; }
+
         public List<Buff> Buffs { get; }
 
-        public BuffManager(IActorParentRef parent)
+        public BuffManager(Actor parent)
         {
             this.Parent = parent;
             Armor = new List<TagSynergy>();
@@ -225,7 +208,6 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
         private void RecalculateBuffs()
         {
             SkillCd = 0;
-            SkillCost = 0;
             SkillRange = 0;
             CanMove = true;
             CanAct = true;
@@ -236,11 +218,13 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
             Armor.Clear();
             Armor.AddRange(Parent.DefaultArmor);
             Attack.Clear();
-            AdditionActionPointsIncome = 0;
             AdditionMaxHealth = 0;
             SkillPower = 0;
             AttackPower = 0;
             AdditionInitiative = 0;
+            OnHitAction = null;
+            OnCastAction = null;
+            OnDeathAction = null;
             foreach (Buff buff in Buffs)
             {
                 buff.Native.Applier?.Invoke(this, buff);
@@ -318,28 +302,12 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
             RecalculateBuffs();
         }
 
-        public void RemoveTileBuffs()
-        {
-            Parent.Affected = true;
-            for (int i = 0; i < Buffs.Count; i++)
-            {
-                if (Buffs[i].Native.OnTile)
-                {
-                    Buffs[i].Purge();
-                    Buffs.RemoveAt(i);
-                    i--;
-                }
-            }
-
-            RecalculateBuffs();
-        }
-
-        public void Update(float time)
+        public void Update()
         {
             int changedBuffs = 0;
             for (int i = 0; i < Buffs.Count; i++)
             {
-                Buffs[i].Update(time);
+                Buffs[i].Update();
                 if (Buffs[i].Duration != null && Buffs[i].Duration <= 0)
                 {
                     changedBuffs++;
@@ -348,8 +316,7 @@ namespace ProjectArena.Engine.Objects.Immaterial.Buffs
                 }
             }
 
-            if
-            (changedBuffs > 0)
+            if (changedBuffs > 0)
             {
                 Parent.Affected = true;
                 RecalculateBuffs();

@@ -17,8 +17,6 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public List<int> KeyActorsSync { get; }
 
-        public int TurnsSkipped { get; }
-
         public PlayerStatus Status { get; }
 
         public Player(Engine.Player player)
@@ -27,7 +25,6 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Id = player.Id;
             this.Team = player.Team;
             this.KeyActorsSync = player.KeyActors.Select(x => x.Id).ToList();
-            this.TurnsSkipped = player.TurnsSkipped;
             this.Status = player.Status;
         }
 

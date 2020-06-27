@@ -13,23 +13,25 @@ using ProjectArena.Engine.VarManagers;
 
 namespace ProjectArena.Engine
 {
-    public class Scene : ISceneParentRef, ISceneForSceneGenerator, ForExternalUse.IScene
+    public class Scene : ISceneForSceneGenerator, ForExternalUse.IScene
     {
-        public delegate bool DefeatConditionMethod(ISceneParentRef scene, IPlayerParentRef player);
+        public delegate bool DefeatConditionMethod(Scene scene, Player player);
 
-        public delegate bool WinConditionMethod(ISceneParentRef scene);
+        public delegate bool WinConditionMethod(Scene scene);
 
         public event EventHandler<ForExternalUse.Synchronization.ISyncEventArgs> ReturnAction;
+
+        public event EventHandler<ForExternalUse.Synchronization.IMoveEventArgs> ReturnMoveAction;
 
         private readonly object lockObject = new object();
 
         private readonly List<Player> players;
 
+        private int updateCounter;
+
         public bool IsActive { get; private set; }
 
         public float PassedTime { get; private set; }
-
-        public string EnemyActorsPrefix { get; private set; }
 
         public DefeatConditionMethod DefeatCondition { get; }
 
@@ -43,13 +45,9 @@ namespace ProjectArena.Engine
 
         public List<ActiveDecoration> Decorations { get; }
 
-        public List<SpecEffect> SpecEffects { get; }
-
         public List<Actor> DeletedActors { get; private set; }
 
         public List<ActiveDecoration> DeletedDecorations { get; private set; }
-
-        public List<SpecEffect> DeletedEffects { get; private set; }
 
         public int IdsCounter { get; private set; }
 
@@ -58,10 +56,6 @@ namespace ProjectArena.Engine
         public INativeManager NativeManager { get; }
 
         public int Version { get; private set; }
-
-        public float RemainedTurnTime { get; private set; }
-
-        public TileObject TempTileObject { get; private set; }
 
         public Guid Id { get; }
 
@@ -100,15 +94,13 @@ namespace ProjectArena.Engine
             ISceneGenerator tempGenerator = (ISceneGenerator)generator;
             this.WinCondition = tempGenerator.WinCondition;
             this.DefeatCondition = tempGenerator.DefeatCondition;
-            this.EnemyActorsPrefix = string.Empty;
             this.IdsCounter = 1;
             this.players = new List<Player>();
             this.Actors = new List<Actor>();
             this.Decorations = new List<ActiveDecoration>();
-            this.SpecEffects = new List<SpecEffect>();
             this.DeletedActors = new List<Actor>();
             this.DeletedDecorations = new List<ActiveDecoration>();
-            this.DeletedEffects = new List<SpecEffect>();
+            updateCounter = 0;
             tempGenerator.GenerateNewScene(this, players, unchecked(seed * id.GetHashCode()));
         }
 
@@ -128,11 +120,6 @@ namespace ProjectArena.Engine
         public List<Actor> GetPlayerActors(Player player)
         {
             return Actors.FindAll(x => x.Owner == player);
-        }
-
-        public void SetupEnemyActorsPrefix(string prefix)
-        {
-            this.EnemyActorsPrefix = prefix;
         }
 
         public IEnumerable<int> GetPlayerActors(string playerId)
@@ -155,7 +142,7 @@ namespace ProjectArena.Engine
 
             actor.DamageModel.Health = health;
             actor.TempTile = target;
-            target.ChangeTempObject(actor, true);
+            target.ChangeTempObject(actor);
             actor.IsAlive = true;
             actor.Affected = true;
             Actors.Add(actor);
@@ -195,7 +182,8 @@ namespace ProjectArena.Engine
 
             Actor actor = new Actor(this, owner, externalId, target, visualization, enemyVisualization, z, NativeManager.GetActorNative(nativeName), roleModel);
             Actors.Add(actor);
-            target.ChangeTempObject(actor, true);
+            target.ChangeTempObject(actor);
+            target.Native.OnCreateAction?.Invoke(this, target, actor);
             return actor;
         }
 
@@ -208,18 +196,12 @@ namespace ProjectArena.Engine
 
             ActiveDecoration decoration = new ActiveDecoration(this, owner, target, visualization, z, health, armor, NativeManager.GetDecorationNative(nativeName), mod);
             Decorations.Add(decoration);
-            target.ChangeTempObject(decoration, true);
+            target.ChangeTempObject(decoration);
+            target.Native.OnCreateAction?.Invoke(this, target, decoration);
             return decoration;
         }
 
-        public SpecEffect CreateEffect(Player owner, string nativeName, Tile target, string visualization, float? z, float? duration, float? mod)
-        {
-            SpecEffect effect = new SpecEffect(this, owner, target.X, target.Y, visualization, z, NativeManager.GetEffectNative(nativeName), duration, mod);
-            SpecEffects.Add(effect);
-            return effect;
-        }
-
-        public Tile ChangeTile(string nativeName, int x, int y, float? height, IPlayerParentRef owner)
+        public Tile ChangeTile(string nativeName, int x, int y, float? height, Player owner)
         {
             if (Tiles[x][y] == null)
             {
@@ -238,22 +220,6 @@ namespace ProjectArena.Engine
             if (tile.Native.Unbearable && tile.TempObject != null)
             {
                 tile.TempObject.Kill();
-            }
-
-            if (tile.TempObject != null)
-            {
-                if (tile.TempObject is Actor actor)
-                {
-                    actor.BuffManager.RemoveTileBuffs();
-                }
-
-                if (!tile.Revealed)
-                {
-                    tile.Affected = true;
-                    tile.Revealed = true;
-                }
-
-                tile.Native.OnStepAction(this, Tiles[x][y]);
             }
 
             return tile;
@@ -275,14 +241,11 @@ namespace ProjectArena.Engine
         private ForExternalUse.Synchronization.ISynchronizer GetSynchronizationDataPlayersOnly()
         {
             return new Synchronizer(
-                TempTileObject,
                 players,
                 new List<Actor>(),
                 new List<ActiveDecoration>(),
-                new List<SpecEffect>(),
                 new List<Actor>(),
                 new List<ActiveDecoration>(),
-                new List<SpecEffect>(),
                 new Point(Tiles.Length, Tiles[0].Length),
                 new List<Tile>(),
                 RandomCounter);
@@ -292,7 +255,6 @@ namespace ProjectArena.Engine
         {
             List<Actor> changedActors = Actors.FindAll(x => x.Affected);
             List<ActiveDecoration> changedDecorations = Decorations.FindAll(x => x.Affected);
-            List<SpecEffect> changedEffects = SpecEffects.FindAll(x => x.Affected);
             List<Tile> changedTiles = new List<Tile>();
             for (int x = 0; x < Tiles.Length; x++)
             {
@@ -306,14 +268,11 @@ namespace ProjectArena.Engine
             }
 
             Synchronizer sync = new Synchronizer(
-                TempTileObject,
                 players,
                 changedActors,
                 changedDecorations,
-                changedEffects,
                 DeletedActors,
                 DeletedDecorations,
-                DeletedEffects,
                 new Point(Tiles.Length, Tiles[0].Length),
                 changedTiles,
                 RandomCounter);
@@ -321,11 +280,9 @@ namespace ProjectArena.Engine
             {
                 changedActors.ForEach(x => x.Affected = false);
                 changedDecorations.ToList().ForEach(x => x.Affected = false);
-                changedEffects.ToList().ForEach(x => x.Affected = false);
                 changedTiles.ToList().ForEach(x => x.Affected = false);
                 this.DeletedDecorations = new List<ActiveDecoration>();
                 this.DeletedActors = new List<Actor>();
-                this.DeletedEffects = new List<SpecEffect>();
             }
 
             return sync;
@@ -342,7 +299,6 @@ namespace ProjectArena.Engine
             {
                 Actors.ForEach(x => x.Affected = false);
                 Decorations.ToList().ForEach(x => x.Affected = false);
-                SpecEffects.ToList().ForEach(x => x.Affected = false);
                 for (int x = 0; x < Tiles.Length; x++)
                 {
                     for (int y = 0; y < Tiles[x].Length; y++)
@@ -353,10 +309,9 @@ namespace ProjectArena.Engine
 
                 this.DeletedDecorations.Clear();
                 this.DeletedActors.Clear();
-                this.DeletedEffects.Clear();
             }
 
-            return new SynchronizerFull(TempTileObject, players, Actors, Decorations, SpecEffects, Tiles, RandomCounter);
+            return new SynchronizerFull(players, Actors, Decorations, Tiles, RandomCounter);
         }
 
         public ForExternalUse.Synchronization.ISynchronizer GetFullSynchronizationData()
@@ -368,102 +323,23 @@ namespace ProjectArena.Engine
         public void StartGame()
         {
             this.ReturnAction(this, new SyncEventArgs(this, ++Version, Helpers.SceneAction.StartGame, GetFullSynchronizationData(true), null, null, null, null));
-            EndTurn(true);
         }
 
-        public void EndTurn(bool firstTurn = false)
+        public void EndTurn()
         {
-            bool turnStarted;
-            do
+            foreach (var actor in Actors)
             {
-                TempTileObject?.EndTurn();
-                float minInitiativePosition = float.MaxValue;
-                TileObject newObject = null;
-                foreach (TileObject obj in Actors)
-                {
-                    if (obj.IsAlive && obj.InitiativePosition < minInitiativePosition)
-                    {
-                        minInitiativePosition = obj.InitiativePosition;
-                        newObject = obj;
-                    }
-                }
-
-                foreach (ActiveDecoration obj in Decorations)
-                {
-                    if (obj.IsAlive && obj.InitiativePosition < minInitiativePosition && obj.Native.Action != null)
-                    {
-                        minInitiativePosition = obj.InitiativePosition;
-                        newObject = obj;
-                    }
-                }
-
-                if (newObject != null)
-                {
-                    this.RemainedTurnTime = firstTurn ?
-                        VarManager.TurnTimeLimit + 20 :
-                        (newObject.Owner == null || newObject.Owner.TurnsSkipped <= 0 ?
-                        VarManager.TurnTimeLimit :
-                        VarManager.TurnTimeLimitAfterSkip);
-                    this.TempTileObject = newObject;
-                    Update(minInitiativePosition);
-                    turnStarted = this.TempTileObject.StartTurn();
-                    if (!AfterUpdateSynchronization(Helpers.SceneAction.EndTurn, TempTileObject, null, null, null))
-                    {
-                        turnStarted = true;
-                    }
-                    else if (this.TempTileObject is ActiveDecoration decoration)
-                    {
-                        DecorationCast(decoration);
-                    }
-                }
-                else
-                {
-                    turnStarted = true;
-                    AfterUpdateSynchronization(Helpers.SceneAction.NoActorsDraw, null, null, null, null);
-                }
-            }
-            while (!turnStarted);
-        }
-
-        private void Update(float time, Actor specificActor = null)
-        {
-            PassedTime += time;
-            for (int x = 0; x < Tiles.Length; x++)
-            {
-                for (int y = 0; y < Tiles[x].Length; y++)
-                {
-                    Tiles[x][y].Update(time);
-                }
+                actor.Update();
             }
 
-            foreach (TileObject obj in Actors)
-            {
-                if (specificActor == null || obj == specificActor)
-                {
-                    obj.Update(time);
-                }
-            }
-
-            foreach (TileObject obj in Decorations)
-            {
-                obj.Update(time);
-            }
-
-            foreach (SpecEffect eff in SpecEffects)
-            {
-                eff.Update(time);
-            }
+            AfterUpdateSynchronization(SceneAction.EndTurn, null, null, null, null);
         }
 
         private void AfterActionUpdate()
         {
             foreach (Player player in players)
             {
-                if (player.Status == PlayerStatus.Playing && player.TurnsSkipped >= VarManager.SkippedTurnsLimit)
-                {
-                    player.Defeat(true);
-                }
-                else if (player.Status == PlayerStatus.Playing && DefeatCondition(this, player))
+                if (player.Status == PlayerStatus.Playing && DefeatCondition(this, player))
                 {
                     player.Defeat(false);
                 }
@@ -490,43 +366,18 @@ namespace ProjectArena.Engine
                     i--;
                 }
             }
-
-            for (int i = 0; i < SpecEffects.Count; i++)
-            {
-                if (!SpecEffects[i].IsAlive)
-                {
-                    DeletedEffects.Add(SpecEffects[i]);
-                    SpecEffects.RemoveAt(i);
-                    i--;
-                }
-            }
         }
 
-        public void UpdateTime(float time)
+        public void Update()
         {
             if (IsActive)
             {
                 lock (lockObject)
                 {
-                    if (IsActive)
+                    updateCounter++;
+                    if (updateCounter >= 10)
                     {
-                        this.RemainedTurnTime -= time;
-                        if (RemainedTurnTime <= 0)
-                        {
-                            IPlayerParentRef player = TempTileObject.Owner;
-                            if (player != null)
-                            {
-                                player.SkipTurn();
-                                if (AfterUpdateSynchronization(Helpers.SceneAction.SkipTurn, TempTileObject, null, null, null))
-                                {
-                                    EndTurn();
-                                }
-                            }
-                            else
-                            {
-                                EndTurn();
-                            }
-                        }
+                        EndTurn();
                     }
                 }
             }
@@ -576,184 +427,98 @@ namespace ProjectArena.Engine
 
             if (needNewAction)
             {
-                AfterUpdateSynchronization(Helpers.SceneAction.Leave, TempTileObject, null, null, null);
+                AfterUpdateSynchronization(Helpers.SceneAction.Leave, null, null, null, null);
             }
 
             return success;
         }
 
-        private void ApplyActionAfterSkipping()
+        public void ActorMove(string playerId, int targetX, int targetY)
         {
-            RemainedTurnTime += VarManager.TurnTimeLimit - VarManager.TurnTimeLimitAfterSkip;
-        }
-
-        public bool DecorationCast(ActiveDecoration actor)
-        {
-            if (TempTileObject == actor)
-            {
-                if (actor.Owner?.ActThisTurn() ?? false)
-                {
-                    ApplyActionAfterSkipping();
-                }
-
-                actor.Cast();
-                if (AfterUpdateSynchronization(Helpers.SceneAction.Decoration, actor, null, null, null))
-                {
-                    EndTurn();
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool ActorMove(int actorId, int targetX, int targetY)
-        {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
+            var player = Players.FirstOrDefault(x => x.Id == playerId);
+            if (IsActive && player.PlayerActor.IsAlive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive)
+                    if (player.PlayerActor.IsAlive && IsActive)
                     {
-                        Actor actor = (Actor)TempTileObject;
-                        if (actor.Owner?.ActThisTurn() ?? false)
-                        {
-                            ApplyActionAfterSkipping();
-                        }
-
-                        bool result = actor.Move(Tiles[targetX][targetY]);
+                        bool result = player.PlayerActor.Move(Tiles[targetX][targetY]);
                         if (result)
                         {
-                            bool actionAvailability = actor.CheckActionAvailability();
-                            if (actionAvailability)
-                            {
-                                Update(0, actor);
-                                AfterActionUpdate();
-                            }
-
-                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.SceneAction.Move, actor, null, targetX, targetY);
-                            if (afterActionUpdateSynchronization && !actionAvailability)
-                            {
-                                EndTurn();
-                            }
+                            ReturnMoveAction?.Invoke(this, new MoveEventArgs(player.PlayerActor.Id, targetX, targetY));
                         }
-
-                        return result;
                     }
                 }
             }
-
-            return false;
         }
 
-        public bool ActorCast(int actorId, int skillId, int targetX, int targetY)
+        public void ActorCast(string playerId, int skillId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
+            var player = Players.FirstOrDefault(x => x.Id == playerId);
+            if (IsActive && player.PlayerActor.IsAlive && player.PlayerActor.Acted && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive)
+                    if (IsActive && player.PlayerActor.IsAlive && player.PlayerActor.Acted)
                     {
-                        Actor actor = (Actor)TempTileObject;
-                        if (actor.Owner?.ActThisTurn() ?? false)
-                        {
-                            ApplyActionAfterSkipping();
-                        }
-
-                        bool result = actor.Cast(skillId, Tiles[targetX][targetY]);
+                        bool result = player.PlayerActor.Cast(skillId, Tiles[targetX][targetY]);
                         if (result)
                         {
-                            bool actionAvailability = actor.CheckActionAvailability();
-                            if (actionAvailability)
-                            {
-                                Update(0, actor);
-                                AfterActionUpdate();
-                            }
-
-                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.SceneAction.Cast, actor, skillId, targetX, targetY);
-                            if (afterActionUpdateSynchronization && !actionAvailability)
-                            {
-                                EndTurn();
-                            }
+                            AfterUpdateSynchronization(Helpers.SceneAction.Cast, player.PlayerActor, skillId, targetX, targetY);
                         }
-
-                        return result;
+                        else
+                        {
+                            AfterUpdateSynchronization(Helpers.SceneAction.Unsuccess, player.PlayerActor, null, targetX, targetY);
+                        }
                     }
                 }
             }
-
-            return false;
         }
 
-        public bool ActorAttack(int actorId, int targetX, int targetY)
+        public void ActorAttack(string playerId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
+            var player = Players.FirstOrDefault(x => x.Id == playerId);
+            if (IsActive && player.PlayerActor.IsAlive && player.PlayerActor.Acted && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive)
+                    if (IsActive && player.PlayerActor.IsAlive && player.PlayerActor.Acted)
                     {
-                        Actor actor = (Actor)TempTileObject;
-                        if (actor.Owner?.ActThisTurn() ?? false)
-                        {
-                            ApplyActionAfterSkipping();
-                        }
-
-                        bool result = actor.Attack(Tiles[targetX][targetY]);
+                        bool result = player.PlayerActor.Attack(Tiles[targetX][targetY]);
                         if (result)
                         {
-                            bool actionAvailability = actor.CheckActionAvailability();
-                            if (actionAvailability)
-                            {
-                                Update(0, actor);
-                                AfterActionUpdate();
-                            }
-
-                            bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.SceneAction.Attack, actor, null, targetX, targetY);
-                            if (afterActionUpdateSynchronization && !actionAvailability)
-                            {
-                                EndTurn();
-                            }
+                            AfterUpdateSynchronization(Helpers.SceneAction.Attack, player.PlayerActor, null, targetX, targetY);
                         }
-
-                        return result;
+                        else
+                        {
+                            AfterUpdateSynchronization(Helpers.SceneAction.Unsuccess, player.PlayerActor, null, targetX, targetY);
+                        }
                     }
                 }
             }
-
-            return false;
         }
 
-        public bool ActorWait(int actorId)
+        public void ActorOrder(int actorId, int skillId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive)
+            if (IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
             {
+                var target = Tiles[targetX][targetY].TempObject;
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive)
+                    var actor = this.Actors.Find(x => x.Id == actorId);
+                    if (IsActive && actor != null && (actor.Order == null || !actor.Order.Intended) && actor.Skills.Any(x => x.Id == skillId))
                     {
-                        Actor actor = (Actor)TempTileObject;
-                        if (actor.Owner?.ActThisTurn() ?? false)
+                        if (target != null && target.IsAlive)
                         {
-                            ApplyActionAfterSkipping();
+                            actor.SetOrderModel(true, skillId, target);
                         }
-
-                        bool result = actor.Wait();
-                        if (result)
+                        else
                         {
-                            if (AfterUpdateSynchronization(Helpers.SceneAction.Wait, actor, null, null, null))
-                            {
-                                EndTurn();
-                            }
+                            actor.SetOrderModel(true, skillId, targetX, targetY);
                         }
-
-                        return result;
                     }
                 }
             }
-
-            return false;
         }
     }
 }

@@ -15,7 +15,5 @@ namespace ProjectArena.Engine.NativeManagers
         SkillNative GetSkillNative(string id);
 
         RoleModelNative GetRoleModelNative(string id);
-
-        SpecEffectNative GetEffectNative(string id);
     }
 }

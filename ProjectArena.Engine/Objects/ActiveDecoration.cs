@@ -13,40 +13,21 @@ namespace ProjectArena.Engine.Objects
 
         public float Mod { get; set; }
 
-        public ActiveDecoration(ISceneParentRef parent, IPlayerParentRef owner, ITileParentRef tempTile, string visualization, float? z, int? maxHealth, TagSynergy[] armor, ActiveDecorationNative native, float? mod)
+        public ActiveDecoration(Scene parent, Player owner, Tile tempTile, string visualization, float? z, int? maxHealth, TagSynergy[] armor, ActiveDecorationNative native, float? mod)
             : base(parent, owner, tempTile, z ?? native.DefaultZ, new DamageModel(maxHealth ?? native.DefaultHealth, armor ?? native.DefaultArmor), native)
         {
             this.Visualization = visualization ?? native.DefaultVisualisation;
             this.Mod = mod ?? native.DefaultMod;
-            this.InitiativePosition += 1;
         }
 
-        public override void Update(float time)
+        public override void OnHitAction(float amount)
         {
-            this.InitiativePosition -= time;
-            if (time > 0)
-            {
-                this.Affected = true;
-            }
-        }
-
-        public void Cast()
-        {
-            Native.Action?.Invoke(Parent, this);
-        }
-
-        public override void EndTurn()
-        {
-            this.InitiativePosition += 1;
-        }
-
-        public override bool StartTurn()
-        {
-            return true;
+            Native.OnHitAction?.Invoke(Parent, this, amount);
         }
 
         public override void OnDeathAction()
         {
+            TempTile.Native.OnDeathAction?.Invoke(Parent, TempTile, this);
             Native.OnDeathAction?.Invoke(Parent, this);
         }
     }

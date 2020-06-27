@@ -18,7 +18,7 @@ namespace ProjectArena.Engine.Helpers
                 player,
                 actor.ExternalId,
                 actor.NativeId,
-                new RoleModelNative(scene.NativeManager, null, actor.Strength, actor.Willpower, actor.Constitution, actor.Speed, actor.ActionPointsIncome, actor.AttackingSkillName, actor.SkillNames.ToArray()),
+                new RoleModelNative(scene.NativeManager, null, actor.Strength, actor.Willpower, actor.Constitution, actor.Speed, actor.AttackingSkillName, actor.SkillNames.ToArray()),
                 target,
                 null,
                 null,

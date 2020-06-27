@@ -21,8 +21,6 @@ namespace ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces
 
         IEnumerable<string> SkillNames { get; }
 
-        int ActionPointsIncome { get; }
-
         IEnumerable<string> StartBuffs { get; }
     }
 }

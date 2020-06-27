@@ -40,11 +40,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
 
         public List<ISkill> Skills { get; }
 
-        public int ActionPointsIncome { get; }
-
         public List<IBuff> Buffs { get; }
-
-        public float InitiativePosition { get; }
 
         public float Health { get; }
 
@@ -57,8 +53,6 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
         public float Z { get; }
 
         public int MaxHealth { get; }
-
-        public int ActionPoints { get; }
 
         public float SkillPower { get; }
 
@@ -84,7 +78,6 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.ExternalId = actor.ExternalId;
             this.NativeId = actor.Native.Id;
             this.AttackingSkill = new Skill(actor.AttackingSkill);
-            this.ActionPointsIncome = actor.ActionPointsIncome;
             this.Strength = actor.Strength;
             this.Willpower = actor.Willpower;
             this.Constitution = actor.Constitution;
@@ -93,14 +86,12 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Team = actor.Owner?.Team;
             this.Skills = actor.Skills.Select(x => (ISkill)new Skill(x)).ToList();
             this.Buffs = actor.Buffs.Select(x => (IBuff)new Buff(x)).ToList();
-            this.InitiativePosition = actor.InitiativePosition;
             this.Health = actor.DamageModel.Health;
             this.IsAlive = actor.IsAlive;
             this.X = actor.X;
             this.Y = actor.Y;
             this.Z = actor.Z;
             this.MaxHealth = actor.MaxHealth;
-            this.ActionPoints = actor.ActionPoints;
             this.SkillPower = actor.SkillPower;
             this.AttackPower = actor.AttackPower;
             this.Initiative = actor.Initiative;
@@ -122,7 +113,6 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             int constitution,
             int speed,
             IEnumerable<string> skillNames,
-            int actionPointsIncome,
             IEnumerable<string> startBuffs)
         {
             this.StartBuffs = startBuffs;
@@ -134,7 +124,6 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Constitution = constitution;
             this.Speed = speed;
             this.SkillNames = skillNames;
-            this.ActionPointsIncome = actionPointsIncome;
         }
     }
 }

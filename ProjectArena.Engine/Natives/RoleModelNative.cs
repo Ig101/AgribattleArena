@@ -18,13 +18,10 @@ namespace ProjectArena.Engine.Natives
 
         public SkillNative[] Skills { get; }
 
-        public int DefaultActionPointsIncome { get; }
-
-        public RoleModelNative(string id, int defaultStrength, int defaultWillpower, int defaultConstitution, int defaultSpeed, int defaultActionPointsIncome, SkillNative attackingSkill, SkillNative[] skills)
+        public RoleModelNative(string id, int defaultStrength, int defaultWillpower, int defaultConstitution, int defaultSpeed, SkillNative attackingSkill, SkillNative[] skills)
         {
             this.Id = id;
             this.AttackingSkill = attackingSkill;
-            this.DefaultActionPointsIncome = defaultActionPointsIncome;
             this.DefaultConstitution = defaultConstitution;
             this.DefaultWillpower = defaultWillpower;
             this.DefaultStrength = defaultStrength;
@@ -32,11 +29,10 @@ namespace ProjectArena.Engine.Natives
             this.Skills = skills;
         }
 
-        public RoleModelNative(INativeManager nativeManager, string id, int defaultStrength, int defaultWillpower, int defaultConstitution, int defaultSpeed, int defaultActionPointsIncome, string attackingSkillId, string[] skillIds)
+        public RoleModelNative(INativeManager nativeManager, string id, int defaultStrength, int defaultWillpower, int defaultConstitution, int defaultSpeed, string attackingSkillId, string[] skillIds)
         {
             this.Id = id;
             this.AttackingSkill = nativeManager.GetSkillNative(attackingSkillId);
-            this.DefaultActionPointsIncome = defaultActionPointsIncome;
             this.DefaultConstitution = defaultConstitution;
             this.DefaultWillpower = defaultWillpower;
             this.DefaultStrength = defaultStrength;

@@ -16,17 +16,13 @@ namespace ProjectArena.Engine.Natives
 
         public int DefaultRange { get; }
 
-        public int DefaultCost { get; }
-
         public float DefaultCd { get; }
 
         public float DefaultMod { get; }
 
         public Targets AvailableTargets { get; }
 
-        public bool OnlyVisibleTargets { get; }
-
-        public Action<ISceneParentRef, IActorParentRef, Tile, Skill> Action { get; }
+        public Action<Scene, Actor, Tile, Skill> Action { get; }
 
         public SkillNative(
             string id,
@@ -34,22 +30,18 @@ namespace ProjectArena.Engine.Natives
             string defaultEnemyVisualization,
             string[] tags,
             int defaultRange,
-            int defaultCost,
             float defaultCd,
             float defaultMod,
             Targets availableTargets,
-            bool onlyVisibleTargets,
-            Action<ISceneParentRef, IActorParentRef, Tile, Skill> action)
+            Action<Scene, Actor, Tile, Skill> action)
             : base(id, tags)
         {
             this.DefaultVisualization = defaultVisualization;
             this.DefaultEnemyVisualization = defaultEnemyVisualization;
             this.DefaultRange = defaultRange;
-            this.DefaultCost = defaultCost;
             this.DefaultCd = defaultCd;
             this.DefaultMod = defaultMod;
             this.AvailableTargets = availableTargets;
-            this.OnlyVisibleTargets = onlyVisibleTargets;
             this.Action = action;
         }
     }

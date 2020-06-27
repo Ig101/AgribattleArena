@@ -9,9 +9,8 @@ namespace ProjectArena.Engine.Objects.Immaterial
 {
     public class Skill : IdObject
     {
-        private readonly IActorParentRef parent;
+        private readonly Actor parent;
         private readonly float cd;
-        private readonly int cost;
         private readonly int range;
 
         public string Visualization { get; set; }
@@ -22,11 +21,9 @@ namespace ProjectArena.Engine.Objects.Immaterial
 
         public SkillNative Native { get; }
 
-        public float Cd => cd + (cd > 0 ? parent.BuffManager.SkillCd : 0);
+        public float Cd => cd * parent.Initiative;
 
         public float Mod { get; }
-
-        public int Cost => cost + parent.BuffManager.SkillCost;
 
         public float PreparationTime { get; set; }
 
@@ -34,85 +31,42 @@ namespace ProjectArena.Engine.Objects.Immaterial
 
         public bool Revealed { get; set; }
 
-        public Skill(IActorParentRef parent, SkillNative skill, string visualization, string enemyVisualization, float? cd, float? mod, int? cost, int? range)
+        public Skill(Actor parent, SkillNative skill, string visualization, string enemyVisualization, float? cd, float? mod, int? cost, int? range)
             : base(parent.Parent)
         {
             this.Visualization = visualization ?? skill.DefaultVisualization;
             this.EnemyVisualization = enemyVisualization ?? skill.DefaultEnemyVisualization;
             this.range = range ?? skill.DefaultRange;
             this.Mod = mod ?? skill.DefaultMod;
-            this.cost = cost ?? skill.DefaultCost;
             this.cd = cd ?? skill.DefaultCd;
             this.Native = skill;
             this.parent = parent;
             this.Revealed = false;
         }
 
-        public void Update(float time)
+        public void Update()
         {
             if (PreparationTime > 0)
             {
-                PreparationTime -= time;
+                PreparationTime -= 1;
             }
-        }
-
-        private bool CheckMilliness(Tile target)
-        {
-            var range = Misc.RangeBetween(parent.X, parent.Y, target.X, target.Y);
-            var incrementingRange = 0;
-            var angleBetween = Misc.AngleBetween(parent.X, parent.Y, target.X, target.Y);
-            var sin = Math.Sin(angleBetween);
-            var cos = Math.Cos(angleBetween);
-            var currentTile = parent.TempTile;
-            while (incrementingRange <= range)
-            {
-                incrementingRange++;
-                Tile nextTarget;
-                if (incrementingRange >= range)
-                {
-                    nextTarget = target;
-                }
-                else
-                {
-                    var nextXFloat = parent.X + (incrementingRange * cos);
-                    var nextYFloat = parent.Y + (incrementingRange * sin);
-                    var nextX = (int)nextXFloat + (nextXFloat % 1 > 0.5 ? 1 : 0);
-                    var nextY = (int)nextYFloat + (nextYFloat % 1 > 0.5 ? 1 : 0);
-                    nextTarget = parent.Parent.Tiles[nextX][nextY];
-                    if (nextTarget == currentTile)
-                    {
-                        continue;
-                    }
-                }
-
-                if (nextTarget.Height - currentTile.Height >= 10 ||
-                    (nextTarget != target && nextTarget.TempObject != null) ||
-                    nextTarget.Native.Unbearable)
-                {
-                    return false;
-                }
-
-                currentTile = nextTarget;
-            }
-
-            return true;
         }
 
         public bool Cast(Tile target)
         {
-            if (parent.ActionPoints >= cost && PreparationTime <= 0 && parent.BuffManager.CanAct &&
+            if (PreparationTime <= 0 && parent.BuffManager.CanAct &&
                     ((Native.AvailableTargets.Allies && target.TempObject != null && target.TempObject is Actor && target.TempObject != parent && target.TempObject.Owner?.Team == parent.Owner?.Team) ||
                     (Native.AvailableTargets.NotAllies && target.TempObject != null && target.TempObject is Actor && target.TempObject != parent && (parent.Owner?.Team == null || target.TempObject.Owner?.Team != parent.Owner?.Team)) ||
                     (Native.AvailableTargets.Decorations && target.TempObject != null && target.TempObject is ActiveDecoration) ||
                     (Native.AvailableTargets.Self && target.TempObject == parent) ||
                     (Native.AvailableTargets.Bearable && target.TempObject == null && !target.Native.Unbearable) ||
                     (Native.AvailableTargets.Unbearable && target.TempObject == null && target.Native.Unbearable)) &&
-                (!Native.OnlyVisibleTargets || CheckMilliness(target)) &&
                 Misc.RangeBetween(parent.X, parent.Y, target.X, target.Y) <= range)
             {
+                parent.TempTile.Native.OnActionAction?.Invoke(parent.Parent, parent.TempTile);
+                parent.OnCastAction?.Invoke(parent.Parent, parent);
                 Native.Action(parent.Parent, parent, target, this);
                 PreparationTime = cd;
-                parent.SpendActionPoints(cost);
                 Revealed = true;
                 return true;
             }

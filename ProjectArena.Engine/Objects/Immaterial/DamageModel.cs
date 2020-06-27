@@ -9,7 +9,7 @@ namespace ProjectArena.Engine.Objects.Immaterial
     {
         private readonly int? maxHealth;
         private readonly TagSynergy[] armor;
-        private IActorDamageModelRef roleModel;
+        private Actor roleModel;
         private float health;
 
         public List<Buff> Buffs => roleModel?.Buffs;
@@ -35,13 +35,13 @@ namespace ProjectArena.Engine.Objects.Immaterial
         {
         }
 
-        public void SetupRoleModel(IActorDamageModelRef model)
+        public void SetupRoleModel(Actor model)
         {
             this.roleModel = model;
             this.health = MaxHealth;
         }
 
-        public bool Damage(float amount, IEnumerable<string> tags)
+        public float Damage(float amount, IEnumerable<string> tags)
         {
             if (tags != null && Armor != null)
             {
@@ -58,7 +58,7 @@ namespace ProjectArena.Engine.Objects.Immaterial
             }
 
             Health -= amount;
-            return amount != 0;
+            return amount;
         }
     }
 }

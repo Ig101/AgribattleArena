@@ -96,7 +96,7 @@ namespace ProjectArena.Engine.SceneGenerators
                 GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 2][height - 6], tempPlayers[1].KeyActorsGen[5], null));
         }
 
-        public static bool DefeatConditionDuel(ISceneParentRef scene, IPlayerParentRef player)
+        public static bool DefeatConditionDuel(Scene scene, Player player)
         {
             foreach (Actor actor in player.KeyActors)
             {
@@ -109,7 +109,7 @@ namespace ProjectArena.Engine.SceneGenerators
             return true;
         }
 
-        public static bool WinConditionDuel(ISceneParentRef scene)
+        public static bool WinConditionDuel(Scene scene)
         {
             int countOfRemainedPlayers = 0;
             foreach (Player player in scene.Players)

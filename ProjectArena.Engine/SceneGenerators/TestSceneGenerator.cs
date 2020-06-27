@@ -84,7 +84,7 @@ namespace ProjectArena.Engine.SceneGenerators
             }
         }
 
-        public static bool DefeatConditionTest(ISceneParentRef scene, IPlayerParentRef player)
+        public static bool DefeatConditionTest(Scene scene, Player player)
         {
             foreach (Actor actor in player.KeyActors)
             {
@@ -97,7 +97,7 @@ namespace ProjectArena.Engine.SceneGenerators
             return true;
         }
 
-        public static bool WinConditionTest(ISceneParentRef scene)
+        public static bool WinConditionTest(Scene scene)
         {
             int countOfRemainedPlayers = 0;
             foreach (Player player in scene.Players)
@@ -111,12 +111,12 @@ namespace ProjectArena.Engine.SceneGenerators
             return countOfRemainedPlayers <= 1;
         }
 
-        public static bool DefeatConditionDummy(ISceneParentRef scene, IPlayerParentRef player)
+        public static bool DefeatConditionDummy(Scene scene, Player player)
         {
             return false;
         }
 
-        public static bool WinConditionDummy(ISceneParentRef scene)
+        public static bool WinConditionDummy(Scene scene)
         {
             return false;
         }

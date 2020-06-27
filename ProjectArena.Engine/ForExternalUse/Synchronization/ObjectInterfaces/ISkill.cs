@@ -18,13 +18,9 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         float Mod { get; }
 
-        int Cost { get; }
-
         float PreparationTime { get; }
 
         Targets AvailableTargets { get; }
-
-        bool OnlyVisibleTargets { get; }
 
         bool Revealed { get; }
     }

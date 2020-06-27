@@ -11,10 +11,6 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         string Visualization { get; }
 
-        float Mod { get; }
-
-        float InitiativePosition { get; }
-
         float Health { get; }
 
         string OwnerId { get; }
@@ -30,8 +26,6 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
         float Z { get; }
 
         float MaxHealth { get; }
-
-        List<TagSynergy> Armor { get; }
 
         bool HealthRevealed { get; }
     }

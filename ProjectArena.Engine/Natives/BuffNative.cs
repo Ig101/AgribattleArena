@@ -15,13 +15,9 @@ namespace ProjectArena.Engine.Natives
 
         public bool SummarizeLength { get; }
 
-        public bool OnTile { get; }
+        public Action<BuffManager, Buff> Applier { get; }
 
-        public Action<ISceneParentRef, IActorParentRef, Buff, float> Action { get; }
-
-        public Action<IBuffManagerParentRef, Buff> Applier { get; }
-
-        public Action<ISceneParentRef, IActorParentRef, Buff> OnPurgeAction { get; }
+        public Action<Scene, Actor, Buff> OnPurgeAction { get; }
 
         public float? DefaultDuration { get; }
 
@@ -33,21 +29,17 @@ namespace ProjectArena.Engine.Natives
             bool eternal,
             int repeatable,
             bool summarizeLength,
-            bool onTile,
             float? defaultDuration,
             float defaultMod,
-            Action<ISceneParentRef, IActorParentRef, Buff, float> action,
-            Action<IBuffManagerParentRef, Buff> applier,
-            Action<ISceneParentRef, IActorParentRef, Buff> onPurgeAction)
+            Action<BuffManager, Buff> applier,
+            Action<Scene, Actor, Buff> onPurgeAction)
             : base(id, tags)
         {
             this.Eternal = eternal;
             this.Repeatable = repeatable < 1 ? 1 : repeatable;
             this.SummarizeLength = summarizeLength;
-            this.OnTile = onTile;
             this.DefaultDuration = defaultDuration;
             this.DefaultMod = defaultMod;
-            this.Action = action;
             this.Applier = applier;
             this.OnPurgeAction = onPurgeAction;
         }

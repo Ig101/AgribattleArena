@@ -13,8 +13,6 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         List<int> KeyActorsSync { get; }
 
-        int TurnsSkipped { get; }
-
         PlayerStatus Status { get; }
     }
 }

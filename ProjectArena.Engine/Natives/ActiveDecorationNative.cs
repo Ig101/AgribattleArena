@@ -19,9 +19,9 @@ namespace ProjectArena.Engine.Natives
 
         public float DefaultMod { get; }
 
-        public Action<ISceneParentRef, ActiveDecoration> Action { get; set; }
+        public Action<Scene, ActiveDecoration, float> OnHitAction { get; set; }
 
-        public Action<ISceneParentRef, ActiveDecoration> OnDeathAction { get; set; }
+        public Action<Scene, ActiveDecoration> OnDeathAction { get; set; }
 
         public ActiveDecorationNative(
             string id,
@@ -31,8 +31,8 @@ namespace ProjectArena.Engine.Natives
             int defaultHealth,
             float defaultZ,
             float defaultMod,
-            Action<ISceneParentRef, ActiveDecoration> action,
-            Action<ISceneParentRef, ActiveDecoration> onDeathAction)
+            Action<Scene, ActiveDecoration, float> onHitAction,
+            Action<Scene, ActiveDecoration> onDeathAction)
             : base(id, tags)
         {
             this.DefaultVisualisation = defaultVisualization;
@@ -40,7 +40,7 @@ namespace ProjectArena.Engine.Natives
             this.DefaultHealth = defaultHealth;
             this.DefaultZ = defaultZ;
             this.DefaultMod = defaultMod;
-            this.Action = action;
+            this.OnHitAction = onHitAction;
             this.OnDeathAction = onDeathAction;
         }
     }

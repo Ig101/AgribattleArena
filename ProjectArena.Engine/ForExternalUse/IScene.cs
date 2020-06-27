@@ -10,15 +10,11 @@ namespace ProjectArena.Engine.ForExternalUse
 
         float PassedTime { get; }
 
-        string EnemyActorsPrefix { get; }
-
         int Version { get; }
 
         bool IsActive { get; }
 
         IEnumerable<IPlayerShort> ShortPlayers { get; }
-
-        float RemainedTurnTime { get; }
 
         IEnumerable<int> GetPlayerActors(string playerId);
 
@@ -26,15 +22,15 @@ namespace ProjectArena.Engine.ForExternalUse
 
         ISynchronizer GetFullSynchronizationData();
 
-        void UpdateTime(float time);
+        void Update();
 
-        bool ActorMove(int actorId, int targetX, int targetY);
+        void ActorMove(string playerId, int targetX, int targetY);
 
-        bool ActorCast(int actorId, int skillId, int targetX, int targetY);
+        void ActorCast(string playerId, int skillId, int targetX, int targetY);
 
-        bool ActorAttack(int actorId, int targetX, int targetY);
+        void ActorAttack(string playerId, int targetX, int targetY);
 
-        bool ActorWait(int actorId);
+        void ActorOrder(int actorId, int skillId, int targetX, int targetY);
 
         bool LeaveScene(string userId);
     }

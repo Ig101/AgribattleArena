@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ProjectArena.Engine.Objects;
+using ProjectArena.Engine.Objects.Abstract;
 
 namespace ProjectArena.Engine.Natives
 {
@@ -14,23 +15,32 @@ namespace ProjectArena.Engine.Natives
 
         public bool Unbearable { get; }
 
-        public Action<ISceneParentRef, Tile, float> Action { get; }
+        public Action<Scene, Tile, TileObject> OnCreateAction { get; }
 
-        public Action<ISceneParentRef, Tile> OnStepAction { get; }
+        public Action<Scene, Tile, TileObject> OnDeathAction { get; }
+
+        public Action<Scene, Tile> OnActionAction { get; }
 
         public float DefaultMod { get; }
 
-        public bool RevealedByDefault { get; }
-
-        public TileNative(string id, string[] tags, bool flat, int defaultHeight, bool unbearable, float defaultMod, bool revealedByDefault, Action<ISceneParentRef, Tile, float> action, Action<ISceneParentRef, Tile> onStepAction)
+        public TileNative(
+            string id,
+            string[] tags,
+            bool flat,
+            int defaultHeight,
+            bool unbearable,
+            float defaultMod,
+            Action<Scene, Tile, TileObject> onCreateAction,
+            Action<Scene, Tile> onActionAction,
+            Action<Scene, Tile, TileObject> onDeathAction)
             : base(id, tags)
         {
-            this.RevealedByDefault = revealedByDefault;
             this.Flat = flat;
             this.DefaultHeight = defaultHeight;
             this.Unbearable = unbearable;
-            this.Action = action;
-            this.OnStepAction = onStepAction;
+            this.OnActionAction = onActionAction;
+            this.OnCreateAction = onCreateAction;
+            this.OnDeathAction = onDeathAction;
             this.DefaultMod = defaultMod;
         }
     }

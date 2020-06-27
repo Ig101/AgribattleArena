@@ -8,23 +8,15 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization
     {
         int RandomCounter { get; }
 
-        int? TempActor { get; }
-
-        int? TempDecoration { get; }
-
         IEnumerable<IPlayer> Players { get; }
 
         IEnumerable<IActor> ChangedActors { get; }
 
         IEnumerable<IActiveDecoration> ChangedDecorations { get; }
 
-        IEnumerable<ISpecEffect> ChangedEffects { get; }
-
         IEnumerable<int> DeletedActors { get; }
 
         IEnumerable<int> DeletedDecorations { get; }
-
-        IEnumerable<int> DeletedEffects { get; }
 
         IEnumerable<ITile> ChangedTiles { get; }
 
