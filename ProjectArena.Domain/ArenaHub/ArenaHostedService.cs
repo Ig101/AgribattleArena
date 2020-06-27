@@ -43,7 +43,7 @@ namespace ProjectArena.Domain.ArenaHub
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(BackgroundProcessing, 5, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+            _timer = new Timer(BackgroundProcessing, 5, TimeSpan.Zero, TimeSpan.FromMilliseconds(500));
             _timeStamp = DateTime.Now.ToUniversalTime();
             _logger.LogInformation("Arena hosted service is running.");
             return Task.CompletedTask;
@@ -81,7 +81,7 @@ namespace ProjectArena.Domain.ArenaHub
             var passed = (currentTime - _timeStamp).TotalSeconds;
             _timeStamp = currentTime;
             _queueService.QueueProcessing(passed);
-            _battleService.EngineTimeProcessing(passed);
+            _battleService.EngineTimeProcessing();
 
             if (currentTime.Date != _lastUpdateDate.Value.Date)
             {

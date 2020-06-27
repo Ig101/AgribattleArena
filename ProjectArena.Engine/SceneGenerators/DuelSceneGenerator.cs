@@ -79,8 +79,9 @@ namespace ProjectArena.Engine.SceneGenerators
                 GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[1][3], tempPlayers[0].KeyActorsGen[3], null));
             tempPlayersForScene[0].KeyActors.Add(
                 GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[4][3], tempPlayers[0].KeyActorsGen[4], null));
-            tempPlayersForScene[0].KeyActors.Add(
-                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[1][5], tempPlayers[0].KeyActorsGen[5], null));
+            var firstPlayerMainActor = GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[1][5], tempPlayers[0].PlayerActorGen, null);
+            tempPlayersForScene[0].PlayerActor = firstPlayerMainActor;
+            tempPlayersForScene[0].KeyActors.Add(firstPlayerMainActor);
 
             tempPlayersForScene[1].KeyActors.Add(
                 GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 2][height - 2], tempPlayers[1].KeyActorsGen[0], null));
@@ -92,8 +93,9 @@ namespace ProjectArena.Engine.SceneGenerators
                 GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 2][height - 4], tempPlayers[1].KeyActorsGen[3], null));
             tempPlayersForScene[1].KeyActors.Add(
                 GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 5][height - 4], tempPlayers[1].KeyActorsGen[4], null));
-            tempPlayersForScene[1].KeyActors.Add(
-                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 2][height - 6], tempPlayers[1].KeyActorsGen[5], null));
+            var secondPlayerMainActor = GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 2][height - 6], tempPlayers[1].PlayerActorGen, null);
+            tempPlayersForScene[1].PlayerActor = firstPlayerMainActor;
+            tempPlayersForScene[1].KeyActors.Add(firstPlayerMainActor);
         }
 
         public static bool DefeatConditionDuel(Scene scene, Player player)

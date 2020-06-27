@@ -41,7 +41,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Mode = new SceneMode()
                         {
                             Generator = EngineHelper.CreateDuelSceneGenerator(),
-                            VarManager = EngineHelper.CreateVarManager(40, 20, 3, 8, 4, 0.05f, 0.05f, 0.03f, 0.4f),
+                            VarManager = EngineHelper.CreateVarManager(4, 0.05f, 0.05f, 0.03f, 0.4f),
                             BattleResultProcessor = BattleResultProcessors.ProcessMainDuelBattleResult,
                             MaxPlayers = 2,
                             TimeTillBot = 20,
@@ -56,7 +56,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Mode = new SceneMode()
                         {
                             Generator = EngineHelper.CreateDuelSceneGenerator(),
-                            VarManager = EngineHelper.CreateVarManager(6000, 10, 3, 8, 4, 0.05f, 0.05f, 0.03f, 0.4f),
+                            VarManager = EngineHelper.CreateVarManager(4, 0.05f, 0.05f, 0.03f, 0.4f),
                             BattleResultProcessor = BattleResultProcessors.ProcessMainDuelBattleResult,
                             MaxPlayers = 2,
                             TimeTillBot = 6,
@@ -71,17 +71,14 @@ namespace ProjectArena.Domain.BattleService.Helpers
         {
             return new ActorDto()
             {
-                ActionPoints = actor.ActionPoints,
                 AttackingSkill = ally || actor.AttackingSkill.Revealed ? new SkillDto()
                 {
                     Cd = actor.AttackingSkill.Cd,
-                    Cost = actor.AttackingSkill.Cost,
                     Id = actor.AttackingSkill.Id,
                     NativeId = actor.AttackingSkill.NativeId,
                     Visualization = ally ? actor.AttackingSkill.Visualization : actor.AttackingSkill.EnemyVisualization,
                     PreparationTime = actor.AttackingSkill.PreparationTime,
                     Range = actor.AttackingSkill.Range,
-                    OnlyVisibleTargets = actor.AttackingSkill.OnlyVisibleTargets,
                     AvailableTargets = new TargetsDto()
                     {
                         Allies = actor.AttackingSkill.AvailableTargets.Allies,
@@ -104,20 +101,17 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 Id = actor.Id,
                 ExternalId = actor.ExternalId,
                 Initiative = actor.Initiative,
-                InitiativePosition = actor.InitiativePosition,
                 MaxHealth = actor.HealthRevealed || ally ? actor.MaxHealth : (int?)null,
                 Health = actor.HealthRevealed || ally ? actor.Health : (float?)null,
                 OwnerId = actor.OwnerId,
                 Skills = actor.Skills.Where(k => ally || k.Revealed).Select(k => new SkillDto()
                 {
                     Cd = k.Cd,
-                    Cost = k.Cost,
                     Id = k.Id,
                     NativeId = k.NativeId,
                     Visualization = ally ? k.Visualization : k.EnemyVisualization,
                     PreparationTime = k.PreparationTime,
                     Range = k.Range,
-                    OnlyVisibleTargets = k.OnlyVisibleTargets,
                     AvailableTargets = new TargetsDto()
                     {
                         Allies = k.AvailableTargets.Allies,
@@ -142,7 +136,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
             {
                 Health = decoration.HealthRevealed || ally ? decoration.Health : (float?)null,
                 Id = decoration.Id,
-                InitiativePosition = decoration.InitiativePosition,
                 IsAlive = decoration.IsAlive,
                 MaxHealth = decoration.HealthRevealed || ally ? decoration.MaxHealth : (float?)null,
                 Visualization = decoration.Visualization,
@@ -154,28 +147,12 @@ namespace ProjectArena.Domain.BattleService.Helpers
             };
         }
 
-        private static SpecEffectDto MapEffect(Engine.ForExternalUse.Synchronization.ObjectInterfaces.ISpecEffect effect)
-        {
-            return new SpecEffectDto()
-            {
-                Duration = effect.Duration,
-                Id = effect.Id,
-                IsAlive = effect.IsAlive,
-                Visualization = effect.Visualization,
-                NativeId = effect.NativeId,
-                OwnerId = effect.OwnerId,
-                X = effect.X,
-                Y = effect.Y,
-                Z = effect.Z
-            };
-        }
-
-        private static TileDto MapTile(Engine.ForExternalUse.Synchronization.ObjectInterfaces.ITile tile, bool ally)
+        private static TileDto MapTile(Engine.ForExternalUse.Synchronization.ObjectInterfaces.ITile tile)
         {
             return new TileDto()
             {
                 Height = tile.Height,
-                NativeId = ally || tile.Revealed ? tile.NativeId : "grass",
+                NativeId = tile.NativeId,
                 OwnerId = tile.OwnerId,
                 TempActorId = tile.TempActorId,
                 X = tile.X,
@@ -195,8 +172,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 DeletedActors = oldSynchronizer.DeletedActors,
                 ChangedDecorations = oldSynchronizer.ChangedDecorations.Select(x => MapDecoration(x, userTeams.Contains(x.Team) || userPlayerIds.Contains(x.OwnerId))),
                 DeletedDecorations = oldSynchronizer.DeletedDecorations,
-                ChangedEffects = oldSynchronizer.ChangedEffects.Select(x => MapEffect(x)),
-                DeletedEffects = oldSynchronizer.DeletedEffects,
                 Players = oldSynchronizer.Players.Select(x => new PlayerDto()
                 {
                     Id = x.Id,
@@ -204,11 +179,9 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     KeyActorsSync = x.KeyActorsSync,
                     Status = (PlayerStatus)(int)x.Status,
                     Team = x.Team,
-                    TurnsSkipped = x.TurnsSkipped
+                    PlayerActorId = x.PlayerActorId
                 }),
-                ChangedTiles = oldSynchronizer.ChangedTiles.Select(x => MapTile(x, userTeams.Contains(x.Team) || userPlayerIds.Contains(x.OwnerId))),
-                TempActor = oldSynchronizer.TempActor,
-                TempDecoration = oldSynchronizer.TempDecoration,
+                ChangedTiles = oldSynchronizer.ChangedTiles.Select(x => MapTile(x)),
                 TilesetHeight = tileSet.GetLength(1),
                 TilesetWidth = tileSet.GetLength(0)
             };
@@ -255,7 +228,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
             synchronizer.SkillActionId = syncEventArgs.SkillActionId;
             synchronizer.ActorId = syncEventArgs.ActorId;
             synchronizer.Version = syncEventArgs.Version;
-            synchronizer.TurnTime = syncEventArgs.Scene.RemainedTurnTime;
             return synchronizer;
         }
 
@@ -265,7 +237,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
             synchronizer.Id = scene.Id;
             synchronizer.RoundsPassed = scene.PassedTime;
             synchronizer.Version = scene.Version;
-            synchronizer.TurnTime = scene.RemainedTurnTime;
             return synchronizer;
         }
 

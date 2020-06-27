@@ -15,7 +15,7 @@ namespace ProjectArena.Engine
 
         public string UserId { get; }
 
-        public Actor PlayerActor { get; }
+        public Actor PlayerActor { get; set; }
 
         public List<Actor> KeyActors { get; }
 

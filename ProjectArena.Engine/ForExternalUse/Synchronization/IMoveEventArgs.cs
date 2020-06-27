@@ -2,10 +2,10 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization
 {
     public interface IMoveEventArgs
     {
-        int? ActorId { get; }
+        int ActorId { get; }
 
-        int? TargetX { get; }
+        int TargetX { get; }
 
-        int? TargetY { get; }
+        int TargetY { get; }
     }
 }

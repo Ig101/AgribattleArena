@@ -10,6 +10,8 @@ namespace ProjectArena.Engine.ForExternalUse.Generation.ObjectInterfaces
 
         int? Team { get; }
 
+        IActor PlayerActorGen { get; }
+
         List<IActor> KeyActorsGen { get; }
     }
 }

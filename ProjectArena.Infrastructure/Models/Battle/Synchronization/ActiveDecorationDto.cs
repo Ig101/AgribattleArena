@@ -10,8 +10,6 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public string Visualization { get; set; }
 
-        public float InitiativePosition { get; set; }
-
         public float? Health { get; set; }
 
         public string OwnerId { get; set; }

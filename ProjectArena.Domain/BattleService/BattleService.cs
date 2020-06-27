@@ -57,7 +57,6 @@ namespace ProjectArena.Domain.BattleService
 
         private void ApplyTalentAction(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs,
             TalentNode talent,
@@ -69,14 +68,14 @@ namespace ProjectArena.Domain.BattleService
                 var requiredTalents = talents.Where(x => !appliedTalents.Contains(x.Position) && talent.Prerequisites.Contains(x.Id));
                 foreach (var requiredTalent in requiredTalents)
                 {
-                    ApplyTalentAction(ref attackSkill, ref actionPointsIncome, ref skills, ref startBuffs, requiredTalent, talents, appliedTalents);
+                    ApplyTalentAction(ref attackSkill, ref skills, ref startBuffs, requiredTalent, talents, appliedTalents);
                 }
             }
 
             var action = (TalentActionDelegates.Action)Delegate.CreateDelegate(
                 typeof(TalentActionDelegates.Action),
                 typeof(TalentActionDelegates).GetMethod(talent.UniqueAction, BindingFlags.Public | BindingFlags.Static));
-            action(ref attackSkill, ref actionPointsIncome, ref skills, ref startBuffs);
+            action(ref attackSkill, ref skills, ref startBuffs);
             appliedTalents.Add(talent.Position);
         }
 
@@ -147,7 +146,6 @@ namespace ProjectArena.Domain.BattleService
 
             var attackingSkill = "slash";
             ICollection<string> skills = new List<string>() { "magicMissle" };
-            var actionPointsIncome = 6;
             ICollection<string> startBuffs = new List<string>();
 
             var talentsWithUniqueAction = talents.Where(t => t.UniqueAction != null).ToList();
@@ -159,7 +157,7 @@ namespace ProjectArena.Domain.BattleService
                     continue;
                 }
 
-                ApplyTalentAction(ref attackingSkill, ref actionPointsIncome, ref skills, ref startBuffs, talent, talentsWithUniqueAction, talentPositionsWithAppliedActions);
+                ApplyTalentAction(ref attackingSkill, ref skills, ref startBuffs, talent, talentsWithUniqueAction, talentPositionsWithAppliedActions);
             }
 
             return EngineHelper.CreateActorForGeneration(
@@ -171,7 +169,6 @@ namespace ProjectArena.Domain.BattleService
                 constitution,
                 speed,
                 skills,
-                actionPointsIncome,
                 startBuffs);
         }
 
@@ -197,8 +194,16 @@ namespace ProjectArena.Domain.BattleService
                 var playerRosters = rosters.Where(x => x.UserId == id).ToList();
                 var roster = playerRosters[_random.Next(playerRosters.Count * RandomModifier) % playerRosters.Count];
                 var playerCharacters = characters.Where(x => x.RosterId == roster.Id).ToList();
+                var mainActor = characters
+                .Where(x => x.RosterId == roster.Id && x.IsKeyCharacter)
+                .Select(x =>
+                {
+                    var talents = allTalents.Where(t => x.ChosenTalents.Contains(t.Position)).ToList();
+                    return GenerateActor(x, talents);
+                })
+                .First();
                 var playerActors = characters
-                .Where(x => x.RosterId == roster.Id)
+                .Where(x => x.RosterId == roster.Id && !x.IsKeyCharacter)
                 .Select(x =>
                 {
                     var talents = allTalents.Where(t => x.ChosenTalents.Contains(t.Position)).ToList();
@@ -206,10 +211,10 @@ namespace ProjectArena.Domain.BattleService
                 })
                 .ToList();
 
-                players.Add(EngineHelper.CreatePlayerForGeneration(Guid.NewGuid().ToString(), id, null, playerActors));
+                players.Add(EngineHelper.CreatePlayerForGeneration(Guid.NewGuid().ToString(), id, null, mainActor, playerActors));
             }
 
-            var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), SynchronizationInfoEventHandler);
+            var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), MoveEventHandler, SynchronizationInfoEventHandler);
             lock (_locker)
             {
                 _scenes = _scenes.Append(scene).ToList();
@@ -254,14 +259,40 @@ namespace ProjectArena.Domain.BattleService
             }
         }
 
-        public void EngineTimeProcessing(double seconds)
+        private void MoveEventHandler(object sender, IMoveEventArgs e)
         {
+            var battleHub = _serviceProvider.GetRequiredService<IHubContext<ArenaHub.ArenaHub>>();
+
+            var uniqueUsers = ((IScene)sender).ShortPlayers
+                .GroupBy(key => key.UserId, res => res, (key, res) => new
+                {
+                    UserId = key,
+                    Left = res.All(x => x.Left)
+                })
+                .Where(x => !x.Left)
+                .Select(x => x.UserId)
+                .ToList();
+
+            battleHub.Clients.Users(uniqueUsers).SendAsync("BattleMove", new MoveInfoDto
+            {
+                TargetX = e.TargetX,
+                TargetY = e.TargetY,
+                ActorId = e.ActorId
+            });
+        }
+
+        public void EngineTimeProcessing()
+        {
+            foreach (var scene in _scenes)
+            {
+                scene.Update();
+            }
+
             lock (_locker)
             {
                 var newScenes = _scenes
                 .Where(scene =>
                 {
-                    scene.UpdateTime((float)seconds);
                     return scene.IsActive;
                 })
                 .ToList();

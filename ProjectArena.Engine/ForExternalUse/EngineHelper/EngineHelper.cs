@@ -42,9 +42,9 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
                 startBuffs);
         }
 
-        public static IPlayer CreatePlayerForGeneration(string id, string userId, int? team, IEnumerable<IActor> keyActors)
+        public static IPlayer CreatePlayerForGeneration(string id, string userId, int? team, IActor playerActor, IEnumerable<IActor> keyActors)
         {
-            return new Synchronizers.SynchronizationObjects.Player(id, userId, team, keyActors.ToList());
+            return new Synchronizers.SynchronizationObjects.Player(id, userId, team, playerActor, keyActors.ToList());
         }
 
         public static IVarManager CreateVarManager(
@@ -74,10 +74,12 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
             INativeManager nativeManager,
             IVarManager varManager,
             int seed,
+            EventHandler<IMoveEventArgs> moveEventHandler,
             EventHandler<ISyncEventArgs> eventHandler)
         {
             Scene scene = new Scene(id, players, generator, nativeManager, varManager, seed);
             scene.ReturnAction += eventHandler;
+            scene.ReturnMoveAction += moveEventHandler;
             scene.StartGame();
             return scene;
         }

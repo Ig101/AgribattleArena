@@ -9,13 +9,11 @@ namespace ProjectArena.Domain.Registry.Helpers
     {
         public delegate void Action(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs);
 
         public static void LearnMistWeapon(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -28,7 +26,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnCharge(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -37,7 +34,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnWarden(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -47,7 +43,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnEmpower(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -56,7 +51,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnMarksmanship(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -69,7 +63,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnOffspring(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -78,7 +71,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnMistwalk(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -87,7 +79,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnBloodsphere(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -97,7 +88,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnBarrier(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -106,7 +96,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnMistPact(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -115,7 +104,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnWand(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {
@@ -124,7 +112,6 @@ namespace ProjectArena.Domain.Registry.Helpers
 
         public static void LearnPowerplace(
             ref string attackSkill,
-            ref int actionPointsIncome,
             ref ICollection<string> skills,
             ref ICollection<string> startBuffs)
         {

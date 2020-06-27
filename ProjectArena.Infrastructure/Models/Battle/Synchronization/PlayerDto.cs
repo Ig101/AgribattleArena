@@ -11,9 +11,9 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public int? Team { get; set; }
 
-        public IEnumerable<int> KeyActorsSync { get; set; }
+        public int PlayerActorId { get; set; }
 
-        public int TurnsSkipped { get; set; }
+        public IEnumerable<int> KeyActorsSync { get; set; }
 
         public PlayerStatus Status { get; set; }
     }

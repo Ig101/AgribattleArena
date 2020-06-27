@@ -12,7 +12,7 @@ namespace ProjectArena.Domain.BattleService
     {
         Task StartNewBattleAsync(SceneMode mode, IEnumerable<UserInQueue> users);
 
-        void EngineTimeProcessing(double seconds);
+        void EngineTimeProcessing();
 
         IScene GetUserScene(string userId, Guid sceneId);
 

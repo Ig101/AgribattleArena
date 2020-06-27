@@ -11,6 +11,8 @@ namespace ProjectArena.Engine.ForExternalUse.Synchronization.ObjectInterfaces
 
         int? Team { get; }
 
+        int PlayerActorId { get; }
+
         List<int> KeyActorsSync { get; }
 
         PlayerStatus Status { get; }
