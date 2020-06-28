@@ -235,6 +235,19 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     this.unsuccessfulActionSubscription = arenaHub.unsuccessfulActionSubject.subscribe(() => {
+      if (this.specificActionResponseForWait && this.specificActionResponseForWait.action !== BattleSynchronizationActionEnum.Move) {
+        const actor = this.battleStorageService.scene.actors.find(x => x.id = this.specificActionResponseForWait.actorId);
+        if (actor) {
+          this.battleStorageService.floatingTexts.push({
+            text: '*fail*',
+            color: { r: 255, g: 255, b: 0, a: 1 },
+            time: 0,
+            x: actor.x,
+            y: actor.y,
+            height: 0
+          });
+        }
+      }
       this.actionsQueue.length = 0;
       this.receivingMessagesFromHubAllowed = true;
       this.specificActionResponseForWait = undefined;
@@ -526,7 +539,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.pressedKey = event.key;
       this.resetButtonsPressedState();
       const action = this.skillList.find(x => x.hotKey === event.key);
-      if (action && this.canAct && !action?.disabled) {
+      if (action && !action?.disabled) {
         action.pressed = true;
       } else if (event.key !== 'Escape') {
         this.pressedKey = undefined;
@@ -606,7 +619,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.pressedKey === event.key && event.key === 'Escape') {
         this.resetSkillActions();
       }
-      if (this.pressedKey === event.key && this.canAct) {
+      if (this.pressedKey === event.key) {
         const action = this.skillList.find(x => x.hotKey === event.key);
         if (action?.pressed && !action?.disabled) {
           if (action.type === SmartActionTypeEnum.Toggle) {
@@ -1051,8 +1064,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             `Not enough action points. Need ${this.battleStorageService.currentActor.skills[i].cost}` :
             this.battleStorageService.currentActor.skills[i].preparationTime > 0 ?
             `Skill will be available after ${Math.floor(this.battleStorageService.currentActor.skills[i].preparationTime)} turns` :
-            !this.battleStorageService.currentActor.canAct ?
-            `Characted cannot act this time` :
             undefined;
         }
       }

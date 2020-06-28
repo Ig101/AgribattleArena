@@ -26,9 +26,9 @@
           <app-hotkeyed-button (mouseDown)="resetButtonsPressedState()" (mouseUp)="changed = true;" *ngFor="let item of skillList" [pressedKey]="pressedKey" [ngClass]="{
             active: item.pressed && item.smartValue === 0,
             toggled: item.smartValue === 1,
-            disabled: !canAct || item.disabled,
+            disabled: item.disabled,
             'active-toggled': item.pressed && item.smartValue === 1
-          }" [disabled]="!canAct" [smartAction]="item" [disabled]="!canAct || item.disabled" (rightClick)="openSkillModal($event)">
+          }" [smartAction]="item" [disabled]="item.disabled" (rightClick)="openSkillModal($event)">
             <div class="text-font-inactive">{{item.smartValue === 0 ? item.hotKey : 'X'}}) {{item.title}}</div>
             <div class="article-font-inactive">&nbsp;&nbsp;&nbsp;cost: {{item.smartObject.cost}}, 
               {{item.smartObject.preparationTime > 0 ? item.smartObject.preparationTime + ' turn' + (item.smartObject.preparationTime > 1 ? 's left' : ' left') : 'ready'}}</div>
