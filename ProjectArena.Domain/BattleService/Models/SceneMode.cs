@@ -15,7 +15,5 @@ namespace ProjectArena.Domain.BattleService.Models
         public ISceneGenerator Generator { get; set; }
 
         public IVarManager VarManager { get; set; }
-
-        public ProcessBattleResult BattleResultProcessor { get; set; }
     }
 }

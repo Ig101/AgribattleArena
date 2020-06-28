@@ -16,7 +16,7 @@
   <div class="modal window">
     <app-initiative-block (changeSelected)="onPositionSelect($event?.x, $event?.y)" (rightClick)="openModalFromPosition($event?.x, $event?.y)"></app-initiative-block>
     <div class="control-block" *ngIf="isMyTurn; else anotherTurn">
-      <div class="casting-block">
+      <!--<div class="casting-block">
         <app-action-points-block
           [actionPointsMaxCount]="maxActionPoints"
           [currentActionPointsCount]="currentActionPoints"
@@ -46,7 +46,7 @@
         </div>
         <div class="text-font-inactive medium">------</div>
       </app-hotkeyed-button>
-    </div>
+    </div>-->
     <ng-template #anotherTurn><div class="non-control-block title-font-inactive">Enemy turn</div></ng-template>
   </div>
 </div>

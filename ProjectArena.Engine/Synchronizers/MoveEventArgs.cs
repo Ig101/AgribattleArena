@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ProjectArena.Engine.ForExternalUse;
 using ProjectArena.Engine.ForExternalUse.Synchronization;
 
@@ -6,17 +7,14 @@ namespace ProjectArena.Engine.Synchronizers
 {
     public class MoveEventArgs : EventArgs, IMoveEventArgs
     {
-        public int ActorId { get; }
+        public IScene Scene { get; }
 
-        public int TargetX { get; }
+        public IEnumerable<IMoveInfo> MoveDefinition { get; }
 
-        public int TargetY { get; }
-
-        public MoveEventArgs(int actorId, int targetX, int targetY)
+        public MoveEventArgs(Scene scene, IEnumerable<MoveInfo> moveInfo)
         {
-            this.ActorId = actorId;
-            this.TargetX = targetX;
-            this.TargetY = targetY;
+            Scene = scene;
+            MoveDefinition = moveInfo;
         }
     }
 }

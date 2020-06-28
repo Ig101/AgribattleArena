@@ -1,13 +1,9 @@
 export enum BattleSynchronizationActionEnum {
   StartGame,
-  Move,
   Attack,
   Cast,
-  Wait,
-  Decoration,
+  Unsuccess,
   EndTurn,
   EndGame,
-  SkipTurn,
   Leave,
-  NoActorsDraw
 }

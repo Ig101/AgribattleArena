@@ -47,6 +47,7 @@ import { SceneObjectModalComponent } from '../modals/scene-object-modal/scene-ob
 import { isObject } from 'util';
 import { ModalObject } from '../models/modals/modal-object.model';
 import { MenuModalComponent } from '../modals/menu-modal/menu-modal.component';
+import { MoveSynchronizer } from 'src/app/shared/models/battle/move-synchronizer.model';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -88,6 +89,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onCloseSubscription: Subscription;
   arenaActionsSubscription: Subscription;
+  arenaMoveActionsSubscription: Subscription;
   synchronizationErrorSubscription: Subscription;
   animationSubscription: Subscription;
   finishLoadingSubscription: Subscription;
@@ -205,30 +207,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     private battleResolver: BattleResolverService,
     private battleStorageService: AsciiBattleStorageService,
     private battleSynchronizerService: AsciiBattleSynchronizerService,
-    private battlePathCreator: AsciiBattlePathCreatorService,
+    // private battlePathCreator: AsciiBattlePathCreatorService,
     private arenaHub: ArenaHubService,
     private userService: UserService,
-    private battleAnimationsService: AsciiBattleAnimationsService,
+    // private battleAnimationsService: AsciiBattleAnimationsService,
     private loadingService: LoadingService,
     private modalService: ModalService,
   ) {
-    this.endTurn = {
-      hotKey: ' ',
-      type: SmartActionTypeEnum.Hold,
-      smartValue: 0,
-      pressed: false,
-      actions: [() => {
-        this.specificActionResponseForWait = {
-          actorId: this.battleStorageService.currentActor.id,
-          action: BattleSynchronizationActionEnum.Wait
-        };
-        this.arenaHub.orderWait(this.battleStorageService.scene.id, this.battleStorageService.currentActor.id);
-        this.battleAnimationsService
-          .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Wait, this.battleStorageService.currentActor);
-      }],
-      title: 'End turn',
-      disabled: undefined
-    };
     this.mouseState.buttonsInfo[0] = {
       pressed: false,
       timeStamp: 0
@@ -254,17 +239,20 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 2000);
       }
     });
-    this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
+    /* this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
       this.processNextActionFromQueueWithChecks(pending);
-    });
-    this.victorySubscription = battleAnimationsService.victoryAnimationPlayed.subscribe((declaration) => {
+    });*/
+    /* this.victorySubscription = battleAnimationsService.victoryAnimationPlayed.subscribe((declaration) => {
       this.endGame(declaration);
-    });
+    });*/
     this.arenaActionsSubscription = arenaHub.battleSynchronizationActionsNotifier.subscribe(() => {
       if (this.receivingMessagesFromHubAllowed) {
         this.processNextActionFromQueue();
       }
     });
+    this.arenaMoveActionsSubscription = arenaHub.moveSynchronizationActionsSubject.subscribe((moves: MoveSynchronizer) => {
+
+    })
   }
 
   ngOnDestroy(): void {

@@ -11,6 +11,7 @@ import { heightImpact, brightImpact } from 'src/app/battle/ascii/helpers/scene-d
 import { UserService } from './user.service';
 import { LoadingService } from './loading.service';
 import { DailyChanges } from '../models/daily-changes.model';
+import { MoveSynchronizer } from '../models/battle/move-synchronizer.model';
 
 const DAILY_UPDATE = 'DailyUpdate';
 const BATTLE_SYNC_ERROR = 'BattleSynchronizationError';
@@ -18,17 +19,14 @@ const BATTLE_START_GAME = 'BattleStartGame';
 const BATTLE_MOVE = 'BattleMove';
 const BATTLE_ATTACK = 'BattleAttack';
 const BATTLE_CAST = 'BattleCast';
-const BATTLE_WAIT = 'BattleWait';
-const BATTLE_DECORATION = 'BattleDecoration';
+const BATTLE_UNSUCCESS = 'BattleUnsuccess';
 const BATTLE_END_TURN = 'BattleEndTurn';
 const BATTLE_END_GAME = 'BattleEndGame';
-const BATTLE_SKIP_TURN = 'BattleSkipTurn';
 const BATTLE_LEAVE = 'BattleLeave';
-const BATTLE_NO_ACTORS_DRAW = 'BattleNoActorsDraw';
 
-type BattleHubReturnMethod = typeof DAILY_UPDATE | typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
-    typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_NO_ACTORS_DRAW |
-    typeof BATTLE_SKIP_TURN | typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT;
+type BattleHubReturnMethod = typeof DAILY_UPDATE | typeof BATTLE_ATTACK | typeof BATTLE_CAST |
+    typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_UNSUCCESS |
+    typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR;
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +38,7 @@ export class ArenaHubService {
   firstActionVersion: number;
   battleSynchronizationActionsList: { action: BattleSynchronizationActionEnum, sync: Synchronizer }[] = [];
   battleSynchronizationActionsNotifier = new Subject<any>();
+  moveSynchronizationActionsSubject = new Subject<MoveSynchronizer>();
   dailyUpdateNotifier = new Subject<DailyChanges>();
 
   prepareForBattleNotifier = new BehaviorSubject<LoadingScene>(undefined);
@@ -100,7 +99,7 @@ export class ArenaHubService {
     }, 0, true);
   }
 
-  addNewListener(methodName: BattleHubReturnMethod, listener: (synchronizer: Synchronizer) => void) {
+  addNewListener(methodName: BattleHubReturnMethod, listener: (synchronizer: Synchronizer | MoveSynchronizer) => void) {
       this.hubConnection.on(methodName, listener);
   }
 
@@ -194,25 +193,19 @@ export class ArenaHubService {
       this.prepareForBattleNotifier.next(loadingScene);
       this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.StartGame, synchronizer);
     });
-    this.addNewListener(BATTLE_MOVE, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Move, synchronizer));
+    this.addNewListener(BATTLE_MOVE, (synchronizer: MoveSynchronizer) =>
+      this.moveSynchronizationActionsSubject.next(synchronizer));
+    this.addNewListener(BATTLE_UNSUCCESS, (synchronizer: Synchronizer) =>
+      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Unsuccess, synchronizer));
     this.addNewListener(BATTLE_ATTACK, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Attack, synchronizer));
+      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Attack, synchronizer));
     this.addNewListener(BATTLE_CAST, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Cast, synchronizer));
-    this.addNewListener(BATTLE_WAIT, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Wait, synchronizer));
-    this.addNewListener(BATTLE_DECORATION, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Decoration, synchronizer));
+      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Cast, synchronizer));
     this.addNewListener(BATTLE_END_TURN, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndTurn, synchronizer));
+      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndTurn, synchronizer));
     this.addNewListener(BATTLE_END_GAME, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndGame, synchronizer));
-    this.addNewListener(BATTLE_SKIP_TURN, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.SkipTurn, synchronizer));
+      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndGame, synchronizer));
     this.addNewListener(BATTLE_LEAVE, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Leave, synchronizer));
-    this.addNewListener(BATTLE_NO_ACTORS_DRAW, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.NoActorsDraw, synchronizer));
+      this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Leave, synchronizer));
   }
 }

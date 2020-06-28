@@ -1,11 +1,11 @@
+using System.Collections.Generic;
+
 namespace ProjectArena.Engine.ForExternalUse.Synchronization
 {
     public interface IMoveEventArgs
     {
-        int ActorId { get; }
+        IScene Scene { get; }
 
-        int TargetX { get; }
-
-        int TargetY { get; }
+        IEnumerable<IMoveInfo> MoveDefinition { get; }
     }
 }

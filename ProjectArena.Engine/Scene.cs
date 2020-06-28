@@ -445,7 +445,7 @@ namespace ProjectArena.Engine
                         bool result = player.PlayerActor.Move(Tiles[targetX][targetY]);
                         if (result)
                         {
-                            ReturnMoveAction?.Invoke(this, new MoveEventArgs(player.PlayerActor.Id, targetX, targetY));
+                            ReturnMoveAction?.Invoke(this, new MoveEventArgs(this, new[] { new MoveInfo(player.PlayerActor.Id, targetX, targetY) }));
                         }
                     }
                 }

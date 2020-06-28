@@ -273,11 +273,15 @@ namespace ProjectArena.Domain.BattleService
                 .Select(x => x.UserId)
                 .ToList();
 
-            battleHub.Clients.Users(uniqueUsers).SendAsync("BattleMove", new MoveInfoDto
+            battleHub.Clients.Users(uniqueUsers).SendAsync("BattleMove", new MoveSynchronizerDto()
             {
-                TargetX = e.TargetX,
-                TargetY = e.TargetY,
-                ActorId = e.ActorId
+                Id = e.Scene.Id,
+                Moves = e.MoveDefinition.Select(x => new MoveInfoDto()
+                {
+                    ActorId = x.ActorId,
+                    TargetX = x.TargetX,
+                    TargetY = x.TargetY
+                })
             });
         }
 
