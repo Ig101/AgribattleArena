@@ -111,10 +111,9 @@ export class AsciiBattleSynchronizerService {
     this.battleStorageService.cameraX = this.battleStorageService.scene.width / 2;
     this.battleStorageService.cameraY = this.battleStorageService.scene.height / 2;
     this.battleStorageService.zoom = 2;
-    this.battleStorageService.defaultActionSquares = this.battleStorageService.currentActor?.owner === currentPlayer ?
+    this.battleStorageService.availableActionSquares = this.battleStorageService.currentActor?.owner === currentPlayer ?
     this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) :
     undefined;
-    this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
   }
 
   synchronizeScene(synchronizer: Synchronizer): SynchronizationDifference {
@@ -296,10 +295,9 @@ export class AsciiBattleSynchronizerService {
         undefined;
       this.battleStorageService.setTurnTime(synchronizer.turnTime);
     }
-    this.battleStorageService.defaultActionSquares = this.battleStorageService.currentActor?.owner === currentPlayer ?
+    this.battleStorageService.availableActionSquares = this.battleStorageService.currentActor?.owner === currentPlayer ?
       this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor, this.battleStorageService.currentActionId) :
       undefined;
-    this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
     return differences;
   }
 }

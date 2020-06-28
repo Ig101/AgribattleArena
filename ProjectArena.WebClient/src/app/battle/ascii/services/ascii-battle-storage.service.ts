@@ -40,7 +40,6 @@ export class AsciiBattleStorageService {
   turnTime: number;
 
   availableActionSquares: ActionSquare[];
-  defaultActionSquares: ActionSquare[];
 
   currentAnimations: AnimationTile[][];
   floatingTexts: FloatingText[] = [];
@@ -82,7 +81,6 @@ export class AsciiBattleStorageService {
     this.players = undefined;
     this.version = -1;
     this.availableActionSquares = undefined;
-    this.defaultActionSquares = undefined;
     this.currentInitiativeList.next(undefined);
     this.turnTime = undefined;
     this.currentAnimations = undefined;

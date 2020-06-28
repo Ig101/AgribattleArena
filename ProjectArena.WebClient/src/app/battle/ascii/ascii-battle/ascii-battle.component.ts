@@ -108,7 +108,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }[] = [];
 
   skillList: SmartAction[] = [];
-  moveButtons: SmartAction[] = [];
+  moveButtons: SmartAction[];
   pressedKey: string;
 
   zoom = 0;
@@ -264,33 +264,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         this.processNextActionFromQueue();
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    clearInterval(this.drawingTimer);
-    this.onCloseSubscription.unsubscribe();
-    this.arenaActionsSubscription.unsubscribe();
-    this.synchronizationErrorSubscription.unsubscribe();
-    this.animationSubscription.unsubscribe();
-    this.finishLoadingSubscription.unsubscribe();
-    this.victorySubscription.unsubscribe();
-    this.battleStorageService.clear();
-  }
-
-  ngOnInit(): void {
-    this.tileWidthInternal = this.tileHeightInternal * 0.6;
-    this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
-    this.canvasContext = this.battleCanvas.nativeElement.getContext('2d');
-    this.battleStorageService.version = 0;
-    const loadBattle = this.activatedRoute.snapshot.data.battle;
-    this.drawingTimer = setInterval(this.updateCycle, 1000 / this.updatingFrequency, this);
-    if (loadBattle) {
-      const snapshot = this.battleResolver.popBattleSnapshot();
-      this.restoreScene(snapshot);
-      if (!this.loadingFinished) {
-        return;
-      }
-    }
     this.moveButtons = [
       {
         hotKey: 'w',
@@ -336,7 +309,34 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         ],
         disabled: undefined
       },
-    ]
+    ];
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.drawingTimer);
+    this.onCloseSubscription.unsubscribe();
+    this.arenaActionsSubscription.unsubscribe();
+    this.synchronizationErrorSubscription.unsubscribe();
+    this.animationSubscription.unsubscribe();
+    this.finishLoadingSubscription.unsubscribe();
+    this.victorySubscription.unsubscribe();
+    this.battleStorageService.clear();
+  }
+
+  ngOnInit(): void {
+    this.tileWidthInternal = this.tileHeightInternal * 0.6;
+    this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
+    this.canvasContext = this.battleCanvas.nativeElement.getContext('2d');
+    this.battleStorageService.version = 0;
+    const loadBattle = this.activatedRoute.snapshot.data.battle;
+    this.drawingTimer = setInterval(this.updateCycle, 1000 / this.updatingFrequency, this);
+    if (loadBattle) {
+      const snapshot = this.battleResolver.popBattleSnapshot();
+      this.restoreScene(snapshot);
+      if (!this.loadingFinished) {
+        return;
+      }
+    }
     this.processNextActionFromQueue();
   }
 
@@ -587,6 +587,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const moveAction = this.moveButtons.find(x => x.hotKey === event.key);
       if (moveAction) {
         moveAction.pressed = true;
+        this.moveButtons.sort((a, b) => {
+          const bVal = b === moveAction ? 1 : 0;
+          const aVal = a === moveAction ? 1 : 0;
+          return bVal - aVal;
+        })
         return;
       }
       this.resetButtonsPressedState();
@@ -648,12 +653,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onKeyUp(event: KeyboardEvent) {
+    const moveAction = this.moveButtons.find(x => x.hotKey === event.key);
+    if (moveAction) {
+      moveAction.pressed = false;
+      return;
+    }
     if (!this.blocked) {
-      const moveAction = this.moveButtons.find(x => x.hotKey === event.key);
-      if (moveAction) {
-        moveAction.pressed = false;
-        return;
-      }
       if (this.pressedKey === event.key && event.key === 'Escape') {
         this.resetSkillActions();
       }
@@ -1077,7 +1082,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
               },
               () => {
                 this.battleStorageService.currentActionId = undefined;
-                this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
+                this.battleStorageService.availableActionSquares =
+                  this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor);
                 this.skillList[i].smartValue = 0;
               }],
             smartObject: this.battleStorageService.currentActor.skills[i],
@@ -1086,8 +1092,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
               `Not enough action points. Need ${this.battleStorageService.currentActor.skills[i].cost}` :
               this.battleStorageService.currentActor.skills[i].preparationTime > 0 ?
               `Skill will be available after ${Math.floor(this.battleStorageService.currentActor.skills[i].preparationTime)} turns` :
-              !this.battleStorageService.currentActor.canAct ?
-              `Characted cannot act this time` :
               undefined
           };
         } else {
@@ -1103,6 +1107,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             this.battleStorageService.currentActor.skills[i].preparationTime > 0 ?
             `Skill will be available after ${Math.floor(this.battleStorageService.currentActor.skills[i].preparationTime)} turns` :
             undefined;
+        }
+      }
+      if (this.battleStorageService.currentActionId) {
+        const skill = this.battleStorageService.currentActor?.skills.find(x => x.id = this.battleStorageService.currentActionId);
+        if (!skill || skill.cost > this.battleStorageService.currentActor.actionPoints) {
+          this.battleStorageService.currentActionId = undefined;
+          this.battleStorageService.availableActionSquares =
+            this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor);
         }
       }
     } else {
@@ -1153,7 +1165,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         return;
       case BattleSynchronizationActionEnum.EndTurn:
         this.battleStorageService.currentActionId = undefined;
-        this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
+        this.battleStorageService.availableActionSquares =
+          this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor);
         break;
     }
     if (!this.battleAnimationsService.generateAnimationsFromSynchronizer(action, onlySecondPart)) {

@@ -180,6 +180,9 @@ export class AsciiBattlePathCreatorService {
 
   calculateActiveSquares(actor: Actor, actionId?: number): ActionSquare[] {
     const skill = actionId && actionId > 0 ? actor.skills.find(x => x.id === actionId) : actor.attackingSkill;
+    if (!skill) {
+      return [];
+    }
     const actorSquare = {
       x: actor.x,
       y: actor.y,
