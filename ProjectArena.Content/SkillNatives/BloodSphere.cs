@@ -13,7 +13,7 @@ namespace ProjectArena.Content.SkillNatives
                 "bloodsphere",
                 "mistsphere",
                 new[] { "damage", "target", "magic", "blood", "ranged", "direct" },
-                5,
+                8,
                 3,
                 0,
                 40,

@@ -13,10 +13,10 @@ namespace ProjectArena.Content.SkillNatives
                 "warden",
                 "warden",
                 new[] { "damage", "target", "physic", "ranged", "direct" },
-                3,
+                6,
                 3,
                 4,
-                50,
+                45,
                 new Targets()
                 {
                     Allies = true,

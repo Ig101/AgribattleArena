@@ -12,7 +12,7 @@ namespace ProjectArena.Content.SkillNatives
                 "mistwalk",
                 "mistwalk",
                 new[] { "target", "movement", "magic", "alteration" },
-                8,
+                10,
                 1,
                 5,
                 0,

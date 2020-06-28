@@ -13,7 +13,7 @@ namespace ProjectArena.Content.SkillNatives
                 "wand",
                 "wand",
                 new[] { "damage", "target", "weapon", "magic", "pure", "ranged", "direct" },
-                4,
+                6,
                 3,
                 0,
                 25,

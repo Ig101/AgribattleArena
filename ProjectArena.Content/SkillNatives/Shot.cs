@@ -13,7 +13,7 @@ namespace ProjectArena.Content.SkillNatives
                 "shot",
                 "shot",
                 new[] { "damage", "target", "weapon", "physic", "ranged", "direct" },
-                5,
+                8,
                 3,
                 0,
                 25,

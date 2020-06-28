@@ -13,7 +13,7 @@ namespace ProjectArena.Content.SkillNatives
                 "mistShot",
                 "mistShot",
                 new[] { "damage", "target", "weapon", "physic", "magic", "pure", "ranged", "direct" },
-                5,
+                8,
                 3,
                 0,
                 20,

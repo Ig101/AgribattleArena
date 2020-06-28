@@ -13,7 +13,7 @@ namespace ProjectArena.Content.SkillNatives
                 "magicMissle",
                 "magicMissle",
                 new[] { "damage", "target", "magic", "pure", "ranged", "direct" },
-                5,
+                8,
                 3,
                 4,
                 40,
