@@ -16,7 +16,7 @@ namespace ProjectArena.Content.DecorationNatives
                     new TagSynergy("pure", 0.5f),
                     new TagSynergy("heal", 0)
                 },
-                100,
+                150,
                 0,
                 0,
                 null,
