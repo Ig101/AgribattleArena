@@ -14,8 +14,8 @@ namespace ProjectArena.Content.SkillNatives
                 "empower",
                 new[] { "target", "buff", "magic", "pure" },
                 8,
-                6,
-                4,
+                3,
+                8,
                 0.5f,
                 new Targets()
                 {

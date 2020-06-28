@@ -70,18 +70,18 @@ namespace ProjectArena.Engine.SceneGenerators
             }).ToList();
 
             tempPlayersForScene[0].KeyActors.Add(
-                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[1][1], tempPlayers[0].KeyActorsGen[0], null));
+                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[5][(height / 2) - 4], tempPlayers[0].KeyActorsGen[0], null));
             tempPlayersForScene[0].KeyActors.Add(
-                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[4][1], tempPlayers[0].KeyActorsGen[1], null));
+                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[5][height / 2], tempPlayers[0].KeyActorsGen[1], null));
             tempPlayersForScene[0].KeyActors.Add(
-                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[7][1], tempPlayers[0].KeyActorsGen[2], null));
+                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[0], sceneTiles[5][(height / 2) + 4], tempPlayers[0].KeyActorsGen[2], null));
 
             tempPlayersForScene[1].KeyActors.Add(
-                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 2][height - 2], tempPlayers[1].KeyActorsGen[0], null));
+                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 6][(height / 2) - 4], tempPlayers[1].KeyActorsGen[0], null));
             tempPlayersForScene[1].KeyActors.Add(
-                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 5][height - 2], tempPlayers[1].KeyActorsGen[1], null));
+                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 6][height / 2], tempPlayers[1].KeyActorsGen[1], null));
             tempPlayersForScene[1].KeyActors.Add(
-                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 8][height - 2], tempPlayers[1].KeyActorsGen[2], null));
+                GeneratorHelper.ConvertExternalActorFromGeneration(scene, tempPlayersForScene[1], sceneTiles[width - 6][(height / 2) + 4], tempPlayers[1].KeyActorsGen[2], null));
         }
 
         public static bool DefeatConditionDuel(ISceneParentRef scene, IPlayerParentRef player)

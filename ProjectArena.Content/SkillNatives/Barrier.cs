@@ -14,7 +14,7 @@ namespace ProjectArena.Content.SkillNatives
                 "barrier",
                 new[] { "target", "decoration", "magic", "alteration" },
                 4,
-                4,
+                3,
                 0,
                 0,
                 new Targets()

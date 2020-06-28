@@ -13,8 +13,8 @@ namespace ProjectArena.Content.SkillNatives
                 "powerplace",
                 new[] { "target", "tile", "buff", "magic", "alteration" },
                 4,
+                3,
                 6,
-                2,
                 0,
                 new Targets()
                 {

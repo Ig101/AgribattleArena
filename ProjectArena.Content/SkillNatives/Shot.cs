@@ -16,10 +16,9 @@ namespace ProjectArena.Content.SkillNatives
                 5,
                 3,
                 0,
-                20,
+                25,
                 new Targets()
                 {
-                    Allies = true,
                     NotAllies = true,
                     Decorations = true
                 },

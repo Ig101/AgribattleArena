@@ -350,33 +350,9 @@ export class AsciiBattleAnimationsService {
         }
         break;
       case BattleSynchronizationActionEnum.Move:
+        frames.push([]);
         if (!onlySecondPart) {
-          frames.push([
-            {
-              updateSynchronizer: true,
-              specificAction: undefined,
-              animationTiles: []
-            }
-          ]);
           this.getFramesFromAction(issuer, frames);
-        } else {
-          frames.push([
-            {
-              updateSynchronizer: false,
-              specificAction: undefined,
-              animationTiles: []
-            },
-            {
-              updateSynchronizer: true,
-              specificAction: undefined,
-              animationTiles: []
-            },
-            {
-              updateSynchronizer: false,
-              specificAction: undefined,
-              animationTiles: []
-            }
-          ]);
         }
         break;
       case BattleSynchronizationActionEnum.Cast:
@@ -464,7 +440,30 @@ export class AsciiBattleAnimationsService {
     if (action === BattleSynchronizationActionEnum.Wait) {
       return false;
     }
-    const skill = action === BattleSynchronizationActionEnum.Move ? undefined :
+    if (action === BattleSynchronizationActionEnum.Move) {
+      const moveFrames = [
+        [
+          {
+            updateSynchronizer: false,
+            animationTiles: [],
+            specificAction: undefined
+          },
+          {
+            updateSynchronizer: true,
+            animationTiles: [],
+            specificAction: undefined
+          },
+          {
+            updateSynchronizer: false,
+            animationTiles: [],
+            specificAction: undefined
+          }
+        ]
+      ];
+      this.animationsQueue.push(...this.mergeFramesToDeclarations(action, undefined, false, moveFrames));
+      return true;
+    }
+    const skill =
       action === BattleSynchronizationActionEnum.Attack ? actor.attackingSkill : actor.skills.find(s => s.id === skillId);
     const frames = [];
     if (skill?.action?.generateIssueDeclarations) {
