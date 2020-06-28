@@ -633,7 +633,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
               x, y, undefined);
       } else if (checkSkillTargets(tile, actor, actor.attackingSkill.availableTargets) &&
-        (!actor.attackingSkill.onlyVisibleTargets || Math.abs(tile.height - initialTile.height) < 10) &&
+        (!actor.attackingSkill.onlyVisibleTargets || tile.height - initialTile.height < 10) &&
         actor.attackingSkill.cost <= actor.actionPoints) {
 
         this.arenaHub.orderAttack(
@@ -1083,7 +1083,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
               () => {
                 this.battleStorageService.currentActionId = undefined;
                 this.battleStorageService.availableActionSquares =
-                  this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor);
+                  this.battleStorageService.currentActor?.owner?.userId === this.userService.user.id ?
+                  this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) : [];
                 this.skillList[i].smartValue = 0;
               }],
             smartObject: this.battleStorageService.currentActor.skills[i],
@@ -1166,7 +1167,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       case BattleSynchronizationActionEnum.EndTurn:
         this.battleStorageService.currentActionId = undefined;
         this.battleStorageService.availableActionSquares =
-          this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor);
+          this.battleStorageService.currentActor?.owner?.userId === this.userService.user.id ?
+          this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) : [];
         break;
     }
     if (!this.battleAnimationsService.generateAnimationsFromSynchronizer(action, onlySecondPart)) {

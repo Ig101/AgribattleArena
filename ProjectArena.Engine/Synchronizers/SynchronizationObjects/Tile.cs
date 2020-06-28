@@ -32,6 +32,7 @@ namespace ProjectArena.Engine.Synchronizers.SynchronizationObjects
             this.Height = tile.Height;
             this.NativeId = tile.Native.Id;
             this.Unbearable = tile.Native.Unbearable;
+            this.Revealed = tile.Revealed;
         }
     }
 }

@@ -12,5 +12,16 @@ export const decorationNatives: { [id: string]: DecorationNative } = {
     },
     action: undefined,
     onDeathAction: undefined
+  },
+  tree: {
+    name: 'Tree',
+    description: 'Unpassable barrier.',
+    active: false,
+    visualization: {
+      char: 'Y',
+      color: { r: 139, g: 69, b: 19, a: 1 }
+    },
+    action: undefined,
+    onDeathAction: undefined
   }
 };
