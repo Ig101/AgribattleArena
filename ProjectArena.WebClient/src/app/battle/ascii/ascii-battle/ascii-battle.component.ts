@@ -587,11 +587,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const moveAction = this.moveButtons.find(x => x.hotKey === event.key);
       if (moveAction) {
         moveAction.pressed = true;
+        moveAction.actions[0]();
         this.moveButtons.sort((a, b) => {
           const bVal = b === moveAction ? 1 : 0;
           const aVal = a === moveAction ? 1 : 0;
           return bVal - aVal;
-        })
+        });
         return;
       }
       this.resetButtonsPressedState();
