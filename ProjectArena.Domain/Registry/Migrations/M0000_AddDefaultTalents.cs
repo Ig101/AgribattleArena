@@ -229,7 +229,7 @@ namespace ProjectArena.Domain.Registry.Migrations
                     Name = "Charge",
                     Class = CharacterClass.Fighter,
                     ClassPoints = 1,
-                    UniqueDescription = "Learns the \"Charge\" ability. Charges to the position within a range of 7 and deal small damage to target. Stun for three turns if range is two or more. Costs 4 action points. Recharges in 3 turns.",
+                    UniqueDescription = "Learns the \"Charge\" ability. Charges to the position within a range of 7 and deal small damage to target. Stun for two turns if range is two or more. Costs 4 action points. Recharges in 3 turns.",
                     UniqueAction = "LearnCharge",
                     StrengthModifier = -5,
                     WillpowerModifier = -3,

@@ -28,7 +28,7 @@ namespace ProjectArena.Content.SkillNatives.Base
         {
             if (targetTile.TempObject != null && targetTile.TempObject is Actor target)
             {
-                var divider = dividedByInitiative ? target.Initiative : 1;
+                var divider = dividedByInitiative ? (target.Initiative * 0.9f) : 1;
                 duration /= divider;
                 target.BuffManager.AddBuff(buffName, mod, duration / divider);
             }

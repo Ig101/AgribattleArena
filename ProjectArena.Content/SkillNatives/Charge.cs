@@ -31,7 +31,7 @@ namespace ProjectArena.Content.SkillNatives
                     targetTile.DoDamageAttack(skill);
                     if (Misc.RangeBetween(owner.X, owner.Y, targetTile.X, targetTile.Y) >= 2)
                     {
-                        targetTile.AddBuff("stun", 0, 3, true);
+                        targetTile.AddBuff("stun", 0, 2, true);
                     }
 
                     var angle = Misc.AngleBetween(targetTile.X, targetTile.Y, owner.X, owner.Y);

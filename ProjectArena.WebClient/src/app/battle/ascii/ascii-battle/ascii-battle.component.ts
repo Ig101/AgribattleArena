@@ -108,6 +108,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }[] = [];
 
   skillList: SmartAction[] = [];
+  moveButtons: SmartAction[] = [];
   pressedKey: string;
 
   zoom = 0;
@@ -290,6 +291,52 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         return;
       }
     }
+    this.moveButtons = [
+      {
+        hotKey: 'w',
+        type: SmartActionTypeEnum.Hold,
+        pressed: false,
+        title: 'Up',
+        smartValue: 0,
+        actions: [
+          () => this.moveActorTo(this.battleStorageService.currentActor.x, this.battleStorageService.currentActor.y - 1)
+        ],
+        disabled: undefined
+      },
+      {
+        hotKey: 's',
+        type: SmartActionTypeEnum.Hold,
+        pressed: false,
+        title: 'Down',
+        smartValue: 0,
+        actions: [
+          () => this.moveActorTo(this.battleStorageService.currentActor.x, this.battleStorageService.currentActor.y + 1)
+        ],
+        disabled: undefined
+      },
+      {
+        hotKey: 'a',
+        type: SmartActionTypeEnum.Hold,
+        pressed: false,
+        title: 'Left',
+        smartValue: 0,
+        actions: [
+          () => this.moveActorTo(this.battleStorageService.currentActor.x - 1, this.battleStorageService.currentActor.y)
+        ],
+        disabled: undefined
+      },
+      {
+        hotKey: 'd',
+        type: SmartActionTypeEnum.Hold,
+        pressed: false,
+        title: 'Right',
+        smartValue: 0,
+        actions: [
+          () => this.moveActorTo(this.battleStorageService.currentActor.x + 1, this.battleStorageService.currentActor.y)
+        ],
+        disabled: undefined
+      },
+    ]
     this.processNextActionFromQueue();
   }
 
@@ -537,6 +584,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   onKeyDown(event: KeyboardEvent) {
     if (!this.blocked) {
       this.pressedKey = event.key;
+      const moveAction = this.moveButtons.find(x => x.hotKey === event.key);
+      if (moveAction) {
+        moveAction.pressed = true;
+        return;
+      }
       this.resetButtonsPressedState();
       const action = this.skillList.find(x => x.hotKey === event.key);
       if (action && !action?.disabled) {
@@ -557,7 +609,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private moveActorTo(x: number, y: number) {
-    if (x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
+    if (this.canAct && x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
       const actor = this.battleStorageService.currentActor;
       const initialTile = this.battleStorageService.scene.tiles[actor.x][actor.y];
       const tile = this.battleStorageService.scene.tiles[x][y];
@@ -595,27 +647,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  onKeyPress(event: KeyboardEvent) {
-    if (this.canAct) {
-      switch (event.key) {
-        case 'w':
-          this.moveActorTo(this.battleStorageService.currentActor.x, this.battleStorageService.currentActor.y - 1);
-          break;
-        case 's':
-          this.moveActorTo(this.battleStorageService.currentActor.x, this.battleStorageService.currentActor.y + 1);
-          break;
-        case 'a':
-          this.moveActorTo(this.battleStorageService.currentActor.x - 1, this.battleStorageService.currentActor.y);
-          break;
-        case 'd':
-          this.moveActorTo(this.battleStorageService.currentActor.x + 1, this.battleStorageService.currentActor.y);
-          break;
-      }
-    }
-  }
-
   onKeyUp(event: KeyboardEvent) {
     if (!this.blocked) {
+      const moveAction = this.moveButtons.find(x => x.hotKey === event.key);
+      if (moveAction) {
+        moveAction.pressed = false;
+        return;
+      }
       if (this.pressedKey === event.key && event.key === 'Escape') {
         this.resetSkillActions();
       }
@@ -1183,6 +1221,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.animationTicker = !this.animationTicker;
       this.tick(shift);
+      for (const action of this.moveButtons) {
+        if (action.pressed) {
+          action.actions[0]();
+          break;
+        }
+      }
       for (let i = 0; i < this.battleStorageService.floatingTexts.length; i++) {
         const floatingText = this.battleStorageService.floatingTexts[i];
         floatingText.time += shift;
