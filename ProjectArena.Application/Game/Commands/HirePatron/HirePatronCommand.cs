@@ -48,12 +48,12 @@ namespace ProjectArena.Application.Game.Commands.HirePatron
 
                 var roster = await _gameContext.Rosters.GetOneAsync(x => x.UserId == request.UserId);
                 var characters = await _gameContext.Characters.GetAsync(x => x.RosterId == roster.Id);
-                if (characters.Count() < 6 && request.CharacterForReplace != null)
+                if (characters.Count() < 3 && request.CharacterForReplace != null)
                 {
                     throw new CannotPerformOperationException("Cannot fire character while roster is not full.");
                 }
 
-                if (characters.Count() >= 6 && request.CharacterForReplace == null)
+                if (characters.Count() >= 3 && request.CharacterForReplace == null)
                 {
                     throw new CannotPerformOperationException("Need character to fire while roster is not full.");
                 }

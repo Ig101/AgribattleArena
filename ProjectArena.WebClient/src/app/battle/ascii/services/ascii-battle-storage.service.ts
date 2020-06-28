@@ -46,6 +46,7 @@ export class AsciiBattleStorageService {
   floatingTexts: FloatingText[] = [];
 
   currentInitiativeList: BehaviorSubject<InitiativePortrait[]>;
+  currentActionId: number;
 
   skillHotkeys = [
     '1',
@@ -89,5 +90,6 @@ export class AsciiBattleStorageService {
     this.ended = false;
     this.shownEnd = false;
     this.endDeclaration = undefined;
+    this.currentActionId = undefined;
   }
 }

@@ -7,6 +7,5 @@ export interface Player {
   team?: number;
   name: string;
   keyActors: number[];
-  turnsSkipped: number;
   status: BattlePlayerStatusEnum;
 }

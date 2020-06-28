@@ -18,7 +18,7 @@ namespace ProjectArena.Tests.Engine
             SyncMessages = new List<ISyncEventArgs>();
             Scene = SceneSamples.CreateSimpleScene(this.EventHandler, false);
             Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).Kill();
-            Scene.ActorWait(Scene.TempTileObject.Id);
+            Scene.ActorWait();
             _decoration = Scene.CreateDecoration(Scene.Players.First(), "test_decoration", Scene.Tiles[4][4], null, null, null, null, null);
             SyncMessages.Clear();
         }
@@ -34,10 +34,10 @@ namespace ProjectArena.Tests.Engine
         [Test]
         public void DecorationCast()
         {
-            Assert.That(Scene.ActorWait(Scene.TempTileObject.Id), Is.True, "Actor first turn");
+            Assert.That(Scene.ActorWait(), Is.True, "Actor first turn");
             Assert.That(SyncMessages.Count, Is.EqualTo(2), "Amount of syncMessages first turn");
             Assert.That(_decoration.DamageModel.Health, Is.EqualTo(100), "Health first turn");
-            Assert.That(Scene.ActorWait(Scene.TempTileObject.Id), Is.True, "Actor second turn");
+            Assert.That(Scene.ActorWait(), Is.True, "Actor second turn");
             Assert.That(SyncMessages.Count, Is.EqualTo(6), "Amount of syncMessages second turn");
             Assert.That(_decoration.DamageModel.Health, Is.EqualTo(90), "Health second turn");
             Assert.That(SyncMessages[4].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Decoration), "Decoration action");
@@ -56,7 +56,7 @@ namespace ProjectArena.Tests.Engine
             while (_decoration.DamageModel.Health > 0 && i < 500)
             {
                 i++;
-                Scene.ActorWait(Scene.TempTileObject.Id);
+                Scene.ActorWait();
             }
 
             Assert.That(i > 400, Is.False, "Cycle error");

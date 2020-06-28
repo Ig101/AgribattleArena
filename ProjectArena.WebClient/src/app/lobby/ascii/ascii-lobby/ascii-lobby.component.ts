@@ -56,7 +56,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   campWidth = 27;
   campHeight = 15;
   campBiom = BiomEnum.Grass;
-  charactersMaxCount = 6;
+  charactersMaxCount = 3;
 
   zoom = 0;
 
@@ -161,8 +161,8 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
         xShift: 4,
         yShift: 1,
         object: this.userService.user.roster[i],
-        x: Math.floor(this.campWidth / 2) + (i % 3 === 1 ? 7 : 5) * (i >= 3 ? 1 : -1),
-        y: Math.floor(this.campHeight / 2) - 4 + ((i % 3) * 4)
+        x: Math.floor(this.campWidth / 2) + (i === 0 ? 5 : -4),
+        y: Math.floor(this.campHeight / 2) + ((i % 2) * 3 - (i === 2 ? 3 : 0))
       };
     }
     this.tiles = new Array<LobbyTile<Character>[]>(this.campWidth);
@@ -202,7 +202,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setupAspectRatio(this.lobbyCanvas.nativeElement.offsetWidth, this.lobbyCanvas.nativeElement.offsetHeight);
     this.canvasContext = this.lobbyCanvas.nativeElement.getContext('2d');
     this.generateCamp();
-    this.fullParty = this.userService.user.roster.length >= 6;
+    this.fullParty = this.userService.user.roster.length >= this.charactersMaxCount;
     this.changed = true;
     this.redrawScene();
     this.drawingTimer = setInterval(() => {
@@ -231,7 +231,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       const activator = this.activators[i];
       activator.object = this.userService.user.roster[i];
     }
-    this.fullParty = this.userService.user.roster.length >= 6;
+    this.fullParty = this.userService.user.roster.length >= this.charactersMaxCount;
     this.changed = true;
   }
 

@@ -37,7 +37,6 @@ export class AsciiBattleSynchronizerService {
         team: player.team,
         name: isCurrentPlayer ? this.userService.user.name : 'Mistspawn gang',
         keyActors: player.keyActorsSync,
-        turnsSkipped: player.turnsSkipped,
         status: player.status
       };
       if (isCurrentPlayer) {
@@ -136,7 +135,6 @@ export class AsciiBattleSynchronizerService {
       const player = this.battleStorageService.players.find(x => x.id === syncPlayer.id);
       player.status = syncPlayer.status;
       player.team = syncPlayer.team;
-      player.turnsSkipped = syncPlayer.turnsSkipped;
       if (player.userId === this.userService.user.id) {
         currentPlayer = player;
       }
@@ -299,7 +297,7 @@ export class AsciiBattleSynchronizerService {
       this.battleStorageService.setTurnTime(synchronizer.turnTime);
     }
     this.battleStorageService.defaultActionSquares = this.battleStorageService.currentActor?.owner === currentPlayer ?
-      this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) :
+      this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor, this.battleStorageService.currentActionId) :
       undefined;
     this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
     return differences;

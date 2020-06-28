@@ -14,13 +14,7 @@ namespace ProjectArena.Engine
 
         List<Actor> KeyActors { get; }
 
-        int TurnsSkipped { get; }
-
         PlayerStatus Status { get; }
-
-        void SkipTurn();
-
-        bool ActThisTurn();
 
         void Defeat(bool leave);
 

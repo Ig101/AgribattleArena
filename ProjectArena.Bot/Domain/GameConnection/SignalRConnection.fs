@@ -43,7 +43,6 @@ let subscribeOnScene (connection: HubConnection) (func: (SynchronizationAction *
     connection.On("BattleDecoration", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Decoration, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleEndTurn", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(EndTurn, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleEndGame", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(EndGame, mapSynchronizer synchronizer)) |> ignore
-    connection.On("BattleSkipTurn", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(SkipTurn, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleLeave", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Leave, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleNoActorsDraw", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(NoActorsDraw, mapSynchronizer synchronizer)) |> ignore
 
@@ -55,6 +54,3 @@ let orderMove (connection: HubConnection) (sceneId: Guid, actorId: int, targetX:
 
 let orderCast (connection: HubConnection) (sceneId: Guid, actorId: int, skillId: int, targetX: int, targetY: int) =
     connection.SendAsync("OrderCastAsync", sceneId, actorId, skillId, targetX, targetY) |> Async.AwaitTask |> Async.Start
-    
-let orderWait (connection: HubConnection) (sceneId: Guid, actorId: int) =
-    connection.SendAsync("OrderWaitAsync", sceneId, actorId) |> Async.AwaitTask |> Async.Start

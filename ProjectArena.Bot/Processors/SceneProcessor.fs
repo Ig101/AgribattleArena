@@ -104,7 +104,7 @@ let private chooseMeaningfulActionsOnly (message: IncomingSynchronizationMessage
             match actorOpt with
             | None -> None
             | Some actor ->
-                if message.Action = Wait || (actingActor = tempActor && ((not actor.CanAct && not actor.CanMove) || actor.ActionPoints <= 0)) then
+                if message.Action = Wait || (actingActor = tempActor && ((not actor.CanAct && not actor.CanMove))) then
                     None
                 else 
                     Some scene

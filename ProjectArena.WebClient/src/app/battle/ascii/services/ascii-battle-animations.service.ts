@@ -53,18 +53,6 @@ export class AsciiBattleAnimationsService {
         this.skippedFlag = false;
       }
       switch (synchronizer.action) {
-        case BattleSynchronizationActionEnum.SkipTurn:
-          if (actor.isDead) {
-            actorFloats.push({
-              text: '*flee*',
-              color: { r: 255, g: 255, b: 0, a: 1 },
-              time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
-              x: actor.x,
-              y: actor.y,
-              height: 0
-            });
-          }
-          break;
         case BattleSynchronizationActionEnum.Leave:
           if (actor.isDead) {
             actorFloats.push({
@@ -362,9 +350,33 @@ export class AsciiBattleAnimationsService {
         }
         break;
       case BattleSynchronizationActionEnum.Move:
-        frames.push([]);
         if (!onlySecondPart) {
+          frames.push([
+            {
+              updateSynchronizer: true,
+              specificAction: undefined,
+              animationTiles: []
+            }
+          ]);
           this.getFramesFromAction(issuer, frames);
+        } else {
+          frames.push([
+            {
+              updateSynchronizer: false,
+              specificAction: undefined,
+              animationTiles: []
+            },
+            {
+              updateSynchronizer: true,
+              specificAction: undefined,
+              animationTiles: []
+            },
+            {
+              updateSynchronizer: false,
+              specificAction: undefined,
+              animationTiles: []
+            }
+          ]);
         }
         break;
       case BattleSynchronizationActionEnum.Cast:
@@ -439,9 +451,6 @@ export class AsciiBattleAnimationsService {
           victory: false
         };
         break;
-      case BattleSynchronizationActionEnum.SkipTurn:
-        this.skippedFlag = true;
-        return this.synchronizeFromSynchronizer(synchronizer);
       case BattleSynchronizationActionEnum.Leave:
         frames.push([]);
     }

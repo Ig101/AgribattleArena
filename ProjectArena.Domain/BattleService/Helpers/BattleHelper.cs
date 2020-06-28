@@ -41,7 +41,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Mode = new SceneMode()
                         {
                             Generator = EngineHelper.CreateDuelSceneGenerator(),
-                            VarManager = EngineHelper.CreateVarManager(40, 20, 3, 8, 4, 0.05f, 0.05f, 0.03f, 0.4f),
+                            VarManager = EngineHelper.CreateVarManager(10, 8, 8, 0.05f, 0.05f, 0.03f, 0.4f),
                             BattleResultProcessor = BattleResultProcessors.ProcessMainDuelBattleResult,
                             MaxPlayers = 2,
                             TimeTillBot = 20,
@@ -56,7 +56,7 @@ namespace ProjectArena.Domain.BattleService.Helpers
                         Mode = new SceneMode()
                         {
                             Generator = EngineHelper.CreateDuelSceneGenerator(),
-                            VarManager = EngineHelper.CreateVarManager(6000, 10, 3, 8, 4, 0.05f, 0.05f, 0.03f, 0.4f),
+                            VarManager = EngineHelper.CreateVarManager(6000, 8, 4, 0.05f, 0.05f, 0.03f, 0.4f),
                             BattleResultProcessor = BattleResultProcessors.ProcessMainDuelBattleResult,
                             MaxPlayers = 2,
                             TimeTillBot = 6,
@@ -204,7 +204,6 @@ namespace ProjectArena.Domain.BattleService.Helpers
                     KeyActorsSync = x.KeyActorsSync,
                     Status = (PlayerStatus)(int)x.Status,
                     Team = x.Team,
-                    TurnsSkipped = x.TurnsSkipped
                 }),
                 ChangedTiles = oldSynchronizer.ChangedTiles.Select(x => MapTile(x, userTeams.Contains(x.Team) || userPlayerIds.Contains(x.OwnerId))),
                 TempActor = oldSynchronizer.TempActor,

@@ -93,7 +93,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
 
   choosePatron(patron: CharacterForSale) {
     this.currentPatron = patron;
-    if (this.userService.user.roster.length >= 6) {
+    if (this.userService.user.roster.length >= 3) {
       this.state = TavernStateEnum.ChooseReplacement;
     } else {
       this.currentCharacterForReplace = undefined;
@@ -160,7 +160,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
 
   backFromName() {
     this.nameForm.controls.textField.setValue('');
-    if (this.userService.user.roster.length >= 6) {
+    if (this.userService.user.roster.length >= 3) {
       this.state = TavernStateEnum.ConfirmReplacement;
     } else {
       this.currentCharacterForReplace = undefined;

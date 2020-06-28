@@ -9,6 +9,5 @@ type SynchronizationAction =
 | Decoration
 | EndTurn
 | EndGame
-| SkipTurn
 | Leave
 | NoActorsDraw

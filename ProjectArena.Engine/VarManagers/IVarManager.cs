@@ -4,10 +4,6 @@
     {
         float TurnTimeLimit { get; }
 
-        float TurnTimeLimitAfterSkip { get; }
-
-        int SkippedTurnsLimit { get; }
-
         int MaxActionPoints { get; }
 
         int ConstitutionMod { get; }

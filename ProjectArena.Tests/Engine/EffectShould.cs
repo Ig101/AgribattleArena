@@ -30,7 +30,7 @@ namespace ProjectArena.Tests.Engine
         [Test]
         public void Impact()
         {
-            Scene.ActorWait(Scene.TempTileObject.Id);
+            Scene.ActorWait();
             Assert.That((int)Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).DamageModel.Health, Is.EqualTo(95), "Actor health after impact");
             Assert.That(_effect.Duration, Is.LessThan(2), "Effect duration");
         }
@@ -41,7 +41,7 @@ namespace ProjectArena.Tests.Engine
             int i = 0;
             while (_effect.Duration > 0 && i < 100)
             {
-                Scene.ActorWait(Scene.TempTileObject.Id);
+                Scene.ActorWait();
             }
 
             Assert.That(i > 400, Is.False, "Cycle error");

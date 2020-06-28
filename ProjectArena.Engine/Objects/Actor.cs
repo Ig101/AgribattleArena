@@ -138,7 +138,6 @@ namespace ProjectArena.Engine.Objects
                 (target.Y == Y && Math.Abs(target.X - X) == 1)))
             {
                 ChangePosition(target, true);
-                SpendActionPoints(1);
                 return true;
             }
 
@@ -213,7 +212,7 @@ namespace ProjectArena.Engine.Objects
 
         public bool CheckActionAvailability()
         {
-            return this.IsAlive && this.ActionPoints > 0 && !CheckStunnedState();
+            return this.IsAlive && !CheckStunnedState();
         }
     }
 }

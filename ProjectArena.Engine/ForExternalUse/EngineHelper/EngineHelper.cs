@@ -51,8 +51,6 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
 
         public static IVarManager CreateVarManager(
             float turnTimeLimit,
-            float turnTimeLimitAfterSkip,
-            int skippedTurnsLimit,
             int maxActionPoints,
             int constitutionMod,
             float willpowerMod,
@@ -62,8 +60,6 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
         {
             return new VarManagers.VarManager(
                 turnTimeLimit,
-                turnTimeLimitAfterSkip,
-                skippedTurnsLimit,
                 maxActionPoints,
                 constitutionMod,
                 willpowerMod,

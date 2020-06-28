@@ -5,6 +5,5 @@ export interface SyncPlayer {
   userId: string;
   team?: number;
   keyActorsSync: number[];
-  turnsSkipped: number;
   status: BattlePlayerStatusEnum;
 }

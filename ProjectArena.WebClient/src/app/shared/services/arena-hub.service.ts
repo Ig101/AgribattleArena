@@ -14,6 +14,7 @@ import { DailyChanges } from '../models/daily-changes.model';
 
 const DAILY_UPDATE = 'DailyUpdate';
 const BATTLE_SYNC_ERROR = 'BattleSynchronizationError';
+const BATTLE_USUCCESSFUL_ACTION = 'BattleUnsuccessfulAction';
 const BATTLE_START_GAME = 'BattleStartGame';
 const BATTLE_MOVE = 'BattleMove';
 const BATTLE_ATTACK = 'BattleAttack';
@@ -22,13 +23,12 @@ const BATTLE_WAIT = 'BattleWait';
 const BATTLE_DECORATION = 'BattleDecoration';
 const BATTLE_END_TURN = 'BattleEndTurn';
 const BATTLE_END_GAME = 'BattleEndGame';
-const BATTLE_SKIP_TURN = 'BattleSkipTurn';
 const BATTLE_LEAVE = 'BattleLeave';
 const BATTLE_NO_ACTORS_DRAW = 'BattleNoActorsDraw';
 
 type BattleHubReturnMethod = typeof DAILY_UPDATE | typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
     typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_NO_ACTORS_DRAW |
-    typeof BATTLE_SKIP_TURN | typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT;
+    typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT | typeof BATTLE_USUCCESSFUL_ACTION;
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +45,7 @@ export class ArenaHubService {
   prepareForBattleNotifier = new BehaviorSubject<LoadingScene>(undefined);
 
   synchronizationErrorState = new BehaviorSubject<boolean>(false);
+  unsuccessfulActionSubject = new Subject<boolean>();
 
   connected: boolean;
 
@@ -119,11 +120,6 @@ export class ArenaHubService {
       .invoke('OrderCastAsync', sceneId, actorId, skillId, targetX, targetY).catch(err => this.catchHubError(err));
   }
 
-  orderWait(sceneId: string, actorId: number) {
-    this.hubConnection
-      .invoke('OrderWaitAsync', sceneId, actorId).catch(err => this.catchHubError(err));
-  }
-
   pickBattleSynchronizationAction(currentVersion: number) {
     if (this.battleSynchronizationActionsList.length === 0) {
       return undefined;
@@ -156,6 +152,7 @@ export class ArenaHubService {
   private  addBattleListeners() {
     this.hubConnection.on(DAILY_UPDATE, (info: DailyChanges) => { this.dailyUpdateNotifier.next(info); });
 
+    this.addNewListener(BATTLE_USUCCESSFUL_ACTION, () => this.unsuccessfulActionSubject.next() );
     this.addNewListener(BATTLE_SYNC_ERROR, () => this.synchronizationErrorState.next(true) );
     this.addNewListener(BATTLE_START_GAME, (synchronizer: Synchronizer) => {
       const currentPlayer = synchronizer.players.find(x => x.userId === this.userId);
@@ -208,8 +205,6 @@ export class ArenaHubService {
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndTurn, synchronizer));
     this.addNewListener(BATTLE_END_GAME, (synchronizer: Synchronizer) =>
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.EndGame, synchronizer));
-    this.addNewListener(BATTLE_SKIP_TURN, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.SkipTurn, synchronizer));
     this.addNewListener(BATTLE_LEAVE, (synchronizer: Synchronizer) =>
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Leave, synchronizer));
     this.addNewListener(BATTLE_NO_ACTORS_DRAW, (synchronizer: Synchronizer) =>

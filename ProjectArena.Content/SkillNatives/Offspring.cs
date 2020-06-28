@@ -38,7 +38,7 @@ namespace ProjectArena.Content.SkillNatives
                             2,
                             mod,
                             30,
-                            6,
+                            2,
                             "slash",
                             new string[]
                             {

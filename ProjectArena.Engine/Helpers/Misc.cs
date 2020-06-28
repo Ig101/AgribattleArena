@@ -21,7 +21,6 @@ namespace ProjectArena.Engine.Helpers
         Decoration,
         EndTurn,
         EndGame,
-        SkipTurn,
         Leave,
         StartGame,
         NoActorsDraw

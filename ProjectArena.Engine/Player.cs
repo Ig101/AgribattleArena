@@ -17,8 +17,6 @@ namespace ProjectArena.Engine
 
         public List<Actor> KeyActors { get; }
 
-        public int TurnsSkipped { get; private set; }
-
         public PlayerStatus Status { get; set; }
 
         public int? StatusHash { get; set; }
@@ -34,25 +32,8 @@ namespace ProjectArena.Engine
             this.Id = id;
             this.UserId = userId;
             this.KeyActors = new List<Actor>();
-            this.TurnsSkipped = 0;
             this.Status = PlayerStatus.Playing;
             this.Left = false;
-        }
-
-        public void SkipTurn()
-        {
-            TurnsSkipped++;
-        }
-
-        public bool ActThisTurn()
-        {
-            if (TurnsSkipped > 0)
-            {
-                TurnsSkipped = 0;
-                return true;
-            }
-
-            return false;
         }
 
         public void Defeat(bool leave)

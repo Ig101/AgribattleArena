@@ -29,7 +29,7 @@ namespace ProjectArena.Tests.Engine
         [Test]
         public void Impact()
         {
-            Scene.ActorWait(Scene.TempTileObject.Id);
+            Scene.ActorWait();
             Assert.That((int)Scene.Tiles[1][2].TempObject.DamageModel.Health, Is.EqualTo(85));
         }
 

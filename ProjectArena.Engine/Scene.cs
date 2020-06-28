@@ -400,10 +400,8 @@ namespace ProjectArena.Engine
                 if (newObject != null)
                 {
                     this.RemainedTurnTime = firstTurn ?
-                        VarManager.TurnTimeLimit + 20 :
-                        (newObject.Owner == null || newObject.Owner.TurnsSkipped <= 0 ?
-                        VarManager.TurnTimeLimit :
-                        VarManager.TurnTimeLimitAfterSkip);
+                        VarManager.TurnTimeLimit + 5 :
+                        VarManager.TurnTimeLimit;
                     this.TempTileObject = newObject;
                     Update(minInitiativePosition);
                     turnStarted = this.TempTileObject.StartTurn();
@@ -459,11 +457,7 @@ namespace ProjectArena.Engine
         {
             foreach (Player player in players)
             {
-                if (player.Status == PlayerStatus.Playing && player.TurnsSkipped >= VarManager.SkippedTurnsLimit)
-                {
-                    player.Defeat(true);
-                }
-                else if (player.Status == PlayerStatus.Playing && DefeatCondition(this, player))
+                if (player.Status == PlayerStatus.Playing && DefeatCondition(this, player))
                 {
                     player.Defeat(false);
                 }
@@ -506,26 +500,14 @@ namespace ProjectArena.Engine
         {
             if (IsActive)
             {
-                lock (lockObject)
+                this.RemainedTurnTime -= time;
+                if (RemainedTurnTime <= 0)
                 {
-                    if (IsActive)
+                    lock (lockObject)
                     {
-                        this.RemainedTurnTime -= time;
-                        if (RemainedTurnTime <= 0)
+                        if (IsActive)
                         {
-                            IPlayerParentRef player = TempTileObject.Owner;
-                            if (player != null)
-                            {
-                                player.SkipTurn();
-                                if (AfterUpdateSynchronization(Helpers.SceneAction.SkipTurn, TempTileObject, null, null, null))
-                                {
-                                    EndTurn();
-                                }
-                            }
-                            else
-                            {
-                                EndTurn();
-                            }
+                            ActorWait();
                         }
                     }
                 }
@@ -582,20 +564,10 @@ namespace ProjectArena.Engine
             return success;
         }
 
-        private void ApplyActionAfterSkipping()
-        {
-            RemainedTurnTime += VarManager.TurnTimeLimit - VarManager.TurnTimeLimitAfterSkip;
-        }
-
         public bool DecorationCast(ActiveDecoration actor)
         {
             if (TempTileObject == actor)
             {
-                if (actor.Owner?.ActThisTurn() ?? false)
-                {
-                    ApplyActionAfterSkipping();
-                }
-
                 actor.Cast();
                 if (AfterUpdateSynchronization(Helpers.SceneAction.Decoration, actor, null, null, null))
                 {
@@ -617,10 +589,6 @@ namespace ProjectArena.Engine
                     if (TempTileObject.Id == actorId && IsActive)
                     {
                         Actor actor = (Actor)TempTileObject;
-                        if (actor.Owner?.ActThisTurn() ?? false)
-                        {
-                            ApplyActionAfterSkipping();
-                        }
 
                         bool result = actor.Move(Tiles[targetX][targetY]);
                         if (result)
@@ -637,9 +605,9 @@ namespace ProjectArena.Engine
                             {
                                 EndTurn();
                             }
-                        }
 
-                        return result;
+                            return true;
+                        }
                     }
                 }
             }
@@ -656,10 +624,6 @@ namespace ProjectArena.Engine
                     if (TempTileObject.Id == actorId && IsActive)
                     {
                         Actor actor = (Actor)TempTileObject;
-                        if (actor.Owner?.ActThisTurn() ?? false)
-                        {
-                            ApplyActionAfterSkipping();
-                        }
 
                         bool result = actor.Cast(skillId, Tiles[targetX][targetY]);
                         if (result)
@@ -676,9 +640,9 @@ namespace ProjectArena.Engine
                             {
                                 EndTurn();
                             }
-                        }
 
-                        return result;
+                            return true;
+                        }
                     }
                 }
             }
@@ -695,10 +659,6 @@ namespace ProjectArena.Engine
                     if (TempTileObject.Id == actorId && IsActive)
                     {
                         Actor actor = (Actor)TempTileObject;
-                        if (actor.Owner?.ActThisTurn() ?? false)
-                        {
-                            ApplyActionAfterSkipping();
-                        }
 
                         bool result = actor.Attack(Tiles[targetX][targetY]);
                         if (result)
@@ -715,9 +675,9 @@ namespace ProjectArena.Engine
                             {
                                 EndTurn();
                             }
-                        }
 
-                        return result;
+                            return true;
+                        }
                     }
                 }
             }
@@ -725,32 +685,22 @@ namespace ProjectArena.Engine
             return false;
         }
 
-        public bool ActorWait(int actorId)
+        public bool ActorWait()
         {
-            if (TempTileObject.Id == actorId && IsActive)
+            if (IsActive)
             {
-                lock (lockObject)
+                Actor actor = (Actor)TempTileObject;
+
+                bool result = actor.Wait();
+                if (result)
                 {
-                    if (TempTileObject.Id == actorId && IsActive)
+                    if (AfterUpdateSynchronization(Helpers.SceneAction.Wait, actor, null, null, null))
                     {
-                        Actor actor = (Actor)TempTileObject;
-                        if (actor.Owner?.ActThisTurn() ?? false)
-                        {
-                            ApplyActionAfterSkipping();
-                        }
-
-                        bool result = actor.Wait();
-                        if (result)
-                        {
-                            if (AfterUpdateSynchronization(Helpers.SceneAction.Wait, actor, null, null, null))
-                            {
-                                EndTurn();
-                            }
-                        }
-
-                        return result;
+                        EndTurn();
                     }
                 }
+
+                return result;
             }
 
             return false;

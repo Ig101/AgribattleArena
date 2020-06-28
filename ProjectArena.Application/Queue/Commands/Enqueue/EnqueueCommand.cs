@@ -42,7 +42,7 @@ namespace ProjectArena.Application.Queue.Commands.Enqueue
             {
                 var roster = await _gameContext.Rosters.GetOneAsync(x => x.UserId == request.UserId);
                 var characters = await _gameContext.Characters.GetAsync(x => x.RosterId == roster.Id && !x.Deleted);
-                if (characters.Count() != 6)
+                if (characters.Count() != 3)
                 {
                     throw new CannotPerformOperationException("Wrong amount of characters");
                 }

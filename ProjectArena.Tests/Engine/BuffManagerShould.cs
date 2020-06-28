@@ -36,7 +36,7 @@ namespace ProjectArena.Tests.Engine
             Assert.That(_actor.Buffs.Count, Is.EqualTo(1), "Count of Buffs");
             Assert.That(_actor.DamageModel.Health, Is.EqualTo(50 + (amount * 2)), "Start amount of health");
             Assert.That(_actor.Strength, Is.EqualTo(10 + (amount * 2)), "Amount of strength");
-            Scene.ActorWait(_actor.Id);
+            Scene.ActorWait();
             Assert.That(_actor.Buffs.Count, Is.EqualTo(1), "Count of Buff after waiting");
             Assert.That(_actor.Buffs[0].Duration, Is.Null, "Buff duration after waiting");
             Assert.That(_actor.AttackModifiers.Count, Is.EqualTo(1), "Attacker count");
@@ -57,7 +57,7 @@ namespace ProjectArena.Tests.Engine
             while (testBuff.Duration > 0 && i < 100)
             {
                 i++;
-                Scene.ActorWait(Scene.TempTileObject.Id);
+                Scene.ActorWait();
                 Assert.That(tempDuration, Is.GreaterThan(testBuff.Duration), "Duration diminishing");
                 tempDuration = (float)testBuff.Duration;
             }
@@ -74,7 +74,7 @@ namespace ProjectArena.Tests.Engine
             _actor.BuffManager.AddBuff("test_debuff", 10, null);
             Assert.That(_actor.Buffs.Count, Is.EqualTo(1), "Count of Buffs");
             Assert.That(_actor.DamageModel.Health, Is.EqualTo(50), "Start amount of health");
-            Scene.ActorWait(_actor.Id);
+            Scene.ActorWait();
             Assert.That(_actor.DamageModel.Health, Is.LessThan(50), "Changed health after waiting");
         }
 

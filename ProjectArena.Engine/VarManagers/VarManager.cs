@@ -4,10 +4,6 @@
     {
         public float TurnTimeLimit { get; }
 
-        public float TurnTimeLimitAfterSkip { get; }
-
-        public int SkippedTurnsLimit { get; }
-
         public int MaxActionPoints { get; }
 
         public int ConstitutionMod { get; }
@@ -22,8 +18,6 @@
 
         public VarManager(
             float turnTimeLimit,
-            float turnTimeLimitAfterSkip,
-            int skippedTurnsLimit,
             int maxActionPoints,
             int constitutionMod,
             float willpowerMod,
@@ -32,8 +26,6 @@
             float minimumInitiative)
         {
             this.TurnTimeLimit = turnTimeLimit;
-            this.TurnTimeLimitAfterSkip = turnTimeLimitAfterSkip;
-            this.SkippedTurnsLimit = skippedTurnsLimit;
             this.MaxActionPoints = maxActionPoints;
             this.ConstitutionMod = constitutionMod;
             this.WillpowerMod = willpowerMod;

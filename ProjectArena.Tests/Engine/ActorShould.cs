@@ -98,7 +98,7 @@ namespace ProjectArena.Tests.Engine
             Actor resurrectionActor = Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1);
             Assert.That(Scene.Tiles[1][2].TempObject, Is.EqualTo(resurrectionActor), "Position");
             resurrectionActor.Kill();
-            Scene.ActorWait(_actor.Id);
+            Scene.ActorWait();
             Assert.That(Scene.Actors.Count, Is.EqualTo(1), "Actors count");
             EndTurnAssertion(_actor.Id, false);
             Scene.ResurrectActor(resurrectionActor, Scene.Tiles[2][2], 30);
@@ -233,7 +233,7 @@ namespace ProjectArena.Tests.Engine
         {
             if (firstPlayer)
             {
-                Scene.ActorWait(_actor.Id);
+                Scene.ActorWait();
                 _actor = (Actor)Scene.TempTileObject;
             }
 
@@ -368,7 +368,7 @@ namespace ProjectArena.Tests.Engine
                 while (skill.PreparationTime > 0 && i < 100)
                 {
                     i++;
-                    Scene.ActorWait(Scene.TempTileObject.Id);
+                    Scene.ActorWait();
                     Assert.That(tempPreparationTime, Is.GreaterThan(skill.PreparationTime), "Preparation time diminishing");
                     tempPreparationTime = skill.PreparationTime;
                 }
@@ -386,7 +386,7 @@ namespace ProjectArena.Tests.Engine
         [TestCase(0, TestName = "Wait(1 turn, 4 points)")]
         public void Wait(int points)
         {
-            Scene.ActorWait(_actor.Id);
+            Scene.ActorWait();
             Assert.That(_actor.ActionPoints, Is.EqualTo(4 - points), "Amount of action points after Wait");
             Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Wait), "Action of Wait message");
             Assert.That(SyncMessages[0].SyncInfo.ChangedActors.Count(), Is.EqualTo(0), "Count of changed actors");
@@ -409,7 +409,7 @@ namespace ProjectArena.Tests.Engine
                 expectedActionPoints[expectedExternalIds[i] - 1] = Math.Min(expectedActionPoints[expectedExternalIds[i] - 1] + expectedActor.ActionPointsIncome, 8);
                 Assert.That(SceneHelper.GetOrderByGuid(((Actor)Scene.TempTileObject).ExternalId), Is.EqualTo(expectedExternalIds[i]), "ExternalId of temp actor");
                 Assert.That(((Actor)Scene.TempTileObject).ActionPoints, Is.EqualTo(expectedActionPoints[expectedExternalIds[i] - 1]), "Action points of temp actor");
-                Scene.ActorWait(expectedActor.Id);
+                Scene.ActorWait();
                 EndTurnAssertion(expectedActor.Id, expectedExternalIds[i + 1] != expectedExternalIds[i]);
                 SyncMessages.Clear();
             }

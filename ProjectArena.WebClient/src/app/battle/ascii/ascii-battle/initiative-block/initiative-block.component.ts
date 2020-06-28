@@ -18,6 +18,10 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
     return this.battleStorageService.shownEnd ? undefined : this.battleStorageService.turnTime;
   }
 
+  get lineWidth() {
+    return Math.min(230, this.timer * 23);
+  }
+
   firstActor: InitiativePortrait;
   otherActors: InitiativePortrait[];
 

@@ -44,6 +44,7 @@ export class AsciiBattlePathCreatorService {
     y: number,
     previousSquare: ActionSquare,
     remainedActionPoints: number,
+    remainedSteps: number,
     allSquares: ActionSquare[],
     onlyTargets: boolean,
     skill: Skill
@@ -64,7 +65,7 @@ export class AsciiBattlePathCreatorService {
               (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
               (!onlyTargets || tile.actor || tile.decoration) && tile.actor !== actor) {
               const existingSquare = allSquares.find(s => s.x === newX && s.y === newY);
-              if (existingSquare && remainedActionPoints <= existingSquare.remainedPoints) {
+              if (existingSquare && remainedSteps <= existingSquare.remainedSteps) {
                 continue;
               } else {
                 removeFromArray(allSquares, existingSquare);
@@ -73,6 +74,7 @@ export class AsciiBattlePathCreatorService {
                 x: newX,
                 y: newY,
                 remainedPoints: remainedActionPoints,
+                remainedSteps: 0,
                 parentSquares: !previousSquare ? [] : [previousSquare, ...previousSquare.parentSquares],
                 type: ActionSquareTypeEnum.Act,
                 isActor: false,
@@ -111,6 +113,7 @@ export class AsciiBattlePathCreatorService {
     y: number,
     previousSquare: ActionSquare,
     remainedActionPoints: number,
+    remainedSteps: number,
     allSquares: ActionSquare[],
     skill: Skill) {
     if (x >= this.battleStorageService.scene.width || x < 0 ||
@@ -122,8 +125,8 @@ export class AsciiBattlePathCreatorService {
       Math.abs(tile.height - initialTile.height) < 10) {
 
       const existingSquare = allSquares.find(s => s.x === x && s.y === y);
-      const actionPointsAfterMove = remainedActionPoints - 1;
-      if (existingSquare && actionPointsAfterMove <= existingSquare.remainedPoints) {
+      const stepsAfterMove = remainedSteps - 1;
+      if (existingSquare && stepsAfterMove <= existingSquare.remainedSteps) {
         return;
       } else {
         removeFromArray(allSquares, existingSquare);
@@ -131,7 +134,8 @@ export class AsciiBattlePathCreatorService {
       const tempSquare = {
         x,
         y,
-        remainedPoints: remainedActionPoints - 1,
+        remainedPoints: remainedActionPoints,
+        remainedSteps: stepsAfterMove,
         parentSquares: !previousSquare ? [] : [previousSquare, ...previousSquare.parentSquares],
         type: ActionSquareTypeEnum.Move,
         isActor: false,
@@ -157,32 +161,30 @@ export class AsciiBattlePathCreatorService {
         this.calculateNeighbourhood(tempSquare, bottomSquare);
       }
       allSquares.push(tempSquare);
-      if (actionPointsAfterMove === 0) {
+      if (stepsAfterMove === 0) {
         return;
       }
       for (let sX = -1; sX <= 1; sX++) {
         for (let sY = -1; sY <= 1; sY++) {
           if (Math.abs(sX) === 1 && sY === 0 || sX === 0 && Math.abs(sY) === 1) {
-            this.calculateNextSquare(actor, tile, x + sX, y + sY, tempSquare, actionPointsAfterMove, allSquares, skill);
+            this.calculateNextSquare(actor, tile, x + sX, y + sY, tempSquare, remainedActionPoints, stepsAfterMove, allSquares, skill);
           }
         }
       }
       this.calculateRangeSquares(actor, tile, x, y, tempSquare,
-        actionPointsAfterMove - skill.cost, allSquares, true, skill);
+       remainedActionPoints - skill.cost, stepsAfterMove, allSquares, true, skill);
       return;
     }
     return;
   }
 
   calculateActiveSquares(actor: Actor, actionId?: number): ActionSquare[] {
-    if (actor.actionPoints === 0) {
-      return [];
-    }
     const skill = actionId && actionId > 0 ? actor.skills.find(x => x.id === actionId) : actor.attackingSkill;
     const actorSquare = {
       x: actor.x,
       y: actor.y,
       remainedPoints: actor.actionPoints,
+      remainedSteps: 0,
       parentSquares: [],
       type: skill.availableTargets.self ? ActionSquareTypeEnum.Act : undefined,
       isActor: true
@@ -192,17 +194,8 @@ export class AsciiBattlePathCreatorService {
     if (!skill) {
       return [];
     }
-    for (let sX = -1; sX <= 1; sX++) {
-      for (let sY = -1; sY <= 1; sY++) {
-        if (Math.abs(sX) === 1 && sY === 0 || sX === 0 && Math.abs(sY) === 1) {
-          if (!actionId) {
-            this.calculateNextSquare(actor, actorTile, actor.x + sX, actor.y + sY, actorSquare, actor.actionPoints, allSquares, skill);
-          }
-        }
-      }
-    }
     this.calculateRangeSquares(actor, actorTile, actor.x, actor.y, actorSquare,
-      actor.actionPoints - skill.cost, allSquares, !actionId, skill);
+      actor.actionPoints - skill.cost, 0, allSquares, false, skill);
     return allSquares.filter(x => x.type !== undefined);
   }
 }

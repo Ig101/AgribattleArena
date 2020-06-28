@@ -14,7 +14,7 @@ namespace ProjectArena.Content.SkillNatives
                 "charge",
                 "charge",
                 new[] { "damage", "target", "movement", "control", "weapon", "direct", "physic" },
-                4,
+                7,
                 4,
                 3,
                 10,

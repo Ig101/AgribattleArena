@@ -34,6 +34,8 @@ let private getNeuralNetworkOutputs (random: Random) (configuration: Configurati
     network.Layers |> Seq.toList |> List.sortBy (fun l -> l.SortIndex) |> List.fold (fun n l -> l.Outputs |> Seq.toList |> List.map (getOutputNeuron random configuration n)) neurons
 
 let private calculateNeededAction (configuration: Configuration) (model: NeuralModelContainer, scene: Scene) (actor: ActorDto) = async {
+    if not configuration.Learning.IsLearning then
+        do! Task.Delay(300)
     let player = scene.Players |> Seq.find (fun p -> p.Id = actor.OwnerId.Value)
     let random = Random()
     let! workingModel = model.Unpack()
@@ -63,7 +65,7 @@ let private orderAction (configuration: Configuration) (sceneId: Guid) (command:
     GC.Collect()
     match command with
     | ActionNeuronType.Wait ->
-        orderWait configuration.Hub (sceneId, actor.Id)
+        ()
     | Move (x, y) ->
         orderMove configuration.Hub (sceneId, actor.Id, x, y)
     | Cast (name, x, y) ->

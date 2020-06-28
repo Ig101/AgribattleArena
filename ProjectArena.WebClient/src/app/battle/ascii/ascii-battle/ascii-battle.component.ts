@@ -89,6 +89,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   onCloseSubscription: Subscription;
   arenaActionsSubscription: Subscription;
   synchronizationErrorSubscription: Subscription;
+  unsuccessfulActionSubscription: Subscription;
   animationSubscription: Subscription;
   finishLoadingSubscription: Subscription;
   victorySubscription: Subscription;
@@ -107,8 +108,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }[] = [];
 
   skillList: SmartAction[] = [];
-  endTurn: SmartAction;
-  currentSkillId: number;
   pressedKey: string;
 
   zoom = 0;
@@ -117,10 +116,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   get canAct() {
     return !this.blocked && !this.specificActionResponseForWait && this.actionsQueue.length === 0 &&
-      this.battleStorageService.turnTime > 0 &&
       this.battleStorageService.currentActor?.owner?.userId === this.userService.user.id &&
-      this.receivingMessagesFromHubAllowed &&
-      !this.specificActionResponseForWait;
+      this.receivingMessagesFromHubAllowed;
   }
 
   get canvasWidth() {
@@ -212,23 +209,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     private loadingService: LoadingService,
     private modalService: ModalService,
   ) {
-    this.endTurn = {
-      hotKey: ' ',
-      type: SmartActionTypeEnum.Hold,
-      smartValue: 0,
-      pressed: false,
-      actions: [() => {
-        this.specificActionResponseForWait = {
-          actorId: this.battleStorageService.currentActor.id,
-          action: BattleSynchronizationActionEnum.Wait
-        };
-        this.arenaHub.orderWait(this.battleStorageService.scene.id, this.battleStorageService.currentActor.id);
-        this.battleAnimationsService
-          .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Wait, this.battleStorageService.currentActor);
-      }],
-      title: 'End turn',
-      disabled: undefined
-    };
     this.mouseState.buttonsInfo[0] = {
       pressed: false,
       timeStamp: 0
@@ -253,6 +233,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       //    location.reload();
         }, 2000);
       }
+    });
+    this.unsuccessfulActionSubscription = arenaHub.unsuccessfulActionSubject.subscribe(() => {
+      this.actionsQueue.length = 0;
+      this.receivingMessagesFromHubAllowed = true;
+      this.specificActionResponseForWait = undefined;
     });
     this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
       this.processNextActionFromQueueWithChecks(pending);
@@ -455,7 +440,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   onMouseUp(event: MouseEvent) {
     this.recalculateMouseMove(event.x, event.y, event.timeStamp);
     if (!this.blocked) {
-      if (!this.skillList.find(x => x.pressed) && !this.endTurn.pressed) {
+      if (!this.skillList.find(x => x.pressed)) {
         this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
         const x = Math.floor(this.mouseState.x);
         const y = Math.floor(this.mouseState.y);
@@ -469,11 +454,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           const currentActionSquare = this.battleStorageService.availableActionSquares
           ?.find(s => s.x === x && s.y === y && s.type);
           if (currentActionSquare) {
-            if (this.currentSkillId) {
+            if (this.battleStorageService.currentActionId) {
               this.arenaHub.orderCast(
                 this.battleStorageService.scene.id,
                 this.battleStorageService.currentActor.id,
-                this.currentSkillId,
+                this.battleStorageService.currentActionId,
                 currentActionSquare.x,
                 currentActionSquare.y);
               this.specificActionResponseForWait = {
@@ -482,7 +467,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
               };
               this.battleAnimationsService
                 .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Cast, this.battleStorageService.currentActor,
-                currentActionSquare.x, currentActionSquare.y, this.currentSkillId);
+                currentActionSquare.x, currentActionSquare.y, this.battleStorageService.currentActionId);
               this.resetSkillActions();
             } else {
               this.actionsQueue = [
@@ -531,7 +516,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   resetButtonsPressedState() {
-    this.endTurn.pressed = false;
     for (const skill of this.skillList) {
       skill.pressed = false;
     }
@@ -541,7 +525,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.blocked) {
       this.pressedKey = event.key;
       this.resetButtonsPressedState();
-      const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
+      const action = this.skillList.find(x => x.hotKey === event.key);
       if (action && this.canAct && !action?.disabled) {
         action.pressed = true;
       } else if (event.key !== 'Escape') {
@@ -559,13 +543,71 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  private moveActorTo(x: number, y: number) {
+    if (x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
+      const actor = this.battleStorageService.currentActor;
+      const initialTile = this.battleStorageService.scene.tiles[actor.x][actor.y];
+      const tile = this.battleStorageService.scene.tiles[x][y];
+      if (actor.canMove && !tile.unbearable && !tile.actor && !tile.decoration &&
+        Math.abs(tile.height - initialTile.height) < 10) {
+          this.arenaHub.orderMove(
+            this.battleStorageService.scene.id,
+            this.battleStorageService.currentActor.id,
+            x,
+            y);
+          this.specificActionResponseForWait = {
+            actorId: this.battleStorageService.currentActor.id,
+            action: BattleSynchronizationActionEnum.Move
+          };
+          this.battleAnimationsService
+            .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
+              x, y, undefined);
+      } else if (checkSkillTargets(tile, actor, actor.attackingSkill.availableTargets) &&
+        (!actor.attackingSkill.onlyVisibleTargets || Math.abs(tile.height - initialTile.height) < 10) &&
+        actor.attackingSkill.cost <= actor.actionPoints) {
+
+        this.arenaHub.orderAttack(
+          this.battleStorageService.scene.id,
+          this.battleStorageService.currentActor.id,
+          x,
+          y);
+        this.specificActionResponseForWait = {
+          actorId: this.battleStorageService.currentActor.id,
+          action: BattleSynchronizationActionEnum.Attack
+        };
+        this.battleAnimationsService
+          .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Attack, this.battleStorageService.currentActor,
+            x, y, undefined);
+      }
+    }
+  }
+
+  onKeyPress(event: KeyboardEvent) {
+    if (this.canAct) {
+      switch (event.key) {
+        case 'w':
+          this.moveActorTo(this.battleStorageService.currentActor.x, this.battleStorageService.currentActor.y - 1);
+          break;
+        case 's':
+          this.moveActorTo(this.battleStorageService.currentActor.x, this.battleStorageService.currentActor.y + 1);
+          break;
+        case 'a':
+          this.moveActorTo(this.battleStorageService.currentActor.x - 1, this.battleStorageService.currentActor.y);
+          break;
+        case 'd':
+          this.moveActorTo(this.battleStorageService.currentActor.x + 1, this.battleStorageService.currentActor.y);
+          break;
+      }
+    }
+  }
+
   onKeyUp(event: KeyboardEvent) {
     if (!this.blocked) {
       if (this.pressedKey === event.key && event.key === 'Escape') {
         this.resetSkillActions();
       }
       if (this.pressedKey === event.key && this.canAct) {
-        const action = this.endTurn.hotKey === event.key ? this.endTurn : this.skillList.find(x => x.hotKey === event.key);
+        const action = this.skillList.find(x => x.hotKey === event.key);
         if (action?.pressed && !action?.disabled) {
           if (action.type === SmartActionTypeEnum.Toggle) {
             action.actions[action.smartValue]();
@@ -837,7 +879,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       if (this.battleStorageService.availableActionSquares?.length > 0) {
         const path = this.generateActionSquareGrid(cameraLeft, cameraTop);
-        this.canvasContext.strokeStyle = this.currentSkillId ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 255, 0, 0.8)';
+        this.canvasContext.strokeStyle = this.battleStorageService.currentActionId ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 255, 0, 0.8)';
         this.canvasContext.lineWidth = 2;
         this.canvasContext.stroke(path);
       }
@@ -969,21 +1011,21 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             type: SmartActionTypeEnum.Toggle,
             pressed: this.pressedKey === this.battleStorageService.skillHotkeys[i],
             title: this.battleStorageService.currentActor.skills[i].name,
-            smartValue: this.battleStorageService.currentActor.skills[i].id === this.currentSkillId ? 1 : 0,
+            smartValue: this.battleStorageService.currentActor.skills[i].id === this.battleStorageService.currentActionId ? 1 : 0,
             actions: [
               () => {
                 const skill = this.battleStorageService.currentActor.skills[i];
                 const actor = this.battleStorageService.currentActor;
-                this.currentSkillId = skill.id;
+                this.battleStorageService.currentActionId = skill.id;
                 this.battleStorageService.availableActionSquares =
-                  this.battlePathCreator.calculateActiveSquares(actor, this.currentSkillId);
+                  this.battlePathCreator.calculateActiveSquares(actor, this.battleStorageService.currentActionId);
                 for (const action of this.skillList) {
                   action.smartValue = 0;
                 }
                 this.skillList[i].smartValue = 1;
               },
               () => {
-                this.currentSkillId = undefined;
+                this.battleStorageService.currentActionId = undefined;
                 this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
                 this.skillList[i].smartValue = 0;
               }],
@@ -1000,7 +1042,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         } else {
           if (this.skillList[i].smartObject !== this.battleStorageService.currentActor.skills[i]) {
             this.skillList[i].title = this.battleStorageService.currentActor.skills[i].name;
-            this.skillList[i].smartValue = this.battleStorageService.currentActor.skills[i].id === this.currentSkillId ? 1 : 0;
+            this.skillList[i].smartValue =
+              this.battleStorageService.currentActor.skills[i].id === this.battleStorageService.currentActionId ? 1 : 0;
             this.skillList[i].smartObject = this.battleStorageService.currentActor.skills[i];
           }
           this.skillList[i].disabled =
@@ -1059,6 +1102,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           this.processNextActionFromQueue();
         }
         return;
+      case BattleSynchronizationActionEnum.EndTurn:
+        this.battleStorageService.currentActionId = undefined;
+        this.battleStorageService.availableActionSquares = this.battleStorageService.defaultActionSquares;
+        break;
     }
     if (!this.battleAnimationsService.generateAnimationsFromSynchronizer(action, onlySecondPart)) {
       this.processNextActionFromQueueWithChecks();
