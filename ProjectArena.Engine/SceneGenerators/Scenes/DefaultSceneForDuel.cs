@@ -25,10 +25,14 @@ namespace ProjectArena.Engine.SceneGenerators.Scenes
             scene.CreateTile("grass", 14, 4, 17);
             scene.CreateTile("grass", 13, 3, 8);
             scene.CreateTile("grass", 14, 3, 8);
+            scene.CreateTile("grass", 12, 4, 17);
+            scene.CreateTile("grass", 15, 4, 17);
             scene.CreateTile("grass", 12, 3, 8);
             scene.CreateTile("grass", 15, 3, 8);
-            scene.CreateTile("grass", 12, 4, 8);
-            scene.CreateTile("grass", 15, 4, 8);
+            scene.CreateTile("grass", 11, 3, 8);
+            scene.CreateTile("grass", 16, 3, 8);
+            scene.CreateTile("grass", 11, 4, 8);
+            scene.CreateTile("grass", 16, 4, 8);
 
             scene.CreateTile("bush", 0, 0, 16);
             scene.CreateTile("bush", 0, 1, 16);
@@ -144,7 +148,7 @@ namespace ProjectArena.Engine.SceneGenerators.Scenes
 
             scene.CreateDecoration(null, "tree", sceneTiles[11][0], null, null, null, null, null);
 
-            scene.CreateDecoration(null, "tree", sceneTiles[12][4], null, null, null, null, null);
+            scene.CreateDecoration(null, "tree", sceneTiles[11][4], null, null, null, null, null);
 
             scene.CreateDecoration(null, "tree", sceneTiles[22][5], null, null, null, null, null);
             scene.CreateDecoration(null, "tree", sceneTiles[22][15], null, null, null, null, null);
@@ -160,7 +164,7 @@ namespace ProjectArena.Engine.SceneGenerators.Scenes
 
             scene.CreateDecoration(null, "tree", sceneTiles[16][0], null, null, null, null, null);
 
-            scene.CreateDecoration(null, "tree", sceneTiles[15][4], null, null, null, null, null);
+            scene.CreateDecoration(null, "tree", sceneTiles[16][4], null, null, null, null, null);
 
             return new (int x, int y)[]
             {
