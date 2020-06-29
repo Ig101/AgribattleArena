@@ -440,50 +440,12 @@ export class AsciiBattleAnimationsService {
         [
           {
             updateSynchronizer: false,
-            animationTiles: [
-              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
-                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
-            ],
+            animationTiles: [],
             specificAction: undefined
           },
           {
             updateSynchronizer: false,
-            animationTiles: [
-              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
-                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
-            ],
-            specificAction: undefined
-          },
-          {
-            updateSynchronizer: false,
-            animationTiles: [
-              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
-                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
-            ],
-            specificAction: undefined
-          },
-          {
-            updateSynchronizer: false,
-            animationTiles: [
-              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
-                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
-            ],
-            specificAction: undefined
-          },
-          {
-            updateSynchronizer: false,
-            animationTiles: [
-              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
-                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
-            ],
-            specificAction: undefined
-          },
-          {
-            updateSynchronizer: false,
-            animationTiles: [
-              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
-                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
-            ],
+            animationTiles: [],
             specificAction: undefined
           }
         ]

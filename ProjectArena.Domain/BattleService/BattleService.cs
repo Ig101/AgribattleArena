@@ -209,7 +209,7 @@ namespace ProjectArena.Domain.BattleService
                 players.Add(EngineHelper.CreatePlayerForGeneration(Guid.NewGuid().ToString(), id, null, playerActors));
             }
 
-            var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), 350, SynchronizationInfoEventHandler);
+            var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), 150, SynchronizationInfoEventHandler);
             lock (_locker)
             {
                 _scenes = _scenes.Append(scene).ToList();
