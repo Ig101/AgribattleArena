@@ -447,11 +447,6 @@ export class AsciiBattleAnimationsService {
             updateSynchronizer: false,
             animationTiles: [],
             specificAction: undefined
-          },
-          {
-            updateSynchronizer: false,
-            animationTiles: [],
-            specificAction: undefined
           }
         ]
       ];
