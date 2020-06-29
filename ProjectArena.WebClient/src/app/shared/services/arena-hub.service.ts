@@ -19,7 +19,6 @@ const BATTLE_START_GAME = 'BattleStartGame';
 const BATTLE_MOVE = 'BattleMove';
 const BATTLE_ATTACK = 'BattleAttack';
 const BATTLE_CAST = 'BattleCast';
-const BATTLE_WAIT = 'BattleWait';
 const BATTLE_DECORATION = 'BattleDecoration';
 const BATTLE_END_TURN = 'BattleEndTurn';
 const BATTLE_END_GAME = 'BattleEndGame';
@@ -28,7 +27,7 @@ const BATTLE_NO_ACTORS_DRAW = 'BattleNoActorsDraw';
 
 type BattleHubReturnMethod = typeof DAILY_UPDATE | typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
     typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_NO_ACTORS_DRAW |
-    typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_WAIT | typeof BATTLE_USUCCESSFUL_ACTION;
+    typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_USUCCESSFUL_ACTION;
 
 @Injectable({
   providedIn: 'root'
@@ -143,7 +142,6 @@ export class ArenaHubService {
 
   private registerBattleSynchronizationAction(action: BattleSynchronizationActionEnum, sync: Synchronizer) {
     const synchronizationObject = { action, sync };
-    console.log(synchronizationObject);
     this.battleSynchronizationActionsList.push(synchronizationObject);
     this.battleSynchronizationActionsList.sort((a, b) => a.sync.version - b.sync.version);
     this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;
@@ -198,8 +196,6 @@ export class ArenaHubService {
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Attack, synchronizer));
     this.addNewListener(BATTLE_CAST, (synchronizer: Synchronizer) =>
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Cast, synchronizer));
-    this.addNewListener(BATTLE_WAIT, (synchronizer: Synchronizer) =>
-    this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Wait, synchronizer));
     this.addNewListener(BATTLE_DECORATION, (synchronizer: Synchronizer) =>
     this.registerBattleSynchronizationAction(BattleSynchronizationActionEnum.Decoration, synchronizer));
     this.addNewListener(BATTLE_END_TURN, (synchronizer: Synchronizer) =>

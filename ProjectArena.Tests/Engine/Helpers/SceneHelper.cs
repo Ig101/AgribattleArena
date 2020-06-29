@@ -44,6 +44,7 @@ namespace ProjectArena.Tests.Engine.Helpers
                 nativeManager,
                 CreateVarManagerWithDefaultVars(),
                 0,
+                0,
                 eventHandler);
 
             return scene;

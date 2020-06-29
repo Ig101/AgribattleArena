@@ -182,7 +182,9 @@ namespace ProjectArena.Tests.Engine.Helpers
             {
                 EngineHelper.CreateActorForGeneration(Guid.Parse("d5bd9080-cd18-475d-9a30-1a1361f99e7e"), "test_actor", "test_actor_attack", 10, 20, 10, 18, new string[] { "test_actor_skill", "test_actor_skill_range" }, 4, new string[0])
             };
-            return SceneHelper.CreateNewScene(nativeManager, tileSet, victory, firstPlayerActors, secondPlayerActors, eventHandler);
+            var scene = SceneHelper.CreateNewScene(nativeManager, tileSet, victory, firstPlayerActors, secondPlayerActors, eventHandler);
+            scene.EndTurn();
+            return scene;
         }
     }
 }

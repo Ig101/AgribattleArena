@@ -3,7 +3,6 @@ export enum BattleSynchronizationActionEnum {
   Move,
   Attack,
   Cast,
-  Wait,
   Decoration,
   EndTurn,
   EndGame,

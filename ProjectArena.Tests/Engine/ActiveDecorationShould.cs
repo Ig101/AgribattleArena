@@ -18,7 +18,7 @@ namespace ProjectArena.Tests.Engine
             SyncMessages = new List<ISyncEventArgs>();
             Scene = SceneSamples.CreateSimpleScene(this.EventHandler, false);
             Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == 1).Kill();
-            Scene.ActorWait();
+            Scene.EndTurn();
             _decoration = Scene.CreateDecoration(Scene.Players.First(), "test_decoration", Scene.Tiles[4][4], null, null, null, null, null);
             SyncMessages.Clear();
         }
@@ -35,17 +35,12 @@ namespace ProjectArena.Tests.Engine
         public void DecorationCast()
         {
             Assert.That(Scene.ActorWait(), Is.True, "Actor first turn");
-            Assert.That(SyncMessages.Count, Is.EqualTo(2), "Amount of syncMessages first turn");
+            Assert.That(SyncMessages.Count, Is.EqualTo(1), "Amount of syncMessages first turn");
             Assert.That(_decoration.DamageModel.Health, Is.EqualTo(100), "Health first turn");
             Assert.That(Scene.ActorWait(), Is.True, "Actor second turn");
-            Assert.That(SyncMessages.Count, Is.EqualTo(6), "Amount of syncMessages second turn");
+            Assert.That(SyncMessages.Count, Is.EqualTo(4), "Amount of syncMessages second turn");
             Assert.That(_decoration.DamageModel.Health, Is.EqualTo(90), "Health second turn");
-            Assert.That(SyncMessages[4].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Decoration), "Decoration action");
-            for (int i = 0; i < 6; i++)
-            {
-                Assert.That(SyncMessages[i].SyncInfo.ChangedDecorations.Count(), Is.EqualTo(i == 2 ? 0 : 1), "Check message decorations " + i);
-            }
-
+            Assert.That(SyncMessages[2].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Decoration), "Decoration action");
             Assert.That(Scene.TempTileObject, Is.EqualTo(Scene.Actors[0]), "Temp tile object at last");
         }
 

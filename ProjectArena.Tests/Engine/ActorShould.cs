@@ -110,8 +110,8 @@ namespace ProjectArena.Tests.Engine
 
         [Test]
         [TestCase(2, false, TestName = "SpendActionPoints(2 points, 4 temp)")]
-        [TestCase(4, true, TestName = "SpendActionPoints(4 points, 4 temp)")]
-        [TestCase(6, true, TestName = "SpendActionPoints(6 points, 4 temp)")]
+        [TestCase(4, false, TestName = "SpendActionPoints(4 points, 4 temp)")]
+        [TestCase(6, false, TestName = "SpendActionPoints(6 points, 4 temp)")]
         public void SpendActionPoints(int points, bool endTurn)
         {
             _actor.SpendActionPoints(points);
@@ -142,7 +142,7 @@ namespace ProjectArena.Tests.Engine
 
             Assert.That(_actor.TempTile.X, Is.EqualTo(available ? targetX : tempX), "X position of Actor2");
             Assert.That(_actor.TempTile.Y, Is.EqualTo(available ? targetY : tempY), "Y position of Actor2");
-            Assert.That(_actor.ActionPoints, Is.EqualTo(available ? 3 : 4), "Amount of actionPoints");
+            Assert.That(_actor.ActionPoints, Is.EqualTo(4), "Amount of actionPoints");
         }
 
         [Test]
@@ -204,22 +204,21 @@ namespace ProjectArena.Tests.Engine
         public void MoveToTileObject()
         {
             MoveCloseToEnemy(2);
-            Assert.That(_actor.ActionPoints, Is.EqualTo(3), "After MoveCloseToEnemy actionPoints");
+            Assert.That(_actor.ActionPoints, Is.EqualTo(4), "After MoveCloseToEnemy actionPoints");
             Assert.That(Scene.ActorMove(_actor.Id, _actor.X - 1, 2), Is.False, "Move to TileObject");
         }
 
         [Test]
         [TestCase(TestName ="MoveToPoint(Move until turn ends)")]
-        public void EndTurnByMove()
+        public void NotEndTurnByMove()
         {
             for (int i = 0; i < 4; i++)
             {
                 Assert.That(Scene.ActorMove(_actor.Id, _actor.X - 1, _actor.Y), Is.True, "Step " + i);
             }
 
-            Assert.That(_actor.ActionPoints, Is.EqualTo(0), "Action points after spending");
-            Assert.That(SyncMessages.Count, Is.EqualTo(5), "SyncMessages count after action points spending");
-            EndTurnAssertion(_actor.Id, true);
+            Assert.That(_actor.ActionPoints, Is.EqualTo(4), "Action points after spending");
+            Assert.That(SyncMessages.Count, Is.EqualTo(4), "SyncMessages count after action points spending");
         }
 
         // Attacking tests
@@ -248,7 +247,7 @@ namespace ProjectArena.Tests.Engine
                 Assert.That(SyncMessages[0].SyncInfo.ChangedActors.Count(), Is.EqualTo(2), "Amount of changed actors");
             }
 
-            Assert.That(_actor.ActionPoints, Is.EqualTo(success ? 2 : 3), "Amount of action points after attack");
+            Assert.That(_actor.ActionPoints, Is.EqualTo(success ? 3 : 4), "Amount of action points after attack");
             Assert.That(Scene.Tiles[targetX][_actor.Y].TempObject.DamageModel.Health, Is.EqualTo(success ? 25 : Scene.Tiles[targetX][_actor.Y].TempObject.DamageModel.MaxHealth), "Target's health");
         }
 
@@ -268,7 +267,7 @@ namespace ProjectArena.Tests.Engine
                 Assert.That(Scene.ActorAttack(_actor.Id, 1, _actor.Y), Is.EqualTo(true), "Attack succession");
                 Assert.That(SyncMessages.Count, Is.EqualTo(i + 1), "Amount of sync messages");
                 Assert.That(targetActor.IsAlive, Is.EqualTo(i < turnKilled), "Is target alive");
-                Assert.That(_actor.ActionPoints, Is.EqualTo(3 - i));
+                Assert.That(_actor.ActionPoints, Is.EqualTo(4 - i));
                 Assert.That(SyncMessages[i].SyncInfo.DeletedActors.Count(), Is.EqualTo(turnKilled == i ? 1 : 0), "Amount of killed actors");
                 if (i < turnKilled)
                 {
@@ -279,28 +278,6 @@ namespace ProjectArena.Tests.Engine
                 {
                     Assert.That(targetActor.DamageModel.Health, Is.LessThanOrEqualTo(0), "Amount of target health");
                     Assert.That(Scene.Actors.Count(), Is.EqualTo(1), "Amount of actors");
-                }
-            }
-        }
-
-        [Test]
-        [TestCase(TestName = "ActorAttack(Attack until end turn)")]
-        public void ActorAttackEndTurn()
-        {
-            int endTurn = 3;
-            for (int i = 0; i < 5; i++)
-            {
-                Assert.That(Scene.ActorAttack(_actor.Id, 17, _actor.Y), Is.EqualTo(i <= endTurn), "Attack succession");
-                Assert.That(SyncMessages.Count, Is.EqualTo(Math.Min(endTurn, i) + (i < endTurn ? 1 : 2)), "Amount of sync messages");
-                Assert.That(Scene.TempTileObject.Id, i < endTurn ? Is.EqualTo(_actor.Id) : Is.Not.EqualTo(_actor.Id), "Turn of which player");
-                if (i <= endTurn)
-                {
-                    Assert.That(SyncMessages[i].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Attack), "Attack action");
-                }
-
-                if (i == endTurn)
-                {
-                    EndTurnAssertion(_actor.Id, true);
                 }
             }
         }
@@ -321,12 +298,7 @@ namespace ProjectArena.Tests.Engine
                 Assert.That(Scene.ActorCast(_actor.Id, skillId, 1, _actor.Y), Is.EqualTo(success), "Cast succession " + i);
                 if (i <= 2 && success)
                 {
-                    if (i == 2)
-                    {
-                        EndTurnAssertion(_actor.Id, false);
-                    }
-
-                    Assert.That(SyncMessages.Count, Is.EqualTo(i < 2 ? i + 1 : 4), "Amount of sync messages " + i);
+                    Assert.That(SyncMessages.Count, Is.EqualTo(i < 2 ? i + 1 : 3), "Amount of sync messages " + i);
                     if (i <= 2)
                     {
                         Assert.That(SyncMessages[i].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Cast), "Cast action " + i);
@@ -334,7 +306,6 @@ namespace ProjectArena.Tests.Engine
                         Assert.That(SyncMessages[i].SyncInfo.ChangedActors.Count(), Is.EqualTo(i < 1 ? 2 : 1), "Amount of changed actors " + i);
                     }
 
-                    Assert.That(_actor.ActionPoints, Is.EqualTo(i < 2 ? 2 - i : 4), "Amount of action points after attack " + i);
                     if (i <= 1)
                     {
                         Assert.That(targetActor.DamageModel.Health, Is.EqualTo(40 - (60 * i)), "Target's health " + i);
@@ -378,40 +349,6 @@ namespace ProjectArena.Tests.Engine
                 Assert.That(Scene.ActorCast(_actor.Id, skillId, 1, _actor.Y), Is.True, "Another cast succession");
                 Assert.That(_actor.ActionPoints, Is.EqualTo(6), "Action points after last cast");
                 Assert.That(Scene.Tiles[1][_actor.Y].TempObject.DamageModel.Health, Is.EqualTo(60), "Amount of target health after last cast");
-            }
-        }
-
-        // Waiting tests
-        [Test]
-        [TestCase(0, TestName = "Wait(1 turn, 4 points)")]
-        public void Wait(int points)
-        {
-            Scene.ActorWait();
-            Assert.That(_actor.ActionPoints, Is.EqualTo(4 - points), "Amount of action points after Wait");
-            Assert.That(SyncMessages[0].Action, Is.EqualTo(ProjectArena.Engine.Helpers.SceneAction.Wait), "Action of Wait message");
-            Assert.That(SyncMessages[0].SyncInfo.ChangedActors.Count(), Is.EqualTo(0), "Count of changed actors");
-            EndTurnAssertion(_actor.Id, true);
-        }
-
-        [Test]
-        [TestCase(2, TestName = "Wait(2 turns passed)")]
-        [TestCase(3, TestName = "Wait(3 turns passed)")]
-        [TestCase(4, TestName = "Wait(4 turns passed)")]
-        [TestCase(5, TestName = "Wait(5 turns passed)")]
-        [TestCase(6, TestName = "Wait(6 turns passed)")]
-        public void MultipleWait(int repetitions)
-        {
-            int[] expectedExternalIds = new int[] { 2, 1, 2, 2, 1, 2, 2 };
-            int[] expectedActionPoints = new int[] { 0, 0 };
-            for (int i = 0; i < repetitions; i++)
-            {
-                Actor expectedActor = Scene.Actors.Find(x => SceneHelper.GetOrderByGuid(x.ExternalId) == expectedExternalIds[i]);
-                expectedActionPoints[expectedExternalIds[i] - 1] = Math.Min(expectedActionPoints[expectedExternalIds[i] - 1] + expectedActor.ActionPointsIncome, 8);
-                Assert.That(SceneHelper.GetOrderByGuid(((Actor)Scene.TempTileObject).ExternalId), Is.EqualTo(expectedExternalIds[i]), "ExternalId of temp actor");
-                Assert.That(((Actor)Scene.TempTileObject).ActionPoints, Is.EqualTo(expectedActionPoints[expectedExternalIds[i] - 1]), "Action points of temp actor");
-                Scene.ActorWait();
-                EndTurnAssertion(expectedActor.Id, expectedExternalIds[i + 1] != expectedExternalIds[i]);
-                SyncMessages.Clear();
             }
         }
     }

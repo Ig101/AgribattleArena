@@ -33,7 +33,7 @@ namespace ProjectArena.Engine
 
         IEnumerable<int> GetPlayerActors(string playerId);
 
-        void EndTurn(bool firstTurn = false);
+        void EndTurn();
 
         bool DecorationCast(ActiveDecoration actor);
 

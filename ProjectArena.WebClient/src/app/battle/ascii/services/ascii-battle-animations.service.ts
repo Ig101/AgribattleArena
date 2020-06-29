@@ -387,8 +387,6 @@ export class AsciiBattleAnimationsService {
           }
         }
         break;
-      case BattleSynchronizationActionEnum.Wait:
-        return this.synchronizeFromSynchronizer(synchronizer);
       case BattleSynchronizationActionEnum.Decoration:
         const decoration = this.battleStorageService.scene.decorations.find(x => x.id === synchronizer.sync.actorId);
         if (decoration && decoration.action) {
@@ -437,25 +435,55 @@ export class AsciiBattleAnimationsService {
   }
 
   generateAnimationsFromIssue(action: BattleSynchronizationActionEnum, actor: Actor, x?: number, y?: number, skillId?: number): boolean {
-    if (action === BattleSynchronizationActionEnum.Wait) {
-      return false;
-    }
     if (action === BattleSynchronizationActionEnum.Move) {
       const moveFrames = [
         [
           {
             updateSynchronizer: false,
-            animationTiles: [],
-            specificAction: undefined
-          },
-          {
-            updateSynchronizer: true,
-            animationTiles: [],
+            animationTiles: [
+              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
+                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
+            ],
             specificAction: undefined
           },
           {
             updateSynchronizer: false,
-            animationTiles: [],
+            animationTiles: [
+              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
+                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
+            ],
+            specificAction: undefined
+          },
+          {
+            updateSynchronizer: false,
+            animationTiles: [
+              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
+                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
+            ],
+            specificAction: undefined
+          },
+          {
+            updateSynchronizer: false,
+            animationTiles: [
+              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
+                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
+            ],
+            specificAction: undefined
+          },
+          {
+            updateSynchronizer: false,
+            animationTiles: [
+              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
+                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
+            ],
+            specificAction: undefined
+          },
+          {
+            updateSynchronizer: false,
+            animationTiles: [
+              {x, y, char: 'x', color: { r: 255, g: 255, b: 0, a: 1 }, unitAlpha: true,
+                unitColorMultiplier: 0, priority: 1, ignoreHeight: false, overflowHealth: false, workingOnSpecEffects: true}
+            ],
             specificAction: undefined
           }
         ]

@@ -25,6 +25,10 @@ namespace ProjectArena.Engine
 
         private readonly List<Player> players;
 
+        private readonly int moveMilliseconds;
+
+        private DateTime? lastMoveTime;
+
         public bool IsActive { get; private set; }
 
         public float PassedTime { get; private set; }
@@ -89,8 +93,11 @@ namespace ProjectArena.Engine
             ForExternalUse.Generation.ISceneGenerator generator,
             ForExternalUse.INativeManager nativeManager,
             ForExternalUse.IVarManager varManager,
-            int seed)
+            int seed,
+            int moveMilliseconds)
         {
+            this.moveMilliseconds = moveMilliseconds;
+            this.IdsCounter = 1;
             this.IsActive = true;
             this.Id = id;
             this.PassedTime = 0;
@@ -101,7 +108,6 @@ namespace ProjectArena.Engine
             this.WinCondition = tempGenerator.WinCondition;
             this.DefeatCondition = tempGenerator.DefeatCondition;
             this.EnemyActorsPrefix = string.Empty;
-            this.IdsCounter = 1;
             this.players = new List<Player>();
             this.Actors = new List<Actor>();
             this.Decorations = new List<ActiveDecoration>();
@@ -367,11 +373,11 @@ namespace ProjectArena.Engine
         // Updates methods
         public void StartGame()
         {
+            this.RemainedTurnTime = 5;
             this.ReturnAction(this, new SyncEventArgs(this, ++Version, Helpers.SceneAction.StartGame, GetFullSynchronizationData(true), null, null, null, null));
-            EndTurn(true);
         }
 
-        public void EndTurn(bool firstTurn = false)
+        public void EndTurn()
         {
             bool turnStarted;
             do
@@ -399,9 +405,7 @@ namespace ProjectArena.Engine
 
                 if (newObject != null)
                 {
-                    this.RemainedTurnTime = firstTurn ?
-                        VarManager.TurnTimeLimit + 5 :
-                        VarManager.TurnTimeLimit;
+                    this.RemainedTurnTime = VarManager.TurnTimeLimit;
                     this.TempTileObject = newObject;
                     Update(minInitiativePosition);
                     turnStarted = this.TempTileObject.StartTurn();
@@ -507,7 +511,14 @@ namespace ProjectArena.Engine
                     {
                         if (IsActive)
                         {
-                            ActorWait();
+                            if (TempTileObject == null)
+                            {
+                                EndTurn();
+                            }
+                            else
+                            {
+                                ActorWait();
+                            }
                         }
                     }
                 }
@@ -580,19 +591,25 @@ namespace ProjectArena.Engine
             return false;
         }
 
+        private bool CheckMoveTime()
+        {
+            return lastMoveTime == null || (DateTime.Now - lastMoveTime.Value).TotalMilliseconds >= moveMilliseconds;
+        }
+
         public bool ActorMove(int actorId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
+            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive)
+                    if (TempTileObject.Id == actorId && IsActive && CheckMoveTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
                         bool result = actor.Move(Tiles[targetX][targetY]);
                         if (result)
                         {
+                            lastMoveTime = DateTime.Now;
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
                             {
@@ -617,11 +634,11 @@ namespace ProjectArena.Engine
 
         public bool ActorCast(int actorId, int skillId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
+            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive)
+                    if (TempTileObject.Id == actorId && IsActive && CheckMoveTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
@@ -652,11 +669,11 @@ namespace ProjectArena.Engine
 
         public bool ActorAttack(int actorId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length)
+            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive)
+                    if (TempTileObject.Id == actorId && IsActive && CheckMoveTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
@@ -694,10 +711,8 @@ namespace ProjectArena.Engine
                 bool result = actor.Wait();
                 if (result)
                 {
-                    if (AfterUpdateSynchronization(Helpers.SceneAction.Wait, actor, null, null, null))
-                    {
-                        EndTurn();
-                    }
+                    lastMoveTime = null;
+                    EndTurn();
                 }
 
                 return result;

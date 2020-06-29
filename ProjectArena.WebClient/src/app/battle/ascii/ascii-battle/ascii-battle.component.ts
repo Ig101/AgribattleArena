@@ -58,6 +58,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('battleCanvas', { static: true }) battleCanvas: ElementRef<HTMLCanvasElement>;
   private canvasContext: CanvasRenderingContext2D;
 
+  finishLoadingFlag = false;
+
   lastChange: number;
 
   drawingTimer;
@@ -236,22 +238,25 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     this.unsuccessfulActionSubscription = arenaHub.unsuccessfulActionSubject.subscribe(() => {
-      if (this.specificActionResponseForWait && this.specificActionResponseForWait.action !== BattleSynchronizationActionEnum.Move) {
-        const actor = this.battleStorageService.scene.actors.find(x => x.id = this.specificActionResponseForWait.actorId);
-        if (actor) {
-          this.battleStorageService.floatingTexts.push({
-            text: '*fail*',
-            color: { r: 255, g: 255, b: 0, a: 1 },
-            time: 0,
-            x: actor.x,
-            y: actor.y,
-            height: 0
-          });
+      if (this.specificActionResponseForWait) {
+        if (this.specificActionResponseForWait.action !== BattleSynchronizationActionEnum.Move) {
+          const unsuccessActor = this.battleStorageService.scene.actors.find(x => x.id === this.specificActionResponseForWait.actorId);
+          if (unsuccessActor) {
+            this.battleStorageService.floatingTexts.push({
+              text: '*fail*',
+              color: { r: 255, g: 255, b: 0, a: 1 },
+              time: 0,
+              x: unsuccessActor.x,
+              y: unsuccessActor.y,
+              height: 0
+            });
+          }
         }
+        this.battleAnimationsService.animationsQueue.length = 0;
+        this.actionsQueue.length = 0;
+        this.receivingMessagesFromHubAllowed = true;
+        this.specificActionResponseForWait = undefined;
       }
-      this.actionsQueue.length = 0;
-      this.receivingMessagesFromHubAllowed = true;
-      this.specificActionResponseForWait = undefined;
     });
     this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
       this.processNextActionFromQueueWithChecks(pending);
@@ -266,7 +271,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     });
     this.moveButtons = [
       {
-        hotKey: 'w',
+        hotKey: 'KeyW',
+        keyVisualization: 'W',
         type: SmartActionTypeEnum.Hold,
         pressed: false,
         title: 'Up',
@@ -277,7 +283,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         disabled: undefined
       },
       {
-        hotKey: 's',
+        hotKey: 'KeyS',
+        keyVisualization: 'S',
         type: SmartActionTypeEnum.Hold,
         pressed: false,
         title: 'Down',
@@ -288,7 +295,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         disabled: undefined
       },
       {
-        hotKey: 'a',
+        hotKey: 'KeyA',
+        keyVisualization: 'A',
         type: SmartActionTypeEnum.Hold,
         pressed: false,
         title: 'Left',
@@ -299,7 +307,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         disabled: undefined
       },
       {
-        hotKey: 'd',
+        hotKey: 'KeyD',
+        keyVisualization: 'D',
         type: SmartActionTypeEnum.Hold,
         pressed: false,
         title: 'Right',
@@ -318,7 +327,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.arenaActionsSubscription.unsubscribe();
     this.synchronizationErrorSubscription.unsubscribe();
     this.animationSubscription.unsubscribe();
-    this.finishLoadingSubscription.unsubscribe();
+    this.finishLoadingSubscription?.unsubscribe();
     this.victorySubscription.unsubscribe();
     this.battleStorageService.clear();
   }
@@ -341,11 +350,15 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.finishLoadingSubscription = this.loadingService.finishLoading()
-      .subscribe(() => {
-        this.loadingFinished = true;
-        this.processNextActionFromQueue();
-      });
+    if (this.battleStorageService.version > 1) {
+      this.finishLoadingSubscription = this.loadingService.finishLoading()
+        .subscribe(() => {
+          this.loadingFinished = true;
+          this.processNextActionFromQueue();
+        });
+     } else {
+         this.finishLoadingFlag = true;
+     }
   }
 
   onResize() {
@@ -583,8 +596,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onKeyDown(event: KeyboardEvent) {
     if (!this.blocked) {
-      this.pressedKey = event.key;
-      const moveAction = this.moveButtons.find(x => x.hotKey === event.key);
+      this.pressedKey = event.code;
+      const moveAction = this.moveButtons.find(x => x.hotKey === event.code);
       if (moveAction) {
         moveAction.pressed = true;
         moveAction.actions[0]();
@@ -596,10 +609,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         return;
       }
       this.resetButtonsPressedState();
-      const action = this.skillList.find(x => x.hotKey === event.key);
+      const action = this.skillList.find(x => x.hotKey === event.code);
       if (action && !action?.disabled) {
         action.pressed = true;
-      } else if (event.key !== 'Escape') {
+      } else if (event.code !== 'Escape') {
         this.pressedKey = undefined;
       }
     }
@@ -654,17 +667,17 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onKeyUp(event: KeyboardEvent) {
-    const moveAction = this.moveButtons.find(x => x.hotKey === event.key);
+    const moveAction = this.moveButtons.find(x => x.hotKey === event.code);
     if (moveAction) {
       moveAction.pressed = false;
       return;
     }
     if (!this.blocked) {
-      if (this.pressedKey === event.key && event.key === 'Escape') {
+      if (this.pressedKey === event.code && event.code === 'Escape') {
         this.resetSkillActions();
       }
-      if (this.pressedKey === event.key) {
-        const action = this.skillList.find(x => x.hotKey === event.key);
+      if (this.pressedKey === event.code) {
+        const action = this.skillList.find(x => x.hotKey === event.code);
         if (action?.pressed && !action?.disabled) {
           if (action.type === SmartActionTypeEnum.Toggle) {
             action.actions[action.smartValue]();
@@ -1064,9 +1077,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       for (let i = 0; i < this.skillList.length; i++) {
         if (!this.skillList[i]) {
           this.skillList[i] = {
-            hotKey: this.battleStorageService.skillHotkeys[i],
+            hotKey: this.battleStorageService.skillHotkeys[i].code,
+            keyVisualization: this.battleStorageService.skillHotkeys[i].key,
             type: SmartActionTypeEnum.Toggle,
-            pressed: this.pressedKey === this.battleStorageService.skillHotkeys[i],
+            pressed: this.pressedKey === this.battleStorageService.skillHotkeys[i].code,
             title: this.battleStorageService.currentActor.skills[i].name,
             smartValue: this.battleStorageService.currentActor.skills[i].id === this.battleStorageService.currentActionId ? 1 : 0,
             actions: [
@@ -1144,7 +1158,25 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     let onlySecondPart = false;
     if (this.specificActionResponseForWait) {
-      if (!action.sync.actorId ||
+      if (action.action === BattleSynchronizationActionEnum.EndTurn) {
+        if (this.specificActionResponseForWait.action !== BattleSynchronizationActionEnum.Move) {
+          const actor = this.battleStorageService.scene.actors.find(x => x.id = this.specificActionResponseForWait.actorId);
+          if (actor) {
+            this.battleStorageService.floatingTexts.push({
+              text: '*fail*',
+              color: { r: 255, g: 255, b: 0, a: 1 },
+              time: 0,
+              x: actor.x,
+              y: actor.y,
+              height: 0
+            });
+          }
+        }
+        this.battleAnimationsService.animationsQueue.length = 0;
+        this.actionsQueue.length = 0;
+        this.receivingMessagesFromHubAllowed = true;
+        this.specificActionResponseForWait = undefined;
+      } else if (!action.sync.actorId ||
         action.sync.actorId !== this.specificActionResponseForWait.actorId) {
         this.loadingService.startLoading({
           title: 'Desynchronization. Page will be refreshed in 2 seconds.'
@@ -1171,6 +1203,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           this.battleStorageService.currentActor?.owner?.userId === this.userService.user.id ?
           this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) : [];
         break;
+    }
+    if (action.sync.version > 1 && this.finishLoadingFlag) {
+      this.finishLoadingSubscription = this.loadingService.finishLoading()
+        .subscribe(() => {
+          this.loadingFinished = true;
+          this.processNextActionFromQueue();
+        });
+      this.finishLoadingFlag = false;
     }
     if (!this.battleAnimationsService.generateAnimationsFromSynchronizer(action, onlySecondPart)) {
       this.processNextActionFromQueueWithChecks();

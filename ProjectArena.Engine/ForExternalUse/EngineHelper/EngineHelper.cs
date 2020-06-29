@@ -80,9 +80,10 @@ namespace ProjectArena.Engine.ForExternalUse.EngineHelper
             INativeManager nativeManager,
             IVarManager varManager,
             int seed,
+            int moveTime,
             EventHandler<ISyncEventArgs> eventHandler)
         {
-            Scene scene = new Scene(id, players, generator, nativeManager, varManager, seed);
+            Scene scene = new Scene(id, players, generator, nativeManager, varManager, seed, moveTime);
             scene.ReturnAction += eventHandler;
             scene.StartGame();
             return scene;

@@ -17,7 +17,6 @@ namespace ProjectArena.Engine.Helpers
         Move,
         Attack,
         Cast,
-        Wait,
         Decoration,
         EndTurn,
         EndGame,
