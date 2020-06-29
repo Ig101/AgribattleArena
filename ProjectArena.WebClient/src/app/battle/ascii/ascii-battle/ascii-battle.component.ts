@@ -85,6 +85,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedTile: { x: number, y: number, duration: number, forced: boolean };
   selectedAlwaysTile: { x: number, y: number, id: number };
 
+  movingTimer = 0;
   tickingFrequency = 2;
   tickState = 0;
 
@@ -629,6 +630,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private moveActorTo(x: number, y: number) {
     if (this.canAct && x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
+      this.movingTimer = 6;
       const actor = this.battleStorageService.currentActor;
       const initialTile = this.battleStorageService.scene.tiles[actor.x][actor.y];
       const tile = this.battleStorageService.scene.tiles[x][y];
@@ -1277,11 +1279,15 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.animationTicker = !this.animationTicker;
       this.tick(shift);
-      for (const action of this.moveButtons) {
-        if (action.pressed) {
-          action.actions[0]();
-          break;
+      if (this.movingTimer <= 0) {
+        for (const action of this.moveButtons) {
+          if (action.pressed) {
+            action.actions[0]();
+            break;
+          }
         }
+      } else {
+        this.movingTimer -= 1;
       }
       for (let i = 0; i < this.battleStorageService.floatingTexts.length; i++) {
         const floatingText = this.battleStorageService.floatingTexts[i];
