@@ -16,6 +16,9 @@ open ProjectArena.Bot.Models.Dtos
 open ProjectArena.Bot.Helpers.SceneHelper
 open ProjectArena.Bot.Helpers.ActionsHelper
 open System.Diagnostics
+open ProjectArena.Bot.Helpers.Strategies.AggressiveHelper
+open ProjectArena.Bot.Helpers.Strategies.DefenciveHelper
+open ProjectArena.Bot.Helpers.Strategies.FleeHelper
 
 let private calculateNeuronValue (random: Random) (neurons: Neuron list) (bond: NeuralBond) =
     let neuronValue = neurons |> List.tryFind (fun n -> n.Name = bond.Input) |> Option.map (fun n -> n.Value)
@@ -30,42 +33,31 @@ let private getOutputNeuron (random: Random) (configuration: Configuration) (neu
         Value = normalize value
     }
 
-let private getNeuralNetworkOutputs (random: Random) (configuration: Configuration) (neurons: Neuron list) (network: NeuralNetwork) =
+let private getNeuralNetworkOutputs (random: Random) (configuration: Configuration) (neurons: Neuron list) (network: NeuralModel) =
     network.Layers |> Seq.toList |> List.sortBy (fun l -> l.SortIndex) |> List.fold (fun n l -> l.Outputs |> Seq.toList |> List.map (getOutputNeuron random configuration n)) neurons
 
 let private calculateNeededAction (configuration: Configuration) (model: NeuralModelContainer, scene: Scene) (actor: ActorDto) = async {
-    if not configuration.Learning.IsLearning then
-        do! Task.Delay(300)
-    let player = scene.Players |> Seq.find (fun p -> p.Id = actor.OwnerId.Value)
+    do! Task.Delay(200)
     let random = Random()
     let! workingModel = model.Unpack()
-    let magnifyingResult, _ =
-        workingModel.MagnifyingNetwork
-        |> getNeuralNetworkOutputs random configuration (getMagnifyingInputNeurons (Some scene))
+    let strategy, _ =
+        workingModel
+        |> getNeuralNetworkOutputs random configuration (getInputNeurons (Some scene))
         |> Seq.toList
-        |> List.map (convertMagnifyingNeuronToAction)
+        |> List.map (convertNeuronToStrategy)
         |> List.sortByDescending (fun (_, v) -> v)
-        |> List.find (fun (a, _) -> match a with | Wait -> true | Proceed (x, y) -> isAnyActionAllowedOnBlock scene (actor, player) (x, y))
+        |> List.head
 
-    match magnifyingResult with
-    | Wait -> return (ActionNeuronType.Wait, actor)
-    | Proceed (x, y) ->
-        let shift = (x, y)
-        let commandResult, _ =
-            workingModel.CommandNetwork
-            |> getNeuralNetworkOutputs random configuration (getCommandInputNeurons shift (Some scene))
-            |> Seq.toList
-            |> List.map (convertCommandNeuronToAction shift)
-            |> List.sortByDescending (fun (_, v) -> v)
-            |> List.find (fun (a, _) -> isActionAllowed scene (actor, player) a)
-        return (commandResult, actor)
+    let action = match strategy with
+                 | Aggressive -> getAggressiveAction (scene, actor)
+                 | Defencive -> getDefenciveAction (scene, actor)
+                 | Flee ->  getFleeAction (scene, actor)
+    return (action, actor)
 }
 
-let private orderAction (configuration: Configuration) (sceneId: Guid) (command: ActionNeuronType, actor: ActorDto) =
+let private orderAction (configuration: Configuration) (sceneId: Guid) (command: SceneAction, actor: ActorDto) =
     GC.Collect()
     match command with
-    | ActionNeuronType.Wait ->
-        ()
     | Move (x, y) ->
         orderMove configuration.Hub (sceneId, actor.Id, x, y)
     | Cast (name, x, y) ->

@@ -6,6 +6,7 @@ type Scene = {
     Id: Guid
     Version: int
     RoundsPassed: float32
+    TurnTime: float32
     TempActor: ActorDto option
     TempDecoration: ActiveDecorationDto option
     Players: PlayerDto seq

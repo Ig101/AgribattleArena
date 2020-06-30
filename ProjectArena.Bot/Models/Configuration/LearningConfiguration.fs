@@ -12,7 +12,6 @@ type LearningConfiguration = {
     EnemyPowerPerformanceCoefficient: float
     PlayerPowerPerformanceCoefficient: float
     
-    MagnifyingHiddenNeuronsCount: int
-    CommandHiddenNeuronsCount: int
+    HiddenNeuronsCount: int
     ActivationDivider: float
 }

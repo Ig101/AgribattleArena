@@ -48,8 +48,7 @@ let setupConfiguration() =
             EnemyPowerPerformanceCoefficient = configuration.GetValue<float>("Learning:EnemyPowerPerformanceCoefficient")
             PlayerPowerPerformanceCoefficient = configuration.GetValue<float>("Learning:PlayerPowerPerformanceCoefficient")
             
-            MagnifyingHiddenNeuronsCount = configuration.GetValue<int>("Learning:MagnifyingHiddenNeuronsCount")
-            CommandHiddenNeuronsCount = configuration.GetValue<int>("Learning:CommandHiddenNeuronsCount")
+            HiddenNeuronsCount = configuration.GetValue<int>("Learning:HiddenNeuronsCount")
             ActivationDivider = configuration.GetValue<float>("Learning:ActivationDivider")
         }
         LazyNeuralModels = configuration.GetValue<bool>("LazyNeuralModels")

@@ -54,7 +54,7 @@ let private isSkillAllowedByTile (scene: Scene) (actor: ActorDto, player: Player
     let unbearable = skill.AvailableTargets.Unbearable && tile.TempActorId.IsNone && tile.Unbearable
     (allies || enemies || decorations || self || bearable || unbearable) && (not skill.OnlyVisibleTargets || checkMilliness scene actor tile)
 
-let isActionAllowed (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: ActionNeuronType) =
+let isActionAllowed (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: SceneAction) =
     match action with
     | Move (x, y) ->
         actor.CanMove && ((x = actor.X && Math.Abs(y - actor.Y) = 1) || (y = actor.Y && Math.Abs(actor.X - x) = 1)) && isMoveAllowedByTile scene actor (x, y)
@@ -67,8 +67,6 @@ let isActionAllowed (scene: Scene) (actor: ActorDto, player: PlayerDto) (action:
         | None -> false
         | Some skill ->
             actor.ActionPoints >= skill.Cost && skill.PreparationTime <= 0.0f && actor.CanAct && rangeBetween(actor.X, actor.Y, x, y) <= float skill.Range && isSkillAllowedByTile scene (actor, player) (skill, x, y)
-    | ActionNeuronType.Wait ->
-        true
 
 let private getAnyAvailableSkill (scene: Scene) (actor: ActorDto, player: PlayerDto) (x, y) =
     actor.AttackingSkill

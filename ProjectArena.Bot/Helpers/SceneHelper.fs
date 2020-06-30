@@ -95,17 +95,8 @@ let getTough (actor: ActorDto option) =
         normalize (health / 100.0))
     |> Option.defaultValue 0.0
 
-let getKnown (actor: ActorDto option) =
-    actor
-    |> Option.map (fun a ->
-        let healthCoefficient = match a.Health.IsSome with | true -> 0.3 | false -> 0.0
-        let attackCoefficient = match a.AttackingSkill.IsSome with | true -> 0.4 | false -> 0.0
-        let skillsCoefficient = float (a.Skills |> Seq.length) * 0.06
-        healthCoefficient + attackCoefficient + skillsCoefficient)
-    |> Option.defaultValue 1.0
+let getXShift (actor: ActorDto option) =
+    actor |> Option.map (fun a -> float a.X / 28.0) |> Option.defaultValue 0.0
 
-let getXShift (shiftX: int) (actor: ActorDto option) =
-    actor |> Option.map (fun a -> float (a.X - shiftX) / 28.0) |> Option.defaultValue 0.0
-
-let getYShift (shiftY: int) (actor: ActorDto option) =
-    actor |> Option.map (fun a -> float (a.Y - shiftY) / 16.0) |> Option.defaultValue 0.0
+let getYShift (actor: ActorDto option) =
+    actor |> Option.map (fun a -> float a.Y / 16.0) |> Option.defaultValue 0.0

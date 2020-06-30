@@ -5,8 +5,6 @@ open ProjectArena.Bot.Domain.BotMongoContext.EntityModels
 type NeuralModel = {
     [<BsonId>]
     Id : string
-    [<BsonElement("m")>]
-    MagnifyingNetwork: NeuralNetwork
-    [<BsonElement("c")>]
-    CommandNetwork: NeuralNetwork
+    [<BsonElement("l")>]
+    Layers : NeuralLayer seq
 }

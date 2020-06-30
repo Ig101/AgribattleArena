@@ -14,47 +14,25 @@ let private initializeLayer (random: Random) inputs outputs =
         Inputs = inputs |> List.map (fun input -> { Input = input; Weight = random.NextDouble() })
     })
 
-let private initializeHiddenMagnifyingLayer (random: Random) (configuration: LearningConfiguration) =
-    getHiddenNeuronNames 'h' configuration.MagnifyingHiddenNeuronsCount
-    |> initializeLayer random (getMagnifyingInputNeuronNames())
+let private initializeHiddenLayer (random: Random) (configuration: LearningConfiguration) =
+    getHiddenNeuronNames 'h' configuration.HiddenNeuronsCount
+    |> initializeLayer random (getInputNeuronNames())
 
-let private initializeOutputMagnifyingLayer (random: Random) (configuration: LearningConfiguration) =
-    getMagnifyingOutputNeuronNames()
-    |> initializeLayer random (getHiddenNeuronNames 'h' configuration.MagnifyingHiddenNeuronsCount)
-
-let private initializeHiddenCommandLayer (random: Random) (configuration: LearningConfiguration) =
-    getHiddenNeuronNames 'h' configuration.CommandHiddenNeuronsCount
-    |> initializeLayer random (getCommandInputNeuronNames())
-
-let private initializeOutputCommandLayer (random: Random) (configuration: LearningConfiguration) =
-    getCommandOutputNeuronNames()
-    |> initializeLayer random (getHiddenNeuronNames 'h' configuration.CommandHiddenNeuronsCount)
+let private initializeOutputLayer (random: Random) (configuration: LearningConfiguration) =
+    getOutputNeuronNames()
+    |> initializeLayer random (getHiddenNeuronNames 'h' configuration.HiddenNeuronsCount)
 
 let initializeRandomNeuralModel (random: Random) (configuration: LearningConfiguration) =
     {
         NeuralModel.Id = Guid.NewGuid().ToString()
-        MagnifyingNetwork = {
-            Layers = [
-                {
-                    SortIndex = 1y
-                    Outputs = initializeHiddenMagnifyingLayer random configuration
-                }
-                {
-                    SortIndex = 3y
-                    Outputs = initializeOutputMagnifyingLayer random configuration
-                }
-            ]
-        }
-        CommandNetwork = {
-            Layers = [
-                {
-                    SortIndex = 1y
-                    Outputs = initializeHiddenCommandLayer random configuration
-                }
-                {
-                    SortIndex = 3y
-                    Outputs = initializeOutputCommandLayer random configuration
-                }
-            ]
-        }
+        Layers = [
+            {
+                SortIndex = 1y
+                Outputs = initializeHiddenLayer random configuration
+            }
+            {
+                SortIndex = 3y
+                Outputs = initializeOutputLayer random configuration
+            }
+        ]
     }

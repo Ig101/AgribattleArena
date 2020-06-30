@@ -8,3 +8,5 @@ type SelfNeuronType =
     | Mobile
     | Tough
     | ActionPoints
+    | Ranged
+    | Time

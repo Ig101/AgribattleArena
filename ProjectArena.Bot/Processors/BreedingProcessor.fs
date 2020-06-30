@@ -45,7 +45,7 @@ let private processOutput (configuration: Configuration) (random: Random) (fathe
         Inputs = output.Inputs |> Seq.map (processInput configuration random fatherOutput)
     }
 
-let private processLayer (configuration: Configuration) (random: Random) (father: NeuralNetwork) (layer: NeuralLayer) =
+let private processLayer (configuration: Configuration) (random: Random) (father: NeuralModel) (layer: NeuralLayer) =
     let fatherLayer = father.Layers |> Seq.find (fun l -> l.SortIndex = layer.SortIndex)
     {
         SortIndex = layer.SortIndex
@@ -55,12 +55,7 @@ let private processLayer (configuration: Configuration) (random: Random) (father
 let private crossingoverAndMutation (configuration: Configuration) (random: Random) (father: NeuralModel, mother: NeuralModel) =
     {
         Id = Guid.NewGuid().ToString()
-        MagnifyingNetwork = {
-            Layers = mother.MagnifyingNetwork.Layers |> Seq.map (processLayer configuration random father.MagnifyingNetwork)
-        }
-        CommandNetwork = {
-            Layers = mother.CommandNetwork.Layers |> Seq.map (processLayer configuration random father.CommandNetwork)
-        }
+        Layers = mother.Layers |> Seq.map (processLayer configuration random father)
     }
 
 let private breedOne (configuration: Configuration) (random: Random) (models: NeuralModelContainer list) = 

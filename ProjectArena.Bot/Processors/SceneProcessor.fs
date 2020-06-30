@@ -29,6 +29,7 @@ let private generateSceneFromSynchronizer (synchronizer: SynchronizerDto) =
         Tiles = synchronizer.ChangedTiles
         TilesetWidth = synchronizer.TilesetWidth
         TilesetHeight = synchronizer.TilesetHeight
+        TurnTime = synchronizer.TurnTime
     }
 
 let private mergeSceneWithSynchronizer (scene: Scene) (synchronizer: SynchronizerDto) =
@@ -66,6 +67,7 @@ let private mergeSceneWithSynchronizer (scene: Scene) (synchronizer: Synchronize
         Tiles = tiles
         TilesetWidth = synchronizer.TilesetWidth
         TilesetHeight = synchronizer.TilesetHeight
+        TurnTime = synchronizer.TurnTime
     }
 
 let private createScene (configuration: Configuration) (synchronizer: SynchronizerDto) = async {
@@ -154,23 +156,24 @@ let sceneMessageProcessor (configuration: Configuration) (model: NeuralModelCont
     | _ -> return newSceneOpt
 }
 
-let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene option) =
-    let calculateVictoryPerformance (scene: Scene, performance: float) =
-        let testingPlayer = scene.Players |> Seq.find (fun p -> p.UserId = configuration.User.UserId)
-        let newPerformance = match testingPlayer.Status with
+let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene option): float =
+    let enrichSceneWithPlayer (scene: Scene) =
+        (scene, scene.Players |> Seq.find (fun p -> p.UserId = configuration.User.UserId))
+    let calculateVictoryPerformance (scene: Scene, player: PlayerDto) (performance: float) =
+        let newPerformance = match player.Status with
                              | PlayerStatus.Victorious -> performance + configuration.Learning.VictoryPerformanceCoefficient
                              | _ -> performance
-        (scene, newPerformance, testingPlayer.Id)
-    let calculatePlayerPowerPerformance (scene: Scene, performance: float, playerId: string) =
+        newPerformance
+    let calculatePlayerPowerPerformance (scene: Scene, player: PlayerDto) (performance: float) =
         let newPerformance =
             scene.Actors
             |> Seq.toList
-            |> List.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = playerId)
+            |> List.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = player.Id)
             |> List.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
             |> fun v -> performance + configuration.Learning.PlayerPowerPerformanceCoefficient * (v / 6.0)
-        (scene, newPerformance, playerId)
-    let calculateEnemyPowerPerformance (scene: Scene, performance: float, playerId: string) =
-        let opponent = scene.Players |> Seq.toList |> List.find (fun p -> p.Id <> playerId)
+        newPerformance
+    let calculateEnemyPowerPerformance (scene: Scene, player: PlayerDto) (performance: float) =
+        let opponent = scene.Players |> Seq.toList |> List.find (fun p -> p.Id <> player.Id)
         let newPerformance =
             scene.Actors
             |> Seq.toList
@@ -178,10 +181,8 @@ let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene opti
             |> List.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
             |> fun v -> performance + configuration.Learning.EnemyPowerPerformanceCoefficient * (1.0 - v / 6.0)
         newPerformance
-    let calculatePerformance (scene: Scene) =
-        calculateVictoryPerformance (scene, 0.0)
-        |> calculatePlayerPowerPerformance
-        |> calculateEnemyPowerPerformance
     match sceneOpt with
-    | Some scene -> calculatePerformance scene
+    | Some scene ->
+        let scenePlayer = enrichSceneWithPlayer scene
+        0.0 |> calculateVictoryPerformance scenePlayer |> calculatePlayerPowerPerformance scenePlayer |> calculateEnemyPowerPerformance scenePlayer
     | None -> 0.0

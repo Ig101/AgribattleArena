@@ -39,7 +39,6 @@ let subscribeOnScene (connection: HubConnection) (func: (SynchronizationAction *
     connection.On("BattleMove", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Move, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleAttack", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Attack, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleCast", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Cast, mapSynchronizer synchronizer)) |> ignore
-    connection.On("BattleWait", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Wait, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleDecoration", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(Decoration, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleEndTurn", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(EndTurn, mapSynchronizer synchronizer)) |> ignore
     connection.On("BattleEndGame", fun (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) -> func(EndGame, mapSynchronizer synchronizer)) |> ignore
