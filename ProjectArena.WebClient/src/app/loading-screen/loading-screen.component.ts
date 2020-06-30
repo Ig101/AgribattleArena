@@ -106,9 +106,9 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     let titlePosition = this.canvasHeight / 2 + titleHeight * 0.375;
     if (definition.loadingScene) {
       titlePosition = this.canvasHeight / 2 - 220;
-      const sceneWidth = 1300;
-      const sceneHeight = 680;
-      let tileHeight = 30;
+      const sceneWidth = 1028;
+      const sceneHeight = 980;
+      let tileHeight = 60;
       let tileWidth = 0.6 * tileHeight;
       const sceneWidthCoefficient = sceneWidth / (tileWidth * definition.loadingScene.width);
       const sceneHeightCoefficient = sceneHeight / (tileHeight * definition.loadingScene.height);

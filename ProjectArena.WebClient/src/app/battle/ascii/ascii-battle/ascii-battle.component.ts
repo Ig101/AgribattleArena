@@ -68,7 +68,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   blocked = false;
 
   private tileWidthInternal = 0;
-  private tileHeightInternal = 30;
+  private tileHeightInternal = 60;
   readonly defaultWidth = 1600;
   readonly defaultHeight = 1080;
   readonly defaultAspectRatio = this.defaultWidth / this.defaultHeight;

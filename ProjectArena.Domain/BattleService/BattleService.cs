@@ -147,7 +147,7 @@ namespace ProjectArena.Domain.BattleService
 
             var attackingSkill = "slash";
             ICollection<string> skills = new List<string>() { "magicMissle" };
-            var actionPointsIncome = 3;
+            var actionPointsIncome = 4;
             ICollection<string> startBuffs = new List<string>();
 
             var talentsWithUniqueAction = talents.Where(t => t.UniqueAction != null).ToList();

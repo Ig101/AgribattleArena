@@ -12,7 +12,7 @@ namespace ProjectArena.Content.RoleModelNatives
                 2,
                 12,
                 20,
-                2,
+                4,
                 "slash",
                 new string[0]);
         }
