@@ -37,7 +37,7 @@ let private getNeuralNetworkOutputs (random: Random) (configuration: Configurati
     network.Layers |> Seq.toList |> List.sortBy (fun l -> l.SortIndex) |> List.fold (fun n l -> l.Outputs |> Seq.toList |> List.map (getOutputNeuron random configuration n)) neurons
 
 let private calculateNeededAction (configuration: Configuration) (model: NeuralModelContainer, scene: Scene) (actor: ActorDto) = async {
-    do! Task.Delay(200)
+    let sw = Stopwatch.StartNew()
     let random = Random()
     let! workingModel = model.Unpack()
     let strategy, _ =
@@ -52,6 +52,10 @@ let private calculateNeededAction (configuration: Configuration) (model: NeuralM
                  | Aggressive -> getAggressiveAction (scene, actor)
                  | Defencive -> getDefenciveAction (scene, actor)
                  | Flee ->  getFleeAction (scene, actor)
+    sw.Stop()
+    let neededDelay = 180 - int sw.ElapsedMilliseconds
+    if neededDelay > 0 then
+        do! Task.Delay(neededDelay)
     return (action, actor)
 }
 

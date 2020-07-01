@@ -177,8 +177,8 @@ namespace ProjectArena.Domain.BattleService.Helpers
                 Height = tile.Height,
                 NativeId = ally || tile.Revealed ? tile.NativeId : "grass",
                 OwnerId = tile.OwnerId,
-                TempActorId = tile.TempActorId,
                 X = tile.X,
+                TempActorId = tile.TempActorId,
                 Y = tile.Y,
                 Unbearable = tile.Unbearable
             };

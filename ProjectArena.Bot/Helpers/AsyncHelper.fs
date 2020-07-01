@@ -2,28 +2,25 @@ module ProjectArena.Bot.Helpers.AsyncHelper
 open System
 open System.Threading.Tasks
 open System.Threading
+open FSharp.Control
+open System.Collections.Generic
 
-let processSequenceAsynchronously (maxTasks: int) (func: 'a -> Async<'b>) (sequence: 'a seq)  : Async<'b list> = async {
-    let mutable queue = sequence |> Seq.toList
-    let mutable hasTasksToProcess = true
-    let mutable tasks: Task<'b> list = []
-    let mutable results = []
-    while hasTasksToProcess do
-        let neededCount = maxTasks - tasks.Length
-        let newTasksFromQueue = match neededCount with
-                                | c when c < queue.Length -> queue |> List.take c
-                                | _ ->
-                                    hasTasksToProcess <- false
-                                    queue
-        queue <- queue |> List.filter (fun q -> not (newTasksFromQueue |> Seq.contains q))
-        let startedTasks =
-            newTasksFromQueue
-            |> List.map (func >> Async.StartAsTask)
-        tasks <- tasks |> List.append startedTasks
-        do! Task.WhenAny tasks
-        results <- tasks |> List.filter (fun t -> t.IsCompleted) |> List.map (fun t -> t.Result) |> List.append results
-        tasks <- tasks |> List.filter (fun t -> not t.IsCompleted)
-    let! remainedResults =
-        Task.WhenAll tasks
-    return remainedResults |> Seq.append results |> Seq.toList
-}
+let private toQueue (sequence: 'a seq) =
+    let queue = Queue<'a>()
+    sequence |> Seq.iter (fun v -> queue.Enqueue(v))
+    queue
+
+let processSequenceAsynchronously (maxTasks: int) (func: 'a -> Async<'b>) (sequence: 'a seq)  : Async<'b list> =
+    let queue = sequence |> toQueue
+    [1..maxTasks]
+    |> AsyncSeq.ofSeq
+    |> AsyncSeq.mapAsyncParallel(fun _ ->
+        async {
+            let mutable results = []
+            while queue.Count > 0 do
+                let input = lock queue (fun () -> queue.Dequeue())
+                let! result = func input
+                results <- results |> List.append [result]
+            return results
+        })
+    |> AsyncSeq.fold (fun r i -> r |> List.append i) []

@@ -13,7 +13,7 @@ let tryGetOwner (scene: Scene) (ownerId: string option) =
 
 let tryGetCurrentActorAndHisOwner (scene: Scene) =
     scene.TempActor 
-    |> Option.bind (fun actor -> actor.OwnerId |> Option.map(fun ownerId -> (actor, scene.Players |> Seq.find (fun p -> p.Id = ownerId))))
+    |> Option.bind (fun actor -> actor.Owner |> Option.map (fun owner -> (actor, owner)))
 
 let isAlly (currentPlayer: PlayerDto) (anotherPlayer: PlayerDto option) =
     match anotherPlayer with

@@ -116,8 +116,7 @@ let private tryGetActingModel (userId: string) (scene: Scene) =
     | None -> None
     | Some actor ->
         let ownerOpt =
-            actor.OwnerId
-            |> Option.map (fun ownerId -> scene.Players |> Seq.find (fun p -> p.Id = ownerId))
+            actor.Owner
         match ownerOpt with
         | Some owner when owner.UserId = userId -> Some scene
         | _ -> None
@@ -133,7 +132,7 @@ let private leaveIfTooLong (configuration: Configuration) (message: IncomingSync
     | _ -> None
 
 let private chooseModel (userId: string) (model, spareModel) (scene: Scene) =
-    let index = scene.Players |> Seq.filter (fun p -> p.UserId = userId) |> Seq.findIndex (fun p -> p.Id = scene.TempActor.Value.OwnerId.Value)
+    let index = scene.Players |> Seq.filter (fun p -> p.UserId = userId) |> Seq.findIndex (fun p -> p = scene.TempActor.Value.Owner.Value)
     match index with
     | 0 -> (model, scene)
     | _ -> (spareModel, scene)
@@ -168,7 +167,7 @@ let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene opti
         let newPerformance =
             scene.Actors
             |> Seq.toList
-            |> List.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = player.Id)
+            |> List.filter (fun a -> a.Owner.IsSome && a.Owner.Value = player)
             |> List.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
             |> fun v -> performance + configuration.Learning.PlayerPowerPerformanceCoefficient * (v / 6.0)
         newPerformance
@@ -177,7 +176,7 @@ let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene opti
         let newPerformance =
             scene.Actors
             |> Seq.toList
-            |> List.filter (fun a -> a.OwnerId.IsSome && a.OwnerId.Value = opponent.Id)
+            |> List.filter (fun a -> a.Owner.IsSome && a.Owner.Value = opponent)
             |> List.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
             |> fun v -> performance + configuration.Learning.EnemyPowerPerformanceCoefficient * (1.0 - v / 6.0)
         newPerformance

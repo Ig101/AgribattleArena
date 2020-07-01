@@ -9,10 +9,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models/Dtos/TargetsDto.fs" />
+    <Compile Include="Models/Dtos/PlayerDto.fs" />
     <Compile Include="Models/Dtos/SkillDto.fs" />
     <Compile Include="Models/Dtos/BuffDto.fs" />
     <Compile Include="Models/Dtos/ActorDto.fs" />
-    <Compile Include="Models/Dtos/PlayerDto.fs" />
     <Compile Include="Models/Dtos/ActiveDecorationDto.fs" />
     <Compile Include="Models/Dtos/SpecEffectDto.fs" />
     <Compile Include="Models/Dtos/TileDto.fs" />
@@ -27,6 +27,7 @@
     <Compile Include="Models/Neural/SelfNeuronType.fs" />
     <Compile Include="Models/Neural/Neuron.fs" />
     <Compile Include="Models/SceneAction.fs" />
+    <Compile Include="Models/ActionPosition.fs" />
     <Compile Include="Helpers/AsyncHelper.fs" />
     <Compile Include="Helpers/MappingHelper.fs" />
     <Compile Include="Helpers/SceneHelper.fs" />
@@ -44,7 +45,6 @@
     <Compile Include="Domain/BotMongoContext/EntityModels/NeuralBond.fs" />
     <Compile Include="Domain/BotMongoContext/EntityModels/NeuralOutputGroup.fs" />
     <Compile Include="Domain/BotMongoContext/EntityModels/NeuralLayer.fs" />
-    <Compile Include="Domain/BotMongoContext/EntityModels/NeuralNetwork.fs" />
     <Compile Include="Domain/BotMongoContext/Entities/NeuralModel.fs" />
     <Compile Include="Domain/BotMongoContext/Entities/NeuralModelDefinition.fs" />
     <Compile Include="Domain/BotMongoContext/BotContext.fs" />

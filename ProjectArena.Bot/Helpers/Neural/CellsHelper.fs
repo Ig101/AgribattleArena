@@ -23,7 +23,7 @@ let private calculateSectorDangerousParam
     let actorCoefficient =
         tileActors
         |> List.sumBy (fun enemyActor ->
-            let ownerOpt = enemyActor.OwnerId |> tryGetOwner scene
+            let ownerOpt = enemyActor.Owner
             match isAlly player ownerOpt with
             | true -> 0.0
             | false ->
@@ -42,7 +42,7 @@ let private calculateSectorFriendlyParam
     let actorCoefficient =
         tileActors
         |> List.sumBy (fun enemyActor ->
-            let ownerOpt = enemyActor.OwnerId |> tryGetOwner scene
+            let ownerOpt = enemyActor.Owner
             match isAlly player ownerOpt with
             | false -> 0.0
             | true ->

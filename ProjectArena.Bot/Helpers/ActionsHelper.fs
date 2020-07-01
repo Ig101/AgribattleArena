@@ -44,7 +44,7 @@ let private checkMilliness (scene: Scene) (actor: ActorDto) (target: TileDto) =
 let private isSkillAllowedByTile (scene: Scene) (actor: ActorDto, player: PlayerDto) (skill: SkillDto, x: int, y: int) =
     let tile = scene.Tiles |> Seq.find (fun t -> t.X = x && t.Y = y)
     let targetActor = tile.TempActorId |> Option.bind (fun aId -> scene.Actors |> Seq.tryFind (fun a -> aId = a.Id))
-    let targetActorOwner = targetActor |> Option.bind (fun a -> a.OwnerId) |> Option.map (fun pId -> scene.Players |> Seq.find (fun p -> p.Id = pId))
+    let targetActorOwner = targetActor |> Option.bind (fun a -> a.Owner)
     let targetDecoration = tile.TempActorId |> Option.bind (fun dId -> scene.Decorations |> Seq.tryFind (fun d -> dId = d.Id))
     let allies = skill.AvailableTargets.Allies && targetActor.IsSome && targetActor.Value.Id <> actor.Id && player.Team = (targetActorOwner |> Option.bind (fun p -> p.Team))
     let enemies = skill.AvailableTargets.NotAllies && targetActor.IsSome && targetActor.Value.Id <> actor.Id && (player.Team.IsNone || player.Team <> (targetActorOwner |> Option.bind (fun p -> p.Team)))
@@ -54,12 +54,12 @@ let private isSkillAllowedByTile (scene: Scene) (actor: ActorDto, player: Player
     let unbearable = skill.AvailableTargets.Unbearable && tile.TempActorId.IsNone && tile.Unbearable
     (allies || enemies || decorations || self || bearable || unbearable) && (not skill.OnlyVisibleTargets || checkMilliness scene actor tile)
 
-let isActionAllowed (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: SceneAction) =
+let isActionAllowedByPosition (actorX, actorY) (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: SceneAction) =
     match action with
     | Wait ->
         true
     | Move (x, y) ->
-        actor.CanMove && ((x = actor.X && Math.Abs(y - actor.Y) = 1) || (y = actor.Y && Math.Abs(actor.X - x) = 1)) && isMoveAllowedByTile scene actor (x, y)
+        actor.CanMove && ((x = actorX && Math.Abs(y - actorY) = 1) || (y = actorY && Math.Abs(actorX - x) = 1)) && isMoveAllowedByTile scene actor (x, y)
     | Cast (name, x, y) ->
         let skillOpt =
             actor.AttackingSkill
@@ -68,7 +68,11 @@ let isActionAllowed (scene: Scene) (actor: ActorDto, player: PlayerDto) (action:
         match skillOpt with
         | None -> false
         | Some skill ->
-            actor.ActionPoints >= skill.Cost && skill.PreparationTime <= 0.0f && actor.CanAct && rangeBetween(actor.X, actor.Y, x, y) <= float skill.Range && isSkillAllowedByTile scene (actor, player) (skill, x, y)
+            actor.ActionPoints >= skill.Cost && skill.PreparationTime <= 0.0f && actor.CanAct && rangeBetween(actorX, actorY, x, y) <= float skill.Range && isSkillAllowedByTile scene (actor, player) (skill, x, y)
+
+
+let isActionAllowed (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: SceneAction) =
+    isActionAllowedByPosition (actor.X, actor.Y) scene (actor, player) action
 
 let private getAnyAvailableSkill (scene: Scene) (actor: ActorDto, player: PlayerDto) (x, y) =
     actor.AttackingSkill

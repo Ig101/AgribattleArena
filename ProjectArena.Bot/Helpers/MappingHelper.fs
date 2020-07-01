@@ -38,7 +38,7 @@ let private mapBuff (buff: ProjectArena.Infrastructure.Models.Battle.Synchroniza
         Duration = buff.Duration |> Option.ofNullable
     }
 
-let private mapActor (actor: ProjectArena.Infrastructure.Models.Battle.Synchronization.ActorDto) =
+let private mapActor (players: PlayerDto list) (actor: ProjectArena.Infrastructure.Models.Battle.Synchronization.ActorDto) =
     {
         ActorDto.Id = actor.Id
         ExternalId = actor.ExternalId |> Option.ofNullable
@@ -49,7 +49,7 @@ let private mapActor (actor: ProjectArena.Infrastructure.Models.Battle.Synchroni
         Buffs = actor.Buffs |> Seq.map mapBuff |> Seq.toList
         InitiativePosition = actor.InitiativePosition
         Health = actor.Health |> Option.ofNullable
-        OwnerId = actor.OwnerId |> Option.ofObj
+        Owner = actor.OwnerId |> Option.ofObj |> Option.map (fun pId -> players |> Seq.find(fun p -> p.Id = pId))
         X = actor.X
         Y = actor.Y
         Z = actor.Z
@@ -100,6 +100,7 @@ let private mapTile (tile: ProjectArena.Infrastructure.Models.Battle.Synchroniza
     }
 
 let mapSynchronizer (synchronizer: ProjectArena.Infrastructure.Models.Battle.Synchronization.SynchronizerDto) =
+    let players = synchronizer.Players |> Seq.map mapPlayer |> Seq.toList
     {
         SynchronizerDto.Id = synchronizer.Id
         Version = synchronizer.Version
@@ -111,8 +112,8 @@ let mapSynchronizer (synchronizer: ProjectArena.Infrastructure.Models.Battle.Syn
         TurnTime = synchronizer.TurnTime
         TempActor = synchronizer.TempActor |> Option.ofNullable
         TempDecoration = synchronizer.TempDecoration |> Option.ofNullable
-        Players = synchronizer.Players |> Seq.map mapPlayer |> Seq.toList
-        ChangedActors = synchronizer.ChangedActors |> Seq.map mapActor |> Seq.toList
+        Players = players
+        ChangedActors = synchronizer.ChangedActors |> Seq.map (mapActor players) |> Seq.toList
         ChangedDecorations = synchronizer.ChangedDecorations |> Seq.map mapDecoration |> Seq.toList
         ChangedEffects = synchronizer.ChangedEffects |> Seq.map mapEffect |> Seq.toList
         DeletedActors = synchronizer.DeletedActors

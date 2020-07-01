@@ -5,4 +5,4 @@ open ProjectArena.Bot.Models.States
 open ProjectArena.Bot.Helpers.Strategies.StrategyHelper
 
 let getFleeAction (scene: Scene, actor: ActorDto) =
-    SceneAction.Move (1, 1)
+    SceneAction.Wait

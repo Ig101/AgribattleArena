@@ -11,7 +11,7 @@ type ActorDto = {
     Buffs: BuffDto seq
     InitiativePosition: float32
     Health: float32 option
-    OwnerId: string option
+    Owner: PlayerDto option
     X: int
     Y: int
     Z: float32
