@@ -56,6 +56,8 @@ let private isSkillAllowedByTile (scene: Scene) (actor: ActorDto, player: Player
 
 let isActionAllowed (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: SceneAction) =
     match action with
+    | Wait ->
+        true
     | Move (x, y) ->
         actor.CanMove && ((x = actor.X && Math.Abs(y - actor.Y) = 1) || (y = actor.Y && Math.Abs(actor.X - x) = 1)) && isMoveAllowedByTile scene actor (x, y)
     | Cast (name, x, y) ->

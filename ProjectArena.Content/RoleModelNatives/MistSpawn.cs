@@ -8,11 +8,11 @@ namespace ProjectArena.Content.RoleModelNatives
         {
             nativeManager.AddRoleModelNative(
                 "mistspawn",
-                12,
+                24,
                 2,
                 12,
                 20,
-                4,
+                2,
                 "slash",
                 new string[0]);
         }

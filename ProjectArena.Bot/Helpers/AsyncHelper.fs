@@ -20,11 +20,10 @@ let processSequenceAsynchronously (maxTasks: int) (func: 'a -> Async<'b>) (seque
             newTasksFromQueue
             |> List.map (func >> Async.StartAsTask)
         tasks <- tasks |> List.append startedTasks
-        do! Task.WhenAny tasks |> Async.AwaitTask |> Async.Ignore
+        do! Task.WhenAny tasks
         results <- tasks |> List.filter (fun t -> t.IsCompleted) |> List.map (fun t -> t.Result) |> List.append results
         tasks <- tasks |> List.filter (fun t -> not t.IsCompleted)
     let! remainedResults =
         Task.WhenAll tasks
-        |> Async.AwaitTask
     return remainedResults |> Seq.append results |> Seq.toList
 }
