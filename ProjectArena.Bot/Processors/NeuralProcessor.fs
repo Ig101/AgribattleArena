@@ -70,8 +70,9 @@ let private orderAction (configuration: Configuration) (sceneId: Guid) (command:
         | None ->
             let skill = actor.Skills |> Seq.find (fun s -> s.NativeId = name)
             orderCast configuration.Hub (sceneId, actor.Id, skill.Id, x, y)
-    | Wait ->
-        ()
+    | Wait when configuration.Learning.IsLearning ->
+        orderSkip configuration.Hub (sceneId, actor.Id)
+    | _ -> ()
 
 let actOnScene (configuration: Configuration) (model: NeuralModelContainer, scene: Scene) =
     match scene.TempActor with

@@ -53,3 +53,6 @@ let orderMove (connection: HubConnection) (sceneId: Guid, actorId: int, targetX:
 
 let orderCast (connection: HubConnection) (sceneId: Guid, actorId: int, skillId: int, targetX: int, targetY: int) =
     connection.SendAsync("OrderCastAsync", sceneId, actorId, skillId, targetX, targetY) |> Async.AwaitTask |> Async.Start
+
+let orderSkip (connection: HubConnection) (sceneId: Guid, actorId: int) =
+    connection.SendAsync("OrderSkipAsync", sceneId, actorId) |> Async.AwaitTask |> Async.Start

@@ -525,6 +525,17 @@ namespace ProjectArena.Engine
             }
         }
 
+        public bool SkipTurn()
+        {
+            if (this.VarManager.CanEndTurnPrematurely)
+            {
+                UpdateTime(this.RemainedTurnTime + 1);
+                return true;
+            }
+
+            return false;
+        }
+
         public bool AfterUpdateSynchronization(Helpers.SceneAction action, TileObject actor, int? actionId, int? targetX, int? targetY)
         {
             AfterActionUpdate();

@@ -119,6 +119,11 @@ export class ArenaHubService {
       .invoke('OrderCastAsync', sceneId, actorId, skillId, targetX, targetY).catch(err => this.catchHubError(err));
   }
 
+  orderSkip(sceneId: string, actorId: number) {
+    this.hubConnection
+      .invoke('OrderSkipAsync', sceneId, actorId).catch(err => this.catchHubError(err));
+  }
+
   pickBattleSynchronizationAction(currentVersion: number) {
     if (this.battleSynchronizationActionsList.length === 0) {
       return undefined;

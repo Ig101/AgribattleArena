@@ -117,5 +117,20 @@ namespace ProjectArena.Domain.ArenaHub
 
             await SendSynchronizationErrorAsync(userId);
         }
+
+        public async Task OrderSkipAsync(Guid sceneId, int actorId)
+        {
+            var userId = Context.UserIdentifier;
+            var scene = _battleService.GetUserScene(userId, sceneId);
+            if (scene.GetUserActors(userId).Contains(actorId))
+            {
+                if (scene.SkipTurn())
+                {
+                    return;
+                }
+            }
+
+            await SendSynchronizationErrorAsync(userId);
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace ProjectArena.Tests.Engine.Helpers
     {
         public static IVarManager CreateVarManagerWithDefaultVars()
         {
-            IVarManager varManager = EngineHelper.CreateVarManager(80, 8, 5, 0.1f, 0.1f, 0.1f, 0);
+            IVarManager varManager = EngineHelper.CreateVarManager(80, false, 8, 5, 0.1f, 0.1f, 0.1f, 0);
 
             return varManager;
         }

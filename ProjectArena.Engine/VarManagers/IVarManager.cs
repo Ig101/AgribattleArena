@@ -4,6 +4,8 @@
     {
         float TurnTimeLimit { get; }
 
+        bool CanEndTurnPrematurely { get; }
+
         int MaxActionPoints { get; }
 
         int ConstitutionMod { get; }

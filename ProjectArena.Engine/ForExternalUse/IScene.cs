@@ -34,6 +34,8 @@ namespace ProjectArena.Engine.ForExternalUse
 
         bool ActorAttack(int actorId, int targetX, int targetY);
 
+        bool SkipTurn();
+
         bool LeaveScene(string userId);
     }
 }

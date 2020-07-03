@@ -4,6 +4,8 @@
     {
         public float TurnTimeLimit { get; }
 
+        public bool CanEndTurnPrematurely { get; }
+
         public int MaxActionPoints { get; }
 
         public int ConstitutionMod { get; }
@@ -18,6 +20,7 @@
 
         public VarManager(
             float turnTimeLimit,
+            bool canEndTurnPrematurely,
             int maxActionPoints,
             int constitutionMod,
             float willpowerMod,
@@ -26,6 +29,7 @@
             float minimumInitiative)
         {
             this.TurnTimeLimit = turnTimeLimit;
+            this.CanEndTurnPrematurely = canEndTurnPrematurely;
             this.MaxActionPoints = maxActionPoints;
             this.ConstitutionMod = constitutionMod;
             this.WillpowerMod = willpowerMod;
