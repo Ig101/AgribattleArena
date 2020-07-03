@@ -53,7 +53,7 @@ let private tryGetTile (scene: Scene) (x: int, y: int) =
 let private bindTileToTileWithIsDecoration (previousSquare: ActionPosition) (scene: Scene) (tile: TileDto) =
     let decorationOpt = tile.TempActorId |> Option.bind (fun id -> scene.Decorations |> Seq.tryFind (fun d -> d.Id = id))
     match (decorationOpt, tile.TempActorId) with
-    | (None, Some id) -> None
+    | (None, Some _) -> None
     | _ ->
         Some (tile, decorationOpt.IsSome || previousSquare.IsDecorationOnWay)
    
@@ -105,10 +105,14 @@ let rec private calculateNextSquare
 
     let nextSteps = previousSquare.Steps + 1
     tryGetTile scene (x, y)
-    |> Option.filter (fun _ -> nextSteps <= maxSteps && float nextSteps <= maxStepsMultiplier * float scene.TurnTime)
+    |> Option.filter (fun tile ->
+        nextSteps <= maxSteps &&
+        float nextSteps <= maxStepsMultiplier * float scene.TurnTime &&
+        actor.CanMove &&
+        not tile.Unbearable &&
+        Math.Abs(tile.Height - initialTile.Height) < 10.0f)
     |> Option.bind (bindTileToTileWithIsDecoration previousSquare scene)
     |> Option.bind (bindExistingTile nextSteps allSquares)
-    |> Option.filter (fun _ -> isActionAllowedByPosition (initialTile.X, initialTile.Y) scene (actor, actor.Owner.Value) (Move (x, y)))
     |> Option.map (fun (tile, isDecoration, allSquares) ->
         let allowedActions, rangeTillAlly, rangeTillEnemy = calculateAllowedActionsAndAllyAndEnemyMinRanges scene alliesAndEnemies actor (x, y)
         let tempSquare = {
