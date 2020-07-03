@@ -8,6 +8,8 @@ namespace ProjectArena.Domain.BattleService.Models
     {
         public int MaxPlayers { get; set; }
 
+        public bool BotsOnly { get; set; }
+
         public int? TimeTillBot { get; set; }
 
         public bool AllowMultiEnqueue { get; set; }

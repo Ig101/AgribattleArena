@@ -52,9 +52,10 @@ namespace ProjectArena.Domain.QueueService
                 var complectedUsers = new List<List<UserInQueue>>();
                 foreach (var user in queue.Queue)
                 {
-                    var complect = complectingUsers
-                        .FirstOrDefault(x => !x.Any(complectingUser => complectingUser.UserId == user.UserId));
-                    if (complect != null && !complect.Any(x => x.UserId == user.UserId))
+                    var complect = queue.Mode.BotsOnly ?
+                        null :
+                        complectingUsers.FirstOrDefault(x => !x.Any(complectingUser => complectingUser.UserId == user.UserId));
+                    if (complect != null)
                     {
                         complect.Add(user);
                         if (complect.Count >= queue.Mode.MaxPlayers)

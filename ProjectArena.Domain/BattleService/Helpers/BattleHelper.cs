@@ -59,7 +59,8 @@ namespace ProjectArena.Domain.BattleService.Helpers
                             VarManager = EngineHelper.CreateVarManager(6000, 8, 4, 0.05f, 0.05f, 0.03f, 0.4f),
                             BattleResultProcessor = BattleResultProcessors.ProcessMainDuelBattleResult,
                             MaxPlayers = 2,
-                            TimeTillBot = 6,
+                            TimeTillBot = 0,
+                            BotsOnly = true,
                             AllowMultiEnqueue = true
                         }
                     }

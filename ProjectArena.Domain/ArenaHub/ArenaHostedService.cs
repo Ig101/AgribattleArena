@@ -23,6 +23,7 @@ namespace ProjectArena.Domain.ArenaHub
         private DateTime _timeStamp;
         private Timer _timer;
         private DateTime? _lastUpdateDate;
+        private double _counter;
 
         public ArenaHostedService(
             IQueueService queueService,
@@ -34,6 +35,7 @@ namespace ProjectArena.Domain.ArenaHub
             _battleService = battleService;
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _counter = 10;
         }
 
         public void Dispose()
@@ -43,7 +45,7 @@ namespace ProjectArena.Domain.ArenaHub
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(BackgroundProcessing, 2, TimeSpan.Zero, TimeSpan.FromSeconds(2));
+            _timer = new Timer(BackgroundProcessing, 1, TimeSpan.Zero, TimeSpan.FromSeconds(1));
             _timeStamp = DateTime.Now.ToUniversalTime();
             _logger.LogInformation("Arena hosted service is running.");
             return Task.CompletedTask;
@@ -79,7 +81,12 @@ namespace ProjectArena.Domain.ArenaHub
             }
 
             var passed = (currentTime - _timeStamp).TotalSeconds;
-            _queueService.QueueProcessing(passed);
+            _counter += passed;
+            if (_counter >= 10)
+            {
+                _queueService.QueueProcessing(_counter);
+            }
+
             _battleService.EngineTimeProcessing(passed);
             _timeStamp = currentTime;
 
