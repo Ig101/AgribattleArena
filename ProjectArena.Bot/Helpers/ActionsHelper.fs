@@ -4,10 +4,10 @@ open ProjectArena.Bot.Models.States
 open ProjectArena.Bot.Models.Dtos
 open ProjectArena.Bot.Models.Neural
 
-let private rangeBetween (x1: int, y1: int, x2: int, y2: int) =
+let rangeBetween (x1: int, y1: int, x2: int, y2: int) =
     Math.Sqrt(float (((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1))));
 
-let private angleBetween (x1: int, y1: int, x2: int, y2: int) =
+let angleBetween (x1: int, y1: int, x2: int, y2: int) =
     Math.Atan2(float (y2 - y1), float (x2 - x1))
 
 let private isMoveAllowedByTile (scene: Scene) (actor: ActorDto) (x: int, y: int) =
