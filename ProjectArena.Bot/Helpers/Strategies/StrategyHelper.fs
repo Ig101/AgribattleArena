@@ -72,28 +72,27 @@ let private tryGetActionAvailable (scene: Scene) (actor: ActorDto) (x: int, y: i
     | true -> buffSkills
     | false -> getRightSkillsArrayByPositionAndTarget (x, y) target
     |> Seq.tryFind (fun (v, _) -> v = skill.NativeId)
-    |> Option.map (fun (_, c) -> Cast (skill.NativeId, target.X, target.Y), c, ally)
-    |> Option.filter (fun (a, _, _) -> isActionAllowedByPosition (x, y) scene (actor, actor.Owner.Value) a)
+    |> Option.map (fun (_, c) -> Cast (skill.NativeId, target.X, target.Y), c)
+    |> Option.filter (fun (a, _) -> isActionAllowedByPosition (x, y) scene (actor, actor.Owner.Value) a)
 
-let private tryGetActionAvailableBulk (scene: Scene) (allies: ActorDto list, enemies: ActorDto list) (actor: ActorDto) (x: int, y: int) (skill: SkillDto) =
-    allies
-    |> Seq.map (tryGetActionAvailable scene actor (x, y) skill true)
-    |> Seq.append (enemies |> Seq.map (tryGetActionAvailable scene actor (x, y) skill false))
+let private tryGetActionAvailableBulk (scene: Scene) (actors: ActorDto list, ally: bool) (actor: ActorDto) (x: int, y: int) (skill: SkillDto) =
+    actors
+    |> Seq.map (tryGetActionAvailable scene actor (x, y) skill ally)
     |> Seq.toList
 
-let private calculateAllowedActionsAndAllyAndEnemyMinRanges (scene: Scene) (allies: ActorDto list, enemies: ActorDto list) (actor: ActorDto) (x: int, y: int) =
+let private calculateAllyAndEnemyAllowedActionsAndMinRanges (scene: Scene) (allies: ActorDto list, enemies: ActorDto list) (actor: ActorDto) (x: int, y: int) =
+    let getRankedActions (actorsAndAlly: ActorDto list * bool) =
+        actor.Skills
+        |> Seq.collect (tryGetActionAvailableBulk scene actorsAndAlly actor (x, y))
+        |> Seq.append (tryGetActionAvailableBulk scene actorsAndAlly actor (x, y) actor.AttackingSkill.Value)
+        |> Seq.choose id
+        |> Seq.sortByDescending (fun (_, p) -> p)
+        |> Seq.tryHead
     let allyMinRange = match allies with
                        | allies when allies |> List.isEmpty -> 0.0
                        | allies -> allies |> List.map (fun a -> rangeBetween (actor.X, actor.Y, a.X, a.Y)) |> List.min
     let enemyMinRange = enemies |> List.map (fun a -> rangeBetween (actor.X, actor.Y, a.X, a.Y)) |> List.min
-    let actions =
-        actor.Skills
-        |> Seq.collect (tryGetActionAvailableBulk scene (allies, enemies) actor (x, y))
-        |> Seq.append (tryGetActionAvailableBulk scene (allies, enemies) actor (x, y) actor.AttackingSkill.Value)
-        |> Seq.choose id
-        |> Seq.sortByDescending (fun (_, p, _) -> p)
-        |> Seq.toList
-    (actions, allyMinRange, enemyMinRange)
+    (getRankedActions(allies, true), allyMinRange, getRankedActions(enemies, false), enemyMinRange)
 
 let rec private calculateNextSquare
     (alliesAndEnemies: ActorDto list * ActorDto list)
@@ -114,14 +113,16 @@ let rec private calculateNextSquare
     |> Option.bind (bindTileToTileWithIsDecoration previousSquare scene)
     |> Option.bind (bindExistingTile nextSteps allSquares)
     |> Option.map (fun (tile, isDecoration, allSquares) ->
-        let allowedActions, rangeTillAlly, rangeTillEnemy = calculateAllowedActionsAndAllyAndEnemyMinRanges scene alliesAndEnemies actor (x, y)
+        let allowedActionAlly, rangeTillAlly, allowedActionEnemy, rangeTillEnemy =
+            calculateAllyAndEnemyAllowedActionsAndMinRanges scene alliesAndEnemies actor (x, y)
         let tempSquare = {
             X = x
             Y = y
             Steps = nextSteps
             IsDecorationOnWay = isDecoration
             ParentSquares = previousSquare.ParentSquares |> List.append [previousSquare]
-            AllowedActionsWithPriorityAndAlly = allowedActions
+            AllyAllowedActionWithPriority = allowedActionAlly
+            EnemyAllowedActionWithPriority = allowedActionEnemy
             RangeTillNearestAlly = rangeTillAlly
             RangeTillNearestEnemy = rangeTillEnemy
         }
@@ -145,14 +146,16 @@ let calculatePaths (scene: Scene) (actor: ActorDto): ActionPosition list =
         scene.Actors
         |> Seq.filter (fun a -> actor.Owner.IsNone || a.Owner.IsNone || (actor.Owner <> a.Owner && (actor.Owner.Value.Team.IsNone || a.Owner.Value.Team <> actor.Owner.Value.Team)))
         |> Seq.toList
-    let allowedActions, rangeTillAlly, rangeTillEnemy = calculateAllowedActionsAndAllyAndEnemyMinRanges scene (allies, enemies) actor (actor.X, actor.Y)
+    let allowedActionAlly, rangeTillAlly, allowedActionEnemy, rangeTillEnemy =
+        calculateAllyAndEnemyAllowedActionsAndMinRanges scene (allies, enemies) actor (actor.X, actor.Y)
     let actorSquare = {
         X = actor.X
         Y = actor.Y
         Steps = 0
         IsDecorationOnWay = false
         ParentSquares = []
-        AllowedActionsWithPriorityAndAlly = allowedActions
+        AllyAllowedActionWithPriority = allowedActionAlly
+        EnemyAllowedActionWithPriority = allowedActionEnemy
         RangeTillNearestAlly = rangeTillAlly
         RangeTillNearestEnemy = rangeTillEnemy
     }

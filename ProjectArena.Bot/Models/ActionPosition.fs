@@ -5,7 +5,8 @@ type ActionPosition = {
     Y: int
     Steps: int
     IsDecorationOnWay: bool
-    AllowedActionsWithPriorityAndAlly: (SceneAction * float * bool) list
+    AllyAllowedActionWithPriority: (SceneAction * float) option
+    EnemyAllowedActionWithPriority: (SceneAction * float) option
     RangeTillNearestEnemy: float
     RangeTillNearestAlly: float
     ParentSquares: ActionPosition list
