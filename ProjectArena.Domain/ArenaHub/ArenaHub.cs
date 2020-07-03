@@ -124,7 +124,7 @@ namespace ProjectArena.Domain.ArenaHub
             var scene = _battleService.GetUserScene(userId, sceneId);
             if (scene.GetUserActors(userId).Contains(actorId))
             {
-                if (scene.SkipTurn())
+                if (scene.SkipTurn(actorId))
                 {
                     return;
                 }

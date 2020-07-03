@@ -427,6 +427,20 @@ namespace ProjectArena.Engine
             while (!turnStarted);
         }
 
+        public bool ActorWait()
+        {
+            Actor actor = (Actor)TempTileObject;
+
+            bool result = actor.Wait();
+            if (result)
+            {
+                lastMoveTime = null;
+                EndTurn();
+            }
+
+            return result;
+        }
+
         private void Update(float time, Actor specificActor = null)
         {
             PassedTime += time;
@@ -525,17 +539,6 @@ namespace ProjectArena.Engine
             }
         }
 
-        public bool SkipTurn()
-        {
-            if (this.VarManager.CanEndTurnPrematurely)
-            {
-                UpdateTime(this.RemainedTurnTime + 1);
-                return true;
-            }
-
-            return false;
-        }
-
         public bool AfterUpdateSynchronization(Helpers.SceneAction action, TileObject actor, int? actionId, int? targetX, int? targetY)
         {
             AfterActionUpdate();
@@ -609,11 +612,11 @@ namespace ProjectArena.Engine
 
         public bool ActorMove(int actorId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
+            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive && CheckMoveTime())
+                    if (TempTileObject?.Id == actorId && IsActive && CheckMoveTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
@@ -645,11 +648,11 @@ namespace ProjectArena.Engine
 
         public bool ActorCast(int actorId, int skillId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
+            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive && CheckMoveTime())
+                    if (TempTileObject?.Id == actorId && IsActive && CheckMoveTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
@@ -680,11 +683,11 @@ namespace ProjectArena.Engine
 
         public bool ActorAttack(int actorId, int targetX, int targetY)
         {
-            if (TempTileObject.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
+            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject.Id == actorId && IsActive && CheckMoveTime())
+                    if (TempTileObject?.Id == actorId && IsActive && CheckMoveTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
@@ -713,20 +716,17 @@ namespace ProjectArena.Engine
             return false;
         }
 
-        public bool ActorWait()
+        public bool SkipTurn(int actorId)
         {
-            if (IsActive)
+            if (TempTileObject?.Id == actorId && this.VarManager.CanEndTurnPrematurely && IsActive)
             {
-                Actor actor = (Actor)TempTileObject;
-
-                bool result = actor.Wait();
-                if (result)
+                lock (lockObject)
                 {
-                    lastMoveTime = null;
-                    EndTurn();
+                    if (TempTileObject?.Id == actorId && IsActive)
+                    {
+                        ActorWait();
+                    }
                 }
-
-                return result;
             }
 
             return false;
