@@ -72,7 +72,7 @@ let private tryGetActionAvailable (scene: Scene) (actor: ActorDto) (x: int, y: i
     | true -> buffSkills
     | false -> getRightSkillsArrayByPositionAndTarget (x, y) target
     |> Seq.tryFind (fun (v, _) -> v = skill.NativeId)
-    |> Option.map (fun (_, c) -> Cast (skill.NativeId, target.X, target.Y), c)
+    |> Option.map (fun (_, c) -> Cast (skill.NativeId, target.X, target.Y), match actor = target with | true -> c - 0.1 | false -> c)
     |> Option.filter (fun (a, _) -> isActionAllowedByPosition (x, y) scene (actor, actor.Owner.Value) a)
 
 let private tryGetActionAvailableBulk (scene: Scene) (actors: ActorDto list, ally: bool) (actor: ActorDto) (x: int, y: int) (skill: SkillDto) =
