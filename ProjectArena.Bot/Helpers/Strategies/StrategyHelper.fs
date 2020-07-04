@@ -7,7 +7,7 @@ open System.Diagnostics
 open ProjectArena.Bot.Helpers.ActionsHelper
 
 let maxStepsMultiplier = 2.0
-let maxSteps = 10
+let maxSteps = 6
 
 let meleeSkills =
     [
@@ -35,9 +35,9 @@ let buffSkills =
         "empower", 0.91
     ]
 
-let summonSkills =
+let summonSkillsPrioritized =
     [
-        "mistpact", 0.9
+        "mistpact"
     ]
 
 let getRightSkillsArrayByPositionAndTarget (x: int, y: int) (target: ActorDto) =
@@ -86,9 +86,11 @@ let private calculateAllyAndEnemyAllowedActionsAndMinRanges (scene: Scene) (alli
         |> Seq.collect (tryGetActionAvailableBulk scene actorsAndAlly actor (x, y))
         |> Seq.append (tryGetActionAvailableBulk scene actorsAndAlly actor (x, y) actor.AttackingSkill.Value)
         |> Seq.choose id
-        |> Seq.sortByDescending (fun (_, p) -> p)
-        |> Seq.tryHead
-    let allyMinRange = match allies with
+        |> Seq.toList
+        |> Option.create
+        |> Option.filter (fun m -> not m.IsEmpty)
+        |> Option.map (Seq.maxBy (fun (_, p) -> p))
+    let allyMinRange = match allies |> List.filter (fun a -> a <> actor) with
                        | allies when allies |> List.isEmpty -> 0.0
                        | allies -> allies |> List.map (fun a -> rangeBetween (actor.X, actor.Y, a.X, a.Y)) |> List.min
     let enemyMinRange = enemies |> List.map (fun a -> rangeBetween (actor.X, actor.Y, a.X, a.Y)) |> List.min
@@ -130,7 +132,7 @@ let rec private calculateNextSquare
 
         [ (-1, 0) ; (1, 0) ; (0, -1) ; (0, 1)]
         |> List.iter (fun (newX, newY) ->
-            allSquaresMutable <- calculateNextSquare alliesAndEnemies (actor, scene) tile (newX, newY) tempSquare allSquaresMutable)
+            allSquaresMutable <- calculateNextSquare alliesAndEnemies (actor, scene) tile (initialTile.X + newX, initialTile.Y + newY) tempSquare allSquaresMutable)
         
         allSquaresMutable
         )
@@ -140,7 +142,7 @@ let calculatePaths (scene: Scene) (actor: ActorDto): ActionPosition list =
     let sw = Stopwatch.StartNew()
     let allies =
         scene.Actors
-        |> Seq.filter (fun a -> actor <> a && actor.Owner.IsSome && a.Owner.IsSome && (actor.Owner = a.Owner || (actor.Owner.Value.Team.IsSome && a.Owner.Value.Team = actor.Owner.Value.Team)))
+        |> Seq.filter (fun a -> actor.Owner.IsSome && a.Owner.IsSome && (actor.Owner = a.Owner || (actor.Owner.Value.Team.IsSome && a.Owner.Value.Team = actor.Owner.Value.Team)))
         |> Seq.toList
     let enemies =
         scene.Actors
@@ -162,11 +164,58 @@ let calculatePaths (scene: Scene) (actor: ActorDto): ActionPosition list =
     let tile = scene.Tiles |> Seq.find (fun t -> t.X = actor.X && t.Y = actor.Y)
     let mutable allSquaresMutable = [actorSquare]
 
-    [ (-1, 0) ; (1, 0) ; (0, -1) ; (0, 1)]
+    [ (-1, 0) ; (1, 0) ; (0, -1) ; (0, 1) ]
     |> List.iter (fun (newX, newY) ->
-        allSquaresMutable <- calculateNextSquare (allies, enemies) (actor, scene) tile (newX, newY) actorSquare allSquaresMutable)
+        allSquaresMutable <- calculateNextSquare (allies, enemies) (actor, scene) tile (actor.X + newX, actor.Y + newY) actorSquare allSquaresMutable)
 
     sw.Stop()
     printfn "Pathfinding: %d" sw.ElapsedMilliseconds
 
     allSquaresMutable
+
+let tryGetSummonNearlyAvailable (scene: Scene) (actor: ActorDto) =
+    let tryReturnAvailableAction (skill: SkillDto) (xShift: int, yShift: int) =
+        let action = Cast (skill.NativeId, actor.X + xShift, actor.Y + yShift)
+        match isActionAllowedByPosition (actor.X, actor.Y) scene (actor, actor.Owner.Value) action with
+        | true -> Some action
+        | false -> None
+    let getSkillsAvailableToCastOnPositions (skill: SkillDto) =
+        [ (-1, 0) ; (1, 0) ; (0, -1) ; (0, 1) ]
+        |> List.map (tryReturnAvailableAction skill)
+    summonSkillsPrioritized
+    |> List.map (fun s ->
+        actor.Skills |> Seq.tryFind (fun actS -> actS.NativeId = s))
+    |> List.choose id
+    |> List.collect getSkillsAvailableToCastOnPositions
+    |> List.choose id
+    |> List.tryHead
+
+let convertMapPositionToAction (scene: Scene) (actor: ActorDto) (ally: bool) (position: ActionPosition) =
+    let tryGetAvailableAction (targetX: int, targetY: int) (skill: SkillDto) =
+        meleeSkills
+        |> Seq.tryFind (fun (v, _) -> v = skill.NativeId)
+        |> Option.map (fun (_, c) -> Cast (skill.NativeId, targetX, targetY), c)
+        |> Option.filter (fun (a, _) -> isActionAllowed scene (actor, actor.Owner.Value) a)
+    let calculateNextPositionAction (position: ActionPosition) =
+        match position.IsDecorationOnWay with
+        | true ->
+            match actor.Skills
+                  |> Seq.map (tryGetAvailableAction (position.X, position.Y))
+                  |> Seq.append ([ tryGetAvailableAction (position.X, position.Y) actor.AttackingSkill.Value])
+                  |> Seq.choose id
+                  |> Seq.toList
+                  |> Option.create
+                  |> Option.filter (fun m -> not m.IsEmpty)
+                  |> Option.map (Seq.maxBy (fun (_, p) -> p)) with
+            | Some (s, _) -> s
+            | None -> Wait
+        | false -> Move (position.X, position.Y)
+    match (position) with
+    | position when actor.X = position.X && actor.Y = position.Y ->
+        match (match ally with | true -> position.AllyAllowedActionWithPriority | false -> position.EnemyAllowedActionWithPriority) with
+        | Some (action, _) -> action
+        | None -> Wait
+    | position when position.ParentSquares.Length = 1 ->
+        position |> calculateNextPositionAction
+    | _ ->
+        position.ParentSquares.[1] |> calculateNextPositionAction
