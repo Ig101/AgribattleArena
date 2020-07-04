@@ -8,6 +8,14 @@
     <ProjectReference Include="..\ProjectArena.Infrastructure\ProjectArena.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Include="appsettings.*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
     <Compile Include="Models/Dtos/TargetsDto.fs" />
     <Compile Include="Models/Dtos/PlayerDto.fs" />
     <Compile Include="Models/Dtos/SkillDto.fs" />
@@ -71,8 +79,6 @@
     <Compile Include="Processors/StorageSetupProcessor.fs" />
     <Compile Include="Processors/ConfigurationProcessor.fs" />
     <Compile Include="Program.fs" />
-    <Content Include="appsettings.json" />
-    <Content Include="appsettings.*.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.7.2" />
