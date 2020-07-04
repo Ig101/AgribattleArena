@@ -10,28 +10,28 @@ let rangeBetween (x1: int, y1: int, x2: int, y2: int) =
 let angleBetween (x1: int, y1: int, x2: int, y2: int) =
     Math.Atan2(float (y2 - y1), float (x2 - x1))
 
-let private isMoveAllowedByTile (scene: Scene) (actor: ActorDto) (x: int, y: int) =
+let private isMoveAllowedByTile (scene: Scene) (actorX: int, actorY: int) (x: int, y: int) =
     let tile = scene.Tiles |> Seq.find (fun t -> t.X = x && t.Y = y)
-    let tempTile = scene.Tiles |> Seq.find (fun t -> t.X = actor.X && t.Y = actor.Y)
+    let tempTile = scene.Tiles |> Seq.find (fun t -> t.X = actorX && t.Y = actorY)
     tile.TempActorId = None && not tile.Unbearable && Math.Abs(tile.Height - tempTile.Height) < 10.0f
 
-let private checkMilliness (scene: Scene) (actor: ActorDto) (target: TileDto) =
-    let range = rangeBetween(actor.X, actor.Y, target.X, target.Y);
+let private checkMilliness (scene: Scene) (actorX: int, actorY: int) (target: TileDto) =
+    let range = rangeBetween(actorX, actorY, target.X, target.Y);
     let mutable incrementingRange = 0.0;
     let mutable freeWay = true
-    let angleBetween = angleBetween(actor.X, actor.Y, target.X, target.Y);
+    let angleBetween = angleBetween(actorX, actorY, target.X, target.Y);
     let sin = Math.Sin(angleBetween);
     let cos = Math.Cos(angleBetween);
-    let mutable currentTile = scene.Tiles |> Seq.find (fun t -> t.X = actor.X && t.Y = actor.Y)
+    let mutable currentTile = scene.Tiles |> Seq.find (fun t -> t.X = actorX && t.Y = actorY)
     while freeWay && incrementingRange <= range do
         incrementingRange <- incrementingRange + 1.0;
         let nextTarget = match incrementingRange >= range with
                          | true -> target
                          | false ->
-                            let nextXFloat = float actor.X + (float incrementingRange * cos);
-                            let nextYFloat = float actor.Y + (float incrementingRange * sin);
-                            let nextX = (int)nextXFloat + (match nextXFloat % 1.0 > 0.5 with | true -> 1 | false -> 0);
-                            let nextY = (int)nextYFloat + (match nextYFloat % 1.0 > 0.5 with | true -> 1 | false -> 0);
+                            let nextXFloat = float actorX + (float incrementingRange * cos);
+                            let nextYFloat = float actorY + (float incrementingRange * sin);
+                            let nextX = int (Math.Round(nextXFloat, MidpointRounding.AwayFromZero));
+                            let nextY = int (Math.Round(nextYFloat, MidpointRounding.AwayFromZero));
                             scene.Tiles |> Seq.find (fun t -> t.X = nextX && t.Y = nextY)
         
         if nextTarget <> currentTile then
@@ -41,7 +41,7 @@ let private checkMilliness (scene: Scene) (actor: ActorDto) (target: TileDto) =
 
     freeWay
 
-let private isSkillAllowedByTile (scene: Scene) (actor: ActorDto, player: PlayerDto) (skill: SkillDto, x: int, y: int) =
+let private isSkillAllowedByTile (scene: Scene) (actor: ActorDto, player: PlayerDto) (actorX: int, actorY: int) (skill: SkillDto, x: int, y: int) =
     let tile = scene.Tiles |> Seq.find (fun t -> t.X = x && t.Y = y)
     let targetActor = tile.TempActorId |> Option.bind (fun aId -> scene.Actors |> Seq.tryFind (fun a -> aId = a.Id))
     let targetActorOwner = targetActor |> Option.bind (fun a -> a.Owner)
@@ -52,14 +52,14 @@ let private isSkillAllowedByTile (scene: Scene) (actor: ActorDto, player: Player
     let self = skill.AvailableTargets.Self && targetActor.IsSome && targetActor.Value.Id = actor.Id
     let bearable = skill.AvailableTargets.Bearable && tile.TempActorId.IsNone && not tile.Unbearable
     let unbearable = skill.AvailableTargets.Unbearable && tile.TempActorId.IsNone && tile.Unbearable
-    (allies || enemies || decorations || self || bearable || unbearable) && (not skill.OnlyVisibleTargets || checkMilliness scene actor tile)
+    (allies || enemies || decorations || self || bearable || unbearable) && (not skill.OnlyVisibleTargets || checkMilliness scene (actorX, actorY) tile)
 
 let isActionAllowedByPosition (actorX, actorY) (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: SceneAction) =
     match action with
     | Wait ->
         true
     | Move (x, y) ->
-        actor.CanMove && ((x = actorX && Math.Abs(y - actorY) = 1) || (y = actorY && Math.Abs(actorX - x) = 1)) && isMoveAllowedByTile scene actor (x, y)
+        actor.CanMove && ((x = actorX && Math.Abs(y - actorY) = 1) || (y = actorY && Math.Abs(actorX - x) = 1)) && isMoveAllowedByTile scene (actorX, actorY) (x, y)
     | Cast (name, x, y) ->
         let skillOpt =
             actor.AttackingSkill
@@ -68,7 +68,7 @@ let isActionAllowedByPosition (actorX, actorY) (scene: Scene) (actor: ActorDto, 
         match skillOpt with
         | None -> false
         | Some skill ->
-            actor.ActionPoints >= skill.Cost && skill.PreparationTime <= 0.0f && actor.CanAct && rangeBetween(actorX, actorY, x, y) <= float skill.Range && isSkillAllowedByTile scene (actor, player) (skill, x, y)
+            actor.ActionPoints >= skill.Cost && skill.PreparationTime <= 0.0f && actor.CanAct && rangeBetween(actorX, actorY, x, y) <= float skill.Range && isSkillAllowedByTile scene (actor, player) (actorX, actorY) (skill, x, y)
 
 
 let isActionAllowed (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: SceneAction) =

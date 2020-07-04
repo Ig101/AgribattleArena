@@ -19,8 +19,8 @@ export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
       } else {
         const nextXFloat = initial.x + (incrementingRange * cos);
         const nextYFloat = initial.y + (incrementingRange * sin);
-        const nextX = Math.floor(nextXFloat) + (nextXFloat % 1 > 0.5 ? 1 : 0);
-        const nextY = Math.floor(nextYFloat) + (nextYFloat % 1 > 0.5 ? 1 : 0);
+        const nextX = Math.round(nextXFloat);
+        const nextY = Math.round(nextYFloat);
         nextTarget = tiles[nextX][nextY];
         if (nextTarget === currentTile) {
             continue;

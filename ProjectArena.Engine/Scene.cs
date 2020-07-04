@@ -724,7 +724,7 @@ namespace ProjectArena.Engine
                 {
                     if (TempTileObject?.Id == actorId && IsActive)
                     {
-                        ActorWait();
+                        return ActorWait();
                     }
                 }
             }

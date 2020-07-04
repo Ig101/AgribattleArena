@@ -169,7 +169,7 @@ let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene opti
             |> Seq.toList
             |> List.filter (fun a -> a.Owner.IsSome && a.Owner.Value = player)
             |> List.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
-            |> fun v -> performance + configuration.Learning.PlayerPowerPerformanceCoefficient * (v / 6.0)
+            |> fun v -> performance + configuration.Learning.PlayerPowerPerformanceCoefficient * (v / 3.0)
         newPerformance
     let calculateEnemyPowerPerformance (scene: Scene, player: PlayerDto) (performance: float) =
         let opponent = scene.Players |> Seq.toList |> List.find (fun p -> p.Id <> player.Id)
@@ -178,7 +178,7 @@ let tryCalculatePerformance (configuration: Configuration) (sceneOpt: Scene opti
             |> Seq.toList
             |> List.filter (fun a -> a.Owner.IsSome && a.Owner.Value = opponent)
             |> List.fold (fun result a -> result + float(a.Health |> Option.defaultValue 100.0f) / float(a.MaxHealth |> Option.defaultValue 100)) 0.0
-            |> fun v -> performance + configuration.Learning.EnemyPowerPerformanceCoefficient * (1.0 - v / 6.0)
+            |> fun v -> performance + configuration.Learning.EnemyPowerPerformanceCoefficient * (1.0 - v / 3.0)
         newPerformance
     match sceneOpt with
     | Some scene ->

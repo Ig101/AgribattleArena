@@ -76,8 +76,8 @@ namespace ProjectArena.Engine.Objects.Immaterial
                 {
                     var nextXFloat = parent.X + (incrementingRange * cos);
                     var nextYFloat = parent.Y + (incrementingRange * sin);
-                    var nextX = (int)nextXFloat + (nextXFloat % 1 > 0.5 ? 1 : 0);
-                    var nextY = (int)nextYFloat + (nextYFloat % 1 > 0.5 ? 1 : 0);
+                    var nextX = (int)Math.Round(nextXFloat, MidpointRounding.AwayFromZero);
+                    var nextY = (int)Math.Round(nextYFloat, MidpointRounding.AwayFromZero);
                     nextTarget = parent.Parent.Tiles[nextX][nextY];
                     if (nextTarget == currentTile)
                     {

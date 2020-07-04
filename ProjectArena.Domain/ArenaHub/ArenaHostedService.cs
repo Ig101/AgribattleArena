@@ -85,6 +85,7 @@ namespace ProjectArena.Domain.ArenaHub
             if (_counter >= 10)
             {
                 _queueService.QueueProcessing(_counter);
+                _counter = 0;
             }
 
             _battleService.EngineTimeProcessing(passed);

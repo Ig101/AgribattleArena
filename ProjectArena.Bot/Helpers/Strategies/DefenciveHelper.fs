@@ -27,6 +27,7 @@ let private getActionOnTiles (scene: Scene) (actor: ActorDto) () =
     let findActionPositionCloseToAlly (map: ActionPosition list) () =
         map
         |> List.filter (fun p -> p.EnemyAllowedActionWithPriority.IsNone && p.AllyAllowedActionWithPriority.IsNone)
+        |> List.sortBy (fun p -> p.Steps)
         |> Option.create
         |> Option.filter (fun m -> not m.IsEmpty)
         |> Option.map (List.minBy (fun p -> p.RangeTillNearestAlly + (match p.IsDecorationOnWay with | true -> 10.0 | _ -> 0.0)))

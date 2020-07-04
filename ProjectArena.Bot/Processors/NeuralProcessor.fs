@@ -53,7 +53,7 @@ let private calculateNeededAction (configuration: Configuration) (model: NeuralM
                  | Defencive -> getDefenciveAction (scene, actor)
                  | Flee ->  getFleeAction (scene, actor)
     sw.Stop()
-    let neededDelay = 180 - int sw.ElapsedMilliseconds
+    let neededDelay = 200 - int sw.ElapsedMilliseconds
     if neededDelay > 0 then
         do! Task.Delay(neededDelay)
     return (action, actor)
