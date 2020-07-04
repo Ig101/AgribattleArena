@@ -183,6 +183,7 @@ let tryGetSummonNearlyAvailable (scene: Scene) (actor: ActorDto) =
         | false -> None
     let getSkillsAvailableToCastOnPositions (skill: SkillDto) =
         [ (-1, 0) ; (1, 0) ; (0, -1) ; (0, 1) ]
+        |> List.filter (fun (x, y) -> actor.X + x >= 0 && actor.X + x < scene.TilesetWidth && actor.Y + y >= 0 && actor.Y + y < scene.TilesetHeight)
         |> List.map (tryReturnAvailableAction skill)
     summonSkillsPrioritized
     |> List.map (fun s ->
