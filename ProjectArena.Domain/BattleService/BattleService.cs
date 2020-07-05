@@ -212,7 +212,7 @@ namespace ProjectArena.Domain.BattleService
             var scene = EngineHelper.CreateNewScene(tempSceneId, players, mode.Generator, _nativeManager, mode.VarManager, _random.Next(), 180, SynchronizationInfoEventHandler);
             lock (_locker)
             {
-                _scenes = _scenes.Append(scene).ToList();
+                _scenes = _scenes.Append(scene).ToHashSet();
             }
         }
 
@@ -264,7 +264,7 @@ namespace ProjectArena.Domain.BattleService
                     scene.UpdateTime((float)seconds);
                     return scene.IsActive;
                 })
-                .ToList();
+                .ToHashSet();
             }
         }
 
@@ -317,7 +317,7 @@ namespace ProjectArena.Domain.BattleService
                     BattleHelper.CalculateReward(ref synchronizer, scene, player.Id);
                     return synchronizer;
                 })
-                .ToList();
+                .ToHashSet();
         }
 
         public IScene GetUserScene(string userId, Guid sceneId)

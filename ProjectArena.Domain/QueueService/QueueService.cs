@@ -19,10 +19,10 @@ namespace ProjectArena.Domain.QueueService
         private readonly IDictionary<GameMode, SceneModeQueue> _queues;
 
         private readonly Random _botsRandom;
-        private readonly ICollection<BotDefinition> _bots;
-
         private readonly IBattleService _battleService;
         private readonly object _locker = new object();
+
+        private IEnumerable<BotDefinition> _bots;
 
         public QueueService(
             IBattleService battleService)
@@ -35,13 +35,12 @@ namespace ProjectArena.Domain.QueueService
 
         public void AddBot(BotDefinition definition)
         {
-            _bots.Add(definition);
+            _bots = _bots.Append(definition).ToHashSet();
         }
 
         public void RemoveBot(string id)
         {
-            var bot = _bots.FirstOrDefault(x => x.BotId == id);
-            _bots.Remove(bot);
+            _bots = _bots.Where(x => x.BotId != id).ToHashSet();
         }
 
         public void QueueProcessing(double time)
@@ -72,7 +71,7 @@ namespace ProjectArena.Domain.QueueService
                     user.Time += time;
                 }
 
-                if (_bots.Count > 0 && queue.Mode.TimeTillBot.HasValue)
+                if (_bots.Count() > 0 && queue.Mode.TimeTillBot.HasValue)
                 {
                     foreach (var complectingUsersItem in complectingUsers)
                     {
@@ -80,7 +79,7 @@ namespace ProjectArena.Domain.QueueService
                         {
                             while (complectingUsersItem.Count < queue.Mode.MaxPlayers)
                             {
-                                var chosenBot = _botsRandom.Next(_bots.Count * RandomModifier) % _bots.Count;
+                                var chosenBot = _botsRandom.Next(_bots.Count() * RandomModifier) % _bots.Count();
                                 complectingUsersItem.Add(new UserInQueue()
                                 {
                                     UserId = _bots.Skip(chosenBot).First().BotId
@@ -93,7 +92,7 @@ namespace ProjectArena.Domain.QueueService
                 }
 
                 var allComplectedActors = complectedUsers.SelectMany(actor => actor).ToList();
-                queue.Queue.RemoveWhere(x => allComplectedActors.Contains(x));
+                queue.Queue = queue.Queue.Where(x => !allComplectedActors.Contains(x)).ToHashSet();
                 foreach (var complect in complectedUsers)
                 {
                     Task.Run(async () => await _battleService.StartNewBattleAsync(queue.Mode, complect));
@@ -110,7 +109,7 @@ namespace ProjectArena.Domain.QueueService
                     continue;
                 }
 
-                queue.Value.Queue.RemoveWhere(x => x.UserId == userId);
+                queue.Value.Queue = queue.Value.Queue.Where(x => x.UserId != userId);
             }
         }
 
@@ -125,10 +124,10 @@ namespace ProjectArena.Domain.QueueService
             lock (_locker)
             {
                 DequeueInternal(user.UserId, user.Mode);
-                targetQueue.Queue.Add(new UserInQueue()
+                targetQueue.Queue = targetQueue.Queue.Append(new UserInQueue()
                 {
                     UserId = user.UserId
-                });
+                }).ToHashSet();
                 return true;
             }
         }
@@ -143,19 +142,16 @@ namespace ProjectArena.Domain.QueueService
 
         public UserInQueueDto IsUserInQueue(string userId)
         {
-            lock (_locker)
-            {
-                return _queues
-                    .Select(
-                        x => x.Value.Queue.FirstOrDefault(member => member.UserId == userId)?.Time == null ? (UserInQueueDto)null : new UserInQueueDto()
-                        {
-                            Mode = x.Key,
-                            Time = (int)x.Value.Queue.FirstOrDefault(member => member.UserId == userId).Time
-                        })
-                    .Where(
-                        x => x != null)
-                    .FirstOrDefault();
-            }
+            return _queues
+                .Select(
+                    x => x.Value.Queue.FirstOrDefault(member => member.UserId == userId)?.Time == null ? (UserInQueueDto)null : new UserInQueueDto()
+                    {
+                        Mode = x.Key,
+                        Time = (int)x.Value.Queue.FirstOrDefault(member => member.UserId == userId).Time
+                    })
+                .Where(
+                    x => x != null)
+                .FirstOrDefault();
         }
     }
 }

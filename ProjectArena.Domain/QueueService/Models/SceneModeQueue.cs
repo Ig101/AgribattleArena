@@ -6,7 +6,7 @@ namespace ProjectArena.Domain.QueueService.Models
 {
     public class SceneModeQueue
     {
-        public HashSet<UserInQueue> Queue { get; set; }
+        public IEnumerable<UserInQueue> Queue { get; set; }
 
         public SceneMode Mode { get; set; }
     }
