@@ -131,7 +131,8 @@ export class ArenaHubService {
     while (this.battleSynchronizationActionsList[0].sync.version <= currentVersion) {
       this.battleSynchronizationActionsList.shift();
     }
-    if (this.battleSynchronizationActionsList[0].sync.version !== currentVersion + 1) {
+    if (this.battleSynchronizationActionsList.length === 0 ||
+      this.battleSynchronizationActionsList[0].sync.version !== currentVersion + 1) {
       return undefined;
     }
     const synchronizationObject = this.battleSynchronizationActionsList[0];

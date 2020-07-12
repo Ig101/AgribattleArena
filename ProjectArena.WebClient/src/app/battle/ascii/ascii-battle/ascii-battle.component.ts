@@ -602,8 +602,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.pressedKey = event.code;
       const moveAction = this.moveButtons.find(x => x.hotKey === event.code);
       if (moveAction) {
-        moveAction.pressed = true;
         moveAction.actions[0]();
+        if (!this.moveButtons.some(x => x.pressed)) {
+          this.movingTimer = 12;
+        }
+        moveAction.pressed = true;
         this.moveButtons.sort((a, b) => {
           const bVal = b === moveAction ? 1 : 0;
           const aVal = a === moveAction ? 1 : 0;
@@ -1163,6 +1166,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.receivingMessagesFromHubAllowed = true;
       return;
     }
+    this.battleStorageService.version = action.sync.version;
     let onlySecondPart = false;
     if (this.specificActionResponseForWait) {
       if (action.action === BattleSynchronizationActionEnum.EndTurn) {
