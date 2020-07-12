@@ -34,4 +34,3 @@ jobs:
         heroku config:set NETCORE_ENVIRONMENT=Production -a $APP_NAME
         heroku container:push worker -a $APP_NAME --context-path ./ProjectArena.Bot
         heroku container:release web worker -a $APP_NAME
-}
