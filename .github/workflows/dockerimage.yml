@@ -29,4 +29,8 @@ jobs:
         heroku config:set DefaultUsers__Root__Password=$ROOT_PASSWORD -a $APP_NAME
         heroku config:set DefaultUsers__Bots__0__Password=$BOT1_PASSWORD -a $APP_NAME
         heroku container:push web -a $APP_NAME
-        heroku container:release web -a $APP_NAME
+        heroku config:set Storage_ConnectionString=$MONGO_CONNECTION_STRING -a $APP_NAME
+        heroku config:set Api__Password=$BOT1_PASSWORD -a $APP_NAME
+        heroku container:push worker -a $APP_NAME --context-path ./ProjectArena.Bot
+        heroku container:release web worker -a $APP_NAME
+}

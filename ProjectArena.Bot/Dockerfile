@@ -1,0 +1,20 @@
+# Dotnet restore
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS dotnetBuild
+WORKDIR /src
+COPY ./*.csproj ProjectArena.Bot/
+COPY ../ProjectArena.Infrastructure/*.csproj ProjectArena.Infrastructure/
+WORKDIR /src/ProjectArena.Bot
+RUN dotnet restore
+WORKDIR /src
+COPY . .
+
+# Dotnet publish
+FROM dotnetBuild AS publish
+WORKDIR /src/ProjectArena.Bot
+RUN dotnet publish -c Release -o /src/publish
+
+# Run
+FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS runtime
+WORKDIR /app
+COPY --from=publish /src/publish .
+CMD dotnet ProjectArena.Bot.dll

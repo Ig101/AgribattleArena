@@ -113,7 +113,8 @@ namespace ProjectArena.Api
 
             app.UseDomainLayer();
 
-            app.UseHttpsRedirection();
+            // Hide until https
+            // app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
