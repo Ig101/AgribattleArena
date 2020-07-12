@@ -57,6 +57,7 @@ namespace ProjectArena.Api.Filters
                     {
                         StatusCode = (int)HttpStatusCode.BadRequest
                     };
+                    return;
                 }
 
                 if (context.Exception is UnauthorizedException)
@@ -66,6 +67,7 @@ namespace ProjectArena.Api.Filters
                     {
                         StatusCode = (int)HttpStatusCode.Unauthorized
                     };
+                    return;
                 }
 
                 if (context.Exception is ForbiddenException)
@@ -75,6 +77,7 @@ namespace ProjectArena.Api.Filters
                     {
                         StatusCode = (int)HttpStatusCode.Forbidden
                     };
+                    return;
                 }
 
                 if (context.Exception is NotFoundException)
@@ -84,6 +87,7 @@ namespace ProjectArena.Api.Filters
                     {
                         StatusCode = (int)HttpStatusCode.NotFound
                     };
+                    return;
                 }
 
                 if (context.Exception is ServiceUnreachableException)
@@ -93,6 +97,7 @@ namespace ProjectArena.Api.Filters
                     {
                         StatusCode = (int)HttpStatusCode.ServiceUnavailable
                     };
+                    return;
                 }
 
                 context.Result = new ObjectResult(factory.CreateProblemDetails(context.HttpContext, (int)HttpStatusCode.InternalServerError, null, null, context.Exception.Message))
