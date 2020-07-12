@@ -602,9 +602,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.pressedKey = event.code;
       const moveAction = this.moveButtons.find(x => x.hotKey === event.code);
       if (moveAction) {
-        moveAction.actions[0]();
         if (!this.moveButtons.some(x => x.pressed)) {
-          this.movingTimer = 12;
+          this.movingTimer = 0;
+          moveAction.actions[0]();
+          this.movingTimer *= 2;
         }
         moveAction.pressed = true;
         this.moveButtons.sort((a, b) => {
@@ -1197,8 +1198,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
      //     location.reload();
         }, 2000);
         return;
+      } else {
+        onlySecondPart = true;
       }
-      onlySecondPart = true;
     }
     const currentPlayer = action.sync.players.find(x => x.userId === this.userService.user.id);
     switch (action.action) {

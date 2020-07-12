@@ -148,7 +148,6 @@ export class ArenaHubService {
 
   private registerBattleSynchronizationAction(action: BattleSynchronizationActionEnum, sync: Synchronizer) {
     const synchronizationObject = { action, sync };
-    console.log(synchronizationObject);
     this.battleSynchronizationActionsList.push(synchronizationObject);
     this.battleSynchronizationActionsList.sort((a, b) => a.sync.version - b.sync.version);
     this.firstActionVersion = this.battleSynchronizationActionsList[0].sync.version;
