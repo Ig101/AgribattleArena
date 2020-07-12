@@ -118,6 +118,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   animationTicker = false;
 
+  synchronizationErrorTimer;
+
   get canAct() {
     return !this.blocked && !this.specificActionResponseForWait && this.actionsQueue.length === 0 &&
       this.battleStorageService.currentActor?.owner?.userId === this.userService.user.id &&
@@ -1142,13 +1144,16 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private processNextActionFromQueue() {
     this.receivingMessagesFromHubAllowed = false;
+    clearTimeout(this.synchronizationErrorTimer);
     if (this.battleStorageService.version + 1 < this.arenaHub.firstActionVersion) {
-      this.loadingService.startLoading({
-        title: 'Desynchronization. Page will be refreshed in 2 seconds.'
-      }, 0, true);
-      console.error('Version is not correct');
-      setTimeout(() => {
-   //     location.reload();
+      this.synchronizationErrorTimer = setTimeout(() => {
+        this.loadingService.startLoading({
+          title: 'Desynchronization. Page will be refreshed in 2 seconds.'
+        }, 0, true);
+        console.error('Version is not correct');
+        setTimeout(() => {
+    //     location.reload();
+        }, 2000);
       }, 2000);
       this.receivingMessagesFromHubAllowed = true;
       return;
