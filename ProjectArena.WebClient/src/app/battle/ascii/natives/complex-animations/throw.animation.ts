@@ -31,6 +31,13 @@ export function throwIssueDeclaration(issueX: number, issueY: number, targetX: n
       specificAction: undefined
     });
   }
+  while (frames.length < 2) {
+    frames.unshift({
+      updateSynchronizer: true,
+      animationTiles: [],
+      specificAction: undefined
+    });
+  }
   return frames;
 }
 

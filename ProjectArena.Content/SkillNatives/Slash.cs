@@ -14,9 +14,9 @@ namespace ProjectArena.Content.SkillNatives
                 "slash",
                 new[] { "damage", "target", "weapon", "melee", "physic" },
                 1,
-                2,
+                1,
                 0,
-                30,
+                15,
                 new Targets()
                 {
                     NotAllies = true,

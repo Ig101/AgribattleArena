@@ -14,9 +14,9 @@ namespace ProjectArena.Content.SkillNatives
                 "wand",
                 new[] { "damage", "target", "weapon", "magic", "pure", "ranged", "direct" },
                 6,
-                2,
+                1,
                 0,
-                24,
+                12,
                 new Targets()
                 {
                     NotAllies = true,

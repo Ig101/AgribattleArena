@@ -27,7 +27,7 @@ namespace ProjectArena.Engine
 
         private readonly int moveMilliseconds;
 
-        private DateTime? lastMoveTime;
+        private DateTime? lastActionTime;
 
         public bool IsActive { get; private set; }
 
@@ -434,7 +434,7 @@ namespace ProjectArena.Engine
             bool result = actor.Wait();
             if (result)
             {
-                lastMoveTime = null;
+                lastActionTime = null;
                 EndTurn();
             }
 
@@ -605,25 +605,25 @@ namespace ProjectArena.Engine
             return false;
         }
 
-        private bool CheckMoveTime()
+        private bool CheckActionTime()
         {
-            return lastMoveTime == null || (DateTime.Now - lastMoveTime.Value).TotalMilliseconds >= moveMilliseconds;
+            return lastActionTime == null || (DateTime.Now - lastActionTime.Value).TotalMilliseconds >= moveMilliseconds;
         }
 
         public bool ActorMove(int actorId, int targetX, int targetY)
         {
-            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
+            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckActionTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject?.Id == actorId && IsActive && CheckMoveTime())
+                    if (TempTileObject?.Id == actorId && IsActive && CheckActionTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
                         bool result = actor.Move(Tiles[targetX][targetY]);
                         if (result)
                         {
-                            lastMoveTime = DateTime.Now;
+                            lastActionTime = DateTime.Now;
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
                             {
@@ -648,17 +648,18 @@ namespace ProjectArena.Engine
 
         public bool ActorCast(int actorId, int skillId, int targetX, int targetY)
         {
-            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
+            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckActionTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject?.Id == actorId && IsActive && CheckMoveTime())
+                    if (TempTileObject?.Id == actorId && IsActive && CheckActionTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
                         bool result = actor.Cast(skillId, Tiles[targetX][targetY]);
                         if (result)
                         {
+                            lastActionTime = DateTime.Now;
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
                             {
@@ -683,17 +684,18 @@ namespace ProjectArena.Engine
 
         public bool ActorAttack(int actorId, int targetX, int targetY)
         {
-            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckMoveTime())
+            if (TempTileObject?.Id == actorId && IsActive && targetX >= 0 && targetY >= 0 && targetX < Tiles.Length && targetY < Tiles[0].Length && CheckActionTime())
             {
                 lock (lockObject)
                 {
-                    if (TempTileObject?.Id == actorId && IsActive && CheckMoveTime())
+                    if (TempTileObject?.Id == actorId && IsActive && CheckActionTime())
                     {
                         Actor actor = (Actor)TempTileObject;
 
                         bool result = actor.Attack(Tiles[targetX][targetY]);
                         if (result)
                         {
+                            lastActionTime = DateTime.Now;
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
                             {

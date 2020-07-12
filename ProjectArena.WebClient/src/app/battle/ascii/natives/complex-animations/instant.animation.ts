@@ -2,6 +2,21 @@ import { Color } from 'src/app/shared/models/color.model';
 import { AnimationFrame } from '../../models/animations/animation-frame.model';
 import { rangeBetween, angleBetween } from 'src/app/helpers/math.helper';
 
+export function instantIssueDeclaration() {
+  const frames: AnimationFrame[] = [];
+  frames.push({
+    updateSynchronizer: true,
+    animationTiles: [],
+    specificAction: undefined
+  });
+  frames.push({
+    updateSynchronizer: true,
+    animationTiles: [],
+    specificAction: undefined
+  });
+  return frames;
+}
+
 export function instantSyncDeclaration(issueX: number, issueY: number, targetX: number, targetY: number, color: Color) {
   const frames: AnimationFrame[] = [];
   frames.push({

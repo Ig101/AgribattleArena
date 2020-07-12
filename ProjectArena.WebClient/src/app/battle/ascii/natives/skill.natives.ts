@@ -6,7 +6,7 @@ import { AnimationTile } from '../models/animations/animation-tile.model';
 import { explosionIssueDeclaration } from './complex-animations/explosion.animation';
 import { throwIssueDeclaration, arrowThrowIssueDeclaration } from './complex-animations/throw.animation';
 import { chargeIssueDeclaration, chargeSyncDeclaration } from './complex-animations/charge.animation';
-import { instantSyncDeclaration } from './complex-animations/instant.animation';
+import { instantSyncDeclaration, instantIssueDeclaration } from './complex-animations/instant.animation';
 import { architectSummonIssueDeclaration, architectSummonSyncDeclaration } from './complex-animations/architect-summon.animation';
 import { strikeSyncDeclaration, strikeIssueDeclaration } from './complex-animations/strike.animation';
 import { undirectDamageIssueDeclaration, undirectDamageSyncDeclaration } from './complex-animations/undirect-damage.animation';
@@ -103,7 +103,9 @@ export const skillNatives: { [id: string]: SkillNative } = {
     name: 'Mistwalk',
     description: 'Teleports to the target location.',
     action: {
-      generateIssueDeclarations: undefined,
+      generateIssueDeclarations: (issuer, tile) => {
+        return instantIssueDeclaration();
+      },
       generateSyncDeclarations: (issuer, tile) => {
         return instantSyncDeclaration(issuer.x, issuer.y, tile.x, tile.y, {r: 100, g: 100, b: 255, a: 1});
       },
@@ -224,7 +226,9 @@ export const skillNatives: { [id: string]: SkillNative } = {
     name: 'Sacrifice',
     description: 'Transfers all health to the target. Doesn\'t work on structures and mechanisms.',
     action: {
-      generateIssueDeclarations: undefined,
+      generateIssueDeclarations: (issuer, tile) => {
+        return instantIssueDeclaration();
+      },
       generateSyncDeclarations: (issuer, tile) => {
         return instantSyncDeclaration(issuer.x, issuer.y, tile.x, tile.y, {r: 255, g: 0, b: 0, a: 1});
       },
@@ -234,7 +238,9 @@ export const skillNatives: { [id: string]: SkillNative } = {
     name: 'Sacrifice',
     description: 'Transfers all health to the target. Doesn\'t work on structures and mechanisms.',
     action: {
-      generateIssueDeclarations: undefined,
+      generateIssueDeclarations: (issuer, tile) => {
+        return instantIssueDeclaration();
+      },
       generateSyncDeclarations: (issuer, tile) => {
         return instantSyncDeclaration(issuer.x, issuer.y, tile.x, tile.y, {r: 55, g: 55, b: 255, a: 1});
       },
