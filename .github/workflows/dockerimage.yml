@@ -19,10 +19,14 @@ jobs:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+        BOT1_PASSWORD: ${{ secrets.BOT1_PASSWORD }}
         APP_NAME: ${{ 'blue-plague' }}
       run: |
         docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
         heroku config:set MongoConnection__ConnectionString=$MONGO_CONNECTION_STRING -a $APP_NAME
         heroku config:set SmtpServer__SmtpPassword=$SMTP_PASSWORD -a $APP_NAME
+        heroku config:set DefaultUsers__Root__Password=$ROOT_PASSWORD -a $APP_NAME
+        heroku config:set DefaultUsers__Bots__0__Password=$BOT1_PASSWORD -a $APP_NAME
         heroku container:push web -a $APP_NAME
         heroku container:release web -a $APP_NAME
