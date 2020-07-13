@@ -170,7 +170,7 @@ export class AsciiBattleAnimationsService {
     if (floatingTexts.length > 0 && frames.length === 0) {
       frames.push([]);
     }
-  
+
     if (frames.length > 0) {
       const declarations = this.mergeFramesToDeclarations(undefined, undefined, true, frames);
       declarations[0].floatingTexts = floatingTexts;

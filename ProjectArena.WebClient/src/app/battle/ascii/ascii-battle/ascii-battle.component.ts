@@ -1135,7 +1135,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
       if (this.battleStorageService.currentActionId) {
-        const skill = this.battleStorageService.currentActor?.skills.find(x => x.id = this.battleStorageService.currentActionId);
+        const skill = this.battleStorageService.currentActor?.skills.find(x => x.id === this.battleStorageService.currentActionId);
         if (!skill || skill.cost > this.battleStorageService.currentActor.actionPoints) {
           this.battleStorageService.currentActionId = undefined;
           this.battleStorageService.availableActionSquares =
