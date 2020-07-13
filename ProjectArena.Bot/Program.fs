@@ -5,6 +5,7 @@ open ProjectArena.Bot.Processors.LearningProcessor
 open System
 open ProjectArena.Bot.Processors.ExtraProcessor
 open ProjectArena.Bot.Processors.AuthorizationProcessor
+open System.Threading
 
 [<EntryPoint>]
 let main argv =
@@ -15,5 +16,5 @@ let main argv =
     |> startExtraProcessing
     |> startLearning
     |> ignore
-    Console.ReadLine() |> ignore
+    Thread.Sleep(Timeout.Infinite)
     0
