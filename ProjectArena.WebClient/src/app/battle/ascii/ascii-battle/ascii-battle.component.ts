@@ -655,7 +655,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
               x, y, undefined);
       } else if (checkSkillTargets(tile, actor, actor.attackingSkill.availableTargets) &&
-        (!actor.attackingSkill.onlyVisibleTargets || tile.height - initialTile.height < 10) &&
+        (!actor.attackingSkill.onlyVisibleTargets ||
+          (tile.height - initialTile.height < 10 && (initialTile.height - tile.height < 10 || actor.attackingSkill.range > 1))) &&
         actor.attackingSkill.cost <= actor.actionPoints) {
 
         this.arenaHub.orderAttack(
