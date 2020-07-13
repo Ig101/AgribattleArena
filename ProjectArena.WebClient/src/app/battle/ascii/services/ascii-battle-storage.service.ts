@@ -62,6 +62,8 @@ export class AsciiBattleStorageService {
       { code: 'Digit0', key: '0' },
   ];
 
+  idle = false;
+
   get isValidScene() {
     return !!this.scene;
   }
@@ -91,5 +93,6 @@ export class AsciiBattleStorageService {
     this.shownEnd = false;
     this.endDeclaration = undefined;
     this.currentActionId = undefined;
+    this.idle = false;
   }
 }

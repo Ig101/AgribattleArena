@@ -31,6 +31,8 @@ namespace ProjectArena.Engine
 
         private DateTime? lastActionTime;
 
+        private float idleTime = 0;
+
         public bool IsActive { get; private set; }
 
         public float PassedTime { get; private set; }
@@ -382,6 +384,7 @@ namespace ProjectArena.Engine
         public void EndTurn()
         {
             lastActionTime = null;
+            idleTime = 0;
             bool turnStarted;
             do
             {
@@ -516,11 +519,25 @@ namespace ProjectArena.Engine
             }
         }
 
-        public void UpdateTime(float time)
+        public bool UpdateTime(float time)
         {
+            bool idleSwitch = false;
             if (IsActive)
             {
                 this.RemainedTurnTime -= time;
+                var newIdleTime = idleTime + time;
+                if (newIdleTime > 3 && TempTileObject != null)
+                {
+                    if (idleTime <= 3)
+                    {
+                        idleSwitch = true;
+                    }
+
+                    this.RemainedTurnTime -= time * TimePenalty;
+                }
+
+                this.idleTime = newIdleTime;
+
                 if (RemainedTurnTime <= 0)
                 {
                     lock (lockObject)
@@ -539,6 +556,8 @@ namespace ProjectArena.Engine
                     }
                 }
             }
+
+            return idleSwitch;
         }
 
         public bool AfterUpdateSynchronization(Helpers.SceneAction action, TileObject actor, int? actionId, int? targetX, int? targetY)
@@ -625,6 +644,7 @@ namespace ProjectArena.Engine
                         bool result = actor.Move(Tiles[targetX][targetY]);
                         if (result)
                         {
+                            idleTime = 0;
                             lastActionTime = DateTime.Now;
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
@@ -662,6 +682,7 @@ namespace ProjectArena.Engine
                         bool result = actor.Cast(skillId, Tiles[targetX][targetY]);
                         if (result)
                         {
+                            idleTime = 0;
                             lastActionTime = DateTime.Now;
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)
@@ -698,6 +719,7 @@ namespace ProjectArena.Engine
                         bool result = actor.Attack(Tiles[targetX][targetY]);
                         if (result)
                         {
+                            idleTime = 0;
                             lastActionTime = DateTime.Now;
                             bool actionAvailability = actor.CheckActionAvailability();
                             if (actionAvailability)

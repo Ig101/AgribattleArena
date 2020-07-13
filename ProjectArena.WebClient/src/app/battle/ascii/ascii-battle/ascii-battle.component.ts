@@ -93,6 +93,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   arenaActionsSubscription: Subscription;
   synchronizationErrorSubscription: Subscription;
   unsuccessfulActionSubscription: Subscription;
+  idleActionSubscription: Subscription;
   animationSubscription: Subscription;
   finishLoadingSubscription: Subscription;
   victorySubscription: Subscription;
@@ -236,7 +237,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Unexpected synchronization error');
         setTimeout(() => {
-      //    location.reload();
+          location.reload();
         }, 2000);
       }
     });
@@ -261,6 +262,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         this.specificActionResponseForWait = undefined;
       }
     });
+    this.idleActionSubscription = arenaHub.idleActionSubject.subscribe(() => {
+      this.battleStorageService.idle = true;
+    });
     this.animationSubscription = battleAnimationsService.generationConclusion.subscribe((pending) => {
       this.processNextActionFromQueueWithChecks(pending);
     });
@@ -268,6 +272,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.endGame(declaration);
     });
     this.arenaActionsSubscription = arenaHub.battleSynchronizationActionsNotifier.subscribe(() => {
+      this.battleStorageService.idle = false;
       if (this.receivingMessagesFromHubAllowed) {
         this.processNextActionFromQueue();
       }
@@ -1030,7 +1035,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Action is not found');
         setTimeout(() => {
-     //     location.reload();
+          location.reload();
         }, 2000);
         return;
     }
@@ -1157,7 +1162,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Version is not correct');
         setTimeout(() => {
-    //     location.reload();
+         location.reload();
         }, 2000);
       }, 2000);
       this.receivingMessagesFromHubAllowed = true;
@@ -1196,7 +1201,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0, true);
         console.error('Action is not correct');
         setTimeout(() => {
-     //     location.reload();
+          location.reload();
         }, 2000);
         return;
       } else {
@@ -1288,6 +1293,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         this.selectedTile.duration += shift;
       }
       this.battleStorageService.turnTime -= shift / 1000;
+      if (this.battleStorageService.idle) {
+        this.battleStorageService.turnTime -= shift / 1000 * this.battleStorageService.movePenalty;
+      }
       if (this.animationTicker && this.battleAnimationsService.processNextAnimationFromQueue()) {
         this.changed = true;
       }

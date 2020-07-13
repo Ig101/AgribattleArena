@@ -261,7 +261,18 @@ namespace ProjectArena.Domain.BattleService
                 var newScenes = _scenes
                 .Where(scene =>
                 {
-                    scene.UpdateTime((float)seconds);
+                    var sendMessage = scene.UpdateTime((float)seconds);
+                    if (sendMessage)
+                    {
+                        var battleHub = _serviceProvider.GetRequiredService<IHubContext<ArenaHub.ArenaHub>>();
+                        var uniqueUsers = scene.ShortPlayers
+                        .Where(x => !x.Left)
+                        .Select(x => x.UserId)
+                        .Distinct()
+                        .ToList();
+                        battleHub.Clients.Users(uniqueUsers).SendAsync("BattleIdle");
+                    }
+
                     return scene.IsActive;
                 })
                 .ToHashSet();

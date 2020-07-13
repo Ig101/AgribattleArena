@@ -26,7 +26,7 @@ namespace ProjectArena.Engine.ForExternalUse
 
         ISynchronizer GetFullSynchronizationData();
 
-        void UpdateTime(float time);
+        bool UpdateTime(float time);
 
         bool ActorMove(int actorId, int targetX, int targetY);
 

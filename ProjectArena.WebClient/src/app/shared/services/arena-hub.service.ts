@@ -24,10 +24,11 @@ const BATTLE_END_TURN = 'BattleEndTurn';
 const BATTLE_END_GAME = 'BattleEndGame';
 const BATTLE_LEAVE = 'BattleLeave';
 const BATTLE_NO_ACTORS_DRAW = 'BattleNoActorsDraw';
+const BATTLE_IDLE = 'BattleIdle';
 
 type BattleHubReturnMethod = typeof DAILY_UPDATE | typeof BATTLE_ATTACK | typeof BATTLE_CAST | typeof BATTLE_DECORATION |
     typeof BATTLE_END_GAME | typeof BATTLE_END_TURN | typeof BATTLE_MOVE | typeof BATTLE_NO_ACTORS_DRAW |
-    typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_USUCCESSFUL_ACTION;
+    typeof BATTLE_LEAVE | typeof BATTLE_START_GAME | typeof BATTLE_SYNC_ERROR | typeof BATTLE_USUCCESSFUL_ACTION | typeof BATTLE_IDLE;
 
 @Injectable({
   providedIn: 'root'
@@ -44,7 +45,8 @@ export class ArenaHubService {
   prepareForBattleNotifier = new BehaviorSubject<LoadingScene>(undefined);
 
   synchronizationErrorState = new BehaviorSubject<boolean>(false);
-  unsuccessfulActionSubject = new Subject<boolean>();
+  unsuccessfulActionSubject = new Subject<any>();
+  idleActionSubject = new Subject<any>();
 
   connected: boolean;
 
@@ -157,6 +159,7 @@ export class ArenaHubService {
   private  addBattleListeners() {
     this.hubConnection.on(DAILY_UPDATE, (info: DailyChanges) => { this.dailyUpdateNotifier.next(info); });
 
+    this.addNewListener(BATTLE_IDLE, () => this.idleActionSubject.next() );
     this.addNewListener(BATTLE_USUCCESSFUL_ACTION, () => this.unsuccessfulActionSubject.next() );
     this.addNewListener(BATTLE_SYNC_ERROR, () => this.synchronizationErrorState.next(true) );
     this.addNewListener(BATTLE_START_GAME, (synchronizer: Synchronizer) => {
