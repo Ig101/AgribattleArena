@@ -83,7 +83,10 @@ export class SignUpComponent implements OnInit {
         if (result.success) {
           this.userService.email = this.form.controls.email.value;
           this.userManagementService.startEmailTimer(60);
-          this.router.navigate(['auth/signup/confirmation']);
+          this.router.navigate(['auth/signin']);
+
+          // OPEN EMAIL
+          /* this.router.navigate(['auth/signup/confirmation']); */
         } else {
           this.form.controls.password.setValue('');
           this.form.controls.confirmPassword.setValue('');

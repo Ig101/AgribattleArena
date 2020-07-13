@@ -139,6 +139,7 @@ export class SettingsModalComponent implements OnInit, OnDestroy, IModal<any> {
           this.userService.unauthorized = true;
           this.userService.user = undefined;
           this.arenaHub.disconnect();
+          this.loading = false;
           this.close();
         });
       } else {

@@ -122,7 +122,9 @@ namespace ProjectArena.Domain
                     identityOptions.Password.RequireNonAlphanumeric = false;
                     identityOptions.Password.RequireDigit = true;
                     identityOptions.User.RequireUniqueEmail = true;
-                    identityOptions.SignIn.RequireConfirmedEmail = true;
+
+                    // OPEN EMAIL
+                    // identityOptions.SignIn.RequireConfirmedEmail = true;
                 }, mongoIdentityOptions =>
                 {
                     mongoIdentityOptions.ConnectionString = identityUrl;
