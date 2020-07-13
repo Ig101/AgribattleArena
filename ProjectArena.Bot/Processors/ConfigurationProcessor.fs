@@ -27,7 +27,7 @@ let private setupLogger level =
     LoggerFactory.Create(fun builder -> builder.AddSerilog(logger) |> ignore).CreateLogger<unit>()
 
 let setupConfiguration() =
-    let environment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
+    let environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
     let configuration =
         newConfigurationBuilder()
         |> setBasePath Environment.CurrentDirectory

@@ -15,7 +15,7 @@ let private isMoveAllowedByTile (scene: Scene) (actorX: int, actorY: int) (x: in
     let tempTile = scene.Tiles |> Seq.find (fun t -> t.X = actorX && t.Y = actorY)
     tile.TempActorId = None && not tile.Unbearable && Math.Abs(tile.Height - tempTile.Height) < 10.0f
 
-let private checkMilliness (scene: Scene) (actorX: int, actorY: int) (target: TileDto) =
+let private checkMilliness (scene: Scene) (actorX: int, actorY: int) (melee: bool) (target: TileDto) =
     let range = rangeBetween(actorX, actorY, target.X, target.Y);
     let mutable incrementingRange = 0.0;
     let mutable freeWay = true
@@ -35,7 +35,7 @@ let private checkMilliness (scene: Scene) (actorX: int, actorY: int) (target: Ti
                             scene.Tiles |> Seq.find (fun t -> t.X = nextX && t.Y = nextY)
         
         if nextTarget <> currentTile then
-            if nextTarget.Height - currentTile.Height >= 10.0f || (nextTarget <> target && nextTarget.TempActorId.IsSome) ||  nextTarget.Unbearable then
+            if nextTarget.Height - currentTile.Height >= 10.0f || (melee && currentTile.Height -  nextTarget.Height >= 10.0f) || (nextTarget <> target && nextTarget.TempActorId.IsSome) ||  nextTarget.Unbearable then
                 freeWay <- false
             currentTile <- nextTarget;
 
@@ -52,7 +52,7 @@ let private isSkillAllowedByTile (scene: Scene) (actor: ActorDto, player: Player
     let self = skill.AvailableTargets.Self && targetActor.IsSome && targetActor.Value.Id = actor.Id
     let bearable = skill.AvailableTargets.Bearable && tile.TempActorId.IsNone && not tile.Unbearable
     let unbearable = skill.AvailableTargets.Unbearable && tile.TempActorId.IsNone && tile.Unbearable
-    (allies || enemies || decorations || self || bearable || unbearable) && (not skill.OnlyVisibleTargets || checkMilliness scene (actorX, actorY) tile)
+    (allies || enemies || decorations || self || bearable || unbearable) && (not skill.OnlyVisibleTargets || checkMilliness scene (actorX, actorY) (skill.Range <= 1) tile)
 
 let isActionAllowedByPosition (actorX, actorY) (scene: Scene) (actor: ActorDto, player: PlayerDto) (action: SceneAction) =
     match action with

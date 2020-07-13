@@ -86,6 +86,7 @@ namespace ProjectArena.Engine.Objects.Immaterial
                 }
 
                 if (nextTarget.Height - currentTile.Height >= 10 ||
+                    (Range <= 1 && currentTile.Height - nextTarget.Height >= 10) ||
                     (nextTarget != target && nextTarget.TempObject != null) ||
                     nextTarget.Native.Unbearable)
                 {

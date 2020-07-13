@@ -1013,7 +1013,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         if (newAction.actorId === this.battleStorageService.currentActor.id &&
           this.battleStorageService.currentActor.canAct &&
           checkSkillTargets(tile, this.battleStorageService.currentActor, skill.availableTargets) &&
-          (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
+          (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, skill.range <= 1, this.battleStorageService.scene.tiles)) &&
           (tile.actor || tile.decoration) && tile.actor !== this.battleStorageService.currentActor) {
           this.arenaHub.orderAttack(this.battleStorageService.scene.id, newAction.actorId, newAction.x, newAction.y);
           this.battleAnimationsService
@@ -1172,7 +1172,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.specificActionResponseForWait) {
       if (action.action === BattleSynchronizationActionEnum.EndTurn) {
         if (this.specificActionResponseForWait.action !== BattleSynchronizationActionEnum.Move) {
-          const actor = this.battleStorageService.scene.actors.find(x => x.id = this.specificActionResponseForWait.actorId);
+          const actor = this.battleStorageService.scene.actors.find(x => x.id === this.specificActionResponseForWait.actorId);
           if (actor) {
             this.battleStorageService.floatingTexts.push({
               text: '*fail*',

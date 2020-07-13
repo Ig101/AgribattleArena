@@ -62,7 +62,7 @@ export class AsciiBattlePathCreatorService {
           rangeBetweenShift(sX, sY) <= skill.range) {
             const tile = this.battleStorageService.scene.tiles[newX][newY];
             if (checkSkillTargets(tile, actor, skill.availableTargets) &&
-              (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, this.battleStorageService.scene.tiles)) &&
+              (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, skill.range <= 1, this.battleStorageService.scene.tiles)) &&
               (!onlyTargets || tile.actor || tile.decoration) && tile.actor !== actor) {
               const existingSquare = allSquares.find(s => s.x === newX && s.y === newY);
               if (existingSquare && remainedSteps <= existingSquare.remainedSteps) {

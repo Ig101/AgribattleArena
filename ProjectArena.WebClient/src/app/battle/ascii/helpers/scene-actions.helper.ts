@@ -4,7 +4,7 @@ import { Skill } from '../models/scene/skill.model';
 import { Targets } from 'src/app/shared/models/battle/targets.model';
 import { Actor } from '../models/scene/actor.model';
 
-export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
+export function checkMilliness(initial: Tile, target: Tile, melee: boolean, tiles: Tile[][]) {
     const range = rangeBetween(initial.x, initial.y, target.x, target.y);
     let incrementingRange = 0;
     const angle = angleBetween(initial.x, initial.y, target.x, target.y);
@@ -28,6 +28,7 @@ export function checkMilliness(initial: Tile, target: Tile, tiles: Tile[][]) {
       }
 
       if (nextTarget.height - currentTile.height >= 10 ||
+        (melee && currentTile.height - nextTarget.height >= 10) ||
         (nextTarget !== target && (nextTarget.decoration || nextTarget.actor)) ||
         nextTarget.unbearable) {
         return false;
