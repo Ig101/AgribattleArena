@@ -14,9 +14,9 @@ namespace ProjectArena.Content.SkillNatives
                 "mistShot",
                 new[] { "damage", "target", "weapon", "physic", "magic", "pure", "ranged", "direct" },
                 8,
-                1,
+                2,
                 0,
-                10,
+                20,
                 new Targets()
                 {
                     NotAllies = true,

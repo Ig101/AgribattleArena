@@ -15,6 +15,8 @@ namespace ProjectArena.Engine
 {
     public class Scene : ISceneParentRef, ISceneForSceneGenerator, ForExternalUse.IScene
     {
+        public const float TimePenalty = 2;
+
         public delegate bool DefeatConditionMethod(ISceneParentRef scene, IPlayerParentRef player);
 
         public delegate bool WinConditionMethod(ISceneParentRef scene);
@@ -379,6 +381,7 @@ namespace ProjectArena.Engine
 
         public void EndTurn()
         {
+            lastActionTime = null;
             bool turnStarted;
             do
             {
@@ -434,7 +437,6 @@ namespace ProjectArena.Engine
             bool result = actor.Wait();
             if (result)
             {
-                lastActionTime = null;
                 EndTurn();
             }
 
@@ -632,7 +634,8 @@ namespace ProjectArena.Engine
                             }
 
                             bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.SceneAction.Move, actor, null, targetX, targetY);
-                            if (afterActionUpdateSynchronization && !actionAvailability)
+                            this.RemainedTurnTime -= TimePenalty;
+                            if (afterActionUpdateSynchronization && (!actionAvailability || this.RemainedTurnTime <= 0))
                             {
                                 EndTurn();
                             }

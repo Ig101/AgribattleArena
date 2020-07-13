@@ -1217,6 +1217,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           this.battleStorageService.currentActor?.owner?.userId === this.userService.user.id ?
           this.battlePathCreator.calculateActiveSquares(this.battleStorageService.currentActor) : [];
         break;
+      case BattleSynchronizationActionEnum.Move:
+        this.battleStorageService.turnTime -= this.battleStorageService.movePenalty;
     }
     if (action.sync.version > 1 && this.finishLoadingFlag) {
       this.finishLoadingSubscription = this.loadingService.finishLoading()
