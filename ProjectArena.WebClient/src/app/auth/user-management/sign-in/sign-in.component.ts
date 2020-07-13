@@ -79,10 +79,12 @@ export class SignInComponent implements OnInit {
             title: 'Loading...'
           }).subscribe(() => {
             this.userService.unauthorized = false;
+            this.userManagementService.loadingEnd();
             this.router.navigate(['lobby']);
           });
         } else if (result.statusCode === 403) {
           this.userService.email = this.form.controls.email.value;
+          this.userManagementService.loadingEnd();
           this.router.navigate(['auth/signup/confirmation']);
         } else {
           this.form.controls.password.setValue('');

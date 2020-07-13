@@ -67,12 +67,13 @@ export class NewPasswordComponent implements OnInit {
       this.webCommunicationService.post<ChangePasswordRequest, void>('api/auth/change-password', {
         userId: this.id,
         code: this.code,
-        password: this.form.controls.password.value 
+        password: this.form.controls.password.value
       })
       .subscribe(result => {
         if (result.success) {
           this.userService.user = undefined;
           this.userService.passwordWasChanged = true;
+          this.userManagementService.loadingEnd();
           this.router.navigate(['auth/signin']);
         } else {
           this.form.controls.password.setValue('');

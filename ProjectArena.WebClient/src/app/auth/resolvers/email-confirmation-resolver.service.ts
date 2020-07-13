@@ -27,6 +27,7 @@ export class EmailConfirmationResolverService implements Resolve<boolean> {
     .pipe(map(result => {
       if (result.success) {
         this.userService.emailWasConfirmed = true;
+        this.userManagementService.loadingEnd();
         this.router.navigate(['auth/signin']);
         return true;
       } else {
