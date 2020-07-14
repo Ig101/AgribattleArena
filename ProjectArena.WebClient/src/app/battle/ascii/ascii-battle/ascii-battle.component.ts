@@ -85,6 +85,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedTile: { x: number, y: number, duration: number, forced: boolean };
   selectedAlwaysTile: { x: number, y: number, id: number };
 
+  oneFrame = 63;
+  animationTicker = 0;
   movingTimer = 0;
   tickingFrequency = 2;
   tickState = 0;
@@ -116,8 +118,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   pressedKey: string;
 
   zoom = 0;
-
-  animationTicker = false;
 
   synchronizationErrorTimer;
 
@@ -641,7 +641,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private moveActorTo(x: number, y: number) {
     if (this.canAct && x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
-      this.movingTimer = 6;
+      this.movingTimer = 3 * this.oneFrame;
       const actor = this.battleStorageService.currentActor;
       const initialTile = this.battleStorageService.scene.tiles[actor.x][actor.y];
       const tile = this.battleStorageService.scene.tiles[x][y];
@@ -779,9 +779,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     cameraLeft: number,
     cameraTop: number) {
     const dim = 0.5;
-    const canvasX = (x - cameraLeft) * this.tileWidth;
-    const canvasY = (y - cameraTop) * this.tileHeight;
-    const symbolY = canvasY + this.tileHeight * 0.75;
+    const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
+    const canvasY = Math.round((y - cameraTop) * this.tileHeight);
+    const symbolY = Math.round(canvasY + this.tileHeight * 0.75);
     if (backgroundColor) {
       this.canvasContext.fillStyle = `rgb(${backgroundColor.r * dim}, ${backgroundColor.g * dim}, ${backgroundColor.b * dim})`;
       this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
@@ -793,9 +793,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   private drawPoint(scene: Scene, x: number, y: number, cameraLeft: number, cameraTop: number, drawChar: Visualization) {
     const tile = scene.tiles[x][y];
     if (tile) {
-      const canvasX = (x - cameraLeft) * this.tileWidth;
-      const canvasY = (y - cameraTop) * this.tileHeight;
-      const symbolY = canvasY + this.tileHeight * 0.75;
+      const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
+      const canvasY = Math.round((y - cameraTop) * this.tileHeight);
+      const symbolY = Math.round(canvasY + this.tileHeight * 0.75);
       if (tile.backgroundColor) {
         const color = heightImpact(tile.height, tile.backgroundColor);
         this.canvasContext.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
@@ -927,6 +927,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const mouseY = Math.floor(this.mouseState.y);
       const currentActionSquare = this.canAct ? this.battleStorageService.availableActionSquares
         ?.find(s => s.x === mouseX && s.y === mouseY && s.type) : undefined;
+      const time = performance.now();
       for (let x = -40; x <= 80; x++) {
         for (let y = -20; y <= 60; y++) {
           if (x >= left && y >= top && x <= right && y <= bottom) {
@@ -961,6 +962,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         }
       }
+      console.log(performance.now() - time);
       if (this.battleStorageService.availableActionSquares?.length > 0) {
         const path = this.generateActionSquareGrid(cameraLeft, cameraTop);
         this.canvasContext.strokeStyle = this.battleStorageService.currentActionId ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 255, 0, 0.8)';
@@ -1296,10 +1298,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.battleStorageService.idle) {
         this.battleStorageService.turnTime -= shift / 1000 * this.battleStorageService.movePenalty;
       }
-      if (this.animationTicker && this.battleAnimationsService.processNextAnimationFromQueue()) {
-        this.changed = true;
+      this.animationTicker += shift;
+      if (this.animationTicker > this.oneFrame) {
+        this.animationTicker = 0;
+        this.changed = this.changed || this.battleAnimationsService.processNextAnimationFromQueue();
       }
-      this.animationTicker = !this.animationTicker;
       this.tick(shift);
       if (this.movingTimer <= 0) {
         for (const action of this.moveButtons) {
@@ -1309,7 +1312,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         }
       } else {
-        this.movingTimer -= 1;
+        this.movingTimer -= shift;
       }
       for (let i = 0; i < this.battleStorageService.floatingTexts.length; i++) {
         const floatingText = this.battleStorageService.floatingTexts[i];
@@ -1329,6 +1332,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private updateCycle(context: AsciiBattleComponent) {
+    console.log('new frame');
     context.updateScene();
     context.redrawScene();
   }
