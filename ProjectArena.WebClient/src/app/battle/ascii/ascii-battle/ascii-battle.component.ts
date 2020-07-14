@@ -962,7 +962,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         }
       }
-      console.log(performance.now() - time);
       if (this.battleStorageService.availableActionSquares?.length > 0) {
         const path = this.generateActionSquareGrid(cameraLeft, cameraTop);
         this.canvasContext.strokeStyle = this.battleStorageService.currentActionId ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 255, 0, 0.8)';
@@ -1332,7 +1331,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private updateCycle(context: AsciiBattleComponent) {
-    console.log('new frame');
     context.updateScene();
     context.redrawScene();
   }
