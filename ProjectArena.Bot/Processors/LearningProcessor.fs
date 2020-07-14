@@ -28,7 +28,7 @@ let private refillTableWithNewModels (configuration:Configuration) (models: Neur
     context.NeuralModelDefinitions.Update((fun _ -> true), Builders<NeuralModelDefinition>.Update.Set((fun x -> x.Key), true))
     context.ApplyChangesAsync() |> Async.AwaitTask
 
-let startLearning (configuration:Configuration) =
+let private startLearning (configuration:Configuration) =
     async {
         while not configuration.WorkerCancellationToken.IsCancellationRequested do
             configuration.Logger.LogInformation "Learning cycle started."
@@ -42,3 +42,8 @@ let startLearning (configuration:Configuration) =
         configuration.Logger.LogError "Learning aborted due to unexpected error."
     } |> Async.Start
     configuration
+
+let tryStartLearning (configuration:Configuration) =
+    match configuration.Learning.IsLearning with
+    | true -> startLearning configuration
+    | false -> configuration

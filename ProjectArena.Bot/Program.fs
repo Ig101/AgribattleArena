@@ -14,7 +14,7 @@ let main argv =
     |> setupAuthorization
     |> setupGameConnection
     |> startExtraProcessing
-    |> startLearning
+    |> tryStartLearning
     |> ignore
     Thread.Sleep(Timeout.Infinite)
     0
