@@ -50,11 +50,10 @@ namespace ProjectArena.Application.Users.Commands.SignUp
                     }));
                 }
 
-                // OPEN EMAIL
-                /* await _mediator.Send(new SendEmailVerificationCommand()
+                await _mediator.Send(new SendEmailVerificationCommand()
                 {
                     User = user
-                }); */
+                });
                 return Unit.Value;
             }
         }

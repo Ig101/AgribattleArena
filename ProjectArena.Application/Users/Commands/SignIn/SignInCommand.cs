@@ -35,13 +35,10 @@ namespace ProjectArena.Application.Users.Commands.SignIn
           throw new UnauthorizedException("Wrong email or password.");
         }
 
-        // OPEN EMAIL
-        /*
         if (!user.EmailConfirmed)
         {
           throw new ForbiddenException("Email is not confirmed");
         }
-        */
 
         var result = await _signInManager.PasswordSignInAsync(user, request.Password, true, false);
         if (!result.Succeeded)
