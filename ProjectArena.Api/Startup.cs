@@ -34,7 +34,6 @@ namespace ProjectArena.Api
             {
                 if (IsFrontendRoute(context))
                 {
-                    context.Request.IsHttps = true;
                     context.Request.Path = new PathString("/index.html");
                 }
 
