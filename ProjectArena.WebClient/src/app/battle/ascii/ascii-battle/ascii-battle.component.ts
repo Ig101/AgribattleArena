@@ -47,6 +47,7 @@ import { SceneObjectModalComponent } from '../modals/scene-object-modal/scene-ob
 import { isObject } from 'util';
 import { ModalObject } from '../models/modals/modal-object.model';
 import { MenuModalComponent } from '../modals/menu-modal/menu-modal.component';
+import { CharsService } from 'src/app/shared/services/chars.service';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -56,7 +57,9 @@ import { MenuModalComponent } from '../modals/menu-modal/menu-modal.component';
 export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('battleCanvas', { static: true }) battleCanvas: ElementRef<HTMLCanvasElement>;
-  private canvasContext: CanvasRenderingContext2D;
+  private canvas2DContext: CanvasRenderingContext2D;
+  private canvasWebGLContext: WebGLRenderingContext;
+  private charsTexture: WebGLTexture;
 
   finishLoadingFlag = false;
 
@@ -215,6 +218,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     private battleAnimationsService: AsciiBattleAnimationsService,
     private loadingService: LoadingService,
     private modalService: ModalService,
+    private charsService: CharsService
   ) {
     this.mouseState.buttonsInfo[0] = {
       pressed: false,
@@ -343,7 +347,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.tileWidthInternal = this.tileHeightInternal * 0.6;
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
-    this.canvasContext = this.battleCanvas.nativeElement.getContext('2d');
+    this.canvas2DContext = this.battleCanvas.nativeElement.getContext('2d');
+    this.canvasWebGLContext = this.battleCanvas.nativeElement.getContext('webgl');
+    this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
     this.battleStorageService.version = 0;
     const loadBattle = this.activatedRoute.snapshot.data.battle;
     this.drawingTimer = setInterval(this.updateCycle, 1000 / this.updatingFrequency, this);
@@ -778,28 +784,42 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     x: number, y: number,
     cameraLeft: number,
     cameraTop: number) {
+
     const dim = 0.5;
     const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
     const canvasY = Math.round((y - cameraTop) * this.tileHeight);
     const symbolY = Math.round(canvasY + this.tileHeight * 0.75);
     if (backgroundColor) {
-      this.canvasContext.fillStyle = `rgb(${backgroundColor.r * dim}, ${backgroundColor.g * dim}, ${backgroundColor.b * dim})`;
-      this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
+    //  this.canvas2DContext.fillStyle = `rgb(${backgroundColor.r * dim}, ${backgroundColor.g * dim}, ${backgroundColor.b * dim})`;
+    //  this.canvas2DContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
     }
-    this.canvasContext.fillStyle = `rgba(${color.r * dim}, ${color.g * dim}, ${color.b * dim}, ${color.a})`;
-    this.canvasContext.fillText(char, canvasX, symbolY);
+ //   this.canvas2DContext.fillStyle = `rgba(${color.r * dim}, ${color.g * dim}, ${color.b * dim}, ${color.a})`;
+ //   this.canvas2DContext.fillText(char, canvasX, symbolY);
   }
 
-  private drawPoint(scene: Scene, x: number, y: number, cameraLeft: number, cameraTop: number, drawChar: Visualization) {
+  private drawPoint(
+    scene: Scene,
+    x: number,
+    y: number,
+    texturePositionX: number,
+    texturePositionY: number,
+    textureWidth: number,
+    textureHeight: number,
+    drawChar: Visualization,
+
+    greenPath: Path2D,
+    yellowPath: Path2D,
+    redPath: Path2D) {
+
     const tile = scene.tiles[x][y];
     if (tile) {
-      const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
-      const canvasY = Math.round((y - cameraTop) * this.tileHeight);
+      const canvasX = Math.round(texturePositionX * this.tileWidth);
+      const canvasY = Math.round(texturePositionY * this.tileHeight);
       const symbolY = Math.round(canvasY + this.tileHeight * 0.75);
       if (tile.backgroundColor) {
         const color = heightImpact(tile.height, tile.backgroundColor);
-        this.canvasContext.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-        this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
+   //     this.canvas2DContext.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+   //     this.canvas2DContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
       }
       const selectedAlways = (this.selectedAlwaysTile && this.selectedAlwaysTile.x === x && this.selectedAlwaysTile.y === y);
       const selected = selectedAlways ||
@@ -807,8 +827,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const replacement = this.battleStorageService.currentAnimations ? this.battleStorageService.currentAnimations[x][y] : undefined;
       if (drawChar) {
         const color = brightImpact(tile.bright, drawChar.color);
-        this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-        this.canvasContext.fillText(drawChar.char, canvasX, symbolY);
+  //      this.canvas2DContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+  //      this.canvas2DContext.fillText(drawChar.char, canvasX, symbolY);
       } else
       if ((tile.actor || tile.decoration) &&
         ((tile.specEffects.length === 0 && !selected) || Math.floor(this.tickState) % 2 === 1) &&
@@ -823,13 +843,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             {r: 255, g: 255, b: 0, a: tile.actor.visualization.color.a} :
             tile.actor.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.actor.z) : color);
-          this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-          this.canvasContext.fillText(replacement?.char ? replacement.char : tile.actor.visualization.char, canvasX, symbolY);
+     //     this.canvas2DContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+     //     this.canvas2DContext.fillText(replacement?.char ? replacement.char : tile.actor.visualization.char, canvasX, symbolY);
         } else if (tile.decoration) {
           let color = heightImpact(tile.decoration.z, tile.decoration.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.decoration.z) : color);
-          this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-          this.canvasContext.fillText(replacement?.char ? replacement.char : tile.decoration.visualization.char, canvasX, symbolY);
+   //       this.canvas2DContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+   //       this.canvas2DContext.fillText(replacement?.char ? replacement.char : tile.decoration.visualization.char, canvasX, symbolY);
         }
       } else if (tile.specEffects.length > 0 &&
         (!selected ||
@@ -842,47 +862,41 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         color =  brightImpact(tile.bright, replacement?.workingOnSpecEffects ?
           this.mixColorWithReplacement(color, replacement, effectForDraw.z) :
           color);
-        this.canvasContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-        this.canvasContext.fillText( replacement?.workingOnSpecEffects ?
-          replacement.char :
-          effectForDraw.visualization.char, canvasX, symbolY);
+   //     this.canvas2DContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+   //     this.canvas2DContext.fillText( replacement?.workingOnSpecEffects ?
+   //       replacement.char :
+   //       effectForDraw.visualization.char, canvasX, symbolY);
       } else {
         const color =  replacement?.workingOnSpecEffects && replacement?.char ?
           brightImpact(tile.bright, replacement.color) :
           heightImpact(tile.height, tile.visualization.color);
-        this.canvasContext.fillStyle = `rgba(${color.r}, ${color.g},
-          ${color.b}, ${color.a})`;
-        this.canvasContext.fillText(replacement?.char ? replacement.char : tile.visualization.char, canvasX, symbolY);
+   //     this.canvas2DContext.fillStyle = `rgba(${color.r}, ${color.g},
+   //       ${color.b}, ${color.a})`;
+  //      this.canvas2DContext.fillText(replacement?.char ? replacement.char : tile.visualization.char, canvasX, symbolY);
       }
       if ((tile.actor || tile.decoration) && !(replacement?.overflowHealth)) {
         const healthObject = tile.actor || tile.decoration;
         if (healthObject.maxHealth) {
           const percentOfHealth = Math.max(0, Math.min(healthObject.health / healthObject.maxHealth, 1));
-          let color: Color;
+          let path: Path2D;
           if (percentOfHealth > 0.65) {
-            color = {r: 0, g: 255, b: 0};
+            path = greenPath;
           } else if (percentOfHealth > 0.25) {
-            color = {r: 255, g: 255, b: 0};
+            path = yellowPath;
           } else {
-            color = {r: 255, g: 0, b: 0};
+            path = redPath;
           }
-          color = brightImpact(tile.bright, color);
           const zoomMultiplier = Math.floor(this.battleZoom);
-          this.canvasContext.lineWidth = zoomMultiplier * 2;
-          this.canvasContext.strokeStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-          const path = new Path2D();
           path.moveTo(canvasX + 1 + zoomMultiplier, canvasY + 1 + zoomMultiplier);
           path.lineTo(
             canvasX + percentOfHealth * (this.tileWidth - 2 * 1 - zoomMultiplier) + 1 + zoomMultiplier,
             canvasY + 1 + zoomMultiplier);
-          this.canvasContext.stroke(path);
         }
       }
     }
   }
 
-  private generateActionSquareGrid(cameraLeft: number, cameraTop: number): Path2D {
-    const path = new Path2D();
+  private generateActionSquareGrid(path: Path2D, cameraLeft: number, cameraTop: number): Path2D {
     for (const square of this.battleStorageService.availableActionSquares) {
       const canvasX = (square.x - cameraLeft) * this.tileWidth;
       const canvasY = (square.y - cameraTop) * this.tileHeight;
@@ -916,9 +930,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const sceneRandom = new Random(this.battleStorageService.scene.hash);
       const cameraLeft = this.battleStorageService.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight;
-      this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      this.canvasContext.font = `${this.tileHeight}px PT Mono`;
-      this.canvasContext.textAlign = 'left';
       const left = Math.floor(cameraLeft) - 1;
       const right = Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)) + 1;
       const top = Math.floor(cameraTop) - 1;
@@ -928,6 +939,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const currentActionSquare = this.canAct ? this.battleStorageService.availableActionSquares
         ?.find(s => s.x === mouseX && s.y === mouseY && s.type) : undefined;
       const time = performance.now();
+      const redPath = new Path2D();
+      const yellowPath = new Path2D();
+      const greenPath = new Path2D();
+      const width = right - left + 1;
+      const height = bottom - top + 1;
       for (let x = -40; x <= 80; x++) {
         for (let y = -20; y <= 60; y++) {
           if (x >= left && y >= top && x <= right && y <= bottom) {
@@ -952,7 +968,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
                 };
               }
               sceneRandom.next();
-              this.drawPoint(scene, x, y, cameraLeft, cameraTop, drawChar);
+              this.drawPoint(scene, x, y, cameraLeft, cameraTop, width, height, drawChar, greenPath, yellowPath, redPath);
             } else {
               const biom = getRandomBiom(sceneRandom, this.battleStorageService.scene.biom);
               this.drawDummyPoint(biom.char, biom.color, biom.backgroundColor, x, y, cameraLeft, cameraTop);
@@ -962,24 +978,32 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         }
       }
+      console.log(performance.now() - time);
       if (this.battleStorageService.availableActionSquares?.length > 0) {
-        const path = this.generateActionSquareGrid(cameraLeft, cameraTop);
-        this.canvasContext.strokeStyle = this.battleStorageService.currentActionId ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 255, 0, 0.8)';
-        this.canvasContext.lineWidth = 2;
-        this.canvasContext.stroke(path);
+        this.generateActionSquareGrid(this.battleStorageService.currentActionId ? redPath : yellowPath, cameraLeft, cameraTop);
       }
+      this.canvas2DContext.lineWidth = 2;
+      this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1)';
+      this.canvas2DContext.stroke(redPath);
+      this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1)';
+      this.canvas2DContext.stroke(yellowPath);
+      this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1)';
+      this.canvas2DContext.stroke(greenPath);
+
+      // TODO Optimize (dont know how yet)
+      this.canvas2DContext.strokeStyle = `rgb(0, 8, 24)`;
+      this.canvas2DContext.lineWidth = 1;
       for (const text of this.battleStorageService.floatingTexts) {
         if (text.time >= 0) {
           const x = (text.x + 0.5 - cameraLeft) * this.tileWidth;
           const y = (text.y - cameraTop) * this.tileHeight - text.height;
-          this.canvasContext.font = `${26}px PT Mono`;
-          this.canvasContext.textAlign = 'center';
-          this.canvasContext.fillStyle = `rgba(${text.color.r}, ${text.color.g},
-            ${text.color.b}, ${text.color.a})`;
-          this.canvasContext.fillText(text.text, x, y);
-          this.canvasContext.lineWidth = 1;
-          this.canvasContext.strokeStyle = `rgba(0, 8, 24, ${text.color.a})`;
-          this.canvasContext.strokeText(text.text, x, y);
+          this.canvas2DContext.font = `${26}px PT Mono`;
+          this.canvas2DContext.textAlign = 'center';
+          this.canvas2DContext.globalAlpha = text.color.a;
+          this.canvas2DContext.fillStyle = `rgb(${text.color.r}, ${text.color.g},
+            ${text.color.b})`;
+          this.canvas2DContext.fillText(text.text, x, y);
+          this.canvas2DContext.strokeText(text.text, x, y);
         }
       }
     }
@@ -1331,6 +1355,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private updateCycle(context: AsciiBattleComponent) {
+    console.log('new frame');
     context.updateScene();
     context.redrawScene();
   }
