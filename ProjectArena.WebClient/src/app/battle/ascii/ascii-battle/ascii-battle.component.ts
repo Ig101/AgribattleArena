@@ -984,6 +984,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       console.log(performance.now() - time);
       time = performance.now();
+      const leftCameraBorder = Math.round((left - cameraLeft) * this.tileWidth);
+      const topCameraBorder = Math.round((top - cameraTop) * this.tileHeight);
       // TODO WebGLProcessing
       console.log(performance.now() - time);
       time = performance.now();
