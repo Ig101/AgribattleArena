@@ -12,6 +12,10 @@ export class CharsService {
   readonly spriteHeight = 30;
   readonly spriteWidth = 18;
 
+  get width() {
+    return this.charsSubCanvas.width;
+  }
+
   constructor() {
     this.charsSubCanvas = document.createElement('canvas');
     this.charsSubCanvas.height = this.spriteHeight;

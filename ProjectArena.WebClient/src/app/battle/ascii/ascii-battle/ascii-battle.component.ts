@@ -48,6 +48,7 @@ import { isObject } from 'util';
 import { ModalObject } from '../models/modals/modal-object.model';
 import { MenuModalComponent } from '../modals/menu-modal/menu-modal.component';
 import { CharsService } from 'src/app/shared/services/chars.service';
+import { fillChar, fillBackground, fillColor, fillVertexPosition } from 'src/app/helpers/webgl.helper';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -781,45 +782,44 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     char: string,
     color: Color,
     backgroundColor: Color,
-    x: number, y: number,
-    cameraLeft: number,
-    cameraTop: number) {
+    texturePosition: number,
+
+    colors: number[],
+    backgrounds: number[],
+    textureMapping: number[]) {
 
     const dim = 0.5;
-    const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
-    const canvasY = Math.round((y - cameraTop) * this.tileHeight);
-    const symbolY = Math.round(canvasY + this.tileHeight * 0.75);
     if (backgroundColor) {
-    //  this.canvas2DContext.fillStyle = `rgb(${backgroundColor.r * dim}, ${backgroundColor.g * dim}, ${backgroundColor.b * dim})`;
-    //  this.canvas2DContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
+      fillBackground(backgrounds, backgroundColor.r * dim, backgroundColor.g * dim, backgroundColor.b * dim, texturePosition);
     }
- //   this.canvas2DContext.fillStyle = `rgba(${color.r * dim}, ${color.g * dim}, ${color.b * dim}, ${color.a})`;
- //   this.canvas2DContext.fillText(char, canvasX, symbolY);
+    fillColor(colors, color.r * dim, color.g * dim, color.b * dim, color.a, texturePosition);
+    fillChar(textureMapping, char, texturePosition);
   }
 
   private drawPoint(
     scene: Scene,
     x: number,
     y: number,
-    texturePositionX: number,
-    texturePositionY: number,
-    textureWidth: number,
-    textureHeight: number,
+    texturePosition: number,
     drawChar: Visualization,
+
+    cameraLeft: number,
+    cameraTop: number,
 
     greenPath: Path2D,
     yellowPath: Path2D,
-    redPath: Path2D) {
+    redPath: Path2D,
+    colors: number[],
+    backgrounds: number[],
+    textureMapping: number[]) {
 
     const tile = scene.tiles[x][y];
     if (tile) {
-      const canvasX = Math.round(texturePositionX * this.tileWidth);
-      const canvasY = Math.round(texturePositionY * this.tileHeight);
-      const symbolY = Math.round(canvasY + this.tileHeight * 0.75);
+      const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
+      const canvasY = Math.round((y - cameraTop) * this.tileHeight);
       if (tile.backgroundColor) {
         const color = heightImpact(tile.height, tile.backgroundColor);
-   //     this.canvas2DContext.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-   //     this.canvas2DContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
+        fillBackground(backgrounds, color.r, color.g, color.b, texturePosition);
       }
       const selectedAlways = (this.selectedAlwaysTile && this.selectedAlwaysTile.x === x && this.selectedAlwaysTile.y === y);
       const selected = selectedAlways ||
@@ -827,10 +827,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const replacement = this.battleStorageService.currentAnimations ? this.battleStorageService.currentAnimations[x][y] : undefined;
       if (drawChar) {
         const color = brightImpact(tile.bright, drawChar.color);
-  //      this.canvas2DContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-  //      this.canvas2DContext.fillText(drawChar.char, canvasX, symbolY);
-      } else
-      if ((tile.actor || tile.decoration) &&
+        fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+        fillChar(textureMapping, drawChar.char, texturePosition);
+      } else if ((tile.actor || tile.decoration) &&
         ((tile.specEffects.length === 0 && !selected) || Math.floor(this.tickState) % 2 === 1) &&
         (!selectedAlways ||
           tile.actor?.id === this.selectedAlwaysTile.id ||
@@ -843,13 +842,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             {r: 255, g: 255, b: 0, a: tile.actor.visualization.color.a} :
             tile.actor.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.actor.z) : color);
-     //     this.canvas2DContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-     //     this.canvas2DContext.fillText(replacement?.char ? replacement.char : tile.actor.visualization.char, canvasX, symbolY);
+          fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+          fillChar(textureMapping, replacement?.char ? replacement.char : tile.actor.visualization.char, texturePosition);
         } else if (tile.decoration) {
           let color = heightImpact(tile.decoration.z, tile.decoration.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.decoration.z) : color);
-   //       this.canvas2DContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-   //       this.canvas2DContext.fillText(replacement?.char ? replacement.char : tile.decoration.visualization.char, canvasX, symbolY);
+          fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+          fillChar(textureMapping, replacement?.char ? replacement.char : tile.decoration.visualization.char, texturePosition);
         }
       } else if (tile.specEffects.length > 0 &&
         (!selected ||
@@ -862,17 +861,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         color =  brightImpact(tile.bright, replacement?.workingOnSpecEffects ?
           this.mixColorWithReplacement(color, replacement, effectForDraw.z) :
           color);
-   //     this.canvas2DContext.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-   //     this.canvas2DContext.fillText( replacement?.workingOnSpecEffects ?
-   //       replacement.char :
-   //       effectForDraw.visualization.char, canvasX, symbolY);
+        fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+        fillChar(textureMapping, replacement?.workingOnSpecEffects ? replacement.char : effectForDraw.visualization.char, texturePosition);
       } else {
         const color =  replacement?.workingOnSpecEffects && replacement?.char ?
           brightImpact(tile.bright, replacement.color) :
           heightImpact(tile.height, tile.visualization.color);
-   //     this.canvas2DContext.fillStyle = `rgba(${color.r}, ${color.g},
-   //       ${color.b}, ${color.a})`;
-  //      this.canvas2DContext.fillText(replacement?.char ? replacement.char : tile.visualization.char, canvasX, symbolY);
+        fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+        fillChar(textureMapping, replacement?.char ? replacement.char : tile.visualization.char, texturePosition);
       }
       if ((tile.actor || tile.decoration) && !(replacement?.overflowHealth)) {
         const healthObject = tile.actor || tile.decoration;
@@ -938,15 +934,21 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const mouseY = Math.floor(this.mouseState.y);
       const currentActionSquare = this.canAct ? this.battleStorageService.availableActionSquares
         ?.find(s => s.x === mouseX && s.y === mouseY && s.type) : undefined;
-      const time = performance.now();
+      let time = performance.now();
       const redPath = new Path2D();
       const yellowPath = new Path2D();
       const greenPath = new Path2D();
       const width = right - left + 1;
       const height = bottom - top + 1;
-      for (let x = -40; x <= 80; x++) {
-        for (let y = -20; y <= 60; y++) {
+      const colors: number[] = new Array<number>(width * height * 4);
+      const backgrounds: number[] = new Array<number>(width * height * 4);
+      const textureMapping: number[] = new Array<number>(width * height * 12);
+      const mainTextureVertexes: number[] = new Array<number>(width * height * 12);
+      let texturePosition = 0;
+      for (let y = -20; y <= 60; y++) {
+        for (let x = -40; x <= 80; x++) {
           if (x >= left && y >= top && x <= right && y <= bottom) {
+            fillVertexPosition(mainTextureVertexes, x, y, cameraLeft, cameraTop, this.tileWidth, this.tileHeight, texturePosition);
             if (x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
               let drawChar;
               if (currentActionSquare?.x === x && currentActionSquare?.y === y) {
@@ -968,17 +970,23 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
                 };
               }
               sceneRandom.next();
-              this.drawPoint(scene, x, y, cameraLeft, cameraTop, width, height, drawChar, greenPath, yellowPath, redPath);
+              this.drawPoint(scene, x, y, texturePosition, drawChar, cameraLeft, cameraTop,
+                greenPath, yellowPath, redPath, colors, backgrounds, textureMapping);
             } else {
               const biom = getRandomBiom(sceneRandom, this.battleStorageService.scene.biom);
-              this.drawDummyPoint(biom.char, biom.color, biom.backgroundColor, x, y, cameraLeft, cameraTop);
+              this.drawDummyPoint(biom.char, biom.color, biom.backgroundColor, texturePosition, colors, backgrounds, textureMapping);
             }
+            texturePosition++;
           } else {
             sceneRandom.next();
           }
         }
       }
       console.log(performance.now() - time);
+      time = performance.now();
+      // TODO WebGLProcessing
+      console.log(performance.now() - time);
+      time = performance.now();
       if (this.battleStorageService.availableActionSquares?.length > 0) {
         this.generateActionSquareGrid(this.battleStorageService.currentActionId ? redPath : yellowPath, cameraLeft, cameraTop);
       }
@@ -1006,6 +1014,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           this.canvas2DContext.strokeText(text.text, x, y);
         }
       }
+      console.log(performance.now() - time);
     }
   }
 
