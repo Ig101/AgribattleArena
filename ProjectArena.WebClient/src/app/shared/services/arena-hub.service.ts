@@ -130,7 +130,9 @@ export class ArenaHubService {
     if (this.battleSynchronizationActionsList.length === 0) {
       return undefined;
     }
-    while (this.battleSynchronizationActionsList[0].sync.version <= currentVersion) {
+    while ((!this.battleSynchronizationActionsList[0] && this.battleSynchronizationActionsList.length > 0) ||
+      this.battleSynchronizationActionsList[0].sync.version <= currentVersion) {
+
       this.battleSynchronizationActionsList.shift();
     }
     if (this.battleSynchronizationActionsList.length === 0 ||

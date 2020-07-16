@@ -25,7 +25,7 @@ export function strikeSyncDeclaration(targetX: number, targetY: number) {
   frames.push({
     updateSynchronizer: true,
     animationTiles: [{x: targetX, y: targetY, char: undefined, color: {r: 255, g: 255, b: 255, a: 1}, unitAlpha: true,
-      unitColorMultiplier: 1, priority: 10, ignoreHeight: true, overflowHealth: false, workingOnSpecEffects: false}],
+      unitColorMultiplier: 0, priority: 10, ignoreHeight: true, overflowHealth: false, workingOnSpecEffects: false}],
     specificAction: undefined
   });
   return frames;

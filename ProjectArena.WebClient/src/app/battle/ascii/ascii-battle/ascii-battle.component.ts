@@ -953,7 +953,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const mouseY = Math.floor(this.mouseState.y);
       const currentActionSquare = this.canAct ? this.battleStorageService.availableActionSquares
         ?.find(s => s.x === mouseX && s.y === mouseY && s.type) : undefined;
-      let time = performance.now();
       const redPath = new Path2D();
       const yellowPath = new Path2D();
       const greenPath = new Path2D();
@@ -1364,7 +1363,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.animationTicker += shift;
       if (this.animationTicker > this.oneFrame) {
         this.animationTicker = 0;
-        this.changed = this.changed || this.battleAnimationsService.processNextAnimationFromQueue();
+        if (this.battleAnimationsService.processNextAnimationFromQueue()) {
+          this.changed = true;
+        }
       }
       this.tick(shift);
       if (this.movingTimer <= 0) {
