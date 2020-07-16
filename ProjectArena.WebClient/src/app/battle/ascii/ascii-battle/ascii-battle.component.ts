@@ -59,6 +59,7 @@ import { AssetsLoadingService } from 'src/app/shared/services/assets-loading.ser
 export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChild('battleCanvas', { static: true }) battleCanvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild('hudCanvas', { static: true }) hudCanvas: ElementRef<HTMLCanvasElement>;
   private canvas2DContext: CanvasRenderingContext2D;
   private canvasWebGLContext: WebGLRenderingContext;
   private charsTexture: WebGLTexture;
@@ -352,9 +353,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     this.tileWidthInternal = this.tileHeightInternal * 0.6;
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
     this.canvasWebGLContext = this.battleCanvas.nativeElement.getContext('webgl');
+    this.canvas2DContext = this.hudCanvas.nativeElement.getContext('2d');
     this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
     this.battleStorageService.version = 0;
     const loadBattle = this.activatedRoute.snapshot.data.battle;
+    this.canvas2DContext.font = `${26}px PT Mono`;
+    this.canvas2DContext.textAlign = 'center';
     this.drawingTimer = setInterval(this.updateCycle, 1000 / this.updatingFrequency, this);
     if (loadBattle) {
       const snapshot = this.battleResolver.popBattleSnapshot();
@@ -401,6 +405,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.battleCanvas.nativeElement.width = oldHeight * newAspectRatio;
       this.battleCanvas.nativeElement.height = oldHeight;
     }
+    this.hudCanvas.nativeElement.width = this.battleCanvas.nativeElement.width;
+    this.hudCanvas.nativeElement.height = this.battleCanvas.nativeElement.height;
     this.zoom = this.battleCanvas.nativeElement.offsetWidth / this.canvasWidth;
     this.changed = true;
     this.redrawScene();
@@ -944,7 +950,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (scene) {
       const sceneRandom = new Random(this.battleStorageService.scene.hash);
       const cameraLeft = this.battleStorageService.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
-      const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight - 1;
+      const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight;
       const left = Math.floor(cameraLeft) - 1;
       const right = Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)) + 1;
       const top = Math.floor(cameraTop) - 1;
@@ -1010,7 +1016,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         textureMapping,
         this.charsTexture,
         Math.round((left - cameraLeft) * this.tileWidth),
-        Math.round((top - cameraTop) * this.tileHeight),
+        Math.round((top - cameraTop - 1) * this.tileHeight),
         (right - left + 1) * this.tileWidth,
         (bottom - top + 1) * this.tileHeight,
         (right - left + 1),
@@ -1021,28 +1027,28 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       if (this.battleStorageService.availableActionSquares?.length > 0) {
         this.generateActionSquareGrid(this.battleStorageService.currentActionId ? redPath : yellowPath, cameraLeft, cameraTop);
       }
-      /*this.canvas2DContext.lineWidth = 2;
+      this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      this.canvas2DContext.globalAlpha = 1.0;
+      this.canvas2DContext.lineWidth = 2;
       this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1)';
       this.canvas2DContext.stroke(redPath);
       this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1)';
       this.canvas2DContext.stroke(yellowPath);
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1)';
-      this.canvas2DContext.stroke(greenPath);*/
+      this.canvas2DContext.stroke(greenPath);
 
       // TODO Optimize (dont know how yet)
-      //this.canvas2DContext.strokeStyle = `rgb(0, 8, 24)`;
-      //this.canvas2DContext.lineWidth = 1;
+      this.canvas2DContext.strokeStyle = `rgb(0, 8, 24)`;
+      this.canvas2DContext.lineWidth = 1;
       for (const text of this.battleStorageService.floatingTexts) {
         if (text.time >= 0) {
           const x = (text.x + 0.5 - cameraLeft) * this.tileWidth;
           const y = (text.y - cameraTop) * this.tileHeight - text.height;
-         /* this.canvas2DContext.font = `${26}px PT Mono`;
-          this.canvas2DContext.textAlign = 'center';
           this.canvas2DContext.globalAlpha = text.color.a;
           this.canvas2DContext.fillStyle = `rgb(${text.color.r}, ${text.color.g},
             ${text.color.b})`;
           this.canvas2DContext.fillText(text.text, x, y);
-          this.canvas2DContext.strokeText(text.text, x, y);*/
+          this.canvas2DContext.strokeText(text.text, x, y);
         }
       }
     }

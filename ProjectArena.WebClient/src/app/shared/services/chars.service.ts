@@ -9,8 +9,8 @@ export class CharsService {
   private context: CanvasRenderingContext2D;
   private chars: { [id: string]: { x: number, y: number } };
 
-  readonly spriteHeight = 120;
-  readonly spriteWidth = 72;
+  readonly spriteHeight = 60;
+  readonly spriteWidth = 36;
 
   get width() {
     return this.charsSubCanvas.width;

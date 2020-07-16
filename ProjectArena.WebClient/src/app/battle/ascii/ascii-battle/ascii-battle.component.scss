@@ -12,6 +12,12 @@
       height: 100%;
       background-color: #000818;
     }
+    .hud {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      background-color: transparent;
+    }
   }
   .interface {
     position: fixed;
