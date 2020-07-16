@@ -48,7 +48,8 @@ import { isObject } from 'util';
 import { ModalObject } from '../models/modals/modal-object.model';
 import { MenuModalComponent } from '../modals/menu-modal/menu-modal.component';
 import { CharsService } from 'src/app/shared/services/chars.service';
-import { fillChar, fillBackground, fillColor, fillVertexPosition } from 'src/app/helpers/webgl.helper';
+import { fillChar, fillBackground, fillColor, fillVertexPosition, drawArrays } from 'src/app/helpers/webgl.helper';
+import { AssetsLoadingService } from 'src/app/shared/services/assets-loading.service';
 
 @Component({
   selector: 'app-ascii-battle',
@@ -61,6 +62,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   private canvas2DContext: CanvasRenderingContext2D;
   private canvasWebGLContext: WebGLRenderingContext;
   private charsTexture: WebGLTexture;
+  private shadersProgram: WebGLProgram;
 
   finishLoadingFlag = false;
 
@@ -219,7 +221,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     private battleAnimationsService: AsciiBattleAnimationsService,
     private loadingService: LoadingService,
     private modalService: ModalService,
-    private charsService: CharsService
+    private charsService: CharsService,
+    private assetsLoadingService: AssetsLoadingService
   ) {
     this.mouseState.buttonsInfo[0] = {
       pressed: false,
@@ -348,7 +351,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.tileWidthInternal = this.tileHeightInternal * 0.6;
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
-    this.canvas2DContext = this.battleCanvas.nativeElement.getContext('2d');
     this.canvasWebGLContext = this.battleCanvas.nativeElement.getContext('webgl');
     this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
     this.battleStorageService.version = 0;
@@ -365,15 +367,23 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.battleStorageService.version > 1) {
-      this.finishLoadingSubscription = this.loadingService.finishLoading()
-        .subscribe(() => {
-          this.loadingFinished = true;
-          this.processNextActionFromQueue();
-        });
-     } else {
-         this.finishLoadingFlag = true;
-     }
+    this.assetsLoadingService.loadShadersAndCreateProgram(
+      this.canvasWebGLContext,
+      'shaders/vertex-shader-2d.fx',
+      'shaders/fragment-shader-2d.fx'
+    )
+      .subscribe((result) => {
+        this.shadersProgram = result;
+        if (this.battleStorageService.version > 1) {
+          this.finishLoadingSubscription = this.loadingService.finishLoading()
+            .subscribe(() => {
+              this.loadingFinished = true;
+              this.processNextActionFromQueue();
+            });
+         } else {
+             this.finishLoadingFlag = true;
+         }
+      });
   }
 
   onResize() {
@@ -784,16 +794,18 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     backgroundColor: Color,
     texturePosition: number,
 
-    colors: number[],
-    backgrounds: number[],
-    textureMapping: number[]) {
+    colors: Uint8Array,
+    backgrounds: Uint8Array,
+    textureMapping: Float32Array) {
 
     const dim = 0.5;
     if (backgroundColor) {
       fillBackground(backgrounds, backgroundColor.r * dim, backgroundColor.g * dim, backgroundColor.b * dim, texturePosition);
+    } else {
+      fillBackground(backgrounds, 0, 0, 0, texturePosition);
     }
     fillColor(colors, color.r * dim, color.g * dim, color.b * dim, color.a, texturePosition);
-    fillChar(textureMapping, char, texturePosition);
+    fillChar(this.charsService, textureMapping, char, texturePosition);
   }
 
   private drawPoint(
@@ -809,9 +821,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     greenPath: Path2D,
     yellowPath: Path2D,
     redPath: Path2D,
-    colors: number[],
-    backgrounds: number[],
-    textureMapping: number[]) {
+    colors: Uint8Array,
+    backgrounds: Uint8Array,
+    textureMapping: Float32Array) {
 
     const tile = scene.tiles[x][y];
     if (tile) {
@@ -820,6 +832,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       if (tile.backgroundColor) {
         const color = heightImpact(tile.height, tile.backgroundColor);
         fillBackground(backgrounds, color.r, color.g, color.b, texturePosition);
+      } else {
+        fillBackground(backgrounds, 0, 0, 0, texturePosition);
       }
       const selectedAlways = (this.selectedAlwaysTile && this.selectedAlwaysTile.x === x && this.selectedAlwaysTile.y === y);
       const selected = selectedAlways ||
@@ -828,7 +842,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       if (drawChar) {
         const color = brightImpact(tile.bright, drawChar.color);
         fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
-        fillChar(textureMapping, drawChar.char, texturePosition);
+        fillChar(this.charsService, textureMapping, drawChar.char, texturePosition);
       } else if ((tile.actor || tile.decoration) &&
         ((tile.specEffects.length === 0 && !selected) || Math.floor(this.tickState) % 2 === 1) &&
         (!selectedAlways ||
@@ -843,12 +857,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
             tile.actor.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.actor.z) : color);
           fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
-          fillChar(textureMapping, replacement?.char ? replacement.char : tile.actor.visualization.char, texturePosition);
+          fillChar(
+            this.charsService, textureMapping, replacement?.char ? replacement.char : tile.actor.visualization.char, texturePosition);
         } else if (tile.decoration) {
           let color = heightImpact(tile.decoration.z, tile.decoration.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.decoration.z) : color);
           fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
-          fillChar(textureMapping, replacement?.char ? replacement.char : tile.decoration.visualization.char, texturePosition);
+          fillChar(
+            this.charsService, textureMapping, replacement?.char ? replacement.char : tile.decoration.visualization.char, texturePosition);
         }
       } else if (tile.specEffects.length > 0 &&
         (!selected ||
@@ -862,13 +878,16 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           this.mixColorWithReplacement(color, replacement, effectForDraw.z) :
           color);
         fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
-        fillChar(textureMapping, replacement?.workingOnSpecEffects ? replacement.char : effectForDraw.visualization.char, texturePosition);
+        fillChar(
+          this.charsService, textureMapping,
+          replacement?.workingOnSpecEffects ? replacement.char : effectForDraw.visualization.char, texturePosition);
       } else {
         const color =  replacement?.workingOnSpecEffects && replacement?.char ?
           brightImpact(tile.bright, replacement.color) :
           heightImpact(tile.height, tile.visualization.color);
         fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
-        fillChar(textureMapping, replacement?.char ? replacement.char : tile.visualization.char, texturePosition);
+        fillChar(
+          this.charsService, textureMapping, replacement?.char ? replacement.char : tile.visualization.char, texturePosition);
       }
       if ((tile.actor || tile.decoration) && !(replacement?.overflowHealth)) {
         const healthObject = tile.actor || tile.decoration;
@@ -917,7 +936,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private redrawScene() {
-    if (!this.changed && !this.loadingFinished) {
+    if (!this.changed || !this.loadingFinished) {
       return;
     }
     this.changed = false;
@@ -925,7 +944,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (scene) {
       const sceneRandom = new Random(this.battleStorageService.scene.hash);
       const cameraLeft = this.battleStorageService.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
-      const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight;
+      const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight - 1;
       const left = Math.floor(cameraLeft) - 1;
       const right = Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)) + 1;
       const top = Math.floor(cameraTop) - 1;
@@ -940,15 +959,15 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const greenPath = new Path2D();
       const width = right - left + 1;
       const height = bottom - top + 1;
-      const colors: number[] = new Array<number>(width * height * 4);
-      const backgrounds: number[] = new Array<number>(width * height * 4);
-      const textureMapping: number[] = new Array<number>(width * height * 12);
-      const mainTextureVertexes: number[] = new Array<number>(width * height * 12);
+      const colors: Uint8Array = new Uint8Array(width * height * 4);
+      const backgrounds: Uint8Array = new Uint8Array(width * height * 4);
+      const textureMapping: Float32Array = new Float32Array(width * height * 12);
+      const mainTextureVertexes: Float32Array = new Float32Array(width * height * 12);
       let texturePosition = 0;
       for (let y = -20; y <= 60; y++) {
         for (let x = -40; x <= 80; x++) {
           if (x >= left && y >= top && x <= right && y <= bottom) {
-            fillVertexPosition(mainTextureVertexes, x, y, cameraLeft, cameraTop, this.tileWidth, this.tileHeight, texturePosition);
+            fillVertexPosition(mainTextureVertexes, x, y, left, top, this.tileWidth, this.tileHeight, texturePosition);
             if (x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
               let drawChar;
               if (currentActionSquare?.x === x && currentActionSquare?.y === y) {
@@ -982,41 +1001,51 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         }
       }
-      console.log(performance.now() - time);
-      time = performance.now();
-      const leftCameraBorder = Math.round((left - cameraLeft) * this.tileWidth);
-      const topCameraBorder = Math.round((top - cameraTop) * this.tileHeight);
-      // TODO WebGLProcessing
-      console.log(performance.now() - time);
-      time = performance.now();
+
+      drawArrays(
+        this.canvasWebGLContext,
+        this.shadersProgram,
+        mainTextureVertexes,
+        colors,
+        backgrounds,
+        textureMapping,
+        this.charsTexture,
+        Math.round((left - cameraLeft) * this.tileWidth),
+        Math.round((top - cameraTop) * this.tileHeight),
+        (right - left + 1) * this.tileWidth,
+        (bottom - top + 1) * this.tileHeight,
+        (right - left + 1),
+        (bottom - top + 1),
+        this.charsService.width,
+        this.charsService.spriteHeight);
+
       if (this.battleStorageService.availableActionSquares?.length > 0) {
         this.generateActionSquareGrid(this.battleStorageService.currentActionId ? redPath : yellowPath, cameraLeft, cameraTop);
       }
-      this.canvas2DContext.lineWidth = 2;
+      /*this.canvas2DContext.lineWidth = 2;
       this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1)';
       this.canvas2DContext.stroke(redPath);
       this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1)';
       this.canvas2DContext.stroke(yellowPath);
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1)';
-      this.canvas2DContext.stroke(greenPath);
+      this.canvas2DContext.stroke(greenPath);*/
 
       // TODO Optimize (dont know how yet)
-      this.canvas2DContext.strokeStyle = `rgb(0, 8, 24)`;
-      this.canvas2DContext.lineWidth = 1;
+      //this.canvas2DContext.strokeStyle = `rgb(0, 8, 24)`;
+      //this.canvas2DContext.lineWidth = 1;
       for (const text of this.battleStorageService.floatingTexts) {
         if (text.time >= 0) {
           const x = (text.x + 0.5 - cameraLeft) * this.tileWidth;
           const y = (text.y - cameraTop) * this.tileHeight - text.height;
-          this.canvas2DContext.font = `${26}px PT Mono`;
+         /* this.canvas2DContext.font = `${26}px PT Mono`;
           this.canvas2DContext.textAlign = 'center';
           this.canvas2DContext.globalAlpha = text.color.a;
           this.canvas2DContext.fillStyle = `rgb(${text.color.r}, ${text.color.g},
             ${text.color.b})`;
           this.canvas2DContext.fillText(text.text, x, y);
-          this.canvas2DContext.strokeText(text.text, x, y);
+          this.canvas2DContext.strokeText(text.text, x, y);*/
         }
       }
-      console.log(performance.now() - time);
     }
   }
 
@@ -1366,7 +1395,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private updateCycle(context: AsciiBattleComponent) {
-    console.log('new frame');
     context.updateScene();
     context.redrawScene();
   }

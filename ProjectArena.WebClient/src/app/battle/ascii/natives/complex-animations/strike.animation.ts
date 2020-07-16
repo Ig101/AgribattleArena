@@ -9,7 +9,7 @@ export function strikeIssueDeclaration(targetX: number, targetY: number) {
       specificAction: undefined
     });
   }
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 2; i++) {
     frames.push({
       updateSynchronizer: false,
       animationTiles: [{x: targetX, y: targetY, char: undefined, color: {r: 255, g: 255, b: 255, a: 1}, unitAlpha: true,
