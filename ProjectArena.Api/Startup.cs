@@ -110,7 +110,7 @@ namespace ProjectArena.Api
                 app.UseDefaultFiles();
                 app.UseStaticFiles(new StaticFileOptions
                 {
-                    ServeUnknownFileTypes = true,
+                    ServeUnknownFileTypes = true
                 });
             }
 
