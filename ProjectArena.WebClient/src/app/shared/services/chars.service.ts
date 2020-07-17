@@ -24,28 +24,26 @@ export class CharsService {
   }
 
   constructor() {
-    setTimeout(() => {
-      this.charsSubCanvas = document.createElement('canvas');
-      this.charsSubCanvas.height = this.spriteHeight;
-      this.chars = {};
-      const tileSpriteFunctions = this.drawTileSprites();
-      const spriteFunctions = this.drawAllSprites();
-      const elements = Object.keys(this.chars).length;
-      this.charsSubCanvas.width = (this.spriteWidth + 2) * elements;
-      this.context = this.charsSubCanvas.getContext('2d');
-      this.context.clearRect(0, 0, (this.spriteWidth + 2) * elements, this.spriteHeight);
-      this.context.fillStyle = 'rgba(150,0,0,255)';
-      this.context.strokeStyle = 'rgba(255,0,0,255)';
-      this.context.lineWidth = 2;
-      tileSpriteFunctions.forEach(e => {
-        e();
-      });
-      this.context.font = `${this.spriteHeight}px PT Mono`;
-      this.context.textAlign = 'left';
-      this.context.fillStyle = 'rgba(255,0,0,255)';
-      spriteFunctions.forEach(e => {
-        e();
-      });
+    this.charsSubCanvas = document.createElement('canvas');
+    this.charsSubCanvas.height = this.spriteHeight;
+    this.chars = {};
+    const tileSpriteFunctions = this.drawTileSprites();
+    const spriteFunctions = this.drawAllSprites();
+    const elements = Object.keys(this.chars).length;
+    this.charsSubCanvas.width = (this.spriteWidth + 2) * elements;
+    this.context = this.charsSubCanvas.getContext('2d');
+    this.context.clearRect(0, 0, (this.spriteWidth + 2) * elements, this.spriteHeight);
+    this.context.fillStyle = 'rgba(150,0,0,255)';
+    this.context.strokeStyle = 'rgba(255,0,0,255)';
+    this.context.lineWidth = 2;
+    tileSpriteFunctions.forEach(e => {
+      e();
+    });
+    this.context.font = `${this.spriteHeight}px PT Mono`;
+    this.context.textAlign = 'left';
+    this.context.fillStyle = 'rgba(255,0,0,255)';
+    spriteFunctions.forEach(e => {
+      e();
     });
   }
 
