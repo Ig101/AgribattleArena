@@ -133,9 +133,11 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     const definition = this.loadingService.definition;
     const titleHeight = 30;
     let titlePosition = this.canvasHeight / 2 + titleHeight * 0.375;
+    if (definition.loadingScene) {
+      titlePosition = this.canvasHeight / 2 - 220;
+    }
     if (definition.loadingScene && this.shadersProgram) {
       this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      titlePosition = this.canvasHeight / 2 - 220;
       const sceneWidth = 1300;
       const sceneHeight = 680;
       let tileHeight = 30;

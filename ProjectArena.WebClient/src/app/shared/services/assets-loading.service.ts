@@ -60,6 +60,7 @@ export class AssetsLoadingService {
             }));
         }))
         .pipe(map((result) => {
+          this.shaders = result;
           return this.processShaders(gl, result);
         }));
     }
