@@ -37,6 +37,8 @@ namespace ProjectArena.Engine
 
         public float PassedTime { get; private set; }
 
+        public bool Idle => idleTime > 3;
+
         public string EnemyActorsPrefix { get; private set; }
 
         public DefeatConditionMethod DefeatCondition { get; }

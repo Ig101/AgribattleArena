@@ -9,6 +9,7 @@ export interface Synchronizer {
   id: string;
   version: number;
   roundsPassed: number;
+  idle: boolean;
   actorId?: number;
   skillActionId?: number;
   targetX?: number;

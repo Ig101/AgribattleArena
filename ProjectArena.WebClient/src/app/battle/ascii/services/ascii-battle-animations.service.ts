@@ -41,17 +41,6 @@ export class AsciiBattleAnimationsService {
     const difference = this.battleSynchronizationService.synchronizeScene(synchronizer.sync);
     for (const actor of difference.actors) {
       const actorFloats = [];
-      if (actor.endedTurn) {
-        actorFloats.push({
-          text: this.skippedFlag ? '*skip*' : '*end*',
-          color: { r: 255, g: 255, b: 0, a: 1 },
-          time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
-          x: actor.x,
-          y: actor.y,
-          height: 0
-        });
-        this.skippedFlag = false;
-      }
       switch (synchronizer.action) {
         case BattleSynchronizationActionEnum.Leave:
           if (actor.isDead) {

@@ -30,6 +30,23 @@ export function fillChar(charsService: CharsService, textureMapping: Float32Arra
   textureMapping[texturePosition * 12 + 11] = charPosition.y + charsService.spriteHeight;
 }
 
+export function fillTileMask(charsService: CharsService, textureMapping: Float32Array,
+                             left: boolean, right: boolean, top: boolean, bottom: boolean, texturePosition: number) {
+  const charPosition = charsService.getTileMask(left, right, top, bottom);
+  textureMapping[texturePosition * 12] = charPosition.x;
+  textureMapping[texturePosition * 12 + 1] = charPosition.y;
+  textureMapping[texturePosition * 12 + 2] = charPosition.x + charsService.spriteWidth;
+  textureMapping[texturePosition * 12 + 3] = charPosition.y;
+  textureMapping[texturePosition * 12 + 4] = charPosition.x;
+  textureMapping[texturePosition * 12 + 5] = charPosition.y + charsService.spriteHeight;
+  textureMapping[texturePosition * 12 + 6] = charPosition.x;
+  textureMapping[texturePosition * 12 + 7] = charPosition.y + charsService.spriteHeight;
+  textureMapping[texturePosition * 12 + 8] = charPosition.x + charsService.spriteWidth;
+  textureMapping[texturePosition * 12 + 9] = charPosition.y;
+  textureMapping[texturePosition * 12 + 10] = charPosition.x + charsService.spriteWidth;
+  textureMapping[texturePosition * 12 + 11] = charPosition.y + charsService.spriteHeight;
+}
+
 export function fillVertexPosition(
   vertexPositions: Float32Array,
   x: number,
@@ -64,6 +81,7 @@ export function drawArrays(
   colors: Uint8Array,
   backgrounds: Uint8Array,
   textureMapping: Float32Array,
+  backgroundTextureMapping: Float32Array,
   texture: WebGLTexture,
   cameraX: number,
   cameraY: number,
@@ -77,6 +95,7 @@ export function drawArrays(
 
   const positionLocation = gl.getAttribLocation(program, 'a_position');
   const texcoordLocation = gl.getAttribLocation(program, 'a_texCoord');
+  const backgroundTexcoordLocation = gl.getAttribLocation(program, 'a_backgroundTexCoord');
 
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -85,6 +104,10 @@ export function drawArrays(
   const texcoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, textureMapping, gl.STATIC_DRAW);
+
+  const backgroundTexcoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, backgroundTexcoordBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, backgroundTextureMapping, gl.STATIC_DRAW);
 
   const colorTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, colorTexture);
@@ -115,6 +138,10 @@ export function drawArrays(
   gl.enableVertexAttribArray(texcoordLocation);
   gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
   gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
+
+  gl.enableVertexAttribArray(backgroundTexcoordLocation);
+  gl.bindBuffer(gl.ARRAY_BUFFER, backgroundTexcoordBuffer);
+  gl.vertexAttribPointer(backgroundTexcoordLocation, 2, gl.FLOAT, false, 0, 0);
 
   gl.uniform2f(positionResolutionLocation, width, height);
   gl.uniform2f(textureResolutionLocation, textureWidth, textureHeight);

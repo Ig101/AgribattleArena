@@ -10,6 +10,8 @@ namespace ProjectArena.Engine.ForExternalUse
 
         float PassedTime { get; }
 
+        bool Idle { get; }
+
         string EnemyActorsPrefix { get; }
 
         int Version { get; }

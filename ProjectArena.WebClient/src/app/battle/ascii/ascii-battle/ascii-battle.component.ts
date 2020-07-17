@@ -48,7 +48,7 @@ import { isObject } from 'util';
 import { ModalObject } from '../models/modals/modal-object.model';
 import { MenuModalComponent } from '../modals/menu-modal/menu-modal.component';
 import { CharsService } from 'src/app/shared/services/chars.service';
-import { fillChar, fillBackground, fillColor, fillVertexPosition, drawArrays } from 'src/app/helpers/webgl.helper';
+import { fillChar, fillBackground, fillColor, fillVertexPosition, drawArrays, fillTileMask } from 'src/app/helpers/webgl.helper';
 import { AssetsLoadingService } from 'src/app/shared/services/assets-loading.service';
 
 @Component({
@@ -801,10 +801,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     texturePosition: number,
 
     colors: Uint8Array,
+    textureMapping: Float32Array,
     backgrounds: Uint8Array,
-    textureMapping: Float32Array) {
+    backgroundTextureMapping: Float32Array) {
 
     const dim = 0.5;
+    fillTileMask(this.charsService, backgroundTextureMapping, false, false, false, false, texturePosition);
     if (backgroundColor) {
       fillBackground(backgrounds, backgroundColor.r * dim, backgroundColor.g * dim, backgroundColor.b * dim, texturePosition);
     } else {
@@ -828,13 +830,22 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     yellowPath: Path2D,
     redPath: Path2D,
     colors: Uint8Array,
+    textureMapping: Float32Array,
     backgrounds: Uint8Array,
-    textureMapping: Float32Array) {
+    backgroundTextureMapping: Float32Array) {
 
     const tile = scene.tiles[x][y];
     if (tile) {
       const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
       const canvasY = Math.round((y - cameraTop) * this.tileHeight);
+      fillTileMask(
+        this.charsService,
+        backgroundTextureMapping,
+        x > 0 && tile.height - scene.tiles[x - 1][y].height >= 10,
+        x < this.battleStorageService.scene.width - 1 && tile.height - scene.tiles[x + 1][y].height >= 10,
+        y > 0 && tile.height - scene.tiles[x][y - 1].height >= 10,
+        y < this.battleStorageService.scene.height - 1 && tile.height - scene.tiles[x][y + 1].height >= 10,
+        texturePosition);
       if (tile.backgroundColor) {
         const color = heightImpact(tile.height, tile.backgroundColor);
         fillBackground(backgrounds, color.r, color.g, color.b, texturePosition);
@@ -964,9 +975,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       const greenPath = new Path2D();
       const width = right - left + 1;
       const height = bottom - top + 1;
-      const colors: Uint8Array = new Uint8Array(width * height * 4);
-      const backgrounds: Uint8Array = new Uint8Array(width * height * 4);
       const textureMapping: Float32Array = new Float32Array(width * height * 12);
+      const colors: Uint8Array = new Uint8Array(width * height * 4);
+      const backgroundTextureMapping: Float32Array = new Float32Array(width * height * 12);
+      const backgrounds: Uint8Array = new Uint8Array(width * height * 4);
       const mainTextureVertexes: Float32Array = new Float32Array(width * height * 12);
       let texturePosition = 0;
       for (let y = -20; y <= 60; y++) {
@@ -995,10 +1007,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
               }
               sceneRandom.next();
               this.drawPoint(scene, x, y, texturePosition, drawChar, cameraLeft, cameraTop,
-                greenPath, yellowPath, redPath, colors, backgrounds, textureMapping);
+                greenPath, yellowPath, redPath, colors, textureMapping, backgrounds, backgroundTextureMapping);
             } else {
               const biom = getRandomBiom(sceneRandom, this.battleStorageService.scene.biom);
-              this.drawDummyPoint(biom.char, biom.color, biom.backgroundColor, texturePosition, colors, backgrounds, textureMapping);
+              this.drawDummyPoint(biom.char, biom.color, biom.backgroundColor, texturePosition,
+                colors, textureMapping, backgrounds, backgroundTextureMapping);
             }
             texturePosition++;
           } else {
@@ -1014,6 +1027,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
         colors,
         backgrounds,
         textureMapping,
+        backgroundTextureMapping,
         this.charsTexture,
         Math.round((left - cameraLeft) * this.tileWidth),
         Math.round((top - cameraTop - 1) * this.tileHeight),
@@ -1279,6 +1293,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
     const currentPlayer = action.sync.players.find(x => x.userId === this.userService.user.id);
+    this.battleStorageService.idle = action.sync.idle;
+    if (this.battleStorageService.idle || action.action === BattleSynchronizationActionEnum.Move) {
+      this.battleStorageService.turnTime = action.sync.turnTime;
+    }
     switch (action.action) {
       case BattleSynchronizationActionEnum.StartGame:
         this.restoreScene(action.sync);

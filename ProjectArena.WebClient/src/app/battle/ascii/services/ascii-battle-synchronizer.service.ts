@@ -46,6 +46,7 @@ export class AsciiBattleSynchronizerService {
     });
     this.battleStorageService.reward = synchronizer.reward;
     this.battleStorageService.turnTime = synchronizer.turnTime;
+    this.battleStorageService.idle = synchronizer.idle;
 
     // Tiles
     const tiles = new Array<Tile[]>(synchronizer.tilesetWidth);

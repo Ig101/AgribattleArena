@@ -11,6 +11,8 @@ namespace ProjectArena.Infrastructure.Models.Battle.Synchronization
 
         public float RoundsPassed { get; set; }
 
+        public bool Idle { get; set; }
+
         public int? ActorId { get; set; }
 
         public int? SkillActionId { get; set; }
