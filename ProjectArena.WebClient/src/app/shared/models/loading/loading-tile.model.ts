@@ -5,4 +5,5 @@ export interface LoadingTile {
   color: Color;
   backgroundColor: Color;
   bright: boolean;
+  height: number;
 }

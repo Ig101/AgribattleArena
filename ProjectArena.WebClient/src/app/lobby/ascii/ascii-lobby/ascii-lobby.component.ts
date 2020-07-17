@@ -26,16 +26,25 @@ import { TavernModalComponent } from '../modals/tavern-modal/tavern-modal.compon
 import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { TalentsModalComponent } from '../modals/talents-modal/talents-modal.component';
 import { HintDeclaration } from '../model/hint-declaration.model';
+import { CharsService } from 'src/app/shared/services/chars.service';
+import { AssetsLoadingService } from 'src/app/shared/services/assets-loading.service';
+import { fillVertexPosition, fillTileMask, fillBackground, fillColor, fillChar, drawArrays } from 'src/app/helpers/webgl.helper';
 
 @Component({
   selector: 'app-ascii-lobby',
   templateUrl: './ascii-lobby.component.html',
   styleUrls: ['./ascii-lobby.component.scss']
 })
-export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AsciiLobbyComponent implements OnInit, OnDestroy {
 
   @ViewChild('lobbyCanvas', { static: true }) lobbyCanvas: ElementRef<HTMLCanvasElement>;
-  private canvasContext: CanvasRenderingContext2D;
+  private canvasWebGLContext: WebGLRenderingContext;
+  @ViewChild('hudCanvas', { static: true }) hudCanvas: ElementRef<HTMLCanvasElement>;
+  private canvas2DContext: CanvasRenderingContext2D;
+  private shadersProgram: WebGLProgram;
+  private charsTexture: WebGLTexture;
+
+  private loaded;
 
   activators: LobbyTileActivator<Character>[];
   tiles: LobbyTile<Character>[][];
@@ -79,7 +88,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   ground = {
     char: '·',
     color: {r: 225, g: 169, b: 95, a: 1} as Color,
-    backgroundColor: {r: 30, g: 23, b: 13, a: 1} as Color
+    backgroundColor: {r: 50, g: 42, b: 23, a: 1} as Color
   };
 
   openedModal: IModal<unknown>;
@@ -126,7 +135,9 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     private arenaHub: ArenaHubService,
     private modalService: ModalService,
     private router: Router,
-    private queueService: QueueService
+    private queueService: QueueService,
+    private charsService: CharsService,
+    private assetsLoadingService: AssetsLoadingService
   ) {
     this.onCloseSubscription = arenaHub.onClose.subscribe(() => {
       this.loadingService.startLoading({
@@ -200,7 +211,9 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     this.lobbyStorageService.userHash = getHashFromString(this.userService.user.id);
     this.tileWidth = this.tileHeight * 0.6;
     this.setupAspectRatio(this.lobbyCanvas.nativeElement.offsetWidth, this.lobbyCanvas.nativeElement.offsetHeight);
-    this.canvasContext = this.lobbyCanvas.nativeElement.getContext('2d');
+    this.canvasWebGLContext = this.lobbyCanvas.nativeElement.getContext('webgl');
+    this.canvas2DContext = this.hudCanvas.nativeElement.getContext('2d');
+    this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
     this.generateCamp();
     this.fullParty = this.userService.user.roster.length >= this.charactersMaxCount;
     this.changed = true;
@@ -208,6 +221,15 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     this.drawingTimer = setInterval(() => {
       this.redrawScene();
     }, 1000 / this.updateFrequency);
+    this.assetsLoadingService.loadShadersAndCreateProgram(
+      this.canvasWebGLContext,
+      'shaders/vertex-shader-2d.fx',
+      'shaders/fragment-shader-2d.fx'
+    )
+      .subscribe((result) => {
+        this.shadersProgram = result;
+        this.changed = true;
+      });
   }
 
   ngOnDestroy(): void {
@@ -216,11 +238,6 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     this.queueService.dequeue(true);
     this.onCloseSubscription.unsubscribe();
     this.userChangedSubscription.unsubscribe();
-  }
-
-  ngAfterViewInit(): void {
-    this.finishLoadingSubscription = this.loadingService.finishLoading()
-    .subscribe(() => { this.finishLoadingSubscription.unsubscribe(); });
   }
 
   onUpdate() {
@@ -322,6 +339,8 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
       this.lobbyCanvas.nativeElement.width = oldHeight * newAspectRatio;
       this.lobbyCanvas.nativeElement.height = oldHeight;
     }
+    this.hudCanvas.nativeElement.width = this.lobbyCanvas.nativeElement.width;
+    this.hudCanvas.nativeElement.height = this.lobbyCanvas.nativeElement.height;
     this.zoom = this.lobbyCanvas.nativeElement.offsetWidth / this.canvasWidth;
     this.changed = true;
     this.redrawScene();
@@ -354,24 +373,28 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
   private drawPoint(
     tile: LobbyTile<Character>,
     x: number, y: number,
-    cameraLeft: number,
-    cameraTop: number,
     active: boolean,
-    clicked: boolean) {
+    clicked: boolean,
+
+    texturePosition: number,
+    colors: Uint8Array,
+    textureMapping: Float32Array,
+    backgrounds: Uint8Array,
+    backgroundTextureMapping: Float32Array) {
+
     if (tile) {
-      const canvasX = (x - cameraLeft) * this.tileWidth;
-      const canvasY = (y - cameraTop) * this.tileHeight;
-      const symbolY = canvasY + this.tileHeight * 0.75;
       const native = tile.activator?.x === x && tile.activator?.y === y && tile.activator.object ?
         actorNatives[tile.activator.object.nativeId] : undefined;
+      fillTileMask(this.charsService, backgroundTextureMapping, false, false, false, false, texturePosition);
       if (tile.backgroundColor) {
-        this.canvasContext.fillStyle = `rgb(${tile.backgroundColor.r}, ${tile.backgroundColor.g}, ${tile.backgroundColor.b})`;
-        this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
+        fillBackground(backgrounds, tile.backgroundColor.r, tile.backgroundColor.g, tile.backgroundColor.b, texturePosition);
+      } else {
+        fillBackground(backgrounds, 0, 0, 0, texturePosition);
       }
-      const color = native ? native.visualization.color : tile.color;
-      this.canvasContext.fillStyle = active ? (clicked ? `rgba(170, 170, 0, ${color.a})` : `rgba(255, 255, 68, ${color.a})`) :
-        `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-      this.canvasContext.fillText(native ? native.visualization.char : tile.char, canvasX, symbolY);
+      let color = native ? native.visualization.color : tile.color;
+      color = active ? (clicked ? { r: 170, g: 170, b: 0, a: color.a } : { r: 255, g: 255, b: 68, a: color.a }) : color;
+      fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+      fillChar(this.charsService, textureMapping, (native ? native.visualization.char : tile.char), texturePosition);
     }
   }
 
@@ -382,22 +405,31 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.changed = false;
     const userRandom = new Random(this.lobbyStorageService.userHash + (this.queueService.inQueue ? this.queueService.queueSeed : 0));
-    if (this.tiles) {
+    if (this.tiles && this.shadersProgram) {
       const cameraLeft = this.campWidth / 2 - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
-      const cameraTop = this.campHeight / 2 - this.canvasHeight / 2 / this.tileHeight + 0.8;
-      this.canvasContext.font = `${this.tileHeight}px PT Mono`;
-      this.canvasContext.textAlign = 'left';
-      const left = Math.floor(cameraLeft) - this.tileWidth;
-      const right = Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)) + this.tileWidth;
-      const top = Math.floor(cameraTop) - this.tileHeight;
-      const bottom = Math.ceil(cameraTop + this.canvasHeight / (this.tileHeight)) + this.tileHeight;
+      const cameraTop = this.campHeight / 2 - this.canvasHeight / 2 / this.tileHeight + 1;
+      this.canvas2DContext.font = `${this.tileHeight}px PT Mono`;
+      this.canvas2DContext.textAlign = 'left';
+      const left = Math.floor(cameraLeft) - 1;
+      const right = Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)) + 1;
+      const top = Math.floor(cameraTop) - 1;
+      const bottom = Math.ceil(cameraTop + this.canvasHeight / (this.tileHeight)) + 1;
       const mouseX = Math.floor(this.mouseState.x);
       const mouseY = Math.floor(this.mouseState.y);
       const clicked = this.mouseState.buttonsInfo[0] && this.mouseState.buttonsInfo[0].pressed;
-      for (let x = -40; x <= 80; x++) {
-        for (let y = -20; y <= 60; y++) {
+      const width = right - left + 1;
+      const height = bottom - top + 1;
+      const textureMapping: Float32Array = new Float32Array(width * height * 12);
+      const colors: Uint8Array = new Uint8Array(width * height * 4);
+      const backgroundTextureMapping: Float32Array = new Float32Array(width * height * 12);
+      const backgrounds: Uint8Array = new Uint8Array(width * height * 4);
+      const mainTextureVertexes: Float32Array = new Float32Array(width * height * 12);
+      let texturePosition = 0;
+      for (let y = -20; y <= 60; y++) {
+        for (let x = -40; x <= 80; x++) {
           let tile: LobbyTile<Character>;
           if (x >= left && x <= right && y >= top && y <= bottom) {
+            fillVertexPosition(mainTextureVertexes, x, y, left, top, this.tileWidth, this.tileHeight, texturePosition);
             if (x >= 0 && y >= 0 && x < this.campWidth && y < this.campHeight) {
               tile = this.tiles[x][y];
               if (this.queueService.inQueue && this.queueService.queueSeed) {
@@ -418,7 +450,7 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
                 activator: undefined
               };
             }
-            this.drawPoint(tile, x, y, cameraLeft, cameraTop,
+            this.drawPoint(tile, x, y,
               tile.activator &&
               tile.activator.object &&
               tile.activator.x === x &&
@@ -427,12 +459,40 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
               mouseX <= x + tile.activator.xShift &&
               mouseY >= y - tile.activator.yShift &&
               mouseY <= y,
-              clicked);
+              clicked,
+              texturePosition,
+              colors,
+              textureMapping,
+              backgrounds,
+              backgroundTextureMapping);
+            texturePosition++;
           } else {
             userRandom.nextDouble();
           }
         }
       }
+
+      drawArrays(
+        this.canvasWebGLContext,
+        this.shadersProgram,
+        mainTextureVertexes,
+        colors,
+        backgrounds,
+        textureMapping,
+        backgroundTextureMapping,
+        this.charsTexture,
+        Math.round((left - cameraLeft) * this.tileWidth),
+        Math.round((top - cameraTop - 1) * this.tileHeight),
+        width * this.tileWidth,
+        height * this.tileHeight,
+        width,
+        height,
+        this.charsService.width,
+        this.charsService.spriteHeight);
+
+      this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      this.canvas2DContext.font = `${26}px PT Mono`;
+      this.canvas2DContext.textAlign = 'center';
       for (const activator of this.activators) {
         if (activator.object) {
           const x = (activator.x + 0.5 - cameraLeft) * this.tileWidth;
@@ -441,11 +501,15 @@ export class AsciiLobbyComponent implements OnInit, AfterViewInit, OnDestroy {
             mouseX <= activator.x + activator.xShift &&
             mouseY >= activator.y - activator.yShift &&
             mouseY <= activator.y;
-          this.canvasContext.font = `${26}px PT Mono`;
-          this.canvasContext.textAlign = 'center';
-          this.canvasContext.fillStyle = activated ? (clicked ? '#aa0' : '#ff4') : '#ffffff';
-          this.canvasContext.fillText(activator.object.name, x, y);
+          this.canvas2DContext.fillStyle = activated ? (clicked ? '#aa0' : '#ff4') : '#ffffff';
+          this.canvas2DContext.fillText(activator.object.name, x, y);
         }
+      }
+
+      if (!this.loaded) {
+        this.loaded = true;
+        this.finishLoadingSubscription = this.loadingService.finishLoading()
+        .subscribe(() => { this.finishLoadingSubscription.unsubscribe(); });
       }
     }
   }

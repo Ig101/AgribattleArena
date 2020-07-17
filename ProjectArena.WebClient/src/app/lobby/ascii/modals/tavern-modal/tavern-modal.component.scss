@@ -10,8 +10,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    max-width: 574px;
-    min-width: 574px;
+    max-width: 518px;
+    min-width: 518px;
     height: 502px;
     app-tavern {
       width: 510px;
@@ -31,7 +31,7 @@
   }
 
   app-characters-list {
-    padding: 116px 6px;
+    padding: 102px 6px;
   }
 
   .title {
@@ -67,5 +67,8 @@
       width: 64px;
       margin-bottom: 24px;
     }
+  }
+  .grass-background {
+    background-color: rgb(0, 20, 0);
   }
 }

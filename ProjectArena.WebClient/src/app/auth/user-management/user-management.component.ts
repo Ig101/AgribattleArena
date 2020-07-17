@@ -62,7 +62,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         this.loadingService.startLoading({
           title: 'Encountered enemy. Prepare for battle!',
           loadingScene: value
-        }, 3000).subscribe(() => {
+        }, 300000).subscribe(() => {
           this.router.navigate(['battle']);
         });
       }

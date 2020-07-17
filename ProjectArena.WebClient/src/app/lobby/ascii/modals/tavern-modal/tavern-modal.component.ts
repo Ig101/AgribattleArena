@@ -57,6 +57,7 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
       this.state = TavernStateEnum.Restricted;
       return;
     }
+    this.loading = true;
     this.state = TavernStateEnum.Tavern;
     this.fireForm = new AppFormGroup({
       textField: this.formBuilder.control('', [
@@ -146,6 +147,9 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
               this.userService.user.roster.push(newCharacter);
             }
             this.userService.userChanged.next();
+            if (this.state !== TavernStateEnum.Tavern) {
+              this.loading = true;
+            }
             this.state = TavernStateEnum.Tavern;
             this.errors = [`You recruited ${newCharacter.name}.`];
             this.nameForm.controls.textField.setValue('');
@@ -164,7 +168,13 @@ export class TavernModalComponent implements OnInit, OnDestroy, IModal<any> {
       this.state = TavernStateEnum.ConfirmReplacement;
     } else {
       this.currentCharacterForReplace = undefined;
+      this.loading = true;
       this.state = TavernStateEnum.Tavern;
     }
+  }
+
+  backFromReplacement() {
+    this.loading = true;
+    this.state = TavernStateEnum.Tavern;
   }
 }

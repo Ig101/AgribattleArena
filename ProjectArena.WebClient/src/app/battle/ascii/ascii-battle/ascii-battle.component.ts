@@ -56,7 +56,7 @@ import { AssetsLoadingService } from 'src/app/shared/services/assets-loading.ser
   templateUrl: './ascii-battle.component.html',
   styleUrls: ['./ascii-battle.component.scss']
 })
-export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AsciiBattleComponent implements OnInit, OnDestroy {
 
   @ViewChild('battleCanvas', { static: true }) battleCanvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('hudCanvas', { static: true }) hudCanvas: ElementRef<HTMLCanvasElement>;
@@ -64,6 +64,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   private canvasWebGLContext: WebGLRenderingContext;
   private charsTexture: WebGLTexture;
   private shadersProgram: WebGLProgram;
+
+  private loaded;
 
   finishLoadingFlag = false;
 
@@ -363,14 +365,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     if (loadBattle) {
       const snapshot = this.battleResolver.popBattleSnapshot();
       this.restoreScene(snapshot);
-      if (!this.loadingFinished) {
-        return;
-      }
     }
-    this.processNextActionFromQueue();
-  }
-
-  ngAfterViewInit(): void {
+    this.finishLoadingFlag = true;
     this.assetsLoadingService.loadShadersAndCreateProgram(
       this.canvasWebGLContext,
       'shaders/vertex-shader-2d.fx',
@@ -378,16 +374,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
     )
       .subscribe((result) => {
         this.shadersProgram = result;
-        if (this.battleStorageService.version > 1) {
-          this.finishLoadingSubscription = this.loadingService.finishLoading()
-            .subscribe(() => {
-              this.loadingFinished = true;
-              this.processNextActionFromQueue();
-            });
-         } else {
-             this.finishLoadingFlag = true;
-         }
       });
+    this.processNextActionFromQueue();
   }
 
   onResize() {
@@ -953,12 +941,12 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private redrawScene() {
-    if (!this.changed || !this.loadingFinished) {
+    if (!this.changed) {
       return;
     }
     this.changed = false;
     const scene = this.battleStorageService.scene;
-    if (scene) {
+    if (scene && this.shadersProgram) {
       const sceneRandom = new Random(this.battleStorageService.scene.hash);
       const cameraLeft = this.battleStorageService.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.battleStorageService.cameraY - this.canvasHeight / 2 / this.tileHeight;
@@ -1051,7 +1039,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1)';
       this.canvas2DContext.stroke(greenPath);
 
-      // TODO Optimize (dont know how yet)
       this.canvas2DContext.strokeStyle = `rgb(0, 8, 24)`;
       this.canvas2DContext.lineWidth = 1;
       for (const text of this.battleStorageService.floatingTexts) {
@@ -1064,6 +1051,17 @@ export class AsciiBattleComponent implements OnInit, OnDestroy, AfterViewInit {
           this.canvas2DContext.fillText(text.text, x, y);
           this.canvas2DContext.strokeText(text.text, x, y);
         }
+      }
+
+      if (!this.loaded) {
+        this.loaded = true;
+        if (this.battleStorageService.version > 1) {
+          this.finishLoadingSubscription = this.loadingService.finishLoading()
+            .subscribe(() => {
+              this.loadingFinished = true;
+              this.processNextActionFromQueue();
+            });
+         }
       }
     }
   }

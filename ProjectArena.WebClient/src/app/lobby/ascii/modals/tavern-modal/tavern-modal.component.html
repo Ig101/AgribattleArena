@@ -1,5 +1,5 @@
 <div class="overlay-container" (click)="closeOnClick($event)">
-  <div class="modal lobby-modal">
+  <div class="modal lobby-modal" [ngClass]="{'grass-background': state === tavernStateEnum.Tavern}">
     <app-modal-loading *ngIf="loading" [errors]="errors" (finishLoading)="loading = false; errors = undefined;"></app-modal-loading>
     <div class="close-container">
       <div class="title text-font-inactive" *ngIf="state === tavernStateEnum.ChooseReplacement">Your roster is full. Choose your soldier to replace with a new one.</div>
@@ -8,9 +8,9 @@
       <div class="filler"></div>
       <app-button class="close-button" [size]="componentSizeEnum.Small" (buttonClick)="close()">X</app-button>
     </div>
-    <app-tavern *ngIf="state === tavernStateEnum.Tavern" (chosenPatron)="choosePatron($event)"></app-tavern>
+    <app-tavern *ngIf="state === tavernStateEnum.Tavern" (chosenPatron)="choosePatron($event)" (finishLoading)="loading = false;"></app-tavern>
     <app-characters-list *ngIf="state === tavernStateEnum.ChooseReplacement" (chosenCharacter)="chooseCharacter($event)"></app-characters-list>
-    <app-button *ngIf="state === tavernStateEnum.ChooseReplacement" class="form-info form-button margin-right" (buttonClick)="state = tavernStateEnum.Tavern">Back</app-button>
+    <app-button *ngIf="state === tavernStateEnum.ChooseReplacement" class="form-info form-button margin-right" (buttonClick)="backFromReplacement()">Back</app-button>
     <form class="form fire-form" [formGroup]="fireForm" *ngIf="state === tavernStateEnum.ConfirmReplacement" (ngSubmit)="fireCharacter()">
       <input class="title-font" type="text" formControlName="textField"/>
       <app-button class="form-info form-button" type="submit" [size]="componentSizeEnum.Large">Ok</app-button>

@@ -180,7 +180,8 @@ export class ArenaHubService {
           char: tileNative.visualization.char,
           color: heightImpact(tile.height, tileNative.visualization.color),
           backgroundColor: heightImpact(tile.height, tileNative.backgroundColor),
-          bright: tileNative.bright
+          bright: tileNative.bright,
+          height: tile.height
         };
       }
       for (const actor of synchronizer.changedActors) {

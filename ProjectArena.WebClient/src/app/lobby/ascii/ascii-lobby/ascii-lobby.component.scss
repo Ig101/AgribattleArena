@@ -10,6 +10,12 @@
     height: 100%;
     background-color: #000818;
   }
+  .hud {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background-color: transparent;
+  }
   .info-container {
     position: fixed;
     left: calc(100% - 362px);

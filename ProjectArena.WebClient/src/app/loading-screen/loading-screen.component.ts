@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { LoadingService } from '../shared/services/loading.service';
 import { LoadingScene } from '../shared/models/loading/loading-scene.model';
+import { CharsService } from '../shared/services/chars.service';
+import { AssetsLoadingService } from '../shared/services/assets-loading.service';
+import { drawArrays, fillTileMask, fillBackground, fillColor, fillChar, fillVertexPosition } from '../helpers/webgl.helper';
 
 @Component({
   selector: 'app-loading-screen',
@@ -10,7 +13,12 @@ import { LoadingScene } from '../shared/models/loading/loading-scene.model';
 export class LoadingScreenComponent implements OnInit, OnDestroy {
 
   @ViewChild('loadingCanvas', { static: true }) battleCanvas: ElementRef<HTMLCanvasElement>;
-  private canvasContext: CanvasRenderingContext2D;
+  private canvasWebGLContext: WebGLRenderingContext;
+
+  @ViewChild('hudCanvas', { static: true }) hudCanvas: ElementRef<HTMLCanvasElement>;
+  private canvas2DContext: CanvasRenderingContext2D;
+  private charsTexture: WebGLTexture;
+  private shadersProgram: WebGLProgram;
 
   readonly defaultWidth = 1600;
   readonly defaultHeight = 1080;
@@ -34,18 +42,30 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private charsService: CharsService,
+    private assetsLoadingService: AssetsLoadingService
   ) { }
   ngOnInit(): void {
-    this.canvasContext = this.battleCanvas.nativeElement.getContext('2d');
+    this.canvas2DContext = this.hudCanvas.nativeElement.getContext('2d');
+    this.canvasWebGLContext = this.battleCanvas.nativeElement.getContext('webgl');
+    this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
     this.loadingService.setupTime();
-    this.loadingService.changed = true;
-    this.redraw();
     this.updateTimer = setInterval(() => {
       this.loadingService.loadingUpdate();
       this.redraw();
     }, 1000 / this.updateFrequency);
+    this.assetsLoadingService.loadShadersAndCreateProgram(
+      this.canvasWebGLContext,
+      'shaders/vertex-shader-2d.fx',
+      'shaders/fragment-shader-2d.fx'
+    )
+      .subscribe((result) => {
+        this.shadersProgram = result;
+        this.loadingService.changed = true;
+        this.redraw();
+      });
   }
 
   ngOnDestroy(): void {
@@ -67,30 +87,41 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
       this.battleCanvas.nativeElement.width = oldHeight * newAspectRatio;
       this.battleCanvas.nativeElement.height = oldHeight;
     }
-    this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.hudCanvas.nativeElement.width = this.battleCanvas.nativeElement.width;
+    this.hudCanvas.nativeElement.height = this.battleCanvas.nativeElement.height;
     this.loadingService.changed = true;
     this.redraw();
   }
 
   private drawPoint(
     scene: LoadingScene,
-    x: number, y: number,
-    cameraLeft: number,
-    cameraTop: number,
+    x: number,
+    y: number,
     tileHeight: number,
-    tileWidth: number) {
+    tileWidth: number,
+    texturePosition: number,
+    colors: Uint8Array,
+    textureMapping: Float32Array,
+    backgrounds: Uint8Array,
+    backgroundTextureMapping: Float32Array) {
+
     const tile = scene.tiles[x][y];
     if (tile) {
-      const canvasX = (x - cameraLeft) * tileWidth;
-      const canvasY = (y - cameraTop) * tileHeight + 140;
-      const symbolY = canvasY + tileHeight * 0.75;
+      fillTileMask(
+        this.charsService,
+        backgroundTextureMapping,
+        x > 0 && tile.height - scene.tiles[x - 1][y].height >= 10,
+        x < scene.width - 1 && tile.height - scene.tiles[x + 1][y].height >= 10,
+        y > 0 && tile.height - scene.tiles[x][y - 1].height >= 10,
+        y < scene.height - 1 && tile.height - scene.tiles[x][y + 1].height >= 10,
+        texturePosition);
       if (tile.backgroundColor) {
-        this.canvasContext.fillStyle = `rgb(${tile.backgroundColor.r}, ${tile.backgroundColor.g}, ${tile.backgroundColor.b})`;
-        this.canvasContext.fillRect(canvasX, canvasY, tileWidth + 1, tileHeight + 1);
+        fillBackground(backgrounds, tile.backgroundColor.r, tile.backgroundColor.g, tile.backgroundColor.b, texturePosition);
+      } else {
+        fillBackground(backgrounds, 0, 0, 0, texturePosition);
       }
-      this.canvasContext.fillStyle = `rgba(${tile.color.r}, ${tile.color.g},
-        ${tile.color.b}, ${tile.color.a})`;
-      this.canvasContext.fillText(tile.char, canvasX, symbolY);
+      fillColor(colors, tile.color.r, tile.color.g, tile.color.b, tile.color.a, texturePosition);
+      fillChar(this.charsService, textureMapping, tile.char, texturePosition);
     }
   }
 
@@ -99,12 +130,11 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     if (!this.loadingService.changed) {
       return;
     }
-    this.loadingService.changed = false;
-    this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     const definition = this.loadingService.definition;
     const titleHeight = 30;
     let titlePosition = this.canvasHeight / 2 + titleHeight * 0.375;
-    if (definition.loadingScene) {
+    if (definition.loadingScene && this.shadersProgram) {
+      this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       titlePosition = this.canvasHeight / 2 - 220;
       const sceneWidth = 1300;
       const sceneHeight = 680;
@@ -122,20 +152,43 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
       }
       const cameraLeft = definition.loadingScene.width / 2 - this.canvasWidth / 2 / tileWidth;
       const cameraTop = definition.loadingScene.height / 2 - this.canvasHeight / 2 / tileHeight;
-      this.canvasContext.font = `${tileHeight}px PT Mono`;
-      this.canvasContext.fillStyle = `#ffffff`;
-      this.canvasContext.textAlign = 'left';
-      for (let x = 0; x < definition.loadingScene.width; x++) {
-        for (let y = 0; y < definition.loadingScene.height; y++ ) {
-          this.drawPoint(definition.loadingScene, x, y, cameraLeft, cameraTop, tileHeight, tileWidth);
+      const textureMapping: Float32Array = new Float32Array(definition.loadingScene.width * definition.loadingScene.height * 12);
+      const colors: Uint8Array = new Uint8Array(definition.loadingScene.width * definition.loadingScene.height * 4);
+      const backgroundTextureMapping: Float32Array = new Float32Array(definition.loadingScene.width * definition.loadingScene.height * 12);
+      const backgrounds: Uint8Array = new Uint8Array(definition.loadingScene.width * definition.loadingScene.height * 4);
+      const mainTextureVertexes: Float32Array = new Float32Array(definition.loadingScene.width * definition.loadingScene.height * 12);
+      let texturePosition = 0;
+      for (let y = 0; y < definition.loadingScene.height; y++ ) {
+        for (let x = 0; x < definition.loadingScene.width; x++) {
+          fillVertexPosition(mainTextureVertexes, x, y, 0, 0, tileWidth, tileHeight, texturePosition);
+          this.drawPoint(definition.loadingScene, x, y, tileHeight, tileWidth, texturePosition,
+            colors, textureMapping, backgrounds, backgroundTextureMapping);
+          texturePosition++;
         }
       }
+      drawArrays(
+        this.canvasWebGLContext,
+        this.shadersProgram,
+        mainTextureVertexes,
+        colors,
+        backgrounds,
+        textureMapping,
+        backgroundTextureMapping,
+        this.charsTexture,
+        Math.round((0 - cameraLeft) * tileWidth),
+        Math.round((0 - cameraTop) * tileHeight) - 140,
+        definition.loadingScene.width * tileWidth,
+        definition.loadingScene.height * tileHeight,
+        definition.loadingScene.width,
+        definition.loadingScene.height,
+        this.charsService.width,
+        this.charsService.spriteHeight);
     }
     if (definition.title) {
-      this.canvasContext.font = `${titleHeight}px PT Mono`;
-      this.canvasContext.fillStyle = `#ffffff`;
-      this.canvasContext.textAlign = 'center';
-      this.canvasContext.fillText(definition.title, this.canvasWidth / 2, titlePosition);
+      this.canvas2DContext.font = `${titleHeight}px PT Mono`;
+      this.canvas2DContext.fillStyle = `#ffffff`;
+      this.canvas2DContext.textAlign = 'center';
+      this.canvas2DContext.fillText(definition.title, this.canvasWidth / 2, titlePosition);
     }
   }
 

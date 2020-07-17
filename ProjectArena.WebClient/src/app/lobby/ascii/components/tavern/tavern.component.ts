@@ -9,6 +9,10 @@ import { Random } from 'src/app/shared/random/random';
 import { Character } from '../../model/character.model';
 import { getRandomBiom } from 'src/app/shared/bioms/biom.helper';
 import { Subscription } from 'rxjs';
+import { actorNatives } from 'src/app/battle/ascii/natives';
+import { fillTileMask, fillBackground, fillColor, fillChar, drawArrays, fillVertexPosition } from 'src/app/helpers/webgl.helper';
+import { CharsService } from 'src/app/shared/services/chars.service';
+import { AssetsLoadingService } from 'src/app/shared/services/assets-loading.service';
 @Component({
   selector: 'app-tavern',
   templateUrl: './tavern.component.html',
@@ -17,9 +21,13 @@ import { Subscription } from 'rxjs';
 export class TavernComponent implements OnInit, OnDestroy {
 
   @ViewChild('tavernCanvas', { static: true }) tavernCanvas: ElementRef<HTMLCanvasElement>;
-  private canvasContext: CanvasRenderingContext2D;
+  private canvasContext: WebGLRenderingContext;
+  private shadersProgram: WebGLProgram;
+  private charsTexture: WebGLTexture;
 
   @Output() chosenPatron = new EventEmitter<CharacterForSale>();
+  @Output() finishLoading = new EventEmitter<any>();
+  private loaded;
 
   userChangedSubscription: Subscription;
 
@@ -61,7 +69,9 @@ export class TavernComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    private lobbyStorageService: AsciiLobbyStorageService
+    private lobbyStorageService: AsciiLobbyStorageService,
+    private charsService: CharsService,
+    private assetsLoadingService: AssetsLoadingService
   ) {
     this.userChangedSubscription = this.userService.userChanged.subscribe(() => this.onUpdate() );
   }
@@ -118,8 +128,12 @@ export class TavernComponent implements OnInit, OnDestroy {
           (y !== 0 || x < 3 || x > 5)) {
           this.tiles[x][y] = {
             char: '#',
-            color: { r: 101, g: 67, b: 33, a: 1},
-            backgroundColor: { r: 24, g: 16, b: 8},
+            color: (x >= 2 && x <= 4 && y > 5) || (x >= 7 && x <= 9 && y > 5) ||
+              (x >= 12 && x <= 14 && y > 5) || (y >= 2 && y <= 4 && x < 5) ?
+              { r: 71, g: 45, b: 21, a: 1 } :  { r: 101, g: 67, b: 33, a: 1},
+            backgroundColor: (x >= 2 && x <= 4 && y > 5) || (x >= 7 && x <= 9 && y > 5) ||
+              (x >= 12 && x <= 14 && y > 5) || (y >= 2 && y <= 4 && x < 5) ?
+              { r: 30, g: 20, b: 10}  : { r: 40, g: 26, b: 14},
             activator: undefined
           };
         } else {
@@ -132,7 +146,7 @@ export class TavernComponent implements OnInit, OnDestroy {
             this.tiles[x][y] = {
               char: '■',
               color: { r: 101, g: 67, b: 33, a: 1},
-              backgroundColor: { r: 14, g: 13, b: 11},
+              backgroundColor: { r: 22, g: 20, b: 18},
               activator
             };
             continue;
@@ -141,7 +155,7 @@ export class TavernComponent implements OnInit, OnDestroy {
             this.tiles[x][y] = {
               char: '+',
               color: { r: 101, g: 67, b: 33, a: 1},
-              backgroundColor: { r: 14, g: 13, b: 11},
+              backgroundColor: { r: 22, g: 20, b: 18},
               activator
             };
             continue;
@@ -150,7 +164,7 @@ export class TavernComponent implements OnInit, OnDestroy {
             this.tiles[x][y] = {
               char: '&',
               color: { r: 255, g: 200, b: 200, a: 1},
-              backgroundColor: { r: 14, g: 13, b: 11},
+              backgroundColor: { r: 22, g: 20, b: 18},
               activator
             };
             continue;
@@ -160,7 +174,7 @@ export class TavernComponent implements OnInit, OnDestroy {
             color: activator?.object && activator?.x === x && activator?.y === y ?
               { r: 160, g: 160, b: 160, a: 1 } :
               { r: 173, g: 165, b: 135, a: 1},
-            backgroundColor: { r: 14, g: 13, b: 11},
+            backgroundColor: { r: 22, g: 20, b: 18},
             activator
           };
         }
@@ -171,13 +185,23 @@ export class TavernComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.tileWidth = this.tileHeight * 0.6;
     this.setupAspectRatio(this.tavernCanvas.nativeElement.offsetWidth, this.tavernCanvas.nativeElement.offsetHeight);
-    this.canvasContext = this.tavernCanvas.nativeElement.getContext('2d');
+    this.canvasContext = this.tavernCanvas.nativeElement.getContext('webgl');
+    this.charsTexture = this.charsService.getTexture(this.canvasContext);
     this.generateTavern();
     this.changed = true;
     this.redrawScene();
     this.drawingTimer = setInterval(() => {
       this.redrawScene();
     }, 1000 / this.updateFrequency);
+    this.assetsLoadingService.loadShadersAndCreateProgram(
+      this.canvasContext,
+      'shaders/vertex-shader-2d.fx',
+      'shaders/fragment-shader-2d.fx'
+    )
+      .subscribe((result) => {
+        this.shadersProgram = result;
+        this.changed = true;
+      });
   }
 
   ngOnDestroy(): void {
@@ -295,21 +319,37 @@ export class TavernComponent implements OnInit, OnDestroy {
 
   private drawPoint(
     tile: LobbyTile<CharacterForSale>,
-    x: number, y: number,
+    x: number,
+    y: number,
+    tiles: LobbyTile<CharacterForSale>[][],
     active: boolean,
-    clicked: boolean) {
-    if (tile) {
-      const canvasX = (x) * this.tileWidth;
-      const canvasY = (y) * this.tileHeight;
-      const symbolY = canvasY + this.tileHeight * 0.75;
-      if (tile.backgroundColor) {
-        this.canvasContext.fillStyle = `rgb(${tile.backgroundColor.r}, ${tile.backgroundColor.g}, ${tile.backgroundColor.b})`;
-        this.canvasContext.fillRect(canvasX, canvasY, this.tileWidth + 1, this.tileHeight + 1);
-      }
-      this.canvasContext.fillStyle = active ? (clicked ? `rgba(170, 170, 0, ${tile.color.a})` : `rgba(255, 255, 68, ${tile.color.a})`) :
-        `rgba(${tile.color.r}, ${tile.color.g}, ${tile.color.b}, ${tile.color.a})`;
-      this.canvasContext.fillText(tile.char, canvasX, symbolY);
+    clicked: boolean,
+
+    texturePosition: number,
+    colors: Uint8Array,
+    textureMapping: Float32Array,
+    backgrounds: Uint8Array,
+    backgroundTextureMapping: Float32Array) {
+
+    fillTileMask(
+      this.charsService,
+      backgroundTextureMapping,
+      tile.char === '#' && (x > 0 && (tiles[x - 1][y].char !== tile.char || tiles[x - 1][y].color.r < tile.color.r) || x === 0),
+      tile.char === '#' && (x < this.tavernWidth - 1 &&
+        (tiles[x + 1][y].char !== tile.char || tiles[x + 1][y].color.r < tile.color.r) || x === this.tavernWidth - 1),
+      tile.char === '#' && (y > 0 && (tiles[x][y - 1].char !== tile.char || tiles[x][y - 1].color.r < tile.color.r) || y === 0),
+      tile.char === '#' && (y < this.tavernHeight - 1 &&
+        (tiles[x][y + 1].char !== tile.char || tiles[x][y + 1].color.r < tile.color.r) || y === this.tavernHeight - 1),
+      texturePosition);
+    if (tile.backgroundColor) {
+      fillBackground(backgrounds, tile.backgroundColor.r, tile.backgroundColor.g, tile.backgroundColor.b, texturePosition);
+    } else {
+      fillBackground(backgrounds, 0, 0, 0, texturePosition);
     }
+    const color = active ?
+      (clicked ? { r: 170, g: 170, b: 0, a: tile.color.a } : { r: 255, g: 255, b: 68, a: tile.color.a }) : tile.color;
+    fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+    fillChar(this.charsService, textureMapping, tile.char, texturePosition);
   }
 
   private redrawScene() {
@@ -317,28 +357,61 @@ export class TavernComponent implements OnInit, OnDestroy {
       return;
     }
     this.changed = false;
-    const userRandom = new Random(this.lobbyStorageService.userHash);
-    if (this.tiles) {
-      this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      this.canvasContext.font = `${this.tileHeight}px PT Mono`;
-      this.canvasContext.textAlign = 'left';
+    if (this.tiles && this.shadersProgram) {
       const mouseX = Math.floor(this.mouseState.x);
       const mouseY = Math.floor(this.mouseState.y);
       const clicked = this.mouseState.buttonsInfo[0] && this.mouseState.buttonsInfo[0].pressed;
-      for (let x = 0; x < this.tavernWidth; x++) {
-        for (let y = 0; y <= this.tavernHeight; y++) {
+      const textureMapping: Float32Array = new Float32Array(this.tavernWidth * this.tavernHeight * 12);
+      const colors: Uint8Array = new Uint8Array(this.tavernWidth * this.tavernHeight * 4);
+      const backgroundTextureMapping: Float32Array = new Float32Array(this.tavernWidth * this.tavernHeight * 12);
+      const backgrounds: Uint8Array = new Uint8Array(this.tavernWidth * this.tavernHeight * 4);
+      const mainTextureVertexes: Float32Array = new Float32Array(this.tavernWidth * this.tavernHeight * 12);
+      let texturePosition = 0;
+      for (let y = 0; y < this.tavernHeight; y++) {
+        for (let x = 0; x < this.tavernWidth; x++) {
+          fillVertexPosition(mainTextureVertexes, x, y, 0, 0, this.tileWidth, this.tileHeight, texturePosition);
           const tile = this.tiles[x][y];
-          this.drawPoint(tile, x, y,
-            tile.activator &&
-            tile.activator.object &&
-            tile.activator.x === x &&
-            tile.activator.y === y &&
-            mouseX >= x - tile.activator.xShift &&
-            mouseX <= x + tile.activator.xShift &&
-            mouseY >= y - tile.activator.yShift &&
-            mouseY <= y + tile.activator.yShift,
-            clicked);
+          if (tile) {
+            this.drawPoint(tile, x, y, this.tiles,
+              tile.activator &&
+              tile.activator.object &&
+              tile.activator.x === x &&
+              tile.activator.y === y &&
+              mouseX >= x - tile.activator.xShift &&
+              mouseX <= x + tile.activator.xShift &&
+              mouseY >= y - tile.activator.yShift &&
+              mouseY <= y + tile.activator.yShift,
+              clicked,
+              texturePosition,
+              colors,
+              textureMapping,
+              backgrounds,
+              backgroundTextureMapping);
+            texturePosition++;
+          }
         }
+      }
+      drawArrays(
+        this.canvasContext,
+        this.shadersProgram,
+        mainTextureVertexes,
+        colors,
+        backgrounds,
+        textureMapping,
+        backgroundTextureMapping,
+        this.charsTexture,
+        0,
+        0,
+        this.tavernWidth * this.tileWidth,
+        this.tavernHeight * this.tileHeight,
+        this.tavernWidth,
+        this.tavernHeight,
+        this.charsService.width,
+        this.charsService.spriteHeight);
+
+      if (!this.loaded) {
+        this.loaded = true;
+        this.finishLoading.emit();
       }
     }
   }

@@ -30,6 +30,10 @@ import { InaccessibilityReasonEnum } from '../../model/enums/inaccessibility-rea
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 import { getNativeIdByTalents } from 'src/app/helpers/talents.helper';
 import { HintDeclaration } from '../../model/hint-declaration.model';
+import { CharsService } from 'src/app/shared/services/chars.service';
+import { AssetsLoadingService } from 'src/app/shared/services/assets-loading.service';
+import { drawArrays, fillTileMask, fillBackground, fillColor, fillChar, fillVertexPosition } from 'src/app/helpers/webgl.helper';
+import { Color } from 'src/app/shared/models/color.model';
 
 @Component({
   selector: 'app-talents-modal',
@@ -44,7 +48,11 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
   @Output() hintEvent = new EventEmitter<HintDeclaration>();
 
   @ViewChild('talentsCanvas', { static: true }) talentsCanvas: ElementRef<HTMLCanvasElement>;
-  private canvasContext: CanvasRenderingContext2D;
+  private canvasContext: WebGLRenderingContext;
+  private shadersProgram: WebGLProgram;
+  private charsTexture: WebGLTexture;
+
+  private loaded: boolean;
 
   cursor: string;
 
@@ -116,7 +124,8 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private talentsService: TalentsService,
     private webCommunicationService: WebCommunicationService,
-    private loadingService: LoadingService
+    private charsService: CharsService,
+    private assetsLoadingService: AssetsLoadingService
   ) { }
 
   close() {
@@ -335,13 +344,23 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
       this.calculateAccessibility(talent.x, talent.y - 1);
       this.calculateAccessibility(talent.x, talent.y + 1);
     }
-
+    this.loading = true;
     this.tileWidth = this.tileHeight * 0.6;
-    this.canvasContext = this.talentsCanvas.nativeElement.getContext('2d');
+    this.canvasContext = this.talentsCanvas.nativeElement.getContext('webgl');
+    this.charsTexture = this.charsService.getTexture(this.canvasContext);
     this.setupAspectRatio(this.talentsCanvas.nativeElement.offsetWidth, this.talentsCanvas.nativeElement.offsetHeight);
     this.drawingTimer = setInterval(() => {
       this.redrawScene();
     }, 1000 / this.updateFrequency);
+    this.assetsLoadingService.loadShadersAndCreateProgram(
+      this.canvasContext,
+      'shaders/vertex-shader-2d.fx',
+      'shaders/fragment-shader-2d.fx'
+    )
+      .subscribe((result) => {
+        this.shadersProgram = result;
+        this.changed = true;
+      });
   }
 
   undo() {
@@ -644,38 +663,41 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
 
   private drawPoint(
     tile: TalentNodeWithStatus,
-    x: number, y: number,
+    x: number,
+    y: number,
     cameraLeft: number,
     cameraTop: number,
     active: boolean,
     clicked: boolean,
-    center: boolean) {
-    if (center) {
-      const canvasX = (x - cameraLeft) * this.tileWidth;
-      const canvasY = (y - cameraTop) * this.tileHeight;
-      const symbolY = canvasY + this.tileHeight * 0.75;
-      this.canvasContext.font = `${this.tileHeight}px PT Mono`;
-      this.canvasContext.fillStyle = this.color;
-      this.canvasContext.fillText(this.char, canvasX, symbolY);
-    }
+    center: boolean,
+
+    texturePosition: number,
+    mainTextureVertexes: Float32Array,
+    colors: Uint8Array,
+    textureMapping: Float32Array,
+    backgrounds: Uint8Array,
+    backgroundTextureMapping: Float32Array) {
+
+    fillBackground(backgrounds, 0, 14, 42, texturePosition);
     if (tile) {
-      const canvasX = (x - cameraLeft) * this.tileWidth;
-      const canvasY = (y - cameraTop) * this.tileHeight;
-      const symbolY = canvasY + this.tileHeight * 0.75;
-      let color: string;
-      if (tile.selected) {
-        color = tile.initiallySelected ? '#8844FF' : '#4444FF';
+      let color: Color;
+      fillTileMask(this.charsService, backgroundTextureMapping, false, false, false, false, texturePosition);
+      fillVertexPosition(mainTextureVertexes, x, y, 0, 0, this.tileWidth, this.tileHeight, texturePosition);
+      if (tile.accessible && active) {
+        color = clicked ? { r: 170, g: 170, b: 0, a: 1 } : { r: 255, g: 255, b: 68, a: 1 };
+      } else if (tile.selected) {
+        color = tile.initiallySelected ? { r: 136, g: 68, b: 255, a: 1} : { r: 68, g: 68, b: 255, a: 1};
       } else {
         if (tile.accessible) {
-          color = tile.initiallySelected ? '#FF2222' : '#FFFFFF';
+          color = tile.initiallySelected ? { r: 255, g: 34, b: 34, a: 1} : { r: 255, g: 255, b: 255, a: 1};
         } else {
-          color = tile.initiallySelected ? '#990000' : '#888888';
+          color = tile.initiallySelected ? { r: 153, g: 0, b: 0, a: 1} : { r: 136, g: 136, b: 136, a: 1};
         }
       }
-      this.canvasContext.font = `${this.tileHeight - 6}px PT Mono`;
-      this.canvasContext.fillStyle = tile.accessible && active ? (clicked ? `rgb(170, 170, 0)` : `rgb(255, 255, 68)`) :
-        color;
-      this.canvasContext.fillText(tile.char, canvasX + 2, symbolY + 3);
+      fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+      fillChar(this.charsService, textureMapping, tile.char, texturePosition);
+    } else {
+      fillColor(colors, 0, 0, 0, 0, texturePosition);
     }
   }
 
@@ -684,22 +706,58 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
       return;
     }
     this.changed = false;
-    const cameraLeft = this.mapWidth / 2 - (this.canvasWidth) / 2 / this.tileWidth;
-    const cameraTop = this.mapHeight / 2 - this.canvasHeight / 2 / this.tileHeight;
-    this.canvasContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.canvasContext.textAlign = 'left';
-    const mouseX = Math.floor(this.mouseState.x);
-    const mouseY = Math.floor(this.mouseState.y);
-    const clicked = this.mouseState.buttonsInfo[0] && this.mouseState.buttonsInfo[0].pressed;
-    for (let x = 0; x < this.mapWidth; x++) {
+    if (this.shadersProgram) {
+      this.canvasContext.clearColor(0, 8, 24, 1);
+      const cameraLeft = this.mapWidth / 2 - (this.canvasWidth) / 2 / this.tileWidth;
+      const cameraTop = this.mapHeight / 2 - this.canvasHeight / 2 / this.tileHeight;
+      const mouseX = Math.floor(this.mouseState.x);
+      const mouseY = Math.floor(this.mouseState.y);
+      const clicked = this.mouseState.buttonsInfo[0] && this.mouseState.buttonsInfo[0].pressed;
+      const textureMapping: Float32Array = new Float32Array(this.mapWidth * this.mapHeight * 12);
+      const colors: Uint8Array = new Uint8Array(this.mapWidth * this.mapHeight * 4);
+      const backgroundTextureMapping: Float32Array = new Float32Array(this.mapWidth * this.mapHeight * 12);
+      const backgrounds: Uint8Array = new Uint8Array(this.mapWidth * this.mapHeight * 4);
+      const mainTextureVertexes: Float32Array = new Float32Array(this.mapWidth * this.mapHeight * 12);
+      let texturePosition = 0;
       for (let y = 0; y < this.mapHeight; y++) {
-        this.drawPoint(this.talents[x][y], x, y, cameraLeft, cameraTop,
-          mouseX >= x &&
-          mouseX <= x &&
-          mouseY >= y &&
-          mouseY <= y,
-          clicked,
-          x === (this.mapWidth - 1) / 2 && y === (this.mapHeight - 1) / 2);
+        for (let x = 0; x < this.mapWidth; x++) {
+          this.drawPoint(this.talents[x][y], x, y, cameraLeft, cameraTop,
+            mouseX >= x &&
+            mouseX <= x &&
+            mouseY >= y &&
+            mouseY <= y,
+            clicked,
+            x === (this.mapWidth - 1) / 2 && y === (this.mapHeight - 1) / 2,
+            texturePosition,
+            mainTextureVertexes,
+            colors,
+            textureMapping,
+            backgrounds,
+            backgroundTextureMapping);
+          texturePosition++;
+        }
+      }
+      drawArrays(
+        this.canvasContext,
+        this.shadersProgram,
+        mainTextureVertexes,
+        colors,
+        backgrounds,
+        textureMapping,
+        backgroundTextureMapping,
+        this.charsTexture,
+        Math.round((0 - cameraLeft) * this.tileWidth),
+        Math.round((0 - cameraTop) * this.tileHeight),
+        this.mapWidth * this.tileWidth,
+        this.mapHeight * this.tileHeight,
+        this.mapWidth,
+        this.mapHeight,
+        this.charsService.width,
+        this.charsService.spriteHeight);
+
+      if (!this.loaded) {
+        this.loaded = true;
+        this.loading = false;
       }
     }
   }
