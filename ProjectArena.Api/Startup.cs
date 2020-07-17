@@ -108,7 +108,10 @@ namespace ProjectArena.Api
             {
                 app.Use(_routingMiddleware);
                 app.UseDefaultFiles();
-                app.UseStaticFiles();
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    ServeUnknownFileTypes = true,
+                });
             }
 
             app.UseDomainLayer();

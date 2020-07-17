@@ -136,8 +136,9 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     if (definition.loadingScene) {
       titlePosition = this.canvasHeight / 2 - 220;
     }
+    this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     if (definition.loadingScene && this.shadersProgram) {
-      this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      this.canvasWebGLContext.clearColor(0, 0, 0, 0);
       const sceneWidth = 1300;
       const sceneHeight = 680;
       let tileHeight = 30;
