@@ -15,6 +15,7 @@ export class CharsService {
   private charsSubCanvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private chars: { [id: string]: { x: number, y: number } };
+  private loaded = false;
 
   readonly spriteHeight = 30;
   readonly spriteWidth = 18;
@@ -23,31 +24,37 @@ export class CharsService {
     return this.charsSubCanvas.width;
   }
 
-  constructor() {
-    this.charsSubCanvas = document.createElement('canvas');
-    this.charsSubCanvas.height = this.spriteHeight;
-    this.chars = {};
-    const tileSpriteFunctions = this.drawTileSprites();
-    const spriteFunctions = this.drawAllSprites();
-    const elements = Object.keys(this.chars).length;
-    this.charsSubCanvas.width = (this.spriteWidth + 2) * elements;
-    this.context = this.charsSubCanvas.getContext('2d');
-    this.context.clearRect(0, 0, (this.spriteWidth + 2) * elements, this.spriteHeight);
-    this.context.fillStyle = 'rgba(150,0,0,255)';
-    this.context.strokeStyle = 'rgba(255,0,0,255)';
-    this.context.lineWidth = 2;
-    tileSpriteFunctions.forEach(e => {
-      e();
-    });
-    this.context.font = `${this.spriteHeight}px PT Mono`;
-    this.context.textAlign = 'left';
-    this.context.fillStyle = 'rgba(255,0,0,255)';
-    spriteFunctions.forEach(e => {
-      e();
-    });
+  constructor() { }
+
+  loadIfNotLoaded() {
+    if (!this.loaded) {
+      this.loaded = true;
+      this.charsSubCanvas = document.createElement('canvas');
+      this.charsSubCanvas.height = this.spriteHeight;
+      this.chars = {};
+      const tileSpriteFunctions = this.drawTileSprites();
+      const spriteFunctions = this.drawAllSprites();
+      const elements = Object.keys(this.chars).length;
+      this.charsSubCanvas.width = (this.spriteWidth + 2) * elements;
+      this.context = this.charsSubCanvas.getContext('2d');
+      this.context.clearRect(0, 0, (this.spriteWidth + 2) * elements, this.spriteHeight);
+      this.context.fillStyle = 'rgba(150,0,0,255)';
+      this.context.strokeStyle = 'rgba(255,0,0,255)';
+      this.context.lineWidth = 2;
+      tileSpriteFunctions.forEach(e => {
+        e();
+      });
+      this.context.font = `${this.spriteHeight}px PT Mono`;
+      this.context.textAlign = 'left';
+      this.context.fillStyle = 'rgba(255,0,0,255)';
+      spriteFunctions.forEach(e => {
+        e();
+      });
+    }
   }
 
   getTexture(gl: WebGLRenderingContext) {
+    this.loadIfNotLoaded();
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -59,10 +66,12 @@ export class CharsService {
   }
 
   getTileMask(left: boolean, right: boolean, top: boolean, bottom: boolean) {
+    this.loadIfNotLoaded();
     return this.chars[this.getTileName(left, right, top, bottom)];
   }
 
   getSpritePositionOnTexture(id: string) {
+    this.loadIfNotLoaded();
     return this.chars[id];
   }
 
