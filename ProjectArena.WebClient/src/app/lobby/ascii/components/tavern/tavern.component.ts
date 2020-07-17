@@ -186,7 +186,6 @@ export class TavernComponent implements OnInit, OnDestroy {
     this.tileWidth = this.tileHeight * 0.6;
     this.setupAspectRatio(this.tavernCanvas.nativeElement.offsetWidth, this.tavernCanvas.nativeElement.offsetHeight);
     this.canvasContext = this.tavernCanvas.nativeElement.getContext('webgl');
-    this.charsTexture = this.charsService.getTexture(this.canvasContext);
     this.generateTavern();
     this.changed = true;
     this.redrawScene();
@@ -199,6 +198,7 @@ export class TavernComponent implements OnInit, OnDestroy {
       'fragment-shader-2d.fx'
     )
       .subscribe((result) => {
+        this.charsTexture = this.charsService.getTexture(this.canvasContext);
         this.shadersProgram = result;
         this.changed = true;
       });

@@ -347,7 +347,6 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.tileWidth = this.tileHeight * 0.6;
     this.canvasContext = this.talentsCanvas.nativeElement.getContext('webgl');
-    this.charsTexture = this.charsService.getTexture(this.canvasContext);
     this.setupAspectRatio(this.talentsCanvas.nativeElement.offsetWidth, this.talentsCanvas.nativeElement.offsetHeight);
     this.drawingTimer = setInterval(() => {
       this.redrawScene();
@@ -358,6 +357,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
       'fragment-shader-2d.fx'
     )
       .subscribe((result) => {
+        this.charsTexture = this.charsService.getTexture(this.canvasContext);
         this.shadersProgram = result;
         this.changed = true;
       });

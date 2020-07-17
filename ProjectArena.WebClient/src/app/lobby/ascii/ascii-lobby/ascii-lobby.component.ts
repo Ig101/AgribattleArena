@@ -213,7 +213,6 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
     this.setupAspectRatio(this.lobbyCanvas.nativeElement.offsetWidth, this.lobbyCanvas.nativeElement.offsetHeight);
     this.canvasWebGLContext = this.lobbyCanvas.nativeElement.getContext('webgl');
     this.canvas2DContext = this.hudCanvas.nativeElement.getContext('2d');
-    this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
     this.generateCamp();
     this.fullParty = this.userService.user.roster.length >= this.charactersMaxCount;
     this.changed = true;
@@ -227,6 +226,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
       'fragment-shader-2d.fx'
     )
       .subscribe((result) => {
+        this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
         this.shadersProgram = result;
         this.changed = true;
       });

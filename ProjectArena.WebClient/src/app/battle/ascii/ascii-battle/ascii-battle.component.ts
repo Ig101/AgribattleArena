@@ -356,7 +356,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
     this.canvasWebGLContext = this.battleCanvas.nativeElement.getContext('webgl');
     this.canvas2DContext = this.hudCanvas.nativeElement.getContext('2d');
-    this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
     this.battleStorageService.version = 0;
     const loadBattle = this.activatedRoute.snapshot.data.battle;
     this.canvas2DContext.font = `${26}px PT Mono`;
@@ -373,6 +372,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       'fragment-shader-2d.fx'
     )
       .subscribe((result) => {
+        this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
         this.shadersProgram = result;
       });
     this.processNextActionFromQueue();

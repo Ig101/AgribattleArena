@@ -49,7 +49,6 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.canvas2DContext = this.hudCanvas.nativeElement.getContext('2d');
     this.canvasWebGLContext = this.battleCanvas.nativeElement.getContext('webgl');
-    this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
     this.loadingService.setupTime();
     this.updateTimer = setInterval(() => {
@@ -62,6 +61,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
       'fragment-shader-2d.fx'
     )
       .subscribe((result) => {
+        this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
         this.shadersProgram = result;
         this.loadingService.changed = true;
         this.redraw();
