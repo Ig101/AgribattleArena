@@ -26,7 +26,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/fragment-shader-2d.fx"
+              "src/fragment-shader-2d.fx",
+              "src/vertex-shader-2d.fx"
             ],
             "styles": [
               "src/styles.scss"

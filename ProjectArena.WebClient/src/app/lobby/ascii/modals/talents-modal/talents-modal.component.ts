@@ -354,8 +354,8 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
     }, 1000 / this.updateFrequency);
     this.assetsLoadingService.loadShadersAndCreateProgram(
       this.canvasContext,
-      'shaders/vertex-shader-2d.fx',
-      'shaders/fragment-shader-2d.fx'
+      'vertex-shader-2d.fx',
+      'fragment-shader-2d.fx'
     )
       .subscribe((result) => {
         this.shadersProgram = result;

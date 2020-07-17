@@ -49,9 +49,9 @@ export class AssetsLoadingService {
     if (this.shaders) {
       return of(this.processShaders(gl, this.shaders));
     } else {
-      return this.http.get(`assets/${vertexShaderPath}`, {responseType: 'text'})
+      return this.http.get(`${vertexShaderPath}`, {responseType: 'text'})
         .pipe(switchMap((vertex: string) => {
-          return this.http.get(`assets/${fragmentShaderPath}`, {responseType: 'text'})
+          return this.http.get(`${fragmentShaderPath}`, {responseType: 'text'})
             .pipe(map((fragment: string) => {
               return {
                 vertex,
