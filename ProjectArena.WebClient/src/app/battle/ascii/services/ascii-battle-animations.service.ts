@@ -46,7 +46,7 @@ export class AsciiBattleAnimationsService {
           if (actor.isDead) {
             actorFloats.push({
               text: '*flee*',
-              color: { r: 255, g: 255, b: 0, a: 1 },
+              color: { r: 255, g: 255, b: 0, a: 1.0 },
               time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
               x: actor.x,
               y: actor.y,
@@ -58,7 +58,7 @@ export class AsciiBattleAnimationsService {
           if (actor.healthChange) {
             actorFloats.push({
               text: (actor.healthChange > 0 ? '+' : '') + actor.healthChange.toString(),
-              color: actor.healthChange > 0 ? { r: 0, g: 255, b: 0, a: 1 } : { r: 255, g: 0, b: 0, a: 1 },
+              color: actor.healthChange > 0 ? { r: 0, g: 255, b: 0, a: 1.0 } : { r: 255, g: 0, b: 0, a: 1.0 },
               time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
               x: actor.x,
               y: actor.y,
@@ -67,7 +67,7 @@ export class AsciiBattleAnimationsService {
           } else if (actor.isDead) {
             actorFloats.push({
               text: '*dead*',
-              color: { r: 255, g: 0, b: 0, a: 1 },
+              color: { r: 255, g: 0, b: 0, a: 1.0 },
               time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
               x: actor.x,
               y: actor.y,
@@ -79,7 +79,7 @@ export class AsciiBattleAnimationsService {
       for (const buff of actor.newBuffs) {
         actorFloats.push({
           text: `+${buff.char}`,
-          color: { r: buff.color.r, g: buff.color.g, b: buff.color.b, a: 1 },
+          color: { r: buff.color.r, g: buff.color.g, b: buff.color.b, a: 1.0 },
           time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
           x: actor.x,
           y: actor.y,
@@ -107,7 +107,7 @@ export class AsciiBattleAnimationsService {
           buff.onApplyAnimation);
         actorFloats.push({
           text: `-${buff.char}`,
-          color: { r: buff.color.r, g: buff.color.g, b: buff.color.b, a: 1 },
+          color: { r: buff.color.r, g: buff.color.g, b: buff.color.b, a: 1.0 },
           time: actorFloats.length * -this.battleStorageService.floatingTextDelay,
           x: actor.x,
           y: actor.y,
@@ -136,7 +136,7 @@ export class AsciiBattleAnimationsService {
       if (decoration.healthChange) {
         decorationFloats.push({
           text: decoration.healthChange.toString(),
-          color: { r: 255, g: 0, b: 0, a: 1 },
+          color: { r: 255, g: 0, b: 0, a: 1.0 },
           time: decorationFloats.length * -this.battleStorageService.floatingTextDelay,
           x: decoration.x,
           y: decoration.y,

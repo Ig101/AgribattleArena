@@ -259,7 +259,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           if (unsuccessActor) {
             this.battleStorageService.floatingTexts.push({
               text: '*fail*',
-              color: { r: 255, g: 255, b: 0, a: 1 },
+              color: { r: 255, g: 255, b: 0, a: 1.0 },
               time: 0,
               x: unsuccessActor.x,
               y: unsuccessActor.y,
@@ -1046,8 +1046,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           const x = (text.x + 0.5 - cameraLeft) * this.tileWidth;
           const y = (text.y - cameraTop) * this.tileHeight - text.height;
           this.canvas2DContext.globalAlpha = text.color.a;
-          this.canvas2DContext.fillStyle = `rgb(${text.color.r}, ${text.color.g},
-            ${text.color.b})`;
+          this.canvas2DContext.fillStyle = `rgba(${text.color.r}, ${text.color.g},
+            ${text.color.b}, 1.0)`;
           this.canvas2DContext.fillText(text.text, x, y);
           this.canvas2DContext.strokeText(text.text, x, y);
         }
@@ -1264,7 +1264,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           if (actor) {
             this.battleStorageService.floatingTexts.push({
               text: '*fail*',
-              color: { r: 255, g: 255, b: 0, a: 1 },
+              color: { r: 255, g: 255, b: 0, a: 1.0 },
               time: 0,
               x: actor.x,
               y: actor.y,

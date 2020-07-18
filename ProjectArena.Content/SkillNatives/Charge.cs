@@ -35,14 +35,17 @@ namespace ProjectArena.Content.SkillNatives
                     }
 
                     var angle = Misc.AngleBetween(targetTile.X, targetTile.Y, owner.X, owner.Y);
-                    var sin = (float)(Math.Sin(angle) * 0.5);
-                    var cos = (float)(Math.Cos(angle) * 0.5);
+                    var sin = (float)Math.Sin(angle);
+                    var cos = (float)Math.Cos(angle);
                     var x = (float)targetTile.X;
                     var y = (float)targetTile.Y;
-                    while ((int)Math.Round(x, MidpointRounding.AwayFromZero) == targetTile.X && (int)Math.Round(y, MidpointRounding.AwayFromZero) == targetTile.Y)
+                    if (targetTile.TempObject != null)
                     {
-                        x += cos;
-                        y += sin;
+                        while ((int)Math.Round(x, MidpointRounding.AwayFromZero) == targetTile.X && (int)Math.Round(y, MidpointRounding.AwayFromZero) == targetTile.Y)
+                        {
+                            x += cos;
+                            y += sin;
+                        }
                     }
 
                     owner.ChangePosition(scene.Tiles[(int)Math.Round(x, MidpointRounding.AwayFromZero)][(int)Math.Round(y, MidpointRounding.AwayFromZero)], true);
