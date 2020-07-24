@@ -368,8 +368,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     this.finishLoadingFlag = true;
     this.assetsLoadingService.loadShadersAndCreateProgram(
       this.canvasWebGLContext,
-      'vertex-shader-2d.fx',
-      'fragment-shader-2d.fx'
+      'vertex-shader-2d.vert',
+      'fragment-shader-2d.frag'
     )
       .subscribe((result) => {
         this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);
@@ -1030,7 +1030,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         this.generateActionSquareGrid(this.battleStorageService.currentActionId ? redPath : yellowPath, cameraLeft, cameraTop);
       }
       this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      this.canvas2DContext.globalAlpha = 1.0;
+      this.canvas2DContext.globalAlpha = 255;
       this.canvas2DContext.lineWidth = 2;
       this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1)';
       this.canvas2DContext.stroke(redPath);
@@ -1045,9 +1045,9 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         if (text.time >= 0) {
           const x = (text.x + 0.5 - cameraLeft) * this.tileWidth;
           const y = (text.y - cameraTop) * this.tileHeight - text.height;
-          this.canvas2DContext.globalAlpha = text.color.a;
-          this.canvas2DContext.fillStyle = `rgba(${text.color.r}, ${text.color.g},
-            ${text.color.b}, 1.0)`;
+          this.canvas2DContext.globalAlpha = text.color.a * 255;
+          this.canvas2DContext.fillStyle = `rgb(${text.color.r}, ${text.color.g},
+            ${text.color.b})`;
           this.canvas2DContext.fillText(text.text, x, y);
           this.canvas2DContext.strokeText(text.text, x, y);
         }

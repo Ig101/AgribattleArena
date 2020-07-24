@@ -222,8 +222,8 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
     }, 1000 / this.updateFrequency);
     this.assetsLoadingService.loadShadersAndCreateProgram(
       this.canvasWebGLContext,
-      'vertex-shader-2d.fx',
-      'fragment-shader-2d.fx'
+      'vertex-shader-2d.vert',
+      'fragment-shader-2d.frag'
     )
       .subscribe((result) => {
         this.charsTexture = this.charsService.getTexture(this.canvasWebGLContext);

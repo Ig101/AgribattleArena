@@ -39,13 +39,14 @@ namespace ProjectArena.Content.SkillNatives
                     var cos = (float)Math.Cos(angle);
                     var x = (float)targetTile.X;
                     var y = (float)targetTile.Y;
-                    if (targetTile.TempObject != null)
+                    var xRound = targetTile.X;
+                    var yRound = targetTile.Y;
+                    while (scene.Tiles[xRound][yRound].TempObject != null)
                     {
-                        while ((int)Math.Round(x, MidpointRounding.AwayFromZero) == targetTile.X && (int)Math.Round(y, MidpointRounding.AwayFromZero) == targetTile.Y)
-                        {
-                            x += cos;
-                            y += sin;
-                        }
+                        x += cos;
+                        y += sin;
+                        xRound = (int)Math.Round(x, MidpointRounding.AwayFromZero);
+                        yRound = (int)Math.Round(y, MidpointRounding.AwayFromZero);
                     }
 
                     owner.ChangePosition(scene.Tiles[(int)Math.Round(x, MidpointRounding.AwayFromZero)][(int)Math.Round(y, MidpointRounding.AwayFromZero)], true);

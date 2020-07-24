@@ -25,9 +25,7 @@
             "aot": true,
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              "src/fragment-shader-2d.fx",
-              "src/vertex-shader-2d.fx"
+              "src/assets"
             ],
             "styles": [
               "src/styles.scss"
