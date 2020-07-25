@@ -352,6 +352,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     const loadBattle = this.activatedRoute.snapshot.data.battle;
     this.canvas2DContext.font = `${26}px PT Mono`;
     this.canvas2DContext.textAlign = 'center';
+    this.canvas2DContext.globalAlpha = 1.0;
     this.drawingTimer = setInterval(this.updateCycle, 1000 / this.updatingFrequency, this);
     if (loadBattle) {
       const snapshot = this.battleResolver.popBattleSnapshot();
