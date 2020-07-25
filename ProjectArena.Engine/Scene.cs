@@ -16,6 +16,7 @@ namespace ProjectArena.Engine
     public class Scene : ISceneParentRef, ISceneForSceneGenerator, ForExternalUse.IScene
     {
         public const float TimePenalty = 2;
+        public const float MoveTimePenalty = 1.4f;
 
         public delegate bool DefeatConditionMethod(ISceneParentRef scene, IPlayerParentRef player);
 
@@ -37,7 +38,7 @@ namespace ProjectArena.Engine
 
         public float PassedTime { get; private set; }
 
-        public bool Idle => idleTime > 3;
+        public bool Idle => idleTime > 2;
 
         public string EnemyActorsPrefix { get; private set; }
 
@@ -528,9 +529,9 @@ namespace ProjectArena.Engine
             {
                 this.RemainedTurnTime -= time;
                 var newIdleTime = idleTime + time;
-                if (newIdleTime > 3 && TempTileObject != null)
+                if (newIdleTime > 2 && TempTileObject != null)
                 {
-                    if (idleTime <= 3)
+                    if (idleTime <= 2)
                     {
                         idleSwitch = true;
                     }
@@ -656,7 +657,7 @@ namespace ProjectArena.Engine
                             }
 
                             bool afterActionUpdateSynchronization = AfterUpdateSynchronization(Helpers.SceneAction.Move, actor, null, targetX, targetY);
-                            this.RemainedTurnTime -= TimePenalty;
+                            this.RemainedTurnTime -= MoveTimePenalty;
                             if (afterActionUpdateSynchronization && (!actionAvailability || this.RemainedTurnTime <= 0))
                             {
                                 EndTurn();

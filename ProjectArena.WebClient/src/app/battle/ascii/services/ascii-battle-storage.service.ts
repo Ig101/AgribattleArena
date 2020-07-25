@@ -27,7 +27,8 @@ export class AsciiBattleStorageService {
   floatingTextSpeed = 0.07;
   floatingTextDelay = 400;
 
-  movePenalty = 2;
+  movePenalty = 1.4;
+  timePenalty = 2;
 
   cameraX: number;
   cameraY: number;

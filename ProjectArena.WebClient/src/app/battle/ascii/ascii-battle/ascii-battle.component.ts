@@ -115,13 +115,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     actorId: number,
     action: BattleSynchronizationActionEnum
   };
-  actionsQueue: {
-    actorId: number,
-    x: number,
-    y: number,
-    action: BattleSynchronizationActionEnum
-  }[] = [];
-
   skillList: SmartAction[] = [];
   moveButtons: SmartAction[];
   pressedKey: string;
@@ -131,7 +124,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   synchronizationErrorTimer;
 
   get canAct() {
-    return !this.blocked && !this.specificActionResponseForWait && this.actionsQueue.length === 0 &&
+    return !this.blocked && !this.specificActionResponseForWait &&
       this.battleStorageService.currentActor?.owner?.userId === this.userService.user.id &&
       this.receivingMessagesFromHubAllowed;
   }
@@ -268,7 +261,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           }
         }
         this.battleAnimationsService.animationsQueue.length = 0;
-        this.actionsQueue.length = 0;
         this.receivingMessagesFromHubAllowed = true;
         this.specificActionResponseForWait = undefined;
       }
@@ -562,26 +554,18 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
                 currentActionSquare.x, currentActionSquare.y, this.battleStorageService.currentActionId);
               this.resetSkillActions();
             } else {
-              this.actionsQueue = [
-                ...currentActionSquare.parentSquares.filter(s => !s.isActor)
-                  .reverse().map(s => {
-                    return {
-                    actorId: this.battleStorageService.currentActor.id,
-                    x: s.x,
-                    y: s.y,
-                    action: s.type === ActionSquareTypeEnum.Move ?
-                      BattleSynchronizationActionEnum.Move :
-                      BattleSynchronizationActionEnum.Attack
-                    };
-                  }), {
-                    actorId: this.battleStorageService.currentActor.id,
-                    x: currentActionSquare.x,
-                    y: currentActionSquare.y,
-                    action: currentActionSquare.type === ActionSquareTypeEnum.Move ?
-                      BattleSynchronizationActionEnum.Move :
-                      BattleSynchronizationActionEnum.Attack
-                  }];
-              this.sendActionFromQueue();
+              this.arenaHub.orderAttack(
+                this.battleStorageService.scene.id,
+                this.battleStorageService.currentActor.id,
+                currentActionSquare.x,
+                currentActionSquare.y);
+              this.specificActionResponseForWait = {
+                actorId: this.battleStorageService.currentActor.id,
+                action: BattleSynchronizationActionEnum.Attack
+              };
+              this.battleAnimationsService
+                .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Attack, this.battleStorageService.currentActor,
+                currentActionSquare.x, currentActionSquare.y);
             }
           }
         }
@@ -1066,63 +1050,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Updating
-  private sendActionFromQueue() {
-    const newAction = this.actionsQueue.shift();
-    if (!this.battleStorageService.currentActor) {
-      this.specificActionResponseForWait = undefined;
-      return;
-    }
-    this.specificActionResponseForWait = {
-      actorId: newAction.actorId,
-      action: newAction.action
-    };
-    const sX = Math.abs(this.battleStorageService.currentActor.x - newAction.x);
-    const sY = Math.abs(this.battleStorageService.currentActor.y - newAction.y);
-    const tile = this.battleStorageService.scene.tiles[newAction.x][newAction.y];
-    const initialTile = this.battleStorageService.scene
-      .tiles[this.battleStorageService.currentActor.x][this.battleStorageService.currentActor.y];
-    switch (newAction.action) {
-      case BattleSynchronizationActionEnum.Move:
-        if (newAction.actorId === this.battleStorageService.currentActor.id &&
-          (sX === 1 && sY === 0 || sX === 0 && sY === 1) && this.battleStorageService.currentActor.canMove &&
-          !tile.unbearable && !tile.actor && !tile.decoration &&
-          Math.abs(tile.height - initialTile.height) < 10) {
-            this.arenaHub.orderMove(this.battleStorageService.scene.id, newAction.actorId, newAction.x, newAction.y);
-            this.battleAnimationsService
-              .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Move, this.battleStorageService.currentActor,
-              newAction.x, newAction.y);
-        } else {
-          this.specificActionResponseForWait = undefined;
-        }
-        break;
-      case BattleSynchronizationActionEnum.Attack:
-        const skill = this.battleStorageService.currentActor.attackingSkill;
-        if (newAction.actorId === this.battleStorageService.currentActor.id &&
-          this.battleStorageService.currentActor.canAct &&
-          checkSkillTargets(tile, this.battleStorageService.currentActor, skill.availableTargets) &&
-          (!skill.onlyVisibleTargets || checkMilliness(initialTile, tile, skill.range <= 1, this.battleStorageService.scene.tiles)) &&
-          (tile.actor || tile.decoration) && tile.actor !== this.battleStorageService.currentActor) {
-          this.arenaHub.orderAttack(this.battleStorageService.scene.id, newAction.actorId, newAction.x, newAction.y);
-          this.battleAnimationsService
-            .generateAnimationsFromIssue(BattleSynchronizationActionEnum.Attack, this.battleStorageService.currentActor,
-            newAction.x, newAction.y);
-        } else {
-          this.specificActionResponseForWait = undefined;
-        }
-        break;
-      default:
-        this.loadingService.startLoading({
-          title: 'Desynchronization. Page will be refreshed in 2 seconds.'
-        }, 0, true);
-        console.error('Action is not found');
-        setTimeout(() => {
-          location.reload();
-        }, 2000);
-        return;
-    }
-  }
-
   private calculateInitiativeScale(): InitiativePortrait[] {
     const allPortraits = this.battleStorageService.scene.actors.map(x => {
       const color = x.visualization.color;
@@ -1273,7 +1200,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           }
         }
         this.battleAnimationsService.animationsQueue.length = 0;
-        this.actionsQueue.length = 0;
         this.receivingMessagesFromHubAllowed = true;
         this.specificActionResponseForWait = undefined;
       } else if (!action.sync.actorId ||
@@ -1327,16 +1253,10 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   private processNextActionFromQueueWithChecks(pending: boolean = false) {
     if (!pending) {
       if (this.specificActionResponseForWait) {
-        if (this.actionsQueue.length > 0) {
-          this.sendActionFromQueue();
-        } else {
-          this.specificActionResponseForWait = undefined;
-        }
+        this.specificActionResponseForWait = undefined;
       }
       this.recalculateSkillActions();
-      if (!this.specificActionResponseForWait) {
-        this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
-      }
+      this.battleStorageService.currentInitiativeList.next(this.calculateInitiativeScale());
     }
     this.processNextActionFromQueue();
   }
@@ -1380,7 +1300,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       }
       this.battleStorageService.turnTime -= shift / 1000;
       if (this.battleStorageService.idle) {
-        this.battleStorageService.turnTime -= shift / 1000 * this.battleStorageService.movePenalty;
+        this.battleStorageService.turnTime -= shift / 1000 * this.battleStorageService.timePenalty;
       }
       this.animationTicker += shift;
       if (this.animationTicker > this.oneFrame) {
