@@ -247,6 +247,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     });
     this.unsuccessfulActionSubscription = arenaHub.unsuccessfulActionSubject.subscribe(() => {
       if (this.specificActionResponseForWait) {
+        console.log('unsuccess');
         if (this.specificActionResponseForWait.action !== BattleSynchronizationActionEnum.Move) {
           const unsuccessActor = this.battleStorageService.scene.actors.find(x => x.id === this.specificActionResponseForWait.actorId);
           if (unsuccessActor) {
@@ -635,6 +636,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   }
 
   private moveActorTo(x: number, y: number) {
+    console.log('move');
     if (this.canAct && x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
       this.movingTimer = 3 * this.oneFrame;
       const actor = this.battleStorageService.currentActor;
