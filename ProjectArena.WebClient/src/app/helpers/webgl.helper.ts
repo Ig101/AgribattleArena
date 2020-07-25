@@ -1,3 +1,4 @@
+import { ITextureService } from '../shared/interfaces/texture-service.interface';
 import { CharsService } from '../shared/services/chars.service';
 
 export function fillBackground(backgrounds: Uint8Array, r: number, g: number, b: number, texturePosition: number) {
@@ -14,7 +15,7 @@ export function fillColor(colors: Uint8Array, r: number, g: number, b: number, a
   colors[texturePosition * 4 + 3] = a;
 }
 
-export function fillChar(charsService: CharsService, textureMapping: Float32Array, char: string, texturePosition: number) {
+export function fillChar(charsService: ITextureService, textureMapping: Float32Array, char: string, texturePosition: number) {
   const charPosition = charsService.getSpritePositionOnTexture(char);
   textureMapping[texturePosition * 12] = charPosition.x;
   textureMapping[texturePosition * 12 + 1] = charPosition.y;
@@ -30,7 +31,7 @@ export function fillChar(charsService: CharsService, textureMapping: Float32Arra
   textureMapping[texturePosition * 12 + 11] = charPosition.y + charsService.spriteHeight;
 }
 
-export function fillTileMask(charsService: CharsService, textureMapping: Float32Array,
+export function fillTileMask(charsService: ITextureService, textureMapping: Float32Array,
                              left: boolean, right: boolean, top: boolean, bottom: boolean, texturePosition: number) {
   const charPosition = charsService.getTileMask(left, right, top, bottom);
   textureMapping[texturePosition * 12] = charPosition.x;

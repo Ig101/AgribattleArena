@@ -34,6 +34,7 @@ import { CharsService } from 'src/app/shared/services/chars.service';
 import { AssetsLoadingService } from 'src/app/shared/services/assets-loading.service';
 import { drawArrays, fillTileMask, fillBackground, fillColor, fillChar, fillVertexPosition } from 'src/app/helpers/webgl.helper';
 import { Color } from 'src/app/shared/models/color.model';
+import { IconsService } from 'src/app/shared/services/icons.service';
 
 @Component({
   selector: 'app-talents-modal',
@@ -124,7 +125,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private talentsService: TalentsService,
     private webCommunicationService: WebCommunicationService,
-    private charsService: CharsService,
+    private iconsService: IconsService,
     private assetsLoadingService: AssetsLoadingService
   ) { }
 
@@ -357,7 +358,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
       'fragment-shader-2d.frag'
     )
       .subscribe((result) => {
-        this.charsTexture = this.charsService.getTexture(this.canvasContext);
+        this.charsTexture = this.iconsService.getTexture(this.canvasContext);
         this.shadersProgram = result;
         this.changed = true;
       });
@@ -681,7 +682,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
     fillBackground(backgrounds, 0, 14, 42, texturePosition);
     if (tile) {
       let color: Color;
-      fillTileMask(this.charsService, backgroundTextureMapping, false, false, false, false, texturePosition);
+      fillTileMask(this.iconsService, backgroundTextureMapping, false, false, false, false, texturePosition);
       fillVertexPosition(mainTextureVertexes, x, y, 0, 0, this.tileWidth, this.tileHeight, texturePosition);
       if (tile.accessible && active) {
         color = clicked ? { r: 170, g: 170, b: 0, a: 1 } : { r: 255, g: 255, b: 68, a: 1 };
@@ -695,7 +696,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
         }
       }
       fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
-      fillChar(this.charsService, textureMapping, tile.char, texturePosition);
+      fillChar(this.iconsService, textureMapping, tile.char, texturePosition);
     } else {
       fillColor(colors, 0, 0, 0, 0, texturePosition);
     }
@@ -752,8 +753,8 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
         this.mapHeight * this.tileHeight,
         this.mapWidth,
         this.mapHeight,
-        this.charsService.width,
-        this.charsService.spriteHeight);
+        this.iconsService.width,
+        this.iconsService.spriteHeight);
 
       if (!this.loaded) {
         this.loaded = true;

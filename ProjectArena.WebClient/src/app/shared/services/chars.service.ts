@@ -6,11 +6,12 @@
 
 import { Injectable } from '@angular/core';
 import { element } from 'protractor';
+import { ITextureService } from '../interfaces/texture-service.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CharsService {
+export class CharsService implements ITextureService {
 
   private charsSubCanvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
@@ -26,7 +27,7 @@ export class CharsService {
 
   constructor() { }
 
-  loadIfNotLoaded() {
+  private loadIfNotLoaded() {
     if (!this.loaded) {
       this.loaded = true;
       this.charsSubCanvas = document.createElement('canvas');
@@ -150,16 +151,6 @@ export class CharsService {
     };
   }
 
-  private drawTalentChar(id: string, text: string) {
-    const elementNumber = Object.keys(this.chars).length ;
-    const symbolY = (this.spriteHeight - 4) * 0.75 + 2;
-    this.chars['t' + id] = { x: (this.spriteWidth + 2) * elementNumber, y: 0 };
-    return () => {
-      this.context.font = `${this.spriteHeight - 4}px PT Mono`;
-      this.context.fillText(text, (this.spriteWidth + 2) * elementNumber + 1, symbolY);
-    };
-  }
-
   private drawAllSprites() {
     return [
       this.drawTextChar('x', 'x'),
@@ -186,32 +177,7 @@ export class CharsService {
       this.drawTextChar('/', '/'),
       this.drawTextChar('X', 'X'),
       this.drawTextChar('+', '+'),
-      this.drawTextChar('|', '|'),
-
-      this.drawTalentChar('c', 'c'),
-      this.drawTalentChar('p', 'p'),
-      this.drawTalentChar('m', 'm'),
-      this.drawTalentChar('f', 'f'),
-      this.drawTalentChar('w', 'w'),
-      this.drawTalentChar('z', 'z'),
-      this.drawTalentChar('q', 'q'),
-      this.drawTalentChar('d', 'd'),
-      this.drawTalentChar('a', 'a'),
-      this.drawTalentChar('e', 'e'),
-      this.drawTalentChar('t', 't'),
-      this.drawTalentChar('r', 'r'),
-      this.drawTalentChar('C', 'C'),
-      this.drawTalentChar('S', 'S'),
-      this.drawTalentChar('W', 'W'),
-      this.drawTalentChar('I', 'I'),
-      this.drawTalentChar('E', 'E'),
-      this.drawTalentChar('B', 'B'),
-      this.drawTalentChar('R', 'R'),
-      this.drawTalentChar('A', 'A'),
-      this.drawTalentChar('F', 'F'),
-      this.drawTalentChar('M', 'M'),
-      this.drawTalentChar('P', 'P'),
-      this.drawTalentChar('O', 'O'),
+      this.drawTextChar('|', '|')
     ];
   }
 }
