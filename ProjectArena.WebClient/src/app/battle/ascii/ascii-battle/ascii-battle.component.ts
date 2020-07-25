@@ -247,7 +247,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     });
     this.unsuccessfulActionSubscription = arenaHub.unsuccessfulActionSubject.subscribe(() => {
       if (this.specificActionResponseForWait) {
-        console.log('unsuccess');
         if (this.specificActionResponseForWait.action !== BattleSynchronizationActionEnum.Move) {
           const unsuccessActor = this.battleStorageService.scene.actors.find(x => x.id === this.specificActionResponseForWait.actorId);
           if (unsuccessActor) {
@@ -636,7 +635,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
   }
 
   private moveActorTo(x: number, y: number) {
-    console.log('move');
     if (this.canAct && x >= 0 && y >= 0 && x < this.battleStorageService.scene.width && y < this.battleStorageService.scene.height) {
       this.movingTimer = 3 * this.oneFrame;
       const actor = this.battleStorageService.currentActor;
@@ -1016,7 +1014,6 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         this.generateActionSquareGrid(this.battleStorageService.currentActionId ? redPath : yellowPath, cameraLeft, cameraTop);
       }
       this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      this.canvas2DContext.globalAlpha = 255;
       this.canvas2DContext.lineWidth = 2;
       this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1)';
       this.canvas2DContext.stroke(redPath);
@@ -1025,15 +1022,14 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1)';
       this.canvas2DContext.stroke(greenPath);
 
-      this.canvas2DContext.strokeStyle = `rgb(0, 8, 24)`;
       this.canvas2DContext.lineWidth = 1;
       for (const text of this.battleStorageService.floatingTexts) {
         if (text.time >= 0) {
           const x = (text.x + 0.5 - cameraLeft) * this.tileWidth;
           const y = (text.y - cameraTop) * this.tileHeight - text.height;
-          this.canvas2DContext.globalAlpha = text.color.a * 255;
-          this.canvas2DContext.fillStyle = `rgb(${text.color.r}, ${text.color.g},
-            ${text.color.b})`;
+          this.canvas2DContext.fillStyle = `rgba(${text.color.r}, ${text.color.g},
+            ${text.color.b}, ${text.color.a})`;
+          this.canvas2DContext.strokeStyle = `rgba(0, 8, 24, ${text.color.a})`;
           this.canvas2DContext.fillText(text.text, x, y);
           this.canvas2DContext.strokeText(text.text, x, y);
         }
