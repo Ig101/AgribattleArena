@@ -36,10 +36,6 @@ namespace ProjectArena.Api
                 {
                     context.Request.Path = new PathString("/index.html");
                 }
-                else
-                {
-                    context.Request.Scheme = "https";
-                }
 
                 await next();
             };

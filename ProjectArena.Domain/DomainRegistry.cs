@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using AspNetCore.Identity.Mongo;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -137,8 +138,12 @@ namespace ProjectArena.Domain
                 options.Cookie.HttpOnly = true;
                 options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
                 options.SlidingExpiration = true;
-                options.LoginPath = "/api/Account/Login";
-                options.AccessDeniedPath = "/api/Account/AccessDenied";
+                options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
             });
             var domainAssembly = Assembly.GetExecutingAssembly();
             services.AddSingleton<IMongoConnection, MongoConnection>(
