@@ -1016,11 +1016,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       }
       this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvas2DContext.lineWidth = 2;
-      this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1)';
+      this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1.0)';
       this.canvas2DContext.stroke(redPath);
-      this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1)';
+      this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1.0)';
       this.canvas2DContext.stroke(yellowPath);
-      this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1)';
+      this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1.0)';
       this.canvas2DContext.stroke(greenPath);
 
       this.canvas2DContext.lineWidth = 1;
@@ -1325,8 +1325,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         if (floatingText.time >= 0) {
           this.changed = true;
           floatingText.height += this.battleStorageService.floatingTextSpeed * shift;
-          floatingText.color.a = Math.min(1, (this.battleStorageService.floatingTextTime - floatingText.time) /
-            this.battleStorageService.floatingTextTime * 2);
+          floatingText.color.a = Math.max(0.0, Math.min(1.0, (this.battleStorageService.floatingTextTime - floatingText.time) /
+            this.battleStorageService.floatingTextTime * 2));
         }
         if (floatingText.time > this.battleStorageService.floatingTextTime) {
           this.battleStorageService.floatingTexts.splice(i, 1);
