@@ -334,6 +334,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.drawingTimer);
+    this.canvasWebGLContext.getExtension('WEBGL_lose_context').loseContext();
     this.onCloseSubscription.unsubscribe();
     this.arenaActionsSubscription.unsubscribe();
     this.synchronizationErrorSubscription.unsubscribe();
@@ -449,7 +450,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         modalObjects.push({
           id: tile.actor.id,
           char: tile.actor.visualization.char,
-          color:  `rgba(${tile.actor.visualization.color.r},${tile.actor.visualization.color.g},
+          color: tile.actor.visualization.color,
+          colorString: `rgba(${tile.actor.visualization.color.r},${tile.actor.visualization.color.g},
             ${tile.actor.visualization.color.b},${tile.actor.visualization.color.a})`,
           name: tile.actor.name,
           description: tile.actor.description,
@@ -461,7 +463,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         modalObjects.push({
           id: tile.decoration.id,
           char: tile.decoration.visualization.char,
-          color: `rgba(${tile.decoration.visualization.color.r},${tile.decoration.visualization.color.g},
+          color: tile.decoration.visualization.color,
+          colorString: `rgba(${tile.decoration.visualization.color.r},${tile.decoration.visualization.color.g},
             ${tile.decoration.visualization.color.b},${tile.decoration.visualization.color.a})`,
           name: tile.decoration.name,
           description: tile.decoration.description,
@@ -474,7 +477,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
           return {
             id: e.id,
             char: e.visualization.char,
-            color: `rgba(${e.visualization.color.r},${e.visualization.color.g},
+            color: e.visualization.color,
+            colorString: `rgba(${e.visualization.color.r},${e.visualization.color.g},
               ${e.visualization.color.b},${e.visualization.color.a})`,
             name: e.name,
             description: e.description,
@@ -489,7 +493,8 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       modalObjects.push({
         id: undefined,
         char: tile.visualization.char,
-        color: `rgba(${tile.visualization.color.r},${tile.visualization.color.g},
+        color: tile.visualization.color,
+        colorString: `rgba(${tile.visualization.color.r},${tile.visualization.color.g},
           ${tile.visualization.color.b},${tile.visualization.color.a})`,
         name: tile.name,
         description: tile.description,
@@ -1054,24 +1059,30 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       const color = x.visualization.color;
       return {
         color: `rgba(${color.r},${color.g},${color.b},${color.a})`,
-        char: x.visualization.char,
         initiativePosition: x.initiativePosition,
         active: true,
         speed: x.initiative,
         x: x.x,
-        y: x.y
+        y: x.y,
+        definition: {
+          char: x.visualization.char,
+          color
+        }
       };
     }).concat(
       this.battleStorageService.scene.decorations.map(x => {
         const color = x.visualization.color;
         return {
           color: `rgba(${color.r},${color.g},${color.b},${color.a})`,
-          char: x.visualization.char,
           initiativePosition: x.initiativePosition,
           active: x.active,
           speed: 1,
           x: x.x,
-          y: x.y
+          y: x.y,
+          definition: {
+            char: x.visualization.char,
+            color
+          }
         };
       }));
     if (allPortraits.length === 0) {

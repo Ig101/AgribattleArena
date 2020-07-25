@@ -26,11 +26,14 @@ export class IconsService implements ITextureService {
       this.iconsSubCanvas = document.createElement('canvas');
       this.iconsSubCanvas.height = this.spriteHeight;
       this.icons = {};
+      this.icons[' '] = { x: 0, y: 0 };
       const spriteFunctions = this.drawAllSprites();
       const elements = Object.keys(this.icons).length;
       this.iconsSubCanvas.width = (this.spriteWidth + 2) * elements;
       this.context = this.iconsSubCanvas.getContext('2d');
       this.context.clearRect(0, 0, (this.spriteWidth + 2) * elements, this.spriteHeight);
+      this.context.fillStyle = 'rgba(255,0,0,255)';
+      this.context.fillRect(0, 0, this.spriteWidth + 2, this.spriteHeight);
       this.context.font = `${this.spriteHeight}px PT Mono`;
       this.context.textAlign = 'left';
       this.context.fillStyle = 'rgba(255,0,0,255)';
@@ -73,7 +76,6 @@ export class IconsService implements ITextureService {
   }
 
   private drawAllSprites() {
-    this.icons[' '] = { x: 0, y: 0 };
     return [
       this.drawTalentIcon('c', 'c'),
       this.drawTalentIcon('p', 'p'),

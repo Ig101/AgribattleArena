@@ -8,9 +8,10 @@ import { FocusRemoverDirective } from './components/directives/focus-remover.dir
 import { MenuIconComponent } from './components/menu-icon/menu-icon.component';
 import { ModalService } from './services/modal.service';
 import { ModalLoadingComponent } from './components/modal-loading/modal-loading.component';
+import { TextureIconComponent } from './texture-icon/texture-icon.component';
 
 @NgModule({
-  declarations: [TextInputComponent, ButtonComponent, LinkComponent, FocusRemoverDirective, MenuIconComponent, ModalLoadingComponent],
+  declarations: [TextInputComponent, ButtonComponent, LinkComponent, FocusRemoverDirective, MenuIconComponent, ModalLoadingComponent, TextureIconComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -28,7 +29,8 @@ import { ModalLoadingComponent } from './components/modal-loading/modal-loading.
     LinkComponent,
     FocusRemoverDirective,
     MenuIconComponent,
-    ModalLoadingComponent
+    ModalLoadingComponent,
+    TextureIconComponent
   ]
 })
 export class SharedModule { }

@@ -1,10 +1,9 @@
 <div class="overlay-container">
   <div class="modal modal-size">
     <div class="title">
-      <div class="decoration-icon title-font-inactive" [style.color]="color" [style.border-color]="color">
-        <div class="health" *ngIf="health">{{health.current}}/{{health.max}}</div>
-        {{char}}
-      </div>
+      <app-texture-icon class="decoration-icon" [textureService]="charsService" [style.borderColor]="color" [definition]="definition">
+        <div class="text-font-inactive health" *ngIf="health">{{health.current}}/{{health.max}}</div>
+      </app-texture-icon>
       <div class="decoration-info-container">
         <div class="title-font-inactive decoration-name">{{name}}</div>
       </div>

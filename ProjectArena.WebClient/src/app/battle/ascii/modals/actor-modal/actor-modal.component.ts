@@ -10,6 +10,8 @@ import { IModal } from 'src/app/shared/interfaces/modal.interface';
 import { Observable, Subject } from 'rxjs';
 import { Color } from 'src/app/shared/models/color.model';
 import { ModalObject } from '../../models/modals/modal-object.model';
+import { CharsService } from 'src/app/shared/services/chars.service';
+import { IconDefinition } from 'src/app/shared/models/icon-definition.model';
 
 @Component({
   selector: 'app-actor-modal',
@@ -21,7 +23,7 @@ export class ActorModalComponent implements IModal<ModalObject>, OnDestroy {
   onClose = new Subject<ModalObject>();
   onCancel = new Subject<ModalObject>();
 
-  actorChar: string;
+  definition: IconDefinition;
   actorColor: string;
   actorName: string;
   actorHealth: number;
@@ -32,10 +34,14 @@ export class ActorModalComponent implements IModal<ModalObject>, OnDestroy {
 
   constructor(
     @Inject(MODAL_DATA) data: ModalObject,
-    private overlay: OverlayRef
+    private overlay: OverlayRef,
+    public charsService: CharsService
   ) {
-    this.actorChar = data.char;
-    this.actorColor = data.color;
+    this.definition = {
+      char: data.char,
+      color: data.color
+    };
+    this.actorColor = data.colorString;
     this.actorName = data.name;
     this.actorDescription = data.description;
     this.actorHealth = Math.ceil(data.health.current);

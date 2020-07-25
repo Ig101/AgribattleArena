@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ModalObject } from '../../models/modals/modal-object.model';
+import { CharsService } from 'src/app/shared/services/chars.service';
 
 @Component({
   selector: 'app-modal-tabs-component',
@@ -12,7 +13,9 @@ export class ModalTabsComponentComponent implements OnInit {
 
   @Output() chooseItem = new EventEmitter<ModalObject>();
 
-  constructor() { }
+  constructor(
+    public charsService: CharsService
+  ) { }
 
   ngOnInit(): void {
   }

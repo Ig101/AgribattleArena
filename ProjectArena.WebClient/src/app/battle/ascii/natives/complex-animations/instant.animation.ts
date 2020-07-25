@@ -5,12 +5,12 @@ import { rangeBetween, angleBetween } from 'src/app/helpers/math.helper';
 export function instantIssueDeclaration() {
   const frames: AnimationFrame[] = [];
   frames.push({
-    updateSynchronizer: true,
+    updateSynchronizer: false,
     animationTiles: [],
     specificAction: undefined
   });
   frames.push({
-    updateSynchronizer: true,
+    updateSynchronizer: false,
     animationTiles: [],
     specificAction: undefined
   });

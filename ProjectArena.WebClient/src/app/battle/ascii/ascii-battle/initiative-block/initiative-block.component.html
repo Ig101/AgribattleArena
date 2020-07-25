@@ -1,13 +1,11 @@
-<div *ngIf="firstActor" class="portrait big-portrait title-font-inactive" [style.borderColor]="firstActor.color" [style.color]="firstActor.color"
-  (mouseenter)="enterActorCard(firstActor)" (mouseleave)="leaveActorCard(firstActor)" (contextmenu)="onClick(firstActor)">
-  {{firstActor.char}}
-</div>
+<app-texture-icon [textureService]="charsService" *ngIf="firstActor" class="portrait big-portrait"  [style.borderColor]="firstActor.color" [definition]="firstActor.definition"></app-texture-icon>
 <div *ngIf="otherActors" class="right-side">
   <div class="portraits-container">
-    <div class="portrait small-portrait text-font-inactive" *ngFor="let item of otherActors" [style.borderColor]="item.color" [style.color]="item.color"
-    (mouseenter)="enterActorCard(item)" (mouseleave)="leaveActorCard(item)" (contextmenu)="onClick(item)">
-      {{item.char}}
-    </div>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="otherActors[0].color" [definition]="otherActors[0].definition"></app-texture-icon>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="otherActors[1].color"[definition]="otherActors[1].definition"></app-texture-icon>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="otherActors[2].color"[definition]="otherActors[2].definition"></app-texture-icon>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="otherActors[3].color"[definition]="otherActors[3].definition"></app-texture-icon>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="otherActors[4].color" [definition]="otherActors[4].definition"></app-texture-icon>
   </div>
   <div *ngIf="timer && timer > 0" class="timer" [style.backgroundColor]="firstActor.color" [style.width]="lineWidth + 'px'">
   </div>

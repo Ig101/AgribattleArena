@@ -70,6 +70,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.updateTimer);
+    this.canvasWebGLContext.getExtension('WEBGL_lose_context').loseContext();
   }
 
   onResize() {

@@ -4,7 +4,8 @@ import { Actor } from '../scene/actor.model';
 export interface ModalObject {
   id: number;
   char: string;
-  color: string;
+  color: Color;
+  colorString: string;
   name: string;
   description: string;
   health: { current: number, max: number };

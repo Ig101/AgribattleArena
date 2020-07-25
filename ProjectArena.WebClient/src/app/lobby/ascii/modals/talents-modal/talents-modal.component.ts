@@ -174,6 +174,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     clearInterval(this.drawingTimer);
+    this.canvasContext.getExtension('WEBGL_lose_context').loseContext();
     this.hintEvent.unsubscribe();
     this.closeEvent.unsubscribe();
   }
@@ -679,10 +680,10 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
 
-    fillBackground(backgrounds, 0, 14, 42, texturePosition);
+    fillBackground(backgrounds, 0, 8, 24, texturePosition);
     if (tile) {
       let color: Color;
-      fillTileMask(this.iconsService, backgroundTextureMapping, false, false, false, false, texturePosition);
+      fillChar(this.iconsService, backgroundTextureMapping, ' ', texturePosition);
       fillVertexPosition(mainTextureVertexes, x, y, 0, 0, this.tileWidth, this.tileHeight, texturePosition);
       if (tile.accessible && active) {
         color = clicked ? { r: 170, g: 170, b: 0, a: 1 } : { r: 255, g: 255, b: 68, a: 1 };

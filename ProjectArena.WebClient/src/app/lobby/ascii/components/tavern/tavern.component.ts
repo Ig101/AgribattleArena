@@ -206,6 +206,7 @@ export class TavernComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.drawingTimer);
+    this.canvasContext.getExtension('WEBGL_lose_context').loseContext();
     this.userChangedSubscription.unsubscribe();
   }
 

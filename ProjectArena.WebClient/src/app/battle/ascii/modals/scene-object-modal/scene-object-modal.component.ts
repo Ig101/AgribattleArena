@@ -5,6 +5,8 @@ import { MODAL_DATA } from 'src/app/shared/services/modal.service';
 import { ActiveDecoration } from '../../models/scene/active-decoration.model';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { ModalObject } from '../../models/modals/modal-object.model';
+import { IconDefinition } from 'src/app/shared/models/icon-definition.model';
+import { CharsService } from 'src/app/shared/services/chars.service';
 
 @Component({
   selector: 'app-scene-object-modal',
@@ -16,7 +18,7 @@ export class SceneObjectModalComponent implements IModal<ModalObject>, OnDestroy
   onClose = new Subject<ModalObject>();
   onCancel = new Subject<ModalObject>();
 
-  char: string;
+  definition: IconDefinition;
   color: string;
   name: string;
   description: string;
@@ -25,10 +27,14 @@ export class SceneObjectModalComponent implements IModal<ModalObject>, OnDestroy
 
   constructor(
     @Inject(MODAL_DATA) data: ModalObject,
-    private overlay: OverlayRef
+    private overlay: OverlayRef,
+    public charsService: CharsService
   ) {
-    this.char = data.char;
-    this.color = data.color;
+    this.definition = {
+      char: data.char,
+      color: data.color
+    };
+    this.color = data.colorString;
     this.name = data.name;
     this.description = data.description;
     this.health = data.health;

@@ -1,3 +1,2 @@
-<div class="title-font-inactive" *ngFor="let item of modalObjects" [style.color]="item.color" (mouseup)="choose($event, item)">
-  {{item.char}}
-</div>
+<app-texture-icon *ngFor="let item of modalObjects" class="decoration-icon" [textureService]="charsService" [definition]="{ char: item.char, color: item.color }" (mouseup)="choose($event, item)">
+</app-texture-icon>

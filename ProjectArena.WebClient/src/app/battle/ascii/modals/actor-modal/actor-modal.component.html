@@ -1,10 +1,9 @@
 <div class="overlay-container">
   <div class="modal modal-size">
     <div class="title">
-      <div class="actor-icon title-font-inactive" [style.color]="actorColor" [style.border-color]="actorColor">
-        <div class="health" *ngIf="actorMaxHealth">{{actorHealth}}/{{actorMaxHealth}}</div>
-        {{actorChar}}
-      </div>
+      <app-texture-icon class="actor-icon" [textureService]="charsService" [style.borderColor]="actorColor" [definition]="definition">
+        <div class="text-font-inactive health" *ngIf="actorMaxHealth">{{actorHealth}}/{{actorMaxHealth}}</div>
+      </app-texture-icon>
       <div class="actor-info-container">
         <div class="title-font-inactive actor-name">{{actorName}}</div>
         <div class="text-font-inactive actor-name">{{actorDescription}}</div>

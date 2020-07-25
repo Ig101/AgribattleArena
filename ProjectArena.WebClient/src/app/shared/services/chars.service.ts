@@ -33,6 +33,7 @@ export class CharsService implements ITextureService {
       this.charsSubCanvas = document.createElement('canvas');
       this.charsSubCanvas.height = this.spriteHeight;
       this.chars = {};
+      this.chars[' '] = { x: 0, y: 0 };
       const tileSpriteFunctions = this.drawTileSprites();
       const spriteFunctions = this.drawAllSprites();
       const elements = Object.keys(this.chars).length;
@@ -45,6 +46,8 @@ export class CharsService implements ITextureService {
       tileSpriteFunctions.forEach(e => {
         e();
       });
+      this.context.fillStyle = 'rgba(255,0,0,255)';
+      this.context.fillRect(0, 0, this.spriteWidth + 2, this.spriteHeight);
       this.context.font = `${this.spriteHeight}px PT Mono`;
       this.context.textAlign = 'left';
       this.context.fillStyle = 'rgba(255,0,0,255)';
@@ -53,7 +56,6 @@ export class CharsService implements ITextureService {
       });
     }
   }
-
   getTexture(gl: WebGLRenderingContext) {
     this.loadIfNotLoaded();
     const texture = gl.createTexture();

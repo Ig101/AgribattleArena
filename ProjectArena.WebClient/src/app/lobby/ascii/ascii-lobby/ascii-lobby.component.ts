@@ -235,6 +235,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.lobbyStorageService.clear();
     clearInterval(this.drawingTimer);
+    this.canvasWebGLContext.getExtension('WEBGL_lose_context').loseContext();
     this.queueService.dequeue(true);
     this.onCloseSubscription.unsubscribe();
     this.userChangedSubscription.unsubscribe();

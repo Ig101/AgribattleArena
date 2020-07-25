@@ -1,7 +1,8 @@
 export interface ITextureService {
-  readonly spriteHeight;
-  readonly spriteWidth;
-  getTexture(gl: WebGLRenderingContext);
-  getSpritePositionOnTexture(id: string);
-  getTileMask(left: boolean, right: boolean, top: boolean, bottom: boolean);
+  readonly spriteHeight: number;
+  readonly spriteWidth: number;
+  readonly width: number;
+  getTexture(gl: WebGLRenderingContext): WebGLTexture;
+  getSpritePositionOnTexture(id: string): { x: number; y: number; };
+  getTileMask(left: boolean, right: boolean, top: boolean, bottom: boolean): { x: number; y: number; };
 }

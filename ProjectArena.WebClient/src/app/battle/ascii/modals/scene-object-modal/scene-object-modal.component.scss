@@ -16,9 +16,7 @@
       position: relative;
       box-sizing: border-box;
       border: double;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      padding: 9px 21px;
       width: 90px;
       height: 90px;
       min-width: 90px;
@@ -28,9 +26,13 @@
       .health {
         color: #bbb;
         position: absolute;
-        left: 6px;
-        top: -8px;
+        right: 0px;
+        padding: 0 6px;
+        left: 0px;
+        background: #000414;
+        top: 2px;
         font-size: 14px;
+        line-height: 14px !important;
       }
     }
     .decoration-info-container {

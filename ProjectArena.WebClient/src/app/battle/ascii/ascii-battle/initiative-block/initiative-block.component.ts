@@ -3,6 +3,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { Actor } from '../../models/scene/actor.model';
 import { InitiativePortrait } from '../../models/gui/initiativePortrait.model';
 import { AsciiBattleStorageService } from '../../services/ascii-battle-storage.service';
+import { CharsService } from 'src/app/shared/services/chars.service';
 
 @Component({
   selector: 'app-initiative-block',
@@ -28,7 +29,10 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
   private selectedActior: InitiativePortrait;
   private sub: Subscription;
 
-  constructor(private battleStorageService: AsciiBattleStorageService) { }
+  constructor(
+    private battleStorageService: AsciiBattleStorageService,
+    public charsService: CharsService
+  ) { }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
@@ -43,13 +47,16 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
         this.otherActors = result.slice(1);
       } else {
         const dummy = {
-          char: '-',
           color: '#444',
           speed: undefined,
           initiativePosition: undefined,
           x: undefined,
-          y: undefined
-        };
+          y: undefined,
+          definition: {
+            char: ' ',
+            color: { r: 68, g: 68, b: 68, a: 1.0 }
+          }
+        } as InitiativePortrait;
         this.firstActor = dummy;
         this.otherActors = new Array<InitiativePortrait>(5);
         for (let i = 0; i < 5; i++) {
