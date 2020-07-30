@@ -145,7 +145,7 @@ export class TavernComponent implements OnInit, OnDestroy {
           if (x === 4 && y === 6 || x === 12 && y === 5 || x === 7 && y === 3) {
             this.tiles[x][y] = {
               char: 'table',
-              color: { r: 101, g: 67, b: 33, a: 1},
+              color: { r: 51, g: 47, b: 49, a: 1},
               backgroundColor: { r: 22, g: 20, b: 18},
               activator
             };
@@ -154,7 +154,7 @@ export class TavernComponent implements OnInit, OnDestroy {
           if (x === 11 && y === 3) {
             this.tiles[x][y] = {
               char: 'bar-corner',
-              color: { r: 101, g: 67, b: 33, a: 1},
+              color: { r: 51, g: 47, b: 49, a: 1},
               backgroundColor: { r: 22, g: 20, b: 18},
               activator
             };
@@ -163,7 +163,7 @@ export class TavernComponent implements OnInit, OnDestroy {
           if (x === 11 && y <= 3) {
             this.tiles[x][y] = {
               char: 'bar-vertical',
-              color: { r: 101, g: 67, b: 33, a: 1},
+              color: { r: 51, g: 47, b: 49, a: 1},
               backgroundColor: { r: 22, g: 20, b: 18},
               activator
             };
@@ -172,7 +172,7 @@ export class TavernComponent implements OnInit, OnDestroy {
           if (y === 3 && x >= 11 && x !== 15) {
             this.tiles[x][y] = {
               char: 'bar-horizontal',
-              color: { r: 101, g: 67, b: 33, a: 1},
+              color: { r: 51, g: 47, b: 49, a: 1},
               backgroundColor: { r: 22, g: 20, b: 18},
               activator
             };
