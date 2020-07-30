@@ -5,7 +5,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Adventurer',
     description: undefined,
     visualization: {
-      char: '@',
+      char: 'adventurer',
       color: { r: 160, g: 160, b: 160, a: 1 }
     }
   },
@@ -13,7 +13,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Spawn',
     description: 'Blue mist soldier',
     visualization: {
-      char: 'S',
+      char: 'adventurer',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
   },
@@ -21,7 +21,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Architect',
     description: undefined,
     visualization: {
-      char: '@',
+      char: 'adventurer',
       color: { r: 165, g: 66, b: 0, a: 1 }
     }
   },
@@ -29,7 +29,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Carver',
     description: 'Blue mist support',
     visualization: {
-      char: 'C',
+      char: 'adventurer',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
   },
@@ -37,7 +37,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Bloodletter',
     description: undefined,
     visualization: {
-      char: '@',
+      char: 'adventurer',
       color: { r: 255, g: 0, b: 0, a: 1 }
     }
   },
@@ -45,7 +45,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Ritualist',
     description: 'Blue mist mage',
     visualization: {
-      char: 'R',
+      char: 'adventurer',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
   },
@@ -53,7 +53,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Enchanter',
     description: undefined,
     visualization: {
-      char: '@',
+      char: 'adventurer',
       color: { r: 255, g: 40, b: 255, a: 1 }
     }
   },
@@ -61,7 +61,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Blacksmith',
     description: 'Blue mist support',
     visualization: {
-      char: 'B',
+      char: 'adventurer',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
   },
@@ -69,7 +69,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Fighter',
     description: undefined,
     visualization: {
-      char: '@',
+      char: 'adventurer',
       color: { r: 255, g: 132, b: 0, a: 1 }
     }
   },
@@ -77,7 +77,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Fencer',
     description: 'Blue mist warrior',
     visualization: {
-      char: 'F',
+      char: 'adventurer',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
   },
@@ -85,7 +85,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Mistcaller',
     description: undefined,
     visualization: {
-      char: '@',
+      char: 'adventurer',
       color: { r: 135, g: 100, b: 255, a: 1 }
     },
   },
@@ -93,7 +93,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Mage',
     description: 'Blue mist mage',
     visualization: {
-      char: 'M',
+      char: 'adventurer',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
   },
@@ -101,7 +101,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Ranger',
     description: undefined,
     visualization: {
-      char: '@',
+      char: 'adventurer',
       color: { r: 0, g: 255, b: 0, a: 1 }
     }
   },
@@ -109,7 +109,7 @@ export const actorNatives: {[id: string]: ActorNative} = {
     name: 'Impaler',
     description: 'Blue mist warrior',
     visualization: {
-      char: 'I',
+      char: 'adventurer',
       color: { r: 55, g: 55, b: 255, a: 1 }
     }
   },

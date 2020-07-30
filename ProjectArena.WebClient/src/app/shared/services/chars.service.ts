@@ -144,6 +144,18 @@ export class CharsService implements ITextureService {
     ];
   }
 
+  private drawImageChar(id: string, src: string) {
+    const elementNumber = Object.keys(this.chars).length ;
+    this.chars[id] = { x: (this.spriteWidth + 2) * elementNumber, y: 0 };
+    return () => {
+      const img = new Image();
+      img.onload = () => {
+          this.context.drawImage(img, (this.spriteWidth + 2) * elementNumber, 0);
+      }
+      img.src = src;
+    };
+  }
+
   private drawTextChar(id: string, text: string) {
     const elementNumber = Object.keys(this.chars).length ;
     const symbolY = this.spriteHeight * 0.75;
@@ -155,25 +167,28 @@ export class CharsService implements ITextureService {
 
   private drawAllSprites() {
     return [
+      this.drawImageChar('adventurer', 'assets/actors/adventurer.png'),
+
+      this.drawImageChar('grass', 'assets/objects/grass.png'),
+      this.drawImageChar('ground', 'assets/objects/ground.png'),
+      this.drawImageChar('rock', 'assets/objects/rock.png'),
+      this.drawImageChar('tree', 'assets/objects/tree.png'),
+
+      this.drawImageChar('floor', 'assets/objects/floor.png'),
+      this.drawImageChar('table', 'assets/objects/table.png'),
+      this.drawImageChar('wood-wall', 'assets/objects/wood-wall.png'),
+      this.drawImageChar('bar-corner', 'assets/objects/bar-corner.png'),
+      this.drawImageChar('bar-vertical', 'assets/objects/bar-vertical.png'),
+      this.drawImageChar('bar-horizontal', 'assets/objects/bar-horizontal.png'),
       this.drawTextChar('x', 'x'),
       this.drawTextChar('.', '.'),
       this.drawTextChar('·', '·'),
       this.drawTextChar('-', '-'),
       this.drawTextChar('!', '!'),
-      this.drawTextChar('@', '@'),
-      this.drawTextChar('S', 'S'),
-      this.drawTextChar('C', 'C'),
-      this.drawTextChar('R', 'R'),
-      this.drawTextChar('B', 'B'),
-      this.drawTextChar('F', 'F'),
-      this.drawTextChar('M', 'M'),
-      this.drawTextChar('I', 'I'),
       this.drawTextChar('s', 's'),
       this.drawTextChar('o', 'o'),
       this.drawTextChar('#', '#'),
-      this.drawTextChar('Y', 'Y'),
       this.drawTextChar('*', '*'),
-      this.drawTextChar('■', '■'),
       this.drawTextChar('&', '&'),
       this.drawTextChar('\\', '\\'),
       this.drawTextChar('/', '/'),

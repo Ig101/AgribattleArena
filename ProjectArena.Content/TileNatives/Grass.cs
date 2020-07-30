@@ -18,11 +18,11 @@ namespace ProjectArena.Content.TileNatives
                 null,
                 null);
             nativeManager.AddTileNative(
-                "bush",
+                "rock",
                 new string[] { "natural" },
                 false,
                 0,
-                false,
+                true,
                 1,
                 true,
                 null,

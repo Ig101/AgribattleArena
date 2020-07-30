@@ -3,28 +3,22 @@ import { Color } from '../models/color.model';
 export const asciiBioms: {[biom: number]: {char: string, color: Color, backgroundColor: Color, probability: number}[] } = {
   0: [
     {
-      char: '-',
-      color: { r: 0, g: 180, b: 0, a: 1 },
-      backgroundColor: { r: 0, g: 35, b: 0 },
-      probability: 6
+      char: 'grass',
+      color: { r: 89, g: 114, b: 255, a: 1 },
+      backgroundColor: { r: 16, g: 22, b: 50 },
+      probability: 60
     },
     {
-      char: '*',
-      color: { r: 0, g: 160, b: 0, a: 1 },
-      backgroundColor: { r: 0, g: 35, b: 0 },
-      probability: 1
+      char: 'rock',
+      color: { r: 72, g: 77, b: 123, a: 1 },
+      backgroundColor: { r: 16, g: 22, b: 50 },
+      probability: 3
     },
     {
-      char: 'Y',
-      color: { r: 139, g: 69, b: 19, a: 1 },
-      backgroundColor: { r: 0, g: 35, b: 0 },
-      probability: 1
-    },
-    {
-      char: 'Y',
-      color: { r: 255, g: 165, b: 79, a: 1 },
-      backgroundColor: { r: 0, g: 35, b: 0 },
-      probability: 1
+      char: 'tree',
+      color: { r: 160, g: 0, b: 200, a: 1 },
+      backgroundColor: { r: 16, g: 22, b: 50 },
+      probability: 10
     }
   ]
 };

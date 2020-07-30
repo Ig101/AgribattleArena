@@ -127,13 +127,13 @@ export class TavernComponent implements OnInit, OnDestroy {
         if ((x === 0 || y === 0 || x === this.tavernWidth - 1 || y === this.tavernHeight - 1) &&
           (y !== 0 || x < 3 || x > 5)) {
           this.tiles[x][y] = {
-            char: '#',
+            char: 'wood-wall',
             color: (x >= 2 && x <= 4 && y > 5) || (x >= 7 && x <= 9 && y > 5) ||
               (x >= 12 && x <= 14 && y > 5) || (y >= 2 && y <= 4 && x < 5) ?
-              { r: 71, g: 45, b: 21, a: 1 } :  { r: 101, g: 67, b: 33, a: 1},
+              { r: 41, g: 30, b: 15, a: 1 } :  { r: 71, g: 45, b: 21, a: 1 },
             backgroundColor: (x >= 2 && x <= 4 && y > 5) || (x >= 7 && x <= 9 && y > 5) ||
               (x >= 12 && x <= 14 && y > 5) || (y >= 2 && y <= 4 && x < 5) ?
-              { r: 30, g: 20, b: 10}  : { r: 40, g: 26, b: 14},
+              { r: 41, g: 30, b: 15 }  : { r: 71, g: 45, b: 21 },
             activator: undefined
           };
         } else {
@@ -144,16 +144,34 @@ export class TavernComponent implements OnInit, OnDestroy {
             a.y + a.yShift >= y);
           if (x === 4 && y === 6 || x === 12 && y === 5 || x === 7 && y === 3) {
             this.tiles[x][y] = {
-              char: '■',
+              char: 'table',
               color: { r: 101, g: 67, b: 33, a: 1},
               backgroundColor: { r: 22, g: 20, b: 18},
               activator
             };
             continue;
           }
-          if ((y === 3 && x >= 11 || x === 11 && y <= 3) && x !== 15) {
+          if (x === 11 && y === 3) {
             this.tiles[x][y] = {
-              char: '+',
+              char: 'bar-corner',
+              color: { r: 101, g: 67, b: 33, a: 1},
+              backgroundColor: { r: 22, g: 20, b: 18},
+              activator
+            };
+            continue;
+          }
+          if (x === 11 && y <= 3) {
+            this.tiles[x][y] = {
+              char: 'bar-vertical',
+              color: { r: 101, g: 67, b: 33, a: 1},
+              backgroundColor: { r: 22, g: 20, b: 18},
+              activator
+            };
+            continue;
+          }
+          if (y === 3 && x >= 11 && x !== 15) {
+            this.tiles[x][y] = {
+              char: 'bar-horizontal',
               color: { r: 101, g: 67, b: 33, a: 1},
               backgroundColor: { r: 22, g: 20, b: 18},
               activator
@@ -170,10 +188,10 @@ export class TavernComponent implements OnInit, OnDestroy {
             continue;
           }
           this.tiles[x][y] = {
-            char: activator?.object && activator?.x === x && activator?.y === y ? '@' : '.',
+            char: activator?.object && activator?.x === x && activator?.y === y ? 'adventurer' : 'floor',
             color: activator?.object && activator?.x === x && activator?.y === y ?
               { r: 160, g: 160, b: 160, a: 1 } :
-              { r: 173, g: 165, b: 135, a: 1},
+              { r: 86, g: 82, b: 67, a: 1},
             backgroundColor: { r: 22, g: 20, b: 18},
             activator
           };
@@ -213,13 +231,13 @@ export class TavernComponent implements OnInit, OnDestroy {
   onUpdate() {
     for (const space of this.patrons) {
       space.object = undefined;
-      this.tiles[space.x][space.y].char = '.';
+      this.tiles[space.x][space.y].char = 'floor';
       this.tiles[space.x][space.y].color = { r: 173, g: 165, b: 135, a: 1};
     }
     for (const patron of this.userService.user.tavern) {
       const space = this.patrons[patron.id - 1];
       space.object = patron;
-      this.tiles[space.x][space.y].char = '@';
+      this.tiles[space.x][space.y].char = 'adventurer';
       this.tiles[space.x][space.y].color = { r: 160, g: 160, b: 160, a: 1 };
     }
     this.changed = true;
@@ -335,11 +353,11 @@ export class TavernComponent implements OnInit, OnDestroy {
     fillTileMask(
       this.charsService,
       backgroundTextureMapping,
-      tile.char === '#' && (x > 0 && (tiles[x - 1][y].char !== tile.char || tiles[x - 1][y].color.r < tile.color.r) || x === 0),
-      tile.char === '#' && (x < this.tavernWidth - 1 &&
+      tile.char === 'wood-wall' && (x > 0 && (tiles[x - 1][y].char !== tile.char || tiles[x - 1][y].color.r < tile.color.r) || x === 0),
+      tile.char === 'wood-wall' && (x < this.tavernWidth - 1 &&
         (tiles[x + 1][y].char !== tile.char || tiles[x + 1][y].color.r < tile.color.r) || x === this.tavernWidth - 1),
-      tile.char === '#' && (y > 0 && (tiles[x][y - 1].char !== tile.char || tiles[x][y - 1].color.r < tile.color.r) || y === 0),
-      tile.char === '#' && (y < this.tavernHeight - 1 &&
+      tile.char === 'wood-wall' && (y > 0 && (tiles[x][y - 1].char !== tile.char || tiles[x][y - 1].color.r < tile.color.r) || y === 0),
+      tile.char === 'wood-wall' && (y < this.tavernHeight - 1 &&
         (tiles[x][y + 1].char !== tile.char || tiles[x][y + 1].color.r < tile.color.r) || y === this.tavernHeight - 1),
       texturePosition);
     if (tile.backgroundColor) {

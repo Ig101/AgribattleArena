@@ -5,23 +5,23 @@ export const tileNatives: { [id: string]: TileNative } = {
     name: 'Grass',
     description: 'No special effects',
     visualization: {
-      char: '-',
-      color: { r: 0, g: 180, b: 0, a: 1 }
+      char: 'grass',
+      color: { r: 89, g: 114, b: 255, a: 1 }
     },
-    backgroundColor: { r: 0, g: 35, b: 0 },
+    backgroundColor: { r: 16, g: 22, b: 50 },
     bright: false,
     action: undefined,
     onActionEffectAnimation: undefined,
     onStepAction: undefined
   },
-  bush: {
-    name: 'Bush',
-    description: 'No special effects',
+  rock: {
+    name: 'Rock',
+    description: 'Unpassable barrier',
     visualization: {
-      char: '*',
-      color: { r: 0, g: 160, b: 0, a: 1 }
+      char: 'rock',
+      color: { r: 72, g: 77, b: 123, a: 1 },
     },
-    backgroundColor: { r: 0, g: 35, b: 0 },
+    backgroundColor: { r: 16, g: 22, b: 50 },
     bright: false,
     action: undefined,
     onActionEffectAnimation: undefined,

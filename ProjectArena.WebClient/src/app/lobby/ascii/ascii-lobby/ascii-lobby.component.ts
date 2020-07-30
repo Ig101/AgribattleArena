@@ -86,9 +86,9 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
   };
 
   ground = {
-    char: '·',
-    color: {r: 225, g: 169, b: 95, a: 1} as Color,
-    backgroundColor: {r: 50, g: 42, b: 23, a: 1} as Color
+    char: 'ground',
+    color: {r: 139, g: 133, b: 175, a: 1} as Color,
+    backgroundColor: {r: 13, g: 13, b: 17, a: 1} as Color
   };
 
   openedModal: IModal<unknown>;
