@@ -4,7 +4,7 @@ export const asciiBioms: {[biom: number]: {char: string, color: Color, backgroun
   0: [
     {
       char: 'grass',
-      color: { r: 89, g: 114, b: 255, a: 1 },
+      color: { r: 45, g: 60, b: 150, a: 1 },
       backgroundColor: { r: 16, g: 22, b: 50 },
       probability: 60
     },

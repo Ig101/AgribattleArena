@@ -87,7 +87,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
 
   ground = {
     char: 'ground',
-    color: {r: 139, g: 133, b: 175, a: 1} as Color,
+    color: {r: 60, g: 61, b: 95, a: 1} as Color,
     backgroundColor: {r: 13, g: 13, b: 17, a: 1} as Color
   };
 
@@ -497,7 +497,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
       for (const activator of this.activators) {
         if (activator.object) {
           const x = (activator.x + 0.5 - cameraLeft) * this.tileWidth;
-          const y = (activator.y - cameraTop) * this.tileHeight;
+          const y = (activator.y - cameraTop) * this.tileHeight - 15;
           const activated = mouseX >= activator.x - activator.xShift &&
             mouseX <= activator.x + activator.xShift &&
             mouseY >= activator.y - activator.yShift &&

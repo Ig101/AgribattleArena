@@ -6,7 +6,7 @@ export const tileNatives: { [id: string]: TileNative } = {
     description: 'No special effects',
     visualization: {
       char: 'grass',
-      color: { r: 89, g: 114, b: 255, a: 1 }
+      color: { r: 45, g: 60, b: 150, a: 1 }
     },
     backgroundColor: { r: 16, g: 22, b: 50 },
     bright: false,
