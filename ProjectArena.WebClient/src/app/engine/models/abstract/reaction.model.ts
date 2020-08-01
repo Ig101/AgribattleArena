@@ -7,5 +7,5 @@ export interface Reaction {
   visualization: string;
   respondsOn: Effect;
 
-  action: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number, order: number) => void;
+  action: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number, containerized: boolean, order: number) => void;
 }

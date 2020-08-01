@@ -15,7 +15,7 @@ export interface IActor {
   isAlive: boolean;
   owner: Player;
 
-  processEffect(effect: Effect, power: number, order: number);
+  processEffect(effect: Effect, power: number, containerized: boolean, order: number);
 
   applyBuff(buff: Buff);
 

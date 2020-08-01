@@ -57,9 +57,9 @@ export class Tile implements IActor {
     return result;
   }
 
-  processEffect(effect: Effect, power: number, order: number) {
+  processEffect(effect: Effect, power: number, containerized: boolean, order: number) {
     for (const actor of this.actors) {
-      actor.processEffect(effect, power, order + 1);
+      actor.processEffect(effect, power, true, order + 1);
     }
   }
 
