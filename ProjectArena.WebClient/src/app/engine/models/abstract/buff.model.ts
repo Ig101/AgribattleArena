@@ -12,6 +12,7 @@ export interface Buff {
 
   blockedActions: string[];
   blockedEffects: Effect[];
+  blockAllActions: boolean;
 
   addedActions: Action[];
   addedPreparationReactions: Reaction[];

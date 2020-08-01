@@ -13,7 +13,6 @@ export interface Action {
   aiPriority: number;
 
   validateActionTargeted: (actor: Actor, power: number, x: number, y: number) => boolean;
-  validateActionUntargeted: (actor: Actor, power: number) => boolean;
   validateActionOnObject: (actor: Actor, power: number, target: IActor) => boolean;
 
   actionTargeted: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number, x: number, y: number) => void;

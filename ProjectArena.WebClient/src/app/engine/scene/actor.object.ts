@@ -84,11 +84,7 @@ export class Actor implements IActor {
   }
 
   validateUntargeted(action: Action) {
-    if (action.validateActionUntargeted) {
-      action.validateActionUntargeted(this, action.power);
-    } else {
-      return false;
-    }
+    return true;
   }
 
 
@@ -198,7 +194,11 @@ export class Actor implements IActor {
 
     this.blockedEffects.push(...buff.blockedEffects);
     this.blockedActions.push(...buff.blockedActions);
-    this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
+    if (buff.blockAllActions) {
+      this.actions.length = 0;
+    } else {
+      this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
+    }
   }
 
   purgeBuffs() {
@@ -240,10 +240,16 @@ export class Actor implements IActor {
       this.blockedEffects.length = 0;
       this.blockedActions.length = 0;
       this.actions = [...this.selfActions];
+      let blockAllActions = false;
       for (const buff of this.buffs) {
         this.blockedEffects.push(...buff.blockedEffects);
         this.blockedActions.push(...buff.blockedActions);
-        this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
+        blockAllActions = blockAllActions || buff.blockAllActions;
+        if (blockAllActions) {
+          this.actions.length = 0;
+        } else {
+          this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
+        }
       }
     }
   }
