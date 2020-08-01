@@ -10,6 +10,10 @@ export interface Action {
   untargeted: number;
   power: number;
 
+  validateActionTargeted: (actor: Actor, power: number, x: number, y: number) => boolean;
+  validateActionUntargeted: (actor: Actor, power: number) => boolean;
+  validateActionOnObject: (actor: Actor, power: number, target: IActor) => boolean;
+
   actionTargeted: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number, x: number, y: number) => void;
   actionUntargeted: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number) => void;
   actionOnObject: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number, target: IActor) => void;

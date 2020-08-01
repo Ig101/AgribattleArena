@@ -6,6 +6,7 @@ import { Reaction } from '../models/abstract/reaction.model';
 import { Effect } from '../content/effects';
 import { ActionDefinition } from '../models/action-definition.model';
 import { Buff } from './abstract/buff.object';
+import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 
 export class Actor implements IActor {
 
@@ -22,6 +23,7 @@ export class Actor implements IActor {
   selfTurnCost: number;
   initiativePosition: number;
 
+  height: number;
   volume: number;
   freeVolume: number;
   isActive: boolean;
@@ -48,9 +50,42 @@ export class Actor implements IActor {
     return this.parentActor.y;
   }
 
+  get z() {
+    return this.parentActor.getActorZ(this);
+  }
+
   constructor() {
 
   }
+
+  getActorZ(actor: Actor) {
+    return 0;
+  }
+
+  validateTargeted(action: Action, x: number, y: number) {
+    if (action.validateActionTargeted) {
+      return action.validateActionTargeted(this, action.power, x, y);
+    } else {
+      return false;
+    }
+  }
+
+  validateOnObject(action: Action, target: IActor) {
+    if (action.validateActionOnObject) {
+      action.validateActionOnObject(this, action.power, target);
+    } else {
+      return false;
+    }
+  }
+
+  validateUntargeted(action: Action) {
+    if (action.validateActionUntargeted) {
+      action.validateActionUntargeted(this, action.power);
+    } else {
+      return false;
+    }
+  }
+
 
   actTargeted(action: Action, x: number, y: number) {
     if (action.actionTargeted) {
@@ -144,5 +179,18 @@ export class Actor implements IActor {
     if (this.durability <= 0) {
       this.isAlive = false;
     }
+  }
+
+  addActor(actor: Actor) {
+    this.actors.push(actor);
+  }
+
+  removeActor(actor: Actor) {
+    removeFromArray(this.actors, actor);
+  }
+
+  move(x: number, y: number) {
+    this.parentActor.removeActor(this);
+    this.parentScene.tiles[x][y].addActor(this);
   }
 }

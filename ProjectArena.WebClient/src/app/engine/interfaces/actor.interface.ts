@@ -1,12 +1,14 @@
 import { Player } from '../scene/abstract/player.object';
 import { Effect } from '../content/effects';
 import { Buff } from '../scene/abstract/buff.object';
+import { Actor } from '../scene/actor.object';
 
 export interface IActor {
-  id: number;
+  readonly id: number;
 
-  x: number;
-  y: number;
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
 
   isAlive: boolean;
   owner: Player;
@@ -18,4 +20,10 @@ export interface IActor {
   purgeBuffs();
 
   changeDurability(durability: number);
+
+  removeActor(actor: Actor);
+
+  addActor(actor: Actor);
+
+  getActorZ(actor: Actor);
 }

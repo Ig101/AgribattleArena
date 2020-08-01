@@ -1,8 +1,9 @@
-import { Actor } from 'src/app/battle/ascii/models/scene/actor.model';
-import { Scene } from 'src/app/battle/ascii/models/scene/scene.model';
 import { IActor } from '../interfaces/actor.interface';
 import { Effect } from '../content/effects';
 import { Buff } from './abstract/buff.object';
+import { Actor } from './actor.object';
+import { Scene } from './scene.object';
+import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 
 // Dummy actor that cannot be changed
 export class Tile implements IActor {
@@ -35,6 +36,23 @@ export class Tile implements IActor {
     return this.positionY;
   }
 
+  get z() {
+    return 0;
+  }
+
+  get height() {
+    return this.actors.reduce((a, b) => a + b.height, 0);
+  }
+
+  getActorZ(actor: Actor) {
+    const index = this.actors.indexOf(actor);
+    let result = 0;
+    for (let  i = 0; i < index; i++) {
+      result += this.actors[i].height;
+    }
+    return result;
+  }
+
   processEffect(effect: Effect, power: number, order: number) { }
 
   applyBuff(buff: Buff) { }
@@ -42,4 +60,14 @@ export class Tile implements IActor {
   purgeBuffs() { }
 
   changeDurability(durability: number) { }
+
+  move(x: number, y: number) { }
+
+  addActor(actor: Actor) {
+    this.actors.push(actor);
+  }
+
+  removeActor(actor: Actor) {
+    removeFromArray(this.actors, actor);
+  }
 }
