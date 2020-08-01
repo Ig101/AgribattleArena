@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectArena.Tests", "Proje
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectArena.Content", "ProjectArena.Content\ProjectArena.Content.csproj", "{8B260010-B98B-4E66-B10C-D8608092F94A}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ProjectArena.Bot", "ProjectArena.Bot\ProjectArena.Bot.fsproj", "{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,17 +114,5 @@ Global
 		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|x64.Build.0 = Release|Any CPU
 		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|x86.ActiveCfg = Release|Any CPU
 		{8B260010-B98B-4E66-B10C-D8608092F94A}.Release|x86.Build.0 = Release|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Debug|x64.Build.0 = Debug|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Debug|x86.Build.0 = Debug|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Release|x64.ActiveCfg = Release|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Release|x64.Build.0 = Release|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Release|x86.ActiveCfg = Release|Any CPU
-		{C1B68433-0A38-4CD7-AB1C-4C967FAA2C8F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
