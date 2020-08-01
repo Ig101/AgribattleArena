@@ -1,6 +1,6 @@
 import { Player } from '../scene/abstract/player.object';
 import { Effect } from '../content/effects';
-import { Buff } from '../scene/abstract/buff.object';
+import { Buff } from '../models/abstract/buff.model';
 import { Actor } from '../scene/actor.object';
 
 export interface IActor {

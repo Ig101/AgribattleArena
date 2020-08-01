@@ -4,11 +4,13 @@ import { Observable, Observer } from 'rxjs';
 import { IActor } from '../../interfaces/actor.interface';
 
 export interface Action {
-  visualization: string;
+  id: string;
   cooldown: number;
   remainedTime: number;
   untargeted: number;
   power: number;
+
+  aiPriority: number;
 
   validateActionTargeted: (actor: Actor, power: number, x: number, y: number) => boolean;
   validateActionUntargeted: (actor: Actor, power: number) => boolean;

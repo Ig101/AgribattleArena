@@ -1,17 +1,16 @@
-import { Actor } from '../actor.object';
-import { Action } from '../../models/abstract/action.model';
-import { Reaction } from '../../models/abstract/reaction.model';
+import { Actor } from '../../scene/actor.object';
+import { Action } from './action.model';
+import { Reaction } from './reaction.model';
 import { Effect } from '../../content/effects';
 
-export class Buff {
+export interface Buff {
 
-  id: number;
+  id: string;
 
-  visualization: string;
   duration: number;
   maxStacks: number;
 
-  blockedActions: Action[];
+  blockedActions: string[];
   blockedEffects: Effect[];
 
   addedActions: Action[];

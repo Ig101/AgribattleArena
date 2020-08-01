@@ -5,8 +5,11 @@ import { Action } from '../models/abstract/action.model';
 import { Reaction } from '../models/abstract/reaction.model';
 import { Effect } from '../content/effects';
 import { ActionDefinition } from '../models/action-definition.model';
-import { Buff } from './abstract/buff.object';
+import { Buff } from '../models/abstract/buff.model';
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
+
+const maxTurnCost = 10;
+const minTurnCost = 1;
 
 export class Actor implements IActor {
 
@@ -39,7 +42,7 @@ export class Actor implements IActor {
   maxDurability: number;
   turnCost: number;
   actions: Action[];
-  blockedActions: Action[];
+  blockedActions: string[];
   blockedEffects: Effect[];
 
   get x() {
@@ -163,21 +166,89 @@ export class Actor implements IActor {
   }
 
   applyBuff(buff: Buff) {
+    const sameBuffs = this.buffs.filter(x => x.id === buff.id);
+    if (buff.maxStacks <= sameBuffs.length) {
+      return;
+    }
+    this.buffs.push(buff);
+    this.turnCost += buff.changedSpeed;
+    if (this.turnCost > maxTurnCost) {
+      buff.changedSpeed -= (maxTurnCost - this.turnCost);
+      this.turnCost = maxTurnCost;
+    }
+    if (this.turnCost < minTurnCost) {
+      buff.changedSpeed += (minTurnCost - this.turnCost);
+      this.turnCost = minTurnCost;
+    }
 
+    const newDurability = this.maxDurability + buff.changedDurability;
+    if (newDurability < 0) {
+      this.isAlive = false;
+    } else if (newDurability !== this.maxDurability) {
+      const difference = this.durability / this.maxDurability;
+      this.durability = difference * newDurability;
+      this.maxDurability = newDurability;
+    }
+
+    this.blockedEffects.push(...buff.blockedEffects);
+    this.blockedActions.push(...buff.blockedActions);
+    this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
   }
 
   purgeBuffs() {
-
+    this.buffs.length = 0;
+    this.blockedEffects.length = 0;
+    this.blockedActions.length = 0;
+    this.actions = [...this.selfActions];
   }
 
   updateBuffs() {
-
+    let buffRemoved = false;
+    for (const buff of this.buffs) {
+      if (buff.duration !== undefined) {
+        buff.duration--;
+      }
+      if (buff.duration <= 0) {
+        buffRemoved = true;
+        this.turnCost -= buff.changedSpeed;
+        if (this.turnCost > maxTurnCost) {
+          buff.changedSpeed -= (maxTurnCost - this.turnCost);
+          this.turnCost = maxTurnCost;
+        }
+        if (this.turnCost < minTurnCost) {
+          buff.changedSpeed += (minTurnCost - this.turnCost);
+          this.turnCost = minTurnCost;
+        }
+        const newDurability = this.maxDurability - buff.changedDurability;
+        if (newDurability < 0) {
+          this.isAlive = false;
+        } else if (newDurability !== this.maxDurability) {
+          const difference = this.durability / this.maxDurability;
+          this.durability = difference * newDurability;
+          this.maxDurability = newDurability;
+        }
+      }
+    }
+    if (buffRemoved) {
+      this.buffs = this.buffs.filter(x => x.duration > 0);
+      this.blockedEffects.length = 0;
+      this.blockedActions.length = 0;
+      this.actions = [...this.selfActions];
+      for (const buff of this.buffs) {
+        this.blockedEffects.push(...buff.blockedEffects);
+        this.blockedActions.push(...buff.blockedActions);
+        this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
+      }
+    }
   }
 
   changeDurability(durability: number) {
     this.durability += durability;
     if (this.durability <= 0) {
       this.isAlive = false;
+    }
+    if (this.durability > this.maxDurability) {
+      this.durability = this.maxDurability;
     }
   }
 

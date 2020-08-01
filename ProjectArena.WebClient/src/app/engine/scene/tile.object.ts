@@ -1,6 +1,6 @@
 import { IActor } from '../interfaces/actor.interface';
 import { Effect } from '../content/effects';
-import { Buff } from './abstract/buff.object';
+import { Buff } from '../models/abstract/buff.model';
 import { Actor } from './actor.object';
 import { Scene } from './scene.object';
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
