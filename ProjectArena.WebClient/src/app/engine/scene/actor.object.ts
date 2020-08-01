@@ -15,6 +15,8 @@ export class Actor implements IActor {
 
   id: number;
 
+  tags: string[];
+
   actors: Actor[];
   parentActor: IActor;
   parentScene: Scene;

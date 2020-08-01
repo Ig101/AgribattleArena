@@ -16,6 +16,10 @@ export class Tile implements IActor {
   actors: Actor[];
   parentScene: Scene;
 
+  get tags() {
+    return [];
+  }
+
   get isAlive() {
     return true;
   }

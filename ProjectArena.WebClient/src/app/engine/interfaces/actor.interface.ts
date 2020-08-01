@@ -6,6 +6,8 @@ import { Actor } from '../scene/actor.object';
 export interface IActor {
   readonly id: number;
 
+  readonly tags: string[];
+
   readonly x: number;
   readonly y: number;
   readonly z: number;
