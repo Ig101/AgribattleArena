@@ -1,8 +1,6 @@
 import { Actor } from '../../scene/actor.object';
 import { Action } from './action.model';
 import { Reaction } from './reaction.model';
-import { Effect } from '../../content/effects';
-
 export interface Buff {
 
   id: string;
@@ -11,7 +9,7 @@ export interface Buff {
   maxStacks: number;
 
   blockedActions: string[];
-  blockedEffects: Effect[];
+  blockedEffects: string[];
   blockAllActions: boolean;
 
   addedActions: Action[];

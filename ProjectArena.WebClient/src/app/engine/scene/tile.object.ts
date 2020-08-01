@@ -1,5 +1,4 @@
 import { IActor } from '../interfaces/actor.interface';
-import { Effect } from '../content/effects';
 import { Buff } from '../models/abstract/buff.model';
 import { Actor } from './actor.object';
 import { Scene } from './scene.object';
@@ -57,9 +56,9 @@ export class Tile implements IActor {
     return result;
   }
 
-  handleEffect(effect: Effect, power: number, containerized: boolean, order: number) {
+  handleEffects(effects: string[], power: number, containerized: boolean, order: number) {
     for (const actor of this.actors) {
-      actor.handleEffect(effect, power, true, order + 1);
+      actor.handleEffects(effects, power, true, order + 1);
     }
   }
 

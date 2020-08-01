@@ -1,5 +1,4 @@
 import { Player } from '../scene/abstract/player.object';
-import { Effect } from '../content/effects';
 import { Buff } from '../models/abstract/buff.model';
 import { Actor } from '../scene/actor.object';
 
@@ -15,7 +14,7 @@ export interface IActor {
   isAlive: boolean;
   owner: Player;
 
-  handleEffect(effect: Effect, power: number, containerized: boolean, order: number);
+  handleEffects(effects: string[], power: number, containerized: boolean, order: number);
 
   applyBuff(buff: Buff);
 

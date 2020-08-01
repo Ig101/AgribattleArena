@@ -3,7 +3,6 @@ import { IActor } from '../interfaces/actor.interface';
 import { Player } from './abstract/player.object';
 import { Action } from '../models/abstract/action.model';
 import { Reaction } from '../models/abstract/reaction.model';
-import { Effect } from '../content/effects';
 import { ActionDefinition } from '../models/action-definition.model';
 import { Buff } from '../models/abstract/buff.model';
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
@@ -48,7 +47,7 @@ export class Actor implements IActor {
   turnCost: number;
   actions: Action[];
   blockedActions: string[];
-  blockedEffects: Effect[];
+  blockedEffects: string[];
 
   get x() {
     return this.parentActor.x;
@@ -112,11 +111,11 @@ export class Actor implements IActor {
     }
   }
 
-  handleEffect(effect: Effect, power: number, containerized: boolean, order: number) {
-    function processReactions(reactions: Reaction[], inlinePower: number): number {
+  handleEffects(effects: string[], power: number, containerized: boolean, order: number) {
+    function processReactions(reactions: Reaction[], inlineEffects: string[], inlinePower: number): number {
       if (reactions) {
         for (const reaction of reactions) {
-          if (reaction.respondsOn === effect) {
+          if (inlineEffects.includes(reaction.respondsOn)) {
             inlinePower = reaction.action(this.parentScene.definitionsSub, this, inlinePower, containerized, order + 1);
           }
         }
@@ -124,29 +123,33 @@ export class Actor implements IActor {
       return inlinePower;
     }
 
-    if (!this.isAlive || order > maxReactionsDepth || this.blockedEffects.includes(effect)) {
+    if (!this.isAlive || order > maxReactionsDepth) {
+      return;
+    }
+    const tempEffects = this.blockedEffects.length > 0 ? effects.filter(x => !this.blockedEffects.includes(x)) : effects;
+    if (tempEffects.length === 0) {
       return;
     }
 
     let tempPower = power;
 
-    tempPower = processReactions(this.preparationReactions, tempPower);
+    tempPower = processReactions(this.preparationReactions, tempEffects, tempPower);
     for (const buff of this.buffs) {
-      tempPower = processReactions(buff.addedPreparationReactions, tempPower);
+      tempPower = processReactions(buff.addedPreparationReactions, tempEffects, tempPower);
     }
 
-    tempPower = processReactions(this.activeReactions, tempPower);
+    tempPower = processReactions(this.activeReactions, tempEffects, tempPower);
     for (const buff of this.buffs) {
-      tempPower = processReactions(buff.addedActiveReactions, tempPower);
+      tempPower = processReactions(buff.addedActiveReactions, tempEffects, tempPower);
     }
 
-    tempPower = processReactions(this.clearReactions, tempPower);
+    tempPower = processReactions(this.clearReactions, tempEffects, tempPower);
     for (const buff of this.buffs) {
-      tempPower = processReactions(buff.addedClearReactions, tempPower);
+      tempPower = processReactions(buff.addedClearReactions, tempEffects, tempPower);
     }
 
     for (const actor of this.actors) {
-      actor.handleEffect(effect, tempPower, true, order + 1);
+      actor.handleEffects(effects, tempPower, true, order + 1);
     }
   }
 
