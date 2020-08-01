@@ -111,10 +111,12 @@ export class Actor implements IActor {
       return;
     }
 
+    let tempPower = power;
+
     if (this.preparationReactions) {
       for (const reaction of this.preparationReactions) {
         if (reaction.respondsOn === effect) {
-          reaction.action(this.parentScene.definitionsSub, this, power, containerized, order + 1);
+          tempPower = reaction.action(this.parentScene.definitionsSub, this, tempPower, containerized, order + 1);
         }
       }
     }
@@ -122,7 +124,7 @@ export class Actor implements IActor {
       if (buff.addedPreparationReactions) {
         for (const reaction of buff.addedPreparationReactions) {
           if (reaction.respondsOn === effect) {
-            reaction.action(this.parentScene.definitionsSub, this, power, containerized, order + 1);
+            tempPower = reaction.action(this.parentScene.definitionsSub, this, tempPower, containerized, order + 1);
           }
         }
       }
@@ -131,7 +133,7 @@ export class Actor implements IActor {
     if (this.activeReactions) {
       for (const reaction of this.activeReactions) {
         if (reaction.respondsOn === effect) {
-          reaction.action(this.parentScene.definitionsSub, this, power, containerized, order + 1);
+          tempPower = reaction.action(this.parentScene.definitionsSub, this, tempPower, containerized, order + 1);
         }
       }
     }
@@ -139,7 +141,7 @@ export class Actor implements IActor {
       if (buff.addedActiveReactions) {
         for (const reaction of buff.addedActiveReactions) {
           if (reaction.respondsOn === effect) {
-            reaction.action(this.parentScene.definitionsSub, this, power, containerized, order + 1);
+            tempPower = reaction.action(this.parentScene.definitionsSub, this, tempPower, containerized, order + 1);
           }
         }
       }
@@ -148,7 +150,7 @@ export class Actor implements IActor {
     if (this.clearReactions) {
       for (const reaction of this.clearReactions) {
         if (reaction.respondsOn === effect) {
-          reaction.action(this.parentScene.definitionsSub, this, power, containerized, order + 1);
+          tempPower = reaction.action(this.parentScene.definitionsSub, this, tempPower, containerized, order + 1);
         }
       }
     }
@@ -156,14 +158,14 @@ export class Actor implements IActor {
       if (buff.addedClearReactions) {
         for (const reaction of buff.addedClearReactions) {
           if (reaction.respondsOn === effect) {
-            reaction.action(this.parentScene.definitionsSub, this, power, containerized, order + 1);
+            tempPower = reaction.action(this.parentScene.definitionsSub, this, tempPower, containerized, order + 1);
           }
         }
       }
     }
 
     for (const actor of this.actors) {
-      actor.processEffect(effect, power, true, order + 1);
+      actor.processEffect(effect, tempPower, true, order + 1);
     }
   }
 
