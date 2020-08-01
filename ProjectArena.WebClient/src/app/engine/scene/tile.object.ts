@@ -53,7 +53,11 @@ export class Tile implements IActor {
     return result;
   }
 
-  processEffect(effect: Effect, power: number, order: number) { }
+  processEffect(effect: Effect, power: number, order: number) {
+    for (const actor of this.actors) {
+      actor.processEffect(effect, power, order + 1);
+    }
+  }
 
   applyBuff(buff: Buff) { }
 

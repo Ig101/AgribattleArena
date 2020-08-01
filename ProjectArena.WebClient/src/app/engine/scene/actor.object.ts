@@ -163,6 +163,10 @@ export class Actor implements IActor {
         }
       }
     }
+
+    for (const actor of this.actors) {
+      actor.processEffect(effect, power, order + 1);
+    }
   }
 
   applyBuff(buff: Buff) {
