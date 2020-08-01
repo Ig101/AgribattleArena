@@ -18,6 +18,8 @@ export class Actor implements IActor {
 
   tags: string[];
 
+  changed: boolean;
+
   actors: Actor[];
   parentActor: IActor;
   parentScene: Scene;
@@ -92,18 +94,21 @@ export class Actor implements IActor {
   actTargeted(action: Action, x: number, y: number) {
     if (action.actionTargeted) {
       action.actionTargeted(this.parentScene.definitionsSub, this, action.power, x, y);
+      action.remainedTime = action.cooldown;
     }
   }
 
   actOnObject(action: Action, target: IActor) {
     if (action.actionOnObject) {
       action.actionOnObject(this.parentScene.definitionsSub, this, action.power, target);
+      action.remainedTime = action.cooldown;
     }
   }
 
   actUntargeted(action: Action) {
     if (action.actionUntargeted) {
       action.actionUntargeted(this.parentScene.definitionsSub, this, action.power);
+      action.remainedTime = action.cooldown;
     }
   }
 
@@ -253,5 +258,21 @@ export class Actor implements IActor {
   move(target: IActor) {
     this.parentActor.removeActor(this);
     target.addActor(this);
+  }
+
+  private isActorReadyToStartTurn() {
+    return this.owner && this.initiativePosition <= 0 && this.actions.some(x => x.remainedTime <= 0);
+  }
+
+  startTurn(): Actor[] {
+    this.initiativePosition--;
+    for (const action of this.actions) {
+      action.remainedTime--;
+    }
+    const result: Actor[] = this.isActorReadyToStartTurn() ? [this] : [];
+    for (const actor of this.actors) {
+      result.push(...actor.startTurn());
+    }
+    return result;
   }
 }

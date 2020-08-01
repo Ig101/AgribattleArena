@@ -1,6 +1,6 @@
-export const effectMove = 1;
-export const effectPhysicalDamage = 2;
+export const move = 1;
+export const physicalDamage = 2;
 
 export type Effect =
-  typeof effectMove |
-  typeof effectPhysicalDamage;
+  typeof move |
+  typeof physicalDamage;

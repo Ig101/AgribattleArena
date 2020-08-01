@@ -5,6 +5,7 @@ import { IActor } from '../../interfaces/actor.interface';
 
 export interface Action {
   id: string;
+  timeCost: number;
   cooldown: number;
   remainedTime: number;
   untargeted: number;
