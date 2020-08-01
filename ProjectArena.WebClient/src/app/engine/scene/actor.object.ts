@@ -264,8 +264,8 @@ export class Actor implements IActor {
     removeFromArray(this.actors, actor);
   }
 
-  move(x: number, y: number) {
+  move(target: IActor) {
     this.parentActor.removeActor(this);
-    this.parentScene.tiles[x][y].addActor(this);
+    target.addActor(this);
   }
 }

@@ -65,7 +65,7 @@ export class Tile implements IActor {
 
   changeDurability(durability: number) { }
 
-  move(x: number, y: number) { }
+  move(target: IActor) { }
 
   addActor(actor: Actor) {
     this.actors.push(actor);

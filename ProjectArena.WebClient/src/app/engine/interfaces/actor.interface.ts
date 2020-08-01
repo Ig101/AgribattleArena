@@ -26,4 +26,6 @@ export interface IActor {
   addActor(actor: Actor);
 
   getActorZ(actor: Actor);
+
+  move(target: IActor);
 }
