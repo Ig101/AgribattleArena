@@ -57,9 +57,12 @@ export class Tile implements IActor {
   }
 
   handleEffects(effects: string[], power: number, containerized: boolean, order: number) {
+    let resultPower = power;
     for (const actor of this.actors) {
-      actor.handleEffects(effects, power, true, order + 1);
+      const powerChange = actor.handleEffects(effects, power, true, order + 1) - power;
+      resultPower += powerChange;
     }
+    return resultPower;
   }
 
   applyBuff(buff: Buff) { }

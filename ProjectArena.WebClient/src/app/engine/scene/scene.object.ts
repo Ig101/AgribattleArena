@@ -16,9 +16,11 @@ export class Scene {
   players: Player[];
 
   currentActor: Actor;
+  turnStarted = false;
   turnTime: number;
 
   startTurn() {
+    this.turnStarted = false;
     if (this.currentActor) {
       this.currentActor.initiativePosition += this.currentActor.turnCost;
     }
@@ -33,7 +35,7 @@ export class Scene {
       undefined;
     if (nextPlayerCandidate) {
       this.currentActor = nextPlayerCandidate;
-      // TODO send start turn to server if its yours
+      // TODO send start turn and start turn after message
     } else {
       // TODO send end turn
     }

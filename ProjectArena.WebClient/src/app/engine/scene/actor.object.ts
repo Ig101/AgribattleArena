@@ -86,7 +86,7 @@ export class Actor implements IActor {
   }
 
   validateUntargeted(action: Action) {
-    return true;
+    return action.actionUntargeted;
   }
 
 
@@ -148,9 +148,12 @@ export class Actor implements IActor {
       tempPower = processReactions(buff.addedClearReactions, tempEffects, tempPower);
     }
 
+    let resultPower = tempPower;
     for (const actor of this.actors) {
-      actor.handleEffects(effects, tempPower, true, order + 1);
+      const powerChange = actor.handleEffects(effects, tempPower, true, order + 1) - tempPower;
+      resultPower += powerChange;
     }
+    return resultPower;
   }
 
   applyBuff(buff: Buff) {
