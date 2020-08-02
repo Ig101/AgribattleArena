@@ -10,7 +10,6 @@ export interface SynchronizationMessageDto {
   varsion: number;
   code: string;
   action: ActionInfo;
-  synchronizer: Synchronizer;
   reward: RewardInfo;
   fullSynchronizationInfo: FullSynchronizationInfo;
   startTurnInfo: StartTurnInfo;

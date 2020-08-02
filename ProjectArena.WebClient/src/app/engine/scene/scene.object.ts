@@ -19,7 +19,9 @@ export class Scene {
   turnStarted = false;
   turnTime: number;
 
-  startTurnAddReturnIsTurnStarted() {
+  /*
+    Make it server side
+    startTurnAddReturnIsTurnStarted() {
     this.turnStarted = false;
     if (this.currentActor) {
       this.currentActor.initiativePosition += this.currentActor.turnCost;
@@ -39,5 +41,5 @@ export class Scene {
     } else {
       return false;
     }
-  }
+  }*/
 }
