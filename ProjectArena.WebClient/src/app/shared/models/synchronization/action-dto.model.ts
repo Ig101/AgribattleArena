@@ -1,5 +1,7 @@
+import { ActionInfo } from './action-info.model';
+
 export interface ActionDto {
-  initiated: boolean;
-  varsion: number;
+  version: number;
   code: string;
+  action: ActionInfo;
 }
