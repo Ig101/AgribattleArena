@@ -19,7 +19,7 @@ export class Scene {
   turnStarted = false;
   turnTime: number;
 
-  startTurn() {
+  startTurnAddReturnIsTurnStarted() {
     this.turnStarted = false;
     if (this.currentActor) {
       this.currentActor.initiativePosition += this.currentActor.turnCost;
@@ -35,9 +35,9 @@ export class Scene {
       undefined;
     if (nextPlayerCandidate) {
       this.currentActor = nextPlayerCandidate;
-      // TODO send start turn and start turn after message
+      return true;
     } else {
-      // TODO send end turn
+      return false;
     }
   }
 }
