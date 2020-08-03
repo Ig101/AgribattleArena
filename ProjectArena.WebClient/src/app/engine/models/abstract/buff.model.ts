@@ -7,6 +7,7 @@ export interface Buff {
 
   duration: number;
   maxStacks: number;
+  counter: number;
 
   blockedActions: string[];
   blockedEffects: string[];

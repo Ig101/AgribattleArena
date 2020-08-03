@@ -156,12 +156,33 @@ export class Actor implements IActor {
     return resultPower;
   }
 
+  private calculateBuffPower(buff: Buff) {
+    return buff.counter * 1000 + (buff.duration !== undefined ? buff.duration : 999);
+  }
+
   applyBuff(buff: Buff) {
-    const sameBuffs = this.buffs.filter(x => x.id === buff.id);
-    if (buff.maxStacks <= sameBuffs.length) {
-      return;
-    }
     this.buffs.push(buff);
+    const sameBuffs = this.buffs.filter(x => x.id === buff.id);
+    const haveExtraBuffs = buff.maxStacks < sameBuffs.length;
+    if (haveExtraBuffs) {
+      const extraBuff = this.buffs.sort((a, b) => this.calculateBuffPower(a) - this.calculateBuffPower(b))[0];
+      removeFromArray(this.buffs, extraBuff);
+      this.turnCost -= buff.changedSpeed;
+      if (this.turnCost > maxTurnCost) {
+        this.turnCost = maxTurnCost;
+      }
+      if (this.turnCost < minTurnCost) {
+        this.turnCost = minTurnCost;
+      }
+      const oldDurability = this.maxDurability - buff.changedDurability;
+      if (oldDurability < 0) {
+        this.isAlive = false;
+      } else if (oldDurability !== this.maxDurability) {
+        const difference = this.durability / this.maxDurability;
+        this.durability = difference * oldDurability;
+        this.maxDurability = oldDurability;
+      }
+    }
     this.turnCost += buff.changedSpeed;
     if (this.turnCost > maxTurnCost) {
       buff.changedSpeed -= (maxTurnCost - this.turnCost);
@@ -181,12 +202,14 @@ export class Actor implements IActor {
       this.maxDurability = newDurability;
     }
 
-    this.blockedEffects.push(...buff.blockedEffects);
-    this.blockedActions.push(...buff.blockedActions);
-    if (buff.blockAllActions) {
-      this.actions.length = 0;
-    } else {
-      this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
+    if (!haveExtraBuffs) {
+      this.blockedEffects.push(...buff.blockedEffects);
+      this.blockedActions.push(...buff.blockedActions);
+      if (buff.blockAllActions) {
+        this.actions.length = 0;
+      } else {
+        this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
+      }
     }
   }
 
@@ -203,15 +226,13 @@ export class Actor implements IActor {
       if (buff.duration !== undefined) {
         buff.duration--;
       }
-      if (buff.duration <= 0) {
+      if (buff.duration !== undefined && buff.duration <= 0) {
         buffRemoved = true;
         this.turnCost -= buff.changedSpeed;
         if (this.turnCost > maxTurnCost) {
-          buff.changedSpeed -= (maxTurnCost - this.turnCost);
           this.turnCost = maxTurnCost;
         }
         if (this.turnCost < minTurnCost) {
-          buff.changedSpeed += (minTurnCost - this.turnCost);
           this.turnCost = minTurnCost;
         }
         const newDurability = this.maxDurability - buff.changedDurability;
