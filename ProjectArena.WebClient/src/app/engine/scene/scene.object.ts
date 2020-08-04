@@ -1,14 +1,27 @@
 import { Tile } from './tile.object';
 import { Player } from './abstract/player.object';
 import { Observer } from 'rxjs/internal/types';
-import { ActionDefinition } from '../models/action-definition.model';
 import { Actor } from './actor.object';
+import { TileStub } from '../models/abstract/tile-stub.model';
+import { ChangeDefinition } from '../models/abstract/change-definition.model';
+import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
+import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
+
+export const SCENE_FRAME_TIME = 1 / 30;
 
 export class Scene {
 
   id: string;
 
-  definitionsSub: Observer<ActionDefinition>;
+  removedActors: number[] = [];
+
+  actionsSub: Observer<ActionInfo>;
+  synchronizersSub: Observer<Synchronizer>;
+
+  tileStubs: TileStub[] = [];
+  changes: ChangeDefinition[] = [];
+  timeLine = 0;
+  lastTime: number;
 
   width: number;
   height: number;
@@ -19,6 +32,28 @@ export class Scene {
   turnStarted = false;
   turnTime: number;
 
+  pushChanges(changes: ChangeDefinition[]) {
+    if (changes && changes.length > 0) {
+      this.changes.push(...changes);
+    }
+  }
+
+  pushTimeline() {
+    const newTime = performance.now();
+    const shift = newTime - this.lastTime;
+    this.lastTime = newTime;
+    this.timeLine += shift;
+    const currentChanges = this.changes.filter(x => x.time <= this.timeLine);
+    this.changes = this.changes.filter(x => x.time > this.timeLine);
+    this.tileStubs.length = 0;
+    for (const change of currentChanges) {
+      change.action();
+    }
+
+    if (this.timeLine > 100000000) {
+      this.timeLine = 0;
+    }
+  }
   /*
     Make it server side
     startTurnAddReturnIsTurnStarted() {

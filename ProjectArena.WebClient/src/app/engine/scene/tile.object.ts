@@ -19,12 +19,6 @@ export class Tile implements IActor {
     return [];
   }
 
-  get isAlive() {
-    return true;
-  }
-
-  set isAlive(_) { }
-
   get owner() {
     return undefined;
   }
@@ -43,6 +37,14 @@ export class Tile implements IActor {
     return 0;
   }
 
+  get isAlive() {
+    return true;
+  }
+
+  get durability() {
+    return 9999999;
+  }
+
   get height() {
     return this.actors.reduce((a, b) => a + b.height, 0);
   }
@@ -56,14 +58,16 @@ export class Tile implements IActor {
     return result;
   }
 
-  handleEffects(effects: string[], power: number, containerized: boolean, order: number) {
+  handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime) {
     let resultPower = power;
     for (const actor of this.actors) {
-      const powerChange = actor.handleEffects(effects, power, true, order + 1) - power;
+      const powerChange = actor.handleEffects(effects, power, true, order + 1, startingTime) - power;
       resultPower += powerChange;
     }
     return resultPower;
   }
+
+  kill() { }
 
   applyBuff(buff: Buff) { }
 

@@ -1,7 +1,7 @@
 import { Actor } from '../../scene/actor.object';
-import { ActionDefinition } from '../action-definition.model';
 import { Observable, Observer } from 'rxjs';
 import { IActor } from '../../interfaces/actor.interface';
+import { ChangeDefinition } from './change-definition.model';
 
 export interface Action {
   id: string;
@@ -16,7 +16,10 @@ export interface Action {
   validateActionTargeted: (actor: Actor, power: number, x: number, y: number) => boolean;
   validateActionOnObject: (actor: Actor, power: number, target: IActor) => boolean;
 
-  actionTargeted: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number, x: number, y: number) => void;
-  actionUntargeted: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number) => void;
-  actionOnObject: (definitionsSub: Observer<ActionDefinition>, actor: Actor, power: number, target: IActor) => void;
+  actionTargeted: (actor: Actor, power: number, x: number, y: number, startingTime: number)
+    => ChangeDefinition[];
+  actionUntargeted: (actor: Actor, power: number, startingTime: number)
+    => ChangeDefinition[];
+  actionOnObject: (actor: Actor, power: number, target: IActor, startingTime: number)
+    => ChangeDefinition[];
 }

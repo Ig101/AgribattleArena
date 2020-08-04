@@ -11,14 +11,18 @@ export interface IActor {
   readonly y: number;
   readonly z: number;
 
-  isAlive: boolean;
+  readonly durability: number;
+  readonly isAlive: boolean;
+
   owner: Player;
 
-  handleEffects(effects: string[], power: number, containerized: boolean, order: number): number;
+  handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime: number): number;
 
   applyBuff(buff: Buff);
 
   purgeBuffs();
+
+  kill();
 
   changeDurability(durability: number);
 
