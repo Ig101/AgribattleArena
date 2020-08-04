@@ -6,6 +6,7 @@ import { TileStub } from '../models/abstract/tile-stub.model';
 import { ChangeDefinition } from '../models/abstract/change-definition.model';
 import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
+import { StartTurnInfo } from 'src/app/shared/models/synchronization/start-turn-info.model';
 
 export const SCENE_FRAME_TIME = 1 / 30;
 
@@ -45,13 +46,21 @@ export class Scene {
     this.timeLine += shift;
     const currentChanges = this.changes.filter(x => x.time <= this.timeLine);
     this.changes = this.changes.filter(x => x.time > this.timeLine);
-    this.tileStubs.length = 0;
+    this.tileStubs = this.tileStubs.filter(x => x.endTime > this.timeLine);
     for (const change of currentChanges) {
       change.action();
     }
 
     if (this.timeLine > 100000000) {
       this.timeLine = 0;
+    }
+  }
+
+  startTurn(definition: StartTurnInfo) {
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        this.tiles[x][y].update();
+      }
     }
   }
   /*

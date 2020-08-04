@@ -198,12 +198,12 @@ export class Actor implements IActor {
       }
       const oldDurability = this.maxDurability - buff.changedDurability;
       if (oldDurability < 0) {
-        this.kill();
+        this.durability = 1;
       } else if (oldDurability !== this.maxDurability) {
         const difference = this.durability / this.maxDurability;
-        this.durability = difference * oldDurability;
-        this.maxDurability = oldDurability;
+        this.durability = difference > 0 ? difference * oldDurability : 1;
       }
+      this.maxDurability = oldDurability;
     }
     this.turnCost += buff.changedSpeed;
     if (this.turnCost > maxTurnCost) {
@@ -217,12 +217,12 @@ export class Actor implements IActor {
 
     const newDurability = this.maxDurability + buff.changedDurability;
     if (newDurability < 0) {
-      this.kill();
+      this.durability = 1;
     } else if (newDurability !== this.maxDurability) {
       const difference = this.durability / this.maxDurability;
-      this.durability = difference * newDurability;
-      this.maxDurability = newDurability;
+      this.durability = difference > 0 ? difference * newDurability : 1;
     }
+    this.maxDurability = newDurability;
 
     if (!haveExtraBuffs) {
       this.blockedEffects.push(...buff.blockedEffects);
@@ -260,12 +260,12 @@ export class Actor implements IActor {
         }
         const newDurability = this.maxDurability - buff.changedDurability;
         if (newDurability < 0) {
-          this.kill();
+          this.durability = 1;
         } else if (newDurability !== this.maxDurability) {
           const difference = this.durability / this.maxDurability;
-          this.durability = difference * newDurability;
-          this.maxDurability = newDurability;
+          this.durability = difference > 0 ? difference * newDurability : 1;
         }
+        this.maxDurability = newDurability;
       }
     }
     if (buffRemoved) {
@@ -285,6 +285,9 @@ export class Actor implements IActor {
           this.actions = [...this.actions, ...buff.addedActions].filter(x => this.blockedActions.includes(x.id));
         }
       }
+    }
+    for (const actor of this.actors) {
+      actor.updateBuffs();
     }
   }
 
@@ -317,17 +320,5 @@ export class Actor implements IActor {
 
   private isActorReadyToStartTurn() {
     return this.owner && this.initiativePosition <= 0 && this.actions.some(x => x.remainedTime <= 0);
-  }
-
-  startTurn(): Actor[] {
-    this.initiativePosition--;
-    for (const action of this.actions) {
-      action.remainedTime--;
-    }
-    const result: Actor[] = this.isActorReadyToStartTurn() ? [this] : [];
-    for (const actor of this.actors) {
-      result.push(...actor.startTurn());
-    }
-    return result;
   }
 }

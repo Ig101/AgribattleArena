@@ -73,6 +73,16 @@ export class Tile implements IActor {
 
   purgeBuffs() { }
 
+  updateBuffs() {
+    for (const actor of this.actors) {
+      actor.updateBuffs();
+    }
+  }
+
+  update() {
+    this.updateBuffs();
+  }
+
   changeDurability(durability: number) { }
 
   move(target: IActor) { }
@@ -83,13 +93,5 @@ export class Tile implements IActor {
 
   removeActor(actor: Actor) {
     removeFromArray(this.actors, actor);
-  }
-
-  startTurn() {
-    const result = [];
-    for (const actor of this.actors) {
-      result.push(...actor.startTurn());
-    }
-    return result;
   }
 }
