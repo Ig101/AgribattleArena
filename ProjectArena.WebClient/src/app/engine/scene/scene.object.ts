@@ -48,6 +48,7 @@ export class Scene {
     this.changes = this.changes.filter(x => x.time > this.timeLine);
     this.tileStubs = this.tileStubs.filter(x => x.endTime > this.timeLine);
     for (const change of currentChanges) {
+      this.tileStubs.push(...change.tileStubs);
       change.action();
     }
 
