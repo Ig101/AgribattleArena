@@ -7,6 +7,7 @@ import { ChangeDefinition } from '../models/abstract/change-definition.model';
 import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
 import { StartTurnInfo } from 'src/app/shared/models/synchronization/start-turn-info.model';
+import { Log } from '../models/abstract/log.model';
 
 export const SCENE_FRAME_TIME = 1 / 30;
 
@@ -21,6 +22,7 @@ export class Scene {
 
   tileStubs: TileStub[] = [];
   changes: ChangeDefinition[] = [];
+  logs: Log[] = [];
   timeLine = 0;
   lastTime: number;
 
@@ -33,6 +35,13 @@ export class Scene {
   turnStarted = false;
   turnTime: number;
 
+  private clearExtraLogs() {
+    const maxLogsCount = 50;
+    if (this.logs.length > maxLogsCount) {
+      this.logs.splice(0, this.logs.length - maxLogsCount);
+    }
+  }
+
   pushChanges(changes: ChangeDefinition[]) {
     if (changes && changes.length > 0) {
       this.changes.push(...changes);
@@ -43,14 +52,19 @@ export class Scene {
     const newTime = performance.now();
     const shift = newTime - this.lastTime;
     this.lastTime = newTime;
+
     this.timeLine += shift;
     const currentChanges = this.changes.filter(x => x.time <= this.timeLine);
     this.changes = this.changes.filter(x => x.time > this.timeLine);
     this.tileStubs = this.tileStubs.filter(x => x.endTime > this.timeLine);
     for (const change of currentChanges) {
       this.tileStubs.push(...change.tileStubs);
+      if (change.logs) {
+        this.logs.push(...change.logs);
+      }
       change.action();
     }
+    this.clearExtraLogs();
 
     if (this.timeLine > 100000000) {
       this.timeLine = 0;
