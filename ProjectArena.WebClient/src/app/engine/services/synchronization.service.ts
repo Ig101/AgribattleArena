@@ -40,6 +40,6 @@ export class SynchronizationService {
   }
 
   processMessage(message: SynchronizationMessageDto) {
-
+    this.sceneService.processMessage(message);
   }
 }

@@ -8,8 +8,12 @@ import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
 import { StartTurnInfo } from 'src/app/shared/models/synchronization/start-turn-info.model';
 import { Log } from '../models/abstract/log.model';
+import { ActorReference } from 'src/app/shared/models/synchronization/objects/actor-reference.model';
+import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization/synchronization-message-dto.model';
+import { ActionType } from 'src/app/shared/models/enum/action-type.enum';
+import { SynchronizationMessageType } from 'src/app/shared/models/enum/synchronization-message-type.enum';
 
-export const SCENE_FRAME_TIME = 1 / 30;
+export const SCENE_FRAME_TIME = 1000 / 30;
 
 export class Scene {
 
@@ -22,6 +26,7 @@ export class Scene {
 
   tileStubs: TileStub[] = [];
   changes: ChangeDefinition[] = [];
+  changed: boolean;
   logs: Log[] = [];
   timeLine = 0;
   lastTime: number;
@@ -35,11 +40,64 @@ export class Scene {
   turnStarted = false;
   turnTime: number;
 
+  waitingMessages: SynchronizationMessageDto[] = [];
+
   private clearExtraLogs() {
     const maxLogsCount = 50;
     if (this.logs.length > maxLogsCount) {
       this.logs.splice(0, this.logs.length - maxLogsCount);
     }
+  }
+
+  private findActorByReference(reference: ActorReference) {
+    return this.tiles[reference.x][reference.y].findActor(reference.id);
+  }
+
+  private createSynchronizerAndClearChanges(): Synchronizer {
+    // TODO Synchronizer
+    this.changed = false;
+    return undefined;
+  }
+
+  private act(definition: ActionInfo) {
+    const actor = this.findActorByReference(definition.actor);
+    // TODO Action
+  }
+
+  private startTurn(definition: StartTurnInfo) {
+    const actor = this.findActorByReference(definition.tempActor);
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        this.tiles[x][y].update();
+      }
+    }
+
+    if (this.changes.length > 0) {
+      this.changed = true;
+    } else {
+      this.synchronizersSub.next(this.createSynchronizerAndClearChanges());
+    }
+
+    if (actor.isAlive) {
+      this.currentActor = actor;
+      this.timeLine = definition.time;
+    }
+  }
+
+  private processMessage(message: SynchronizationMessageDto) {
+    switch (message.id) {
+      case SynchronizationMessageType.ActionDone:
+        this.act(message.action);
+        break;
+      case SynchronizationMessageType.TurnStarted:
+        this.startTurn(message.startTurnInfo);
+        break;
+    }
+    // TODO Reward and EndGame
+  }
+
+  getShiftedTimeframe(frames: number) {
+    return this.timeLine = frames * SCENE_FRAME_TIME;
   }
 
   pushChanges(changes: ChangeDefinition[]) {
@@ -48,35 +106,40 @@ export class Scene {
     }
   }
 
-  pushTimeline() {
+  update() {
     const newTime = performance.now();
     const shift = newTime - this.lastTime;
     this.lastTime = newTime;
 
     this.timeLine += shift;
-    const currentChanges = this.changes.filter(x => x.time <= this.timeLine);
-    this.changes = this.changes.filter(x => x.time > this.timeLine);
-    this.tileStubs = this.tileStubs.filter(x => x.endTime > this.timeLine);
-    for (const change of currentChanges) {
-      this.tileStubs.push(...change.tileStubs);
-      if (change.logs) {
-        this.logs.push(...change.logs);
+    if (this.changes.length === 0) {
+      if (this.changed) {
+        this.synchronizersSub.next(this.createSynchronizerAndClearChanges());
       }
-      change.action();
+      if (this.waitingMessages.length > 0) {
+        this.processMessage(this.waitingMessages.shift());
+      }
+    } else {
+      const currentChanges = this.changes.filter(x => x.time <= this.timeLine);
+      this.changes = this.changes.filter(x => x.time > this.timeLine);
+      for (const change of currentChanges) {
+        this.tileStubs.push(...change.tileStubs);
+        if (change.logs) {
+          this.logs.push(...change.logs);
+        }
+        change.action();
+      }
     }
+    this.tileStubs = this.tileStubs.filter(x => x.endTime > this.timeLine);
     this.clearExtraLogs();
 
-    if (this.timeLine > 100000000) {
+    if (this.timeLine > 1000000000) {
       this.timeLine = 0;
     }
   }
 
-  startTurn(definition: StartTurnInfo) {
-    for (let x = 0; x < this.width; x++) {
-      for (let y = 0; y < this.height; y++) {
-        this.tiles[x][y].update();
-      }
-    }
+  pushMessages(...messages: SynchronizationMessageDto[]) {
+    this.waitingMessages.push(...messages);
   }
   /*
     Make it server side

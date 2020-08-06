@@ -94,4 +94,18 @@ export class Tile implements IActor {
   removeActor(actor: Actor) {
     removeFromArray(this.actors, actor);
   }
+
+  findActor(id: number): Actor {
+    for (const actor of this.actors) {
+      const neededActor = actor.findActor(id);
+      if (neededActor) {
+        return neededActor;
+      }
+    }
+    return undefined;
+  }
+
+  createSynchronizerAndClearInfo() {
+    return this.actors.filter(x => x.changed).map(x => x.createSynchronizerAndClearInfo());
+  }
 }

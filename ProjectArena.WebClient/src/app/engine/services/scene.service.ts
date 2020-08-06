@@ -5,6 +5,8 @@ import { StartTurnInfo } from 'src/app/shared/models/synchronization/start-turn-
 import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
 import { Subject } from 'rxjs';
 import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
+import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization/synchronization-message-dto.model';
+import { Scene } from '../scene/scene.object';
 
 @Injectable()
 export class SceneService {
@@ -12,25 +14,21 @@ export class SceneService {
   actionsSub = new Subject<ActionInfo>();
   synchronizersSub = new Subject<Synchronizer>();
 
+  private scene: Scene;
+
   constructor() { }
 
   setupGame(fullSynchronizer: FullSynchronizationInfo) {
 
   }
 
-  act(actionInfo: ActionInfo, isReceivedFromMessage: boolean) {
+  act(actionInfo: ActionInfo) {
 
   }
 
-  startTurn(definition: StartTurnInfo) {
-
-  }
-
-  setupRewardInfo(reward: RewardInfo) {
-
-  }
-
-  endGame(reward: RewardInfo, victorious: boolean) {
-
+  processMessage(message: SynchronizationMessageDto) {
+    if (this.scene) {
+      this.scene.pushMessages(message);
+    }
   }
 }

@@ -11,6 +11,5 @@ export interface SynchronizationMessageDto {
   code: string;
   action: ActionInfo;
   reward: RewardInfo;
-  fullSynchronizationInfo: FullSynchronizationInfo;
   startTurnInfo: StartTurnInfo;
 }

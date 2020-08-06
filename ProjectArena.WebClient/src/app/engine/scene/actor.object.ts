@@ -2,10 +2,13 @@ import { Scene } from './scene.object';
 import { IActor } from '../interfaces/actor.interface';
 import { Player } from './abstract/player.object';
 import { Action } from '../models/abstract/action.model';
-import { Reaction } from '../models/abstract/reaction.model';
+import { Reaction, KILL_EFFECT_NAME, BUFF_EFFECT_NAME } from '../models/abstract/reaction.model';
 import { Buff } from '../models/abstract/buff.model';
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 import { Color } from 'src/app/shared/models/color.model';
+import { ActorSynchronization } from 'src/app/shared/models/synchronization/objects/actor-synchronization.model';
+import { ActorReference } from 'src/app/shared/models/synchronization/objects/actor-reference.model';
+import { BuffSynchronization } from 'src/app/shared/models/synchronization/objects/buff-synchronization.model';
 
 const maxTurnCost = 10;
 const minTurnCost = 1;
@@ -24,7 +27,8 @@ export class Actor implements IActor {
   tags: string[];
 
   changed: boolean;
-  changedGlobally: boolean;
+  latestX: number;
+  latestY: number;
 
   actors: Actor[];
   parentActor: IActor;
@@ -64,6 +68,14 @@ export class Actor implements IActor {
 
   get z() {
     return this.parentActor.getActorZ(this);
+  }
+
+  get reference(): ActorReference {
+    return {
+      x: this.x,
+      y: this.y,
+      id: this.id
+    };
   }
 
   constructor() {
@@ -177,6 +189,7 @@ export class Actor implements IActor {
 
   kill() {
     this.isAlive = false;
+    this.handleEffects([KILL_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
     this.parentActor.removeActor(this);
     this.parentScene.removedActors.push(this.id);
   }
@@ -244,6 +257,7 @@ export class Actor implements IActor {
   }
 
   updateBuffs() {
+    this.handleEffects([BUFF_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
     let buffRemoved = false;
     for (const buff of this.buffs) {
       if (buff.duration !== undefined) {
@@ -316,6 +330,48 @@ export class Actor implements IActor {
     this.changed = true;
     this.parentActor.removeActor(this);
     target.addActor(this);
+  }
+
+  findActor(id: number): Actor {
+    if (this.id === id) {
+      return this;
+    }
+    for (const actor of this.actors) {
+      const neededActor = actor.findActor(id);
+      if (neededActor) {
+        return neededActor;
+      }
+    }
+    return undefined;
+  }
+
+  createSynchronizerAndClearInfo() {
+    const result = {
+      reference: {
+        x: this.latestX,
+        y: this.latestY,
+        id: this.id
+      },
+      parentId: this.parentActor.id,
+      x: this.x,
+      y: this.y,
+      durability: this.durability,
+      actors: this.actors.filter(x => x.changed).map(x => x.createSynchronizerAndClearInfo()),
+      buffs: this.buffs.map(x => {
+        return {
+          id: x.id,
+          duration: x.duration,
+          maxStacks: x.maxStacks,
+          counter: x.counter,
+          changedDurability: x.changedDurability,
+          changedSpeed: x.changedSpeed
+        } as BuffSynchronization;
+      })
+    };
+    this.changed = false;
+    this.latestX = this.x;
+    this.latestY = this.y;
+    return result;
   }
 
   private isActorReadyToStartTurn() {
