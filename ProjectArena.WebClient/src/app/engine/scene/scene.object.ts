@@ -12,6 +12,7 @@ import { ActorReference } from 'src/app/shared/models/synchronization/objects/ac
 import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization/synchronization-message-dto.model';
 import { ActionType } from 'src/app/shared/models/enum/action-type.enum';
 import { SynchronizationMessageType } from 'src/app/shared/models/enum/synchronization-message-type.enum';
+import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
@@ -37,10 +38,13 @@ export class Scene {
   players: Player[];
 
   currentActor: Actor;
-  turnStarted = false;
   turnTime: number;
 
   waitingMessages: SynchronizationMessageDto[] = [];
+
+  constructor(synchronizer: FullSynchronizationInfo, turnInfo: StartTurnInfo) {
+    // TODO Constructor
+  }
 
   private clearExtraLogs() {
     const maxLogsCount = 50;
@@ -61,7 +65,20 @@ export class Scene {
 
   private act(definition: ActionInfo) {
     const actor = this.findActorByReference(definition.actor);
-    // TODO Action
+    const action = actor.actions.find(x => x.id === definition.id);
+    // TODO Desync
+    switch (definition.type) {
+      case ActionType.Untargeted:
+        actor.actUntargeted(action);
+        break;
+      case ActionType.Targeted:
+        actor.actTargeted(action, definition.x, definition.y);
+        break;
+      case ActionType.OnObject:
+        const target = this.findActorByReference({ x: definition.x, y: definition.y, id: definition.targetId });
+        actor.actOnObject(action, target);
+        break;
+    }
   }
 
   private startTurn(definition: StartTurnInfo) {
@@ -140,6 +157,14 @@ export class Scene {
 
   pushMessages(...messages: SynchronizationMessageDto[]) {
     this.waitingMessages.push(...messages);
+  }
+
+  intendedAction(definition: ActionInfo) {
+    if (this.waitingMessages.length !== 0 || this.changes.length !== 0 || definition.actor.id !== this.currentActor.id) {
+      return;
+    }
+    this.actionsSub.next(definition);
+    this.act(definition);
   }
   /*
     Make it server side

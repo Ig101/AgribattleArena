@@ -1,3 +1,5 @@
+import { ActionSynchronization } from './action-synchronization.model';
+
 export interface BuffSynchronization {
   id: string;
 
@@ -7,4 +9,6 @@ export interface BuffSynchronization {
 
   changedDurability: number;
   changedSpeed: number;
+
+  actions: ActionSynchronization[];
 }

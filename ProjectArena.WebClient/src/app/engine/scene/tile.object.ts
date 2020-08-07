@@ -49,6 +49,10 @@ export class Tile implements IActor {
     return this.actors.reduce((a, b) => a + b.height, 0);
   }
 
+  constructor() {
+    // TODO Constructor
+  }
+
   getActorZ(actor: Actor) {
     const index = this.actors.indexOf(actor);
     let result = 0;

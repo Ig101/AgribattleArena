@@ -8,7 +8,6 @@ export interface Action {
   timeCost: number;
   cooldown: number;
   remainedTime: number;
-  untargeted: number;
   power: number;
 
   aiPriority: number;

@@ -44,7 +44,6 @@ export class Actor implements IActor {
   height: number;
   volume: number;
   freeVolume: number;
-  isActive: boolean;
 
   buffs: Buff[];
   selfActions: Action[];
@@ -78,8 +77,19 @@ export class Actor implements IActor {
     };
   }
 
-  constructor() {
+  constructor(
+    scene: Scene,
+    actorSynchronization: ActorSynchronization
+  ) {
+    this.parentScene = scene;
     this.isAlive = true;
+    this.synchronize(actorSynchronization);
+  }
+
+  // TODO Synchronize
+  synchronize(synchronizer: ActorSynchronization) {
+    this.durability = synchronizer.durability;
+    this.maxDurability = synchronizer.maxDurability;
   }
 
   getActorZ(actor: Actor) {
@@ -109,7 +119,6 @@ export class Actor implements IActor {
 
   actTargeted(action: Action, x: number, y: number) {
     if (this.isAlive && action.actionTargeted) {
-      //  this.parentScene.actionsSub.next();
       action.remainedTime = action.cooldown;
       this.parentScene.pushChanges(
         action.actionTargeted(this, action.power, x, y, this.parentScene.timeLine));
@@ -118,7 +127,6 @@ export class Actor implements IActor {
 
   actOnObject(action: Action, target: IActor) {
     if (this.isAlive && action.actionOnObject) {
-      //  this.parentScene.actionsSub.next();
       action.remainedTime = action.cooldown;
       this.parentScene.pushChanges(
         action.actionOnObject(this, action.power, target, this.parentScene.timeLine));
@@ -127,7 +135,6 @@ export class Actor implements IActor {
 
   actUntargeted(action: Action) {
     if (this.isAlive && action.actionUntargeted) {
-      //  this.parentScene.actionsSub.next();
       action.remainedTime = action.cooldown;
       this.parentScene.pushChanges(
         action.actionUntargeted(this, action.power, this.parentScene.timeLine));
@@ -355,8 +362,24 @@ export class Actor implements IActor {
       parentId: this.parentActor.id,
       x: this.x,
       y: this.y,
+      char: this.char,
+      color: this.color,
+      height: this.height,
+      volume: this.volume,
+      freeVolume: this.freeVolume,
+      backgroundColor: this.backgroundColor,
       durability: this.durability,
+      maxDurability: this.selfMaxDurability,
+      turnCost: this.selfTurnCost,
+      initiativePosition: this.initiativePosition,
       actors: this.actors.filter(x => x.changed).map(x => x.createSynchronizerAndClearInfo()),
+      actions: this.selfActions.map(x => ({
+        id: x.id,
+        remainedTime: x.remainedTime
+      })),
+      preparationReactions: this.preparationReactions.map(x => x.id),
+      activeReactions: this.activeReactions.map(x => x.id),
+      clearReactions: this.clearReactions.map(x => x.id),
       buffs: this.buffs.map(x => {
         return {
           id: x.id,
@@ -364,10 +387,14 @@ export class Actor implements IActor {
           maxStacks: x.maxStacks,
           counter: x.counter,
           changedDurability: x.changedDurability,
-          changedSpeed: x.changedSpeed
+          changedSpeed: x.changedSpeed,
+          actions: x.addedActions.map(a => ({
+            id: a.id,
+            remainedTime: a.remainedTime
+          })),
         } as BuffSynchronization;
       })
-    };
+    } as ActorSynchronization;
     this.changed = false;
     this.latestX = this.x;
     this.latestY = this.y;
