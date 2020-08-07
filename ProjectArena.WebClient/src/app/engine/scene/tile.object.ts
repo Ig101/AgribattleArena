@@ -49,8 +49,11 @@ export class Tile implements IActor {
     return this.actors.reduce((a, b) => a + b.height, 0);
   }
 
-  constructor() {
-    // TODO Constructor
+  constructor(scene: Scene, x: number, y: number) {
+    this.actors = [];
+    this.parentScene = scene;
+    this.positionX = x;
+    this.positionY = y;
   }
 
   getActorZ(actor: Actor) {
@@ -77,14 +80,10 @@ export class Tile implements IActor {
 
   purgeBuffs() { }
 
-  updateBuffs() {
-    for (const actor of this.actors) {
-      actor.updateBuffs();
-    }
-  }
-
   update() {
-    this.updateBuffs();
+    for (const actor of this.actors) {
+      actor.update();
+    }
   }
 
   changeDurability(durability: number) { }

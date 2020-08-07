@@ -79,15 +79,12 @@ export class Actor implements IActor {
 
   constructor(
     scene: Scene,
-    actorSynchronization: ActorSynchronization
+    parent: IActor,
+    synchronizer: ActorSynchronization
   ) {
     this.parentScene = scene;
     this.isAlive = true;
-    this.synchronize(actorSynchronization);
-  }
-
-  // TODO Synchronize
-  synchronize(synchronizer: ActorSynchronization) {
+      // TODO Synchronize
     this.durability = synchronizer.durability;
     this.maxDurability = synchronizer.maxDurability;
   }
@@ -263,7 +260,9 @@ export class Actor implements IActor {
     this.actions = [...this.selfActions];
   }
 
-  updateBuffs() {
+  update() {
+    this.actions.forEach(x => x.remainedTime--);
+    this.initiativePosition--;
     this.handleEffects([BUFF_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
     let buffRemoved = false;
     for (const buff of this.buffs) {
@@ -308,7 +307,7 @@ export class Actor implements IActor {
       }
     }
     for (const actor of this.actors) {
-      actor.updateBuffs();
+      actor.update();
     }
   }
 
@@ -377,6 +376,7 @@ export class Actor implements IActor {
         id: x.id,
         remainedTime: x.remainedTime
       })),
+      ownerId: this.owner?.id,
       preparationReactions: this.preparationReactions.map(x => x.id),
       activeReactions: this.activeReactions.map(x => x.id),
       clearReactions: this.clearReactions.map(x => x.id),

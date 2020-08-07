@@ -5,7 +5,7 @@ export interface ActionInfo {
   actor: ActorReference;
   id: string;
   type: ActionType;
-  x: number;
-  y: number;
-  targetId: number;
+  x?: number;
+  y?: number;
+  targetId?: number;
 }

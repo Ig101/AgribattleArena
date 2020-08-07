@@ -10,6 +10,8 @@ export interface ActorSynchronization {
   color: Color;
   backgroundColor: Color;
 
+  ownerId: string;
+
   parentId: number;
   x: number;
   y: number;
