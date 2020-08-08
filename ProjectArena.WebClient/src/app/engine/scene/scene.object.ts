@@ -20,6 +20,7 @@ import { INativesCollection } from '../interfaces/natives-collection.interface';
 import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
 import { ActorSynchronization } from 'src/app/shared/models/synchronization/objects/actor-synchronization.model';
 import { Color } from 'src/app/shared/models/color.model';
+import { rangeBetween } from 'src/app/helpers/math.helper';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
@@ -299,19 +300,21 @@ export class Scene {
   }
 
   canActGenerally(actor: Actor) {
-    return this.canCast(actor, undefined);
+    return this.canCast(actor, undefined, undefined, undefined);
   }
 
-  canCast(actor: Actor, action: Action) {
+  canCast(actor: Actor, action: Action, x: number, y: number) {
     return this.waitingMessages.length === 0 &&
       this.changes.length === 0 &&
       actor.id === this.currentActor.id &&
-      (!action || (action.remainedTime <= 0)) &&
+      (!action ||
+        (action.remainedTime <= 0 &&
+        (!x || action.range >= rangeBetween(x, y, actor.x, actor.y)))) &&
       this.turnTime > 0;
   }
 
   private intendedAction(actor: Actor, action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
-    if (!this.canCast(actor, action)) {
+    if (!this.canCast(actor, action, x, y)) {
       return;
     }
     const definition = {
@@ -323,6 +326,7 @@ export class Scene {
       targetId: target.id
     } as ActionInfo;
     this.actionsSub.next(definition);
+    this.turnTime -= action.timeCost;
     this.act(actor, action, type, x, y, target);
   }
 

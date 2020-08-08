@@ -6,6 +6,7 @@ import { ChangeDefinition } from './change-definition.model';
 export interface Action {
   id: string;
   timeCost: number;
+  range: number;
   cooldown: number;
   remainedTime: number;
   power: number;
