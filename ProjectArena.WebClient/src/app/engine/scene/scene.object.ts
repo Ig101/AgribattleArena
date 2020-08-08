@@ -109,6 +109,12 @@ export class Scene {
   }
 
   private createSynchronizerAndClearChanges(): Synchronizer {
+    const actors: ActorSynchronization[] = [];
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        actors.push(...this.tiles[x][y].createSynchronizerAndClearInfo());
+      }
+    }
     // TODO Synchronizer
     this.changed = false;
     return undefined;
