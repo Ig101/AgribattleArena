@@ -20,7 +20,6 @@ export class Actor implements IActor {
 
   char: string;
   color: Color;
-  backgroundColor: Color;
 
   isAlive: boolean;
 
@@ -89,7 +88,6 @@ export class Actor implements IActor {
     this.owner = synchronizer.ownerId ? this.parentScene.players.find(x => x.id === synchronizer.ownerId) : undefined;
     this.char = synchronizer.char;
     this.color = synchronizer.color;
-    this.backgroundColor = synchronizer.backgroundColor;
     this.tags = synchronizer.tags;
     this.durability = synchronizer.durability;
     this.selfMaxDurability = synchronizer.maxDurability;
@@ -400,7 +398,6 @@ export class Actor implements IActor {
       height: this.height,
       volume: this.volume,
       freeVolume: this.freeVolume,
-      backgroundColor: this.backgroundColor,
       durability: this.durability,
       maxDurability: this.selfMaxDurability,
       turnCost: this.selfTurnCost,

@@ -8,7 +8,6 @@ export interface ActorSynchronization {
 
   char: string;
   color: Color;
-  backgroundColor: Color;
 
   ownerId: string;
 
