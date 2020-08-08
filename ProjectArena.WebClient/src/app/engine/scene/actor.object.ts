@@ -53,9 +53,9 @@ export class Actor implements IActor {
 
   maxDurability: number;
   turnCost: number;
-  actions: Action[];
-  blockedActions: string[];
-  blockedEffects: string[];
+  actions: Action[] = [];
+  blockedActions: string[] = [];
+  blockedEffects: string[] = [];
 
   get x() {
     return this.parentActor.x;
@@ -84,9 +84,31 @@ export class Actor implements IActor {
   ) {
     this.parentScene = scene;
     this.isAlive = true;
-      // TODO Synchronize
+    this.parentActor = parent;
+    this.owner = synchronizer.ownerId ? this.parentScene.players.find(x => x.id === synchronizer.ownerId) : undefined;
+    this.char = synchronizer.char;
+    this.color = synchronizer.color;
+    this.backgroundColor = synchronizer.backgroundColor;
+    this.tags = synchronizer.tags;
     this.durability = synchronizer.durability;
+    this.selfMaxDurability = synchronizer.maxDurability;
     this.maxDurability = synchronizer.maxDurability;
+    this.selfTurnCost = synchronizer.turnCost;
+    this.turnCost = synchronizer.turnCost;
+    this.initiativePosition = synchronizer.initiativePosition;
+    this.height = synchronizer.height;
+    this.volume = synchronizer.volume;
+    this.freeVolume = synchronizer.freeVolume;
+    this.preparationReactions = synchronizer.preparationReactions.map(x => scene.nativesCollection.buildReaction(x));
+    this.activeReactions = synchronizer.activeReactions.map(x => scene.nativesCollection.buildReaction(x));
+    this.clearReactions = synchronizer.clearReactions.map(x => scene.nativesCollection.buildReaction(x));
+    this.selfActions = synchronizer.actions.map(x => scene.nativesCollection.buildAction(x));
+    this.actions = [...this.selfActions];
+    this.buffs = [];
+    synchronizer.buffs.forEach(x => this.applyBuff(scene.nativesCollection.buildBuff(x)));
+    this.actors = synchronizer.actors.map(x => new Actor(scene, this, x));
+    this.latestX = this.x;
+    this.latestY = this.y;
   }
 
   getActorZ(actor: Actor) {
@@ -217,8 +239,8 @@ export class Actor implements IActor {
       if (oldDurability < 0) {
         this.durability = 1;
       } else if (oldDurability !== this.maxDurability) {
-        const difference = this.durability / this.maxDurability;
-        this.durability = difference > 0 ? difference * oldDurability : 1;
+        const difference = oldDurability / this.maxDurability;
+        this.durability = difference > 0 ? difference * this.durability : 1;
       }
       this.maxDurability = oldDurability;
     }
@@ -236,8 +258,8 @@ export class Actor implements IActor {
     if (newDurability < 0) {
       this.durability = 1;
     } else if (newDurability !== this.maxDurability) {
-      const difference = this.durability / this.maxDurability;
-      this.durability = difference > 0 ? difference * newDurability : 1;
+      const difference = newDurability / this.maxDurability;
+      this.durability = difference > 0 ? difference * this.durability : 1;
     }
     this.maxDurability = newDurability;
 
@@ -257,6 +279,10 @@ export class Actor implements IActor {
     this.buffs.length = 0;
     this.blockedEffects.length = 0;
     this.blockedActions.length = 0;
+    const difference = this.selfMaxDurability / this.maxDurability;
+    this.durability = difference > 0 ? difference * this.durability : 1;
+    this.maxDurability = this.selfMaxDurability;
+    this.turnCost = this.selfTurnCost;
     this.actions = [...this.selfActions];
   }
 
@@ -282,8 +308,8 @@ export class Actor implements IActor {
         if (newDurability < 0) {
           this.durability = 1;
         } else if (newDurability !== this.maxDurability) {
-          const difference = this.durability / this.maxDurability;
-          this.durability = difference > 0 ? difference * newDurability : 1;
+          const difference = newDurability / this.maxDurability;
+          this.durability = difference > 0 ? difference * this.durability : 1;
         }
         this.maxDurability = newDurability;
       }

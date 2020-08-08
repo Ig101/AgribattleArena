@@ -16,18 +16,17 @@ import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/f
 import { Action } from '../models/abstract/action.model';
 import { Target } from '@angular/compiler';
 import { IActor } from '../interfaces/actor.interface';
+import { INativesCollection } from '../interfaces/natives-collection.interface';
+import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
 export class Scene {
 
   id: string;
+  currentPlayer: Player;
 
   removedActors: number[] = [];
-
-  actionsSub: Observer<ActionInfo>;
-  synchronizersSub: Observer<Synchronizer>;
-  desyncSub: Observer<boolean>;
 
   tileStubs: TileStub[] = [];
   changes: ChangeDefinition[] = [];
@@ -44,19 +43,48 @@ export class Scene {
   currentActor: Actor;
   turnTime: number;
 
+  reward: RewardInfo;
+
   waitingMessages: SynchronizationMessageDto[] = [];
 
   constructor(
-    actionsSub: Observer<ActionInfo>,
-    synchronizersSub: Observer<Synchronizer>,
-    desyncSub: Observer<boolean>,
+    public actionsSub: Observer<ActionInfo>,
+    public synchronizersSub: Observer<Synchronizer>,
+    public desyncSub: Observer<boolean>,
+    public nativesCollection: INativesCollection,
+    private endGameSub: Observer<boolean>,
     synchronizer: FullSynchronizationInfo,
+    reward: RewardInfo,
     turnInfo: StartTurnInfo) {
 
-    this.actionsSub = actionsSub;
-    this.synchronizersSub = synchronizersSub;
-    this.desyncSub = desyncSub;
-    // TODO Constructor
+    this.desyncSub.next(false);
+    this.endGameSub.next(false);
+
+    this.players = synchronizer.players.map(x => new Player(x));
+    this.currentPlayer = this.players.find(x => x.id === synchronizer.currentPlayerId);
+    this.width = synchronizer.width;
+    this.height = synchronizer.height;
+    this.id = synchronizer.id;
+    this.tiles = new Array<Tile[]>(this.width);
+    for (let x = 0; x < this.width; x++) {
+      this.tiles[x] = new Array<Tile>(this.height);
+      for (let y = 0; y < this.height; y++) {
+        this.tiles[x][y] = new Tile(this, x, y);
+      }
+    }
+    for (const actor of synchronizer.actors) {
+      const tile = this.tiles[actor.x][actor.y];
+      tile.actors.push(new Actor(this, tile, actor));
+    }
+    this.reward = reward;
+    this.waitingMessages = synchronizer.waitingActions;
+    if (turnInfo) {
+      const actor = this.findActorByReference(turnInfo.tempActor);
+      if (actor && actor.isAlive) {
+        this.currentActor = actor;
+        this.turnTime = turnInfo.time;
+      }
+    }
   }
 
   private clearExtraLogs() {
@@ -133,8 +161,14 @@ export class Scene {
       case SynchronizationMessageType.TurnStarted:
         this.startTurn(message.startTurnInfo);
         break;
+      case SynchronizationMessageType.Rewarded:
+        this.reward = message.reward;
+        break;
+      case SynchronizationMessageType.GameEnded:
+        this.reward = message.reward;
+        this.endGameSub.next(true);
+        break;
     }
-    // TODO Reward and EndGame
   }
 
   getShiftedTimeframe(frames: number) {

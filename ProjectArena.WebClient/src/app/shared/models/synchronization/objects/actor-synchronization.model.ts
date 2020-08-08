@@ -12,6 +12,8 @@ export interface ActorSynchronization {
 
   ownerId: string;
 
+  tags: string[];
+
   parentId: number;
   x: number;
   y: number;
