@@ -28,7 +28,9 @@ export interface IActor {
 
   removeActor(actor: Actor);
 
-  addActor(actor: Actor);
+  addActorOnTop(actor: Actor);
+
+  addActor(actor: Actor, index: number);
 
   getActorZ(actor: Actor);
 

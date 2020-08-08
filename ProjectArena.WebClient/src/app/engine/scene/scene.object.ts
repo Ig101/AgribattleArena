@@ -18,6 +18,8 @@ import { Target } from '@angular/compiler';
 import { IActor } from '../interfaces/actor.interface';
 import { INativesCollection } from '../interfaces/natives-collection.interface';
 import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
+import { ActorSynchronization } from 'src/app/shared/models/synchronization/objects/actor-synchronization.model';
+import { Color } from 'src/app/shared/models/color.model';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
@@ -33,6 +35,7 @@ export class Scene {
   changed: boolean;
   logs: Log[] = [];
   timeLine = 0;
+  idCounterPosition = 0;
   lastTime: number;
 
   width: number;
@@ -63,6 +66,7 @@ export class Scene {
     this.endGameSub.next(false);
 
     this.timeLine = synchronizer.timeLine;
+    this.idCounterPosition = synchronizer.idCounterPosition;
     this.changed = false;
     this.players = synchronizer.players.map(x => new Player(x));
     this.currentPlayer = this.players.find(x => x.id === synchronizer.currentPlayerId);
@@ -70,14 +74,16 @@ export class Scene {
     this.height = synchronizer.height;
     this.id = synchronizer.id;
     this.tiles = new Array<Tile[]>(this.width);
+    let tilesCounter = 1;
     for (let x = 0; x < this.width; x++) {
       this.tiles[x] = new Array<Tile>(this.height);
       for (let y = 0; y < this.height; y++) {
-        this.tiles[x][y] = new Tile(this, x, y);
+        this.tiles[x][y] = new Tile(this, tilesCounter, x, y);
+        tilesCounter++;
       }
     }
     for (const actor of synchronizer.actors) {
-      const tile = this.tiles[actor.x][actor.y];
+      const tile = this.getTileById(actor.parentId);
       tile.actors.push(new Actor(this, tile, actor));
     }
     this.reward = reward;
@@ -173,6 +179,70 @@ export class Scene {
         this.endGameSub.next(true);
         break;
     }
+  }
+
+  getTileById(id: number) {
+    const tileX = Math.floor((id - 1) / this.height);
+    const tileY = (id - 1) % this.height;
+    return this.tiles[tileX][tileY];
+  }
+
+  createNewActor(
+    x: number,
+    y: number,
+    char: string,
+    color: Color,
+    backgroundColor: Color,
+    owner: Player,
+    tags: string[],
+    durability: number,
+    turnCost: number,
+    height: number,
+    volume: number,
+    freeVolume: number,
+    preparationReactions: string[],
+    activeReactions: string[],
+    clearReactions: string[],
+    actions: string[],
+    parent?: IActor,
+    position?: number
+  ): Actor {
+    const id = this.idCounterPosition++;
+    const synchronization = {
+      reference: {
+        id, x, y
+      },
+      char,
+      color,
+      backgroundColor,
+      ownerId: owner.id,
+      tags,
+      durability,
+      maxDurability: durability,
+      turnCost,
+      initiativePosition: turnCost,
+      height,
+      volume,
+      freeVolume,
+      preparationReactions,
+      activeReactions,
+      clearReactions,
+      actions: actions.map(a => ({
+        id: a,
+        remainedTime: 0
+      })),
+      actors: [],
+      buffs: []
+    } as ActorSynchronization;
+    const actor = new Actor(this, parent, synchronization);
+    if (parent) {
+      if (position !== undefined) {
+        parent.addActor(actor, position);
+      } else {
+        parent.addActorOnTop(actor);
+      }
+    }
+    return actor;
   }
 
   getShiftedTimeframe(frames: number) {

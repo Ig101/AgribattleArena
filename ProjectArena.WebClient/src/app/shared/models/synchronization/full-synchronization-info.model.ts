@@ -6,6 +6,7 @@ import { SynchronizationMessageDto } from './synchronization-message-dto.model';
 export interface FullSynchronizationInfo {
   id: string;
   timeLine: number;
+  idCounterPosition: number;
   currentPlayerId: string;
   actors: ActorSynchronization[];
   players: PlayerSynchronization[];

@@ -15,8 +15,6 @@ export interface ActorSynchronization {
   tags: string[];
 
   parentId: number;
-  x: number;
-  y: number;
   durability: number;
   maxDurability: number;
   turnCost: number;

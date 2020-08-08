@@ -82,6 +82,7 @@ export class Actor implements IActor {
     parent: IActor,
     synchronizer: ActorSynchronization
   ) {
+    this.id = synchronizer.reference.id;
     this.parentScene = scene;
     this.isAlive = true;
     this.parentActor = parent;
@@ -348,9 +349,18 @@ export class Actor implements IActor {
     }
   }
 
-  addActor(actor: Actor) {
+  addActorOnTop(actor: Actor) {
     this.changed = true;
     this.actors.push(actor);
+  }
+
+  addActor(actor: Actor, index: number) {
+    if (index >= this.actors.length) {
+      this.addActorOnTop(actor);
+      return;
+    }
+    this.changed = true;
+    this.actors.splice(Math.max(0, index), 0, actor);
   }
 
   removeActor(actor: Actor) {
@@ -361,7 +371,7 @@ export class Actor implements IActor {
   move(target: IActor) {
     this.changed = true;
     this.parentActor.removeActor(this);
-    target.addActor(this);
+    target.addActorOnTop(this);
   }
 
   findActor(id: number): Actor {
@@ -385,8 +395,6 @@ export class Actor implements IActor {
         id: this.id
       },
       parentId: this.parentActor.id,
-      x: this.x,
-      y: this.y,
       char: this.char,
       color: this.color,
       height: this.height,

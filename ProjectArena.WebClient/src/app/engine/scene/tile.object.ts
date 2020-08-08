@@ -49,8 +49,9 @@ export class Tile implements IActor {
     return this.actors.reduce((a, b) => a + b.height, 0);
   }
 
-  constructor(scene: Scene, x: number, y: number) {
+  constructor(scene: Scene, id: number, x: number, y: number) {
     this.actors = [];
+    this.id = id;
     this.parentScene = scene;
     this.positionX = x;
     this.positionY = y;
@@ -90,9 +91,18 @@ export class Tile implements IActor {
 
   move(target: IActor) { }
 
-  addActor(actor: Actor) {
+  addActorOnTop(actor: Actor) {
     this.actors.push(actor);
   }
+
+  addActor(actor: Actor, index: number) {
+    if (index >= this.actors.length) {
+      this.addActorOnTop(actor);
+      return;
+    }
+    this.actors.splice(Math.max(0, index), 0, actor);
+  }
+
 
   removeActor(actor: Actor) {
     removeFromArray(this.actors, actor);
