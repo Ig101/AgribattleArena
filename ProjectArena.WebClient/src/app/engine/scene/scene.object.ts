@@ -41,7 +41,7 @@ export class Scene {
   players: Player[];
 
   currentActor: Actor;
-  turnTime: number;
+  turnTime = 0;
 
   reward: RewardInfo;
 
@@ -57,9 +57,13 @@ export class Scene {
     reward: RewardInfo,
     turnInfo: StartTurnInfo) {
 
+    // TODO Desyncs
+
     this.desyncSub.next(false);
     this.endGameSub.next(false);
 
+    this.timeLine = synchronizer.timeLine;
+    this.changed = false;
     this.players = synchronizer.players.map(x => new Player(x));
     this.currentPlayer = this.players.find(x => x.id === synchronizer.currentPlayerId);
     this.width = synchronizer.width;

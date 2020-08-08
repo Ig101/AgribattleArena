@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { SceneService } from './scene.service';
 import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization/synchronization-message-dto.model';
-import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
+import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
+import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
 
 @Injectable()
 export class SynchronizationService {
@@ -17,8 +18,8 @@ export class SynchronizationService {
   constructor(
     private sceneService: SceneService
   ) {
-    sceneService.actionsSub.subscribe(this.issueAction);
-    sceneService.synchronizersSub.subscribe(this.sendActionSynchronizationInfo);
+    sceneService.actionsSub.subscribe(x => this.issueAction(x));
+    sceneService.synchronizersSub.subscribe(x => this.sendActionSynchronizationInfo(x));
   }
 
   private generateNewCode() {
@@ -32,11 +33,12 @@ export class SynchronizationService {
   }
 
   issueAction(action: ActionInfo) {
+    // TODO SendAction
     const newCode = this.generateNewCode();
   }
 
   sendActionSynchronizationInfo(synchronizer: Synchronizer) {
-
+    // TODO SendAction
   }
 
   processMessage(message: SynchronizationMessageDto) {

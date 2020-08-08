@@ -3,27 +3,61 @@ import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/f
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
 import { StartTurnInfo } from 'src/app/shared/models/synchronization/start-turn-info.model';
 import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
 import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization/synchronization-message-dto.model';
-import { Scene } from '../scene/scene.object';
+import { Scene, SCENE_FRAME_TIME } from '../scene/scene.object';
+import { INativesCollection } from '../interfaces/natives-collection.interface';
+import { MessageType } from '@aspnet/signalr';
+import { SynchronizationMessageType } from 'src/app/shared/models/enum/synchronization-message-type.enum';
 
 @Injectable()
 export class SceneService {
 
   actionsSub = new Subject<ActionInfo>();
   synchronizersSub = new Subject<Synchronizer>();
+  desyncSub = new BehaviorSubject<boolean>(false);
+  endGameSub = new BehaviorSubject<boolean>(false);
 
-  private scene: Scene;
+  updateSub = new Subject<void>();
+  updater;
 
-  constructor() { }
+  private sceneInternal: Scene;
 
-  setupGame(fullSynchronizer: FullSynchronizationInfo) {
-
+  get scene() {
+    return this.sceneInternal;
   }
 
-  act(actionInfo: ActionInfo) {
+  // TODO Inject token for natives collection
+  constructor(
+    private nativesCollection: INativesCollection
+  ) { }
 
+  setupGame(fullSynchronizer: FullSynchronizationInfo, reward: RewardInfo, turnInfo: StartTurnInfo) {
+    this.sceneInternal = new Scene(
+      this.actionsSub,
+      this.synchronizersSub,
+      this.desyncSub,
+      this.nativesCollection,
+      this.endGameSub,
+      fullSynchronizer,
+      reward,
+      turnInfo
+    );
+  }
+
+  startUpdates() {
+    clearInterval(this.updater);
+    this.scene.lastTime = performance.now();
+    this.updater = setInterval(() => {
+      this.scene.update();
+      this.updateSub.next();
+    }, SCENE_FRAME_TIME);
+  }
+
+  clearScene() {
+    clearInterval(this.updater);
+    this.sceneInternal = undefined;
   }
 
   processMessage(message: SynchronizationMessageDto) {
