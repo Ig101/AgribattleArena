@@ -291,7 +291,7 @@ export class Actor implements IActor {
     this.handleEffects([BUFF_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
     let buffRemoved = false;
     for (const buff of this.buffs) {
-      if (buff.duration !== undefined) {
+      if (buff.duration !== undefined && (!buff.updatesOnTurnOnly || this.parentScene.currentActor.id === this.id || !this.owner)) {
         buff.duration--;
       }
       if (buff.duration !== undefined && buff.duration <= 0) {

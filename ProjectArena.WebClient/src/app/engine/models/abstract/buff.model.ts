@@ -5,6 +5,7 @@ export interface Buff {
 
   id: string;
 
+  updatesOnTurnOnly: boolean;
   duration: number;
   maxStacks: number;
   counter: number;
