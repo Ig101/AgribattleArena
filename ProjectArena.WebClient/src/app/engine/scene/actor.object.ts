@@ -20,6 +20,7 @@ export class Actor implements IActor {
 
   char: string;
   color: Color;
+  left: boolean;
 
   isAlive: boolean;
 
@@ -86,6 +87,7 @@ export class Actor implements IActor {
     this.name = synchronizer.name;
     this.parentScene = scene;
     this.isAlive = true;
+    this.left = synchronizer.left;
     this.parentActor = parent;
     this.owner = synchronizer.ownerId ? this.parentScene.players.find(x => x.id === synchronizer.ownerId) : undefined;
     this.char = synchronizer.char;
@@ -390,6 +392,7 @@ export class Actor implements IActor {
       maxDurability: this.selfMaxDurability,
       turnCost: this.selfTurnCost,
       initiativePosition: this.initiativePosition,
+      left: this.left,
       actors: this.actors.filter(x => x.changed).map(x => x.createSynchronizerAndClearInfo()),
       actions: this.selfActions.map(x => ({
         id: x.id,

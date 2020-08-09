@@ -15,20 +15,36 @@ export function fillColor(colors: Uint8Array, r: number, g: number, b: number, a
   colors[texturePosition * 4 + 3] = a;
 }
 
-export function fillChar(charsService: ITextureService, textureMapping: Float32Array, char: string, texturePosition: number) {
+export function fillChar(charsService: ITextureService, textureMapping: Float32Array,
+                         char: string, texturePosition: number, mirrored: boolean = false) {
   const charPosition = charsService.getSpritePositionOnTexture(char);
-  textureMapping[texturePosition * 12] = charPosition.x;
-  textureMapping[texturePosition * 12 + 1] = charPosition.y;
-  textureMapping[texturePosition * 12 + 2] = charPosition.x + charsService.spriteWidth;
-  textureMapping[texturePosition * 12 + 3] = charPosition.y;
-  textureMapping[texturePosition * 12 + 4] = charPosition.x;
-  textureMapping[texturePosition * 12 + 5] = charPosition.y + charsService.spriteHeight;
-  textureMapping[texturePosition * 12 + 6] = charPosition.x;
-  textureMapping[texturePosition * 12 + 7] = charPosition.y + charsService.spriteHeight;
-  textureMapping[texturePosition * 12 + 8] = charPosition.x + charsService.spriteWidth;
-  textureMapping[texturePosition * 12 + 9] = charPosition.y;
-  textureMapping[texturePosition * 12 + 10] = charPosition.x + charsService.spriteWidth;
-  textureMapping[texturePosition * 12 + 11] = charPosition.y + charsService.spriteHeight;
+  if (mirrored) {
+    textureMapping[texturePosition * 12] = charPosition.x + charsService.spriteWidth;
+    textureMapping[texturePosition * 12 + 1] = charPosition.y;
+    textureMapping[texturePosition * 12 + 2] = charPosition.x;
+    textureMapping[texturePosition * 12 + 3] = charPosition.y;
+    textureMapping[texturePosition * 12 + 4] = charPosition.x + charsService.spriteWidth;
+    textureMapping[texturePosition * 12 + 5] = charPosition.y + charsService.spriteHeight;
+    textureMapping[texturePosition * 12 + 6] = charPosition.x  + charsService.spriteWidth;
+    textureMapping[texturePosition * 12 + 7] = charPosition.y + charsService.spriteHeight;
+    textureMapping[texturePosition * 12 + 8] = charPosition.x;
+    textureMapping[texturePosition * 12 + 9] = charPosition.y;
+    textureMapping[texturePosition * 12 + 10] = charPosition.x;
+    textureMapping[texturePosition * 12 + 11] = charPosition.y + charsService.spriteHeight;
+  } else {
+    textureMapping[texturePosition * 12] = charPosition.x;
+    textureMapping[texturePosition * 12 + 1] = charPosition.y;
+    textureMapping[texturePosition * 12 + 2] = charPosition.x + charsService.spriteWidth;
+    textureMapping[texturePosition * 12 + 3] = charPosition.y;
+    textureMapping[texturePosition * 12 + 4] = charPosition.x;
+    textureMapping[texturePosition * 12 + 5] = charPosition.y + charsService.spriteHeight;
+    textureMapping[texturePosition * 12 + 6] = charPosition.x;
+    textureMapping[texturePosition * 12 + 7] = charPosition.y + charsService.spriteHeight;
+    textureMapping[texturePosition * 12 + 8] = charPosition.x + charsService.spriteWidth;
+    textureMapping[texturePosition * 12 + 9] = charPosition.y;
+    textureMapping[texturePosition * 12 + 10] = charPosition.x + charsService.spriteWidth;
+    textureMapping[texturePosition * 12 + 11] = charPosition.y + charsService.spriteHeight;
+  }
 }
 
 export function fillTileMask(charsService: ITextureService, textureMapping: Float32Array,

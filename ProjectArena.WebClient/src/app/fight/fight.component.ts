@@ -137,6 +137,7 @@ export class FightComponent implements OnInit, OnDestroy {
             x,
             y
           },
+          left: false,
           name: 'Ground',
           char: 'ground',
           color: {r: 60, g: 61, b: 95, a: 1},
@@ -163,6 +164,7 @@ export class FightComponent implements OnInit, OnDestroy {
             x,
             y
           },
+          left: false,
           name: 'Grass',
           char: 'grass',
           color: { r: 45, g: 60, b: 150, a: 1 },
@@ -192,9 +194,10 @@ export class FightComponent implements OnInit, OnDestroy {
         x: 9,
         y: 7
       },
+      left: false,
       name: 'Actor',
       char: 'adventurer',
-      color: { r: 55, g: 55, b: 255, a: 1 },
+      color: { r: 255, g: 155, b: 55, a: 1 },
       ownerId: 'sampleP',
       tags: ['active', 'intelligent'],
       parentId: 1 + 9 * 16 + 7,
@@ -373,19 +376,22 @@ export class FightComponent implements OnInit, OnDestroy {
       }*/ else {
         let color: Color;
         let char: string;
+        let mirrored: boolean;
         if (!info.visibleActor) {
           color = { r: 0, g: 0, b: 0, a: 0 };
           char = ' ';
+          mirrored = false;
         } else {
           color = info.visibleActor === info.backgroundActor ?
           heightImpact(currentTileHeight, info.visibleActor.color) :
           info.visibleActor.color;
           char = info.visibleActor.char;
+          mirrored = info.visibleActor.left;
         }
         // TODO TileStubs
         fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
         fillChar(
-          this.charsService, textureMapping, info.visibleActor.char, texturePosition);
+          this.charsService, textureMapping, info.visibleActor.char, texturePosition, mirrored);
       }
       if (info.visibleActor && info.visibleActor.tags.includes('active')) {
         if (info.visibleActor.maxDurability) {

@@ -9,6 +9,7 @@ export interface ActorSynchronization {
   name: string;
   char: string;
   color: Color;
+  left: boolean;
 
   ownerId: string;
 
