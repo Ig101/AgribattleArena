@@ -8,6 +8,7 @@ export interface Action {
   id: string;
   name: string;
   description: string;
+  onlyVisible: boolean;
   timeCost: number;
   range: number;
   cooldown: number;

@@ -304,34 +304,23 @@ export class Scene {
     this.waitingMessages.push(...messages);
   }
 
-  canActGenerally(actor: Actor) {
-    return this.canCast(actor, undefined, undefined, undefined);
-  }
-
-  canCast(actor: Actor, action: Action, x: number, y: number) {
+  canCast(actor: Actor) {
     return this.waitingMessages.length === 0 &&
       this.changes.length === 0 &&
       actor.id === this.currentActor.id &&
-      (!action ||
-        (action.remainedTime <= 0 &&
-        (!x || action.range >= rangeBetween(x, y, actor.x, actor.y)))) &&
       this.turnTime > 0;
   }
 
-  canUse(actor: Actor, action: Action, x: number, y: number) {
+  canUse(actor: Actor) {
+    const action = actor.actions.find(a => a.actionClass === ActionClassEnum.Use);
     return this.waitingMessages.length === 0 &&
       this.changes.length === 0 &&
       actor.parentActor.id === this.currentActor.id &&
-      (action && action.actionClass === ActionClassEnum.Use &&
-        (action.remainedTime <= 0 &&
-        (!x || action.range >= rangeBetween(x, y, actor.x, actor.y)))) &&
+      (action && action.actionClass === ActionClassEnum.Use && action.remainedTime <= 0) &&
       this.turnTime > 0;
   }
 
   private intendedAction(actor: Actor, action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
-    if (!this.canCast(actor, action, x, y)) {
-      return;
-    }
     const definition = {
       actor: actor.reference,
       id: action.id,
@@ -355,9 +344,6 @@ export class Scene {
 
   intendedUseAction(usable: Actor, x: number, y: number) {
     const action = usable.actions.find(a => a.actionClass === ActionClassEnum.Use);
-    if (!this.canUse(usable, action, x, y)) {
-      return;
-    }
     const definition = {
       actor: usable.reference,
       id: action.id,

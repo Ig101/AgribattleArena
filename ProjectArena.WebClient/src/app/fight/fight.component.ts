@@ -20,7 +20,8 @@ import { BiomEnum } from '../shared/models/enum/biom.enum';
 import { Actor } from '../engine/scene/actor.object';
 import { Tile } from '../engine/scene/tile.object';
 import { Visualization } from './models/visualization.model';
-import { DEFAULT_HEIGHT } from '../content/content.helper';
+import { DEFAULT_HEIGHT, RANGED_RANGE, VISIBILITY_AMPLIFICATION } from '../content/content.helper';
+import { angleBetween, rangeBetween } from '../helpers/math.helper';
 
 @Component({
   selector: 'app-fight',
@@ -51,6 +52,9 @@ export class FightComponent implements OnInit, OnDestroy {
   battleZoom: number;
 
   updateSubscription: Subscription;
+
+  rangeMapIsActive: boolean;
+  rangeMap: boolean[][]; // undefined for nothing, false for red, true for yellow
 
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
@@ -102,6 +106,13 @@ export class FightComponent implements OnInit, OnDestroy {
     this.cameraY = this.scene.height / 2;
     this.battleZoom = 1;
     this.updateSubscription = this.sceneService.updateSub.subscribe(() => this.redraw());
+    this.rangeMapIsActive = false;
+    const mapSize = RANGED_RANGE * 2 + 1;
+    this.rangeMap = new Array<boolean[]>(mapSize);
+    for (let i = 0; i < mapSize; i++) {
+      this.rangeMap[i] = new Array<boolean>(mapSize);
+    }
+
     this.assetsLoadingService.loadShadersAndCreateProgram(
       this.canvasWebGLContext,
       'vertex-shader-2d.vert',
@@ -263,6 +274,117 @@ export class FightComponent implements OnInit, OnDestroy {
     this.hudCanvas.nativeElement.height = this.battleCanvas.nativeElement.height;
     this.zoom = this.battleCanvas.nativeElement.offsetWidth / this.canvasWidth;
     this.redraw();
+  }
+
+  private fillRangeMapPart(
+    actorZ: number,
+    actorX: number,
+    actorY: number,
+    startPointX: number,
+    startPointY: number,
+  ) {
+    let nextX = actorX;
+    let nextY = actorY;
+    let visible = true;
+    const angle = angleBetween(actorX, actorY, startPointX, startPointY);
+    const sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+    while (nextX !== startPointX || nextY !== startPointY) {
+      let nextXDouble = nextX;
+      let nextYDouble = nextY;
+      while (Math.round(nextXDouble) === nextX && Math.round(nextYDouble) === nextY) {
+        nextXDouble += cos * 0.5;
+        nextYDouble += sin * 0.5;
+      }
+      nextX = Math.round(nextXDouble);
+      nextY = Math.round(nextYDouble);
+      if (this.rangeMap[nextX][nextY] === undefined) {
+        const range = rangeBetween(actorX, actorY, nextX, nextY);
+        if (range > RANGED_RANGE || nextX < 0 || nextY < 0 || nextX >= this.scene.width || nextY >= this.scene.height) {
+          return;
+        }
+        this.rangeMap[nextX][nextY] = visible;
+        if (this.scene.tiles[nextX][nextY].height > actorZ + range * VISIBILITY_AMPLIFICATION) {
+          visible = false;
+        }
+      }
+    }
+  }
+
+  private fillRangeMapAndPathes(
+    actorZ: number,
+    actorX: number,
+    actorY: number,
+    yellowPath: Path2D,
+    redPath: Path2D,
+    cameraLeft: number,
+    cameraTop: number
+  ) {
+    for (let x = 0; x < RANGED_RANGE * 2 + 1; x++) {
+      for (let y = 0; y < RANGED_RANGE * 2 + 1; y++) {
+        this.rangeMap[x][y] = undefined;
+      }
+    }
+    this.rangeMap[RANGED_RANGE][RANGED_RANGE] = true;
+    for (let i = -RANGED_RANGE; i <= RANGED_RANGE; i++) {
+      let newX = actorX + i;
+      let newY = actorY - RANGED_RANGE;
+      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY);
+      newX = actorX - RANGED_RANGE;
+      newY = actorY + i;
+      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY);
+      newX = actorX + i;
+      newY = actorY + RANGED_RANGE;
+      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY);
+      newX = actorX + RANGED_RANGE;
+      newY = actorY + i;
+      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY);
+    }
+    for (let x = 0; x < RANGED_RANGE * 2 + 1; x++) {
+      for (let y = 0; y < RANGED_RANGE * 2 + 1; y++) {
+        const value = this.rangeMap[x][y];
+        if (value !== undefined) {
+          const canvasX = (actorX + x - RANGED_RANGE - cameraLeft) * this.tileWidth;
+          const canvasY = (actorY + y - RANGED_RANGE - cameraTop) * this.tileHeight;
+          // left
+          if (x === 0 || this.rangeMap[x - 1][y] === undefined) {
+            const path = value ? yellowPath : redPath;
+            path.moveTo(canvasX, canvasY - 1);
+            path.lineTo(canvasX, canvasY + this.tileHeight + 1);
+          } else if (this.rangeMap[x - 1][y] === false && value === true) {
+            yellowPath.moveTo(canvasX, canvasY - 1);
+            yellowPath.lineTo(canvasX, canvasY + this.tileHeight + 1);
+          }
+          // right
+          if (x === this.scene.width - 1 || this.rangeMap[x + 1][y] === undefined) {
+            const path = value ? yellowPath : redPath;
+            path.moveTo(canvasX - 1, canvasY + this.tileHeight);
+            path.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
+          } else if (this.rangeMap[x + 1][y] === false && value === true) {
+            yellowPath.moveTo(canvasX - 1, canvasY + this.tileHeight);
+            yellowPath.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
+          }
+          // top
+          if (y === 0 || this.rangeMap[x][y - 1] === undefined) {
+            const path = value ? yellowPath : redPath;
+            path.moveTo(canvasX - 1, canvasY);
+            path.lineTo(canvasX + this.tileWidth + 1, canvasY);
+          } else if (this.rangeMap[x][y - 1] === false && value === true) {
+            yellowPath.moveTo(canvasX - 1, canvasY);
+            yellowPath.lineTo(canvasX + this.tileWidth + 1, canvasY);
+          }
+          // bottom
+          if (y === this.scene.height - 1 || this.rangeMap[x][y + 1] === undefined) {
+            const path = value ? yellowPath : redPath;
+            path.moveTo(canvasX - 1, canvasY + this.tileHeight);
+            path.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
+          } else if (this.rangeMap[x][y + 1] === false && value === true) {
+            yellowPath.moveTo(canvasX - 1, canvasY + this.tileHeight);
+            yellowPath.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
+          }
+        }
+      }
+    }
   }
 
   private drawDummyPoint(
@@ -431,6 +553,17 @@ export class FightComponent implements OnInit, OnDestroy {
       const redPath = new Path2D();
       const yellowPath = new Path2D();
       const greenPath = new Path2D();
+
+      // TODO Disable on enemy turn or when cannot cast ranged skills
+      this.fillRangeMapAndPathes(
+        this.scene.currentActor.z + this.scene.currentActor.height,
+        this.scene.currentActor.x,
+        this.scene.currentActor.y,
+        yellowPath,
+        redPath,
+        cameraLeft,
+        cameraTop);
+
       const width = right - left + 1;
       const height = bottom - top + 1;
       const textureMapping: Float32Array = new Float32Array(width * height * 12);
@@ -476,7 +609,6 @@ export class FightComponent implements OnInit, OnDestroy {
         (bottom - top + 1),
         this.charsService.width,
         this.charsService.spriteHeight);
-
       this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvas2DContext.lineWidth = 2;
       this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1.0)';

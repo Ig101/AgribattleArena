@@ -9,10 +9,7 @@ import { actionNatives } from './actions/action.natives';
 import { buffNatives } from './buffs/buff.natives';
 import { Injectable } from '@angular/core';
 import { ActionClassEnum } from '../engine/models/enums/action-class.enum';
-
-export const MELEE_RANGE = 1;
-export const UNTARGETED_RANGE = 0;
-export const RANGED_RANGE = 8;
+import { MELEE_RANGE, UNTARGETED_RANGE, RANGED_RANGE } from './content.helper';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +44,7 @@ export class NativesCollection implements INativesCollection {
       id: synchronization.id,
       name: native.name,
       description: native.description,
+      onlyVisible: native.onlyVisible,
       timeCost: native.timeCost,
       range,
       cooldown: native.cooldown,
