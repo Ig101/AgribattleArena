@@ -18,8 +18,6 @@ export interface Action {
 
   actionTargeted: (actor: Actor, power: number, x: number, y: number, startingTime: number)
     => ChangeDefinition[];
-  actionUntargeted: (actor: Actor, power: number, startingTime: number)
-    => ChangeDefinition[];
   actionOnObject: (actor: Actor, power: number, target: IActor, startingTime: number)
     => ChangeDefinition[];
 }

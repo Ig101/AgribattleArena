@@ -130,11 +130,6 @@ export class Actor implements IActor {
     }
   }
 
-  validateUntargeted(action: Action) {
-    return action.actionUntargeted;
-  }
-
-
   actTargeted(action: Action, x: number, y: number) {
     if (this.isAlive && action.actionTargeted) {
       action.remainedTime = action.cooldown;
@@ -148,14 +143,6 @@ export class Actor implements IActor {
       action.remainedTime = action.cooldown;
       this.parentScene.pushChanges(
         action.actionOnObject(this, action.power, target, this.parentScene.timeLine));
-    }
-  }
-
-  actUntargeted(action: Action) {
-    if (this.isAlive && action.actionUntargeted) {
-      action.remainedTime = action.cooldown;
-      this.parentScene.pushChanges(
-        action.actionUntargeted(this, action.power, this.parentScene.timeLine));
     }
   }
 

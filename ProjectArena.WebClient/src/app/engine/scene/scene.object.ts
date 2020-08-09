@@ -129,9 +129,6 @@ export class Scene {
     action.remainedTime = action.cooldown;
     this.turnTime -= action.timeCost;
     switch (type) {
-      case ActionType.Untargeted:
-        actor.actUntargeted(action);
-        break;
       case ActionType.Targeted:
         actor.actTargeted(action, x, y);
         break;
@@ -326,10 +323,6 @@ export class Scene {
     this.actionsSub.next(definition);
     this.turnTime -= action.timeCost;
     this.act(actor, action, type, x, y, target);
-  }
-
-  intendedUntargetedAction(actor: Actor, action: Action) {
-    this.intendedAction(actor, action, ActionType.Untargeted);
   }
 
   intendedTargetedAction(actor: Actor, action: Action, x: number, y: number) {
