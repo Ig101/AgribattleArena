@@ -3,10 +3,8 @@ import { PlayerSynchronization } from 'src/app/shared/models/synchronization/obj
 
 export class Player {
   id: string;
-  isBot: boolean;
 
   constructor(synchronizer: PlayerSynchronization) {
     this.id = synchronizer.id;
-    this.isBot = synchronizer.isBot;
   }
 }

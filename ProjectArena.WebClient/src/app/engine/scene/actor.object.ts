@@ -276,7 +276,6 @@ export class Actor implements IActor {
 
   update() {
     this.actions.forEach(x => x.remainedTime--);
-    this.initiativePosition--;
     this.handleEffects([BUFF_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
     let buffRemoved = false;
     for (const buff of this.buffs) {

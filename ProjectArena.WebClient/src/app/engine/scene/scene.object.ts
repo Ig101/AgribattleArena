@@ -155,15 +155,17 @@ export class Scene {
       }
     }
 
+    if (actor?.isAlive) {
+      this.currentActor = actor;
+      this.currentActor.changed = true;
+      this.currentActor.initiativePosition += this.currentActor.turnCost;
+      this.turnTime = definition.time;
+    }
+
     if (this.changes.length > 0) {
       this.changed = true;
     } else {
       this.synchronizersSub.next(this.createSynchronizerAndClearChanges());
-    }
-
-    if (actor.isAlive) {
-      this.currentActor = actor;
-      this.turnTime = definition.time;
     }
   }
 
