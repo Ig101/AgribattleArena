@@ -34,6 +34,7 @@ export class NativesCollection implements INativesCollection {
       cooldown: native.cooldown,
       remainedTime: synchronization.remainedTime,
       power: native.power,
+      actionClass: native.actionClass,
       aiPriority: native.aiPriority,
       validateActionTargeted: native.validateActionTargeted,
       validateActionOnObject: native.validateActionOnObject,

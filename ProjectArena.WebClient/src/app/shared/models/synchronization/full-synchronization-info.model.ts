@@ -2,6 +2,7 @@ import { RewardInfo } from './reward-info.model';
 import { ActorSynchronization } from './objects/actor-synchronization.model';
 import { PlayerSynchronization } from './objects/player-synchronization.model';
 import { SynchronizationMessageDto } from './synchronization-message-dto.model';
+import { BiomEnum } from '../enum/biom.enum';
 
 export interface FullSynchronizationInfo {
   id: string;
@@ -12,5 +13,6 @@ export interface FullSynchronizationInfo {
   players: PlayerSynchronization[];
   width: number;
   height: number;
+  biom: BiomEnum;
   waitingActions: SynchronizationMessageDto[];
 }

@@ -15,9 +15,9 @@ export function brightImpact(bright: boolean, color: Color) {
 export function heightImpact(z: number, color: Color): Color {
   if (z !== 0) {
     return {
-      r: Math.min(255, Math.max(0, color.r * (1 + z / 40))),
-      g: Math.min(255, Math.max(0, color.g * (1 + z / 40))),
-      b: Math.min(255, Math.max(0, color.b * (1 + z / 40))),
+      r: Math.min(255, Math.max(0, color.r * (1 + z / 400))),
+      g: Math.min(255, Math.max(0, color.g * (1 + z / 400))),
+      b: Math.min(255, Math.max(0, color.b * (1 + z / 400))),
       a: color.a
     };
   }

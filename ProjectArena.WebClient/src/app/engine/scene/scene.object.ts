@@ -21,13 +21,18 @@ import { ActorSynchronization } from 'src/app/shared/models/synchronization/obje
 import { Color } from 'src/app/shared/models/color.model';
 import { rangeBetween } from 'src/app/helpers/math.helper';
 import { INativesCollection } from '../interfaces/natives-collection.interface';
+import { getHashFromString } from 'src/app/helpers/extensions/hash.extension';
+import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
 export class Scene {
 
   id: string;
+  hash: number;
   currentPlayer: Player;
+
+  biom: BiomEnum;
 
   removedActors: number[] = [];
 
@@ -74,6 +79,8 @@ export class Scene {
     this.width = synchronizer.width;
     this.height = synchronizer.height;
     this.id = synchronizer.id;
+    this.hash = getHashFromString(this.id);
+    this.biom = synchronizer.biom;
     this.tiles = new Array<Tile[]>(this.width);
     let tilesCounter = 1;
     for (let x = 0; x < this.width; x++) {

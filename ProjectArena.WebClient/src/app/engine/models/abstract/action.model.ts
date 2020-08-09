@@ -2,6 +2,7 @@ import { Actor } from '../../scene/actor.object';
 import { Observable, Observer } from 'rxjs';
 import { IActor } from '../../interfaces/actor.interface';
 import { ChangeDefinition } from './change-definition.model';
+import { ActionClassEnum } from '../enums/action-class.enum';
 
 export interface Action {
   id: string;
@@ -12,6 +13,7 @@ export interface Action {
   cooldown: number;
   remainedTime: number;
   power: number;
+  actionClass: ActionClassEnum;
 
   aiPriority: number;
 

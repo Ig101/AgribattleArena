@@ -25,39 +25,40 @@ export class CharsService implements ITextureService {
     return this.charsSubCanvas.width;
   }
 
-  constructor() { }
-
-  private loadIfNotLoaded() {
-    if (!this.loaded) {
-      this.loaded = true;
-      this.charsSubCanvas = document.createElement('canvas');
-      this.charsSubCanvas.height = this.spriteHeight;
-      this.chars = {};
-      this.chars[' '] = { x: 0, y: 0 };
-      const tileSpriteFunctions = this.drawTileSprites();
-      const spriteFunctions = this.drawAllSprites();
-      const elements = Object.keys(this.chars).length;
-      this.charsSubCanvas.width = (this.spriteWidth + 2) * elements;
-      this.context = this.charsSubCanvas.getContext('2d');
-      this.context.clearRect(0, 0, (this.spriteWidth + 2) * elements, this.spriteHeight);
-      this.context.fillStyle = 'rgba(150,0,0,255)';
-      this.context.strokeStyle = 'rgba(255,0,0,255)';
-      this.context.lineWidth = 2;
-      tileSpriteFunctions.forEach(e => {
-        e();
-      });
-      this.context.fillStyle = 'rgba(255,0,0,255)';
-      this.context.fillRect(0, 0, this.spriteWidth + 2, this.spriteHeight);
-      this.context.font = `${this.spriteHeight}px PT Mono`;
-      this.context.textAlign = 'left';
-      this.context.fillStyle = 'rgba(255,0,0,255)';
-      spriteFunctions.forEach(e => {
-        e();
-      });
+  constructor() {
+    this.loaded = true;
+    this.charsSubCanvas = document.createElement('canvas');
+    document.body.appendChild(this.charsSubCanvas);
+    this.charsSubCanvas.height = this.spriteHeight;
+    this.chars = {};
+    this.chars[' '] = { x: 0, y: 0 };
+    const tileSpriteFunctions = this.drawTileSprites();
+    const spriteFunctions = this.drawAllSprites();
+    const elements = Object.keys(this.chars).length;
+    this.charsSubCanvas.width = (this.spriteWidth + 2) * elements;
+    this.context = this.charsSubCanvas.getContext('2d');
+    this.context.clearRect(0, 0, (this.spriteWidth + 2) * elements, this.spriteHeight);
+    this.context.fillStyle = 'rgba(150,0,0,255)';
+    this.context.strokeStyle = 'rgba(255,0,0,255)';
+    this.context.lineWidth = 2;
+    for (const e of tileSpriteFunctions) {
+      e();
     }
+    this.context.fillStyle = 'rgba(255,0,0,255)';
+    this.context.fillRect(0, 0, this.spriteWidth + 2, this.spriteHeight);
+    this.context.font = `${this.spriteHeight}px PT Mono`;
+    this.context.textAlign = 'left';
+    this.context.fillStyle = 'rgba(255,0,0,255)';
+    for (const e of spriteFunctions) {
+      e();
+    }
+    this.loaded = true;
   }
+
   getTexture(gl: WebGLRenderingContext) {
-    this.loadIfNotLoaded();
+    while (!this.loaded) {
+
+    }
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -69,12 +70,16 @@ export class CharsService implements ITextureService {
   }
 
   getTileMask(left: boolean, right: boolean, top: boolean, bottom: boolean) {
-    this.loadIfNotLoaded();
+    while (!this.loaded) {
+
+    }
     return this.chars[this.getTileName(left, right, top, bottom)];
   }
 
   getSpritePositionOnTexture(id: string) {
-    this.loadIfNotLoaded();
+    while (!this.loaded) {
+
+    }
     return this.chars[id];
   }
 
@@ -151,7 +156,7 @@ export class CharsService implements ITextureService {
       const img = new Image();
       img.onload = () => {
           this.context.drawImage(img, (this.spriteWidth + 2) * elementNumber, 0);
-      }
+      };
       img.src = src;
     };
   }
