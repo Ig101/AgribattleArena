@@ -15,10 +15,11 @@ export function brightImpact(bright: boolean, color: Color) {
 
 export function heightImpact(z: number, color: Color): Color {
   if (z !== 0) {
+    const zImpact = z >= DEFAULT_HEIGHT ? (z - DEFAULT_HEIGHT) / 600 : -(DEFAULT_HEIGHT - z) / 1200;
     return {
-      r: Math.min(255, Math.max(0, color.r * (1 + (z - DEFAULT_HEIGHT) / 600))),
-      g: Math.min(255, Math.max(0, color.g * (1 + (z - DEFAULT_HEIGHT) / 600))),
-      b: Math.min(255, Math.max(0, color.b * (1 + (z - DEFAULT_HEIGHT) / 600))),
+      r: Math.min(255, Math.max(0, color.r * (1 + zImpact))),
+      g: Math.min(255, Math.max(0, color.g * (1 + zImpact))),
+      b: Math.min(255, Math.max(0, color.b * (1 + zImpact))),
       a: color.a
     };
   }

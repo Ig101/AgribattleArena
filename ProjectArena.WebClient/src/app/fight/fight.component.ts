@@ -189,15 +189,15 @@ export class FightComponent implements OnInit, OnDestroy {
     actors.push({
       reference: {
         id: 5000,
-        x: 5,
-        y: 5
+        x: 9,
+        y: 7
       },
       name: 'Actor',
       char: 'adventurer',
       color: { r: 55, g: 55, b: 255, a: 1 },
       ownerId: 'sampleP',
       tags: ['active', 'intelligent'],
-      parentId: 1 + 5 * 16 + 5,
+      parentId: 1 + 9 * 16 + 7,
       durability: 100,
       maxDurability: 100,
       turnCost: 1,
@@ -234,8 +234,8 @@ export class FightComponent implements OnInit, OnDestroy {
         time: 8000000000,
         tempActor: {
           id: 5000,
-          x: 5,
-          y: 5
+          x: 9,
+          y: 7
         }
       }
     );
@@ -272,7 +272,7 @@ export class FightComponent implements OnInit, OnDestroy {
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
 
-    const dim = 0.5;
+    const dim = 0.3;
     fillTileMask(this.charsService, backgroundTextureMapping, false, false, false, false, texturePosition);
     fillBackground(backgrounds, color.r * dim / 5, color.g * dim / 5, color.b * dim / 5, texturePosition);
     fillColor(colors, color.r * dim, color.g * dim, color.b * dim, color.a, texturePosition);
