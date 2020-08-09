@@ -5,9 +5,9 @@ import { ActionClassEnum } from 'src/app/engine/models/enums/action-class.enum';
 
 export interface ActionNative {
   name: string;
+  untargeted: boolean;
   description: string;
   timeCost: number;
-  range: number;
   cooldown: number;
   power: number;
   aiPriority: number;

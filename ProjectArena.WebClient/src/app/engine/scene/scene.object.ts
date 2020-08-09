@@ -23,6 +23,7 @@ import { rangeBetween } from 'src/app/helpers/math.helper';
 import { INativesCollection } from '../interfaces/natives-collection.interface';
 import { getHashFromString } from 'src/app/helpers/extensions/hash.extension';
 import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
+import { ActionClassEnum } from '../models/enums/action-class.enum';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
@@ -317,6 +318,16 @@ export class Scene {
       this.turnTime > 0;
   }
 
+  canUse(actor: Actor, action: Action, x: number, y: number) {
+    return this.waitingMessages.length === 0 &&
+      this.changes.length === 0 &&
+      actor.parentActor.id === this.currentActor.id &&
+      (action && action.actionClass === ActionClassEnum.Use &&
+        (action.remainedTime <= 0 &&
+        (!x || action.range >= rangeBetween(x, y, actor.x, actor.y)))) &&
+      this.turnTime > 0;
+  }
+
   private intendedAction(actor: Actor, action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
     if (!this.canCast(actor, action, x, y)) {
       return;
@@ -340,6 +351,23 @@ export class Scene {
 
   intendedOnObjectAction(actor: Actor, action: Action, target: IActor) {
     this.intendedAction(actor, action, ActionType.OnObject, undefined, undefined, target);
+  }
+
+  intendedUseAction(usable: Actor, x: number, y: number) {
+    const action = usable.actions.find(a => a.actionClass === ActionClassEnum.Use);
+    if (!this.canUse(usable, action, x, y)) {
+      return;
+    }
+    const definition = {
+      actor: usable.reference,
+      id: action.id,
+      type: ActionType.Targeted,
+      x,
+      y
+    } as ActionInfo;
+    this.actionsSub.next(definition);
+    this.turnTime -= action.timeCost;
+    this.act(usable, action, ActionType.Targeted, x, y);
   }
   /*
     Make it server side

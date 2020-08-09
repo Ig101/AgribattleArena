@@ -8,6 +8,11 @@ import { reactionNatives } from './reactions/reaction.natives';
 import { actionNatives } from './actions/action.natives';
 import { buffNatives } from './buffs/buff.natives';
 import { Injectable } from '@angular/core';
+import { ActionClassEnum } from '../engine/models/enums/action-class.enum';
+
+export const MELEE_RANGE = 1;
+export const UNTARGETED_RANGE = 0;
+export const RANGED_RANGE = 8;
 
 @Injectable({
   providedIn: 'root'
@@ -25,12 +30,25 @@ export class NativesCollection implements INativesCollection {
 
   buildAction(synchronization: ActionSynchronization): Action {
     const native = actionNatives[synchronization.id];
+    let range;
+    switch (native.actionClass) {
+      case ActionClassEnum.Attack:
+      case ActionClassEnum.Move:
+        range = MELEE_RANGE;
+        break;
+      case ActionClassEnum.Autocast:
+        range = UNTARGETED_RANGE;
+        break;
+      default:
+        range = native.untargeted ? UNTARGETED_RANGE : RANGED_RANGE;
+        break;
+    }
     return {
       id: synchronization.id,
       name: native.name,
       description: native.description,
       timeCost: native.timeCost,
-      range: native.range,
+      range,
       cooldown: native.cooldown,
       remainedTime: synchronization.remainedTime,
       power: native.power,
