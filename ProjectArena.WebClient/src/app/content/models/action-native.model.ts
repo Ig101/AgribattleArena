@@ -1,18 +1,14 @@
-import { Actor } from '../../scene/actor.object';
-import { Observable, Observer } from 'rxjs';
-import { IActor } from '../../interfaces/actor.interface';
-import { ChangeDefinition } from './change-definition.model';
+import { Actor } from 'src/app/engine/scene/actor.object';
+import { ChangeDefinition } from 'src/app/engine/models/abstract/change-definition.model';
+import { IActor } from 'src/app/engine/interfaces/actor.interface';
 
-export interface Action {
-  id: string;
+export interface ActionNative {
   name: string;
   description: string;
   timeCost: number;
   range: number;
   cooldown: number;
-  remainedTime: number;
   power: number;
-
   aiPriority: number;
 
   validateActionTargeted: (actor: Actor, power: number, x: number, y: number) => boolean;

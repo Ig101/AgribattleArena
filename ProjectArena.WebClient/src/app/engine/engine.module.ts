@@ -11,13 +11,12 @@ import { SynchronizationService } from './services/synchronization.service';
   imports: [
     SharedModule
   ],
-  exports: [
-    SceneService,
-    SynchronizationService
-  ],
   providers: [
     SceneService,
     SynchronizationService
   ]
 })
-export class EngineModule { }
+export class EngineModule {
+  constructor(synchronizationService: SynchronizationService) {
+  }
+}

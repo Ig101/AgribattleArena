@@ -9,6 +9,7 @@ import { MenuIconComponent } from './components/menu-icon/menu-icon.component';
 import { ModalService } from './services/modal.service';
 import { ModalLoadingComponent } from './components/modal-loading/modal-loading.component';
 import { TextureIconComponent } from './texture-icon/texture-icon.component';
+import { NativesCollection } from '../content/natives-collection';
 
 @NgModule({
   declarations: [TextInputComponent, ButtonComponent, LinkComponent, FocusRemoverDirective, MenuIconComponent, ModalLoadingComponent, TextureIconComponent],

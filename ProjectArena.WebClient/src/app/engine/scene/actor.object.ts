@@ -25,6 +25,7 @@ export class Actor implements IActor {
 
   tags: string[];
 
+  name: string;
   changed: boolean;
   latestX: number;
   latestY: number;
@@ -82,6 +83,7 @@ export class Actor implements IActor {
     synchronizer: ActorSynchronization
   ) {
     this.id = synchronizer.reference.id;
+    this.name = synchronizer.name;
     this.parentScene = scene;
     this.isAlive = true;
     this.parentActor = parent;

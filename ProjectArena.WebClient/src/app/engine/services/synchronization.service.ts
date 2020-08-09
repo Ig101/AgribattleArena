@@ -4,6 +4,7 @@ import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
 import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
 import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
+import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
 
 @Injectable()
 export class SynchronizationService {
@@ -16,7 +17,8 @@ export class SynchronizationService {
   }
 
   constructor(
-    private sceneService: SceneService
+    private sceneService: SceneService,
+    private arenaHubService: ArenaHubService
   ) {
     sceneService.actionsSub.subscribe(x => this.issueAction(x));
     sceneService.synchronizersSub.subscribe(x => this.sendActionSynchronizationInfo(x));

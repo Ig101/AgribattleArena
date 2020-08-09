@@ -5,6 +5,9 @@ export interface Buff {
 
   id: string;
 
+  name: string;
+  description: string;
+
   updatesOnTurnOnly: boolean;
   duration: number;
   maxStacks: number;
@@ -21,5 +24,4 @@ export interface Buff {
 
   changedDurability: number;
   changedSpeed: number;
-  parentActor: Actor;
 }

@@ -16,11 +16,11 @@ import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/f
 import { Action } from '../models/abstract/action.model';
 import { Target } from '@angular/compiler';
 import { IActor } from '../interfaces/actor.interface';
-import { INativesCollection } from '../interfaces/natives-collection.interface';
 import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
 import { ActorSynchronization } from 'src/app/shared/models/synchronization/objects/actor-synchronization.model';
 import { Color } from 'src/app/shared/models/color.model';
 import { rangeBetween } from 'src/app/helpers/math.helper';
+import { INativesCollection } from '../interfaces/natives-collection.interface';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 

@@ -6,6 +6,7 @@ import { Color } from '../../color.model';
 export interface ActorSynchronization {
   reference: ActorReference;
 
+  name: string;
   char: string;
   color: Color;
 
