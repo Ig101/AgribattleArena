@@ -20,6 +20,7 @@ import { BiomEnum } from '../shared/models/enum/biom.enum';
 import { Actor } from '../engine/scene/actor.object';
 import { Tile } from '../engine/scene/tile.object';
 import { Visualization } from './models/visualization.model';
+import { DEFAULT_HEIGHT } from '../content/content.helper';
 
 @Component({
   selector: 'app-fight',
@@ -146,9 +147,9 @@ export class FightComponent implements OnInit, OnDestroy {
           maxDurability: 100000,
           turnCost: 1,
           initiativePosition: 0,
-          height: 300,
-          volume: 15000,
-          freeVolume: 2700,
+          height: x > 4 && y > 4 ? 900 : 500,
+          volume: 10000,
+          freeVolume: 9000,
           preparationReactions: [],
           activeReactions: [],
           clearReactions: [],
@@ -307,7 +308,11 @@ export class FightComponent implements OnInit, OnDestroy {
     return { backgroundActor, visibleActor, multiActor };
   }
 
-  private getTileHeight(tile: Tile) {
+  private getTileHeight(x: number, y: number) {
+    if (x < 0 || y < 0 || x >= this.scene.width || y >= this.scene.height) {
+      return DEFAULT_HEIGHT;
+    }
+    const tile = this.scene.tiles[x][y];
     for (let i = tile.actors.length - 1; i >= 0; i--) {
       const actor = tile.actors[i];
       if (actor.tags.includes('tile')) {
@@ -343,10 +348,10 @@ export class FightComponent implements OnInit, OnDestroy {
       fillTileMask(
         this.charsService,
         backgroundTextureMapping,
-        x > 0 && currentTileHeight - this.getTileHeight(this.scene.tiles[x - 1][y]) >= 120,
-        x < this.scene.width - 1 && currentTileHeight - this.getTileHeight(this.scene.tiles[x + 1][y]) >= 120,
-        y > 0 && currentTileHeight - this.getTileHeight(this.scene.tiles[x][y - 1]) >= 120,
-        y < this.scene.height - 1 && currentTileHeight - this.getTileHeight(this.scene.tiles[x][y + 1]) >= 120,
+        currentTileHeight - this.getTileHeight(x - 1, y) >= 120,
+        currentTileHeight - this.getTileHeight(x + 1, y) >= 120,
+        currentTileHeight - this.getTileHeight(x, y - 1) >= 120,
+        currentTileHeight - this.getTileHeight(x, y + 1) >= 120,
         texturePosition);
       if (info.backgroundActor) {
         const color = heightImpact(currentTileHeight, info.backgroundActor.color);
@@ -405,6 +410,7 @@ export class FightComponent implements OnInit, OnDestroy {
 
   redraw() {
     if (this.scene && this.shadersProgram) {
+      const time = performance.now();
       const sceneRandom = new Random(this.scene.hash);
       const cameraLeft = this.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.cameraY - this.canvasHeight / 2 / this.tileHeight;
@@ -473,6 +479,8 @@ export class FightComponent implements OnInit, OnDestroy {
       this.canvas2DContext.stroke(yellowPath);
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1.0)';
       this.canvas2DContext.stroke(greenPath);
+
+      // console.log(performance.now() - time);
 
       /* if (this.battleStorageService.availableActionSquares?.length > 0) {
         this.generateActionSquareGrid(this.battleStorageService.currentActionId ? redPath : yellowPath, cameraLeft, cameraTop);
