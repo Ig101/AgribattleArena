@@ -1,6 +1,6 @@
 <div class="battle">
   <canvas #battleCanvas
-    (window:resize)="onResize()">
+    (window:resize)="onResize()" (window:mousemove)="onMouseMove($event)">
     Not working in your browser
   </canvas>  
   <canvas #hudCanvas class="hud"></canvas>
