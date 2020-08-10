@@ -19,7 +19,7 @@ export class SceneService {
   desyncSub = new BehaviorSubject<boolean>(false);
   endGameSub = new BehaviorSubject<boolean>(false);
 
-  updateSub = new Subject<void>();
+  updateSub = new Subject<number>();
   updater;
 
   private sceneInternal: Scene;
@@ -50,8 +50,8 @@ export class SceneService {
     clearInterval(this.updater);
     this.scene.lastTime = performance.now();
     this.updater = setInterval(() => {
-      this.scene.update();
-      this.updateSub.next();
+      const shift = this.scene.update();
+      this.updateSub.next(shift);
     }, SCENE_FRAME_TIME);
   }
 

@@ -55,6 +55,10 @@ export class FightComponent implements OnInit, OnDestroy {
 
   zoom = 0;
 
+  tickerState = false;
+  tickerTime: number;
+  tickerPeriod = (1000 / 10);
+
   cameraX: number;
   cameraY: number;
   battleZoom: number;
@@ -137,7 +141,9 @@ export class FightComponent implements OnInit, OnDestroy {
     this.cameraX = this.scene.width / 2;
     this.cameraY = this.scene.height / 2;
     this.battleZoom = 1;
-    this.updateSubscription = this.sceneService.updateSub.subscribe(() => this.redraw());
+    this.updateSubscription = this.sceneService.updateSub.subscribe((shift) => {
+      this.redraw(shift);
+    });
     this.rangeMapIsActive = true;
     const mapSize = RANGED_RANGE * 2 + 1;
     this.rangeMap = new Array<boolean[]>(mapSize);
@@ -242,7 +248,7 @@ export class FightComponent implements OnInit, OnDestroy {
       char: 'adventurer',
       color: { r: 255, g: 155, b: 55, a: 1 },
       ownerId: 'sampleP',
-      tags: ['active', 'intelligent'],
+      tags: ['active'],
       parentId: 1 + 9 * 16 + 7,
       durability: 100,
       maxDurability: 100,
@@ -504,15 +510,13 @@ export class FightComponent implements OnInit, OnDestroy {
         continue;
       }
       if (visibleActor.tags.includes('small')) {
-        if (actor.tags.includes('small')) {
-          multiActor = true;
-        } else {
+        if (!actor.tags.includes('small')) {
           visibleActor = actor;
-          multiActor = false;
         }
+        multiActor = true;
       }
     }
-    return { backgroundActor, visibleActor, multiActor };
+    return { backgroundActor, visibleActor: (visibleActor.tags.includes('small') && multiActor) ? undefined : visibleActor , multiActor };
   }
 
   private getTileHeight(x: number, y: number) {
@@ -573,8 +577,11 @@ export class FightComponent implements OnInit, OnDestroy {
       let color: Color;
       let char: string;
       let mirrored: boolean;
-      // TODO multi actor
-      if (!info.visibleActor) {
+      if (info.multiActor && (!info.visibleActor || this.tickerState)) {
+        color = { r: 255, g: 255, b: 0, a: 1 };
+        char = '*';
+        mirrored = false;
+      } else if (!info.visibleActor) {
         color = { r: 0, g: 0, b: 0, a: 0 };
         char = ' ';
         mirrored = false;
@@ -610,8 +617,17 @@ export class FightComponent implements OnInit, OnDestroy {
     }
   }
 
-  redraw() {
+  redraw(shift?: number) {
     if (this.scene && this.shadersProgram) {
+
+      if (shift) {
+        this.tickerTime -= shift;
+        if (this.tickerTime <= 0) {
+          this.tickerState = !this.tickerState;
+          this.tickerTime += this.tickerPeriod;
+        }
+      }
+
       const time = performance.now();
       const sceneRandom = new Random(this.scene.hash);
       const cameraLeft = this.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;

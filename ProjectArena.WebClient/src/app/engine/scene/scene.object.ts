@@ -289,11 +289,15 @@ export class Scene {
       const currentChanges = this.changes.filter(x => x.time <= this.timeLine);
       this.changes = this.changes.filter(x => x.time > this.timeLine);
       for (const change of currentChanges) {
-        this.tileStubs.push(...change.tileStubs);
+        if (change.tileStubs) {
+          this.tileStubs.push(...change.tileStubs);
+        }
         if (change.logs) {
           this.logs.push(...change.logs);
         }
-        change.action();
+        if (change.action) {
+          change.action();
+        }
       }
       this.visualizationChanged = true;
     }
@@ -303,6 +307,8 @@ export class Scene {
     if (this.timeLine > 1000000000) {
       this.timeLine = 0;
     }
+
+    return shift;
   }
 
   pushMessages(...messages: SynchronizationMessageDto[]) {
