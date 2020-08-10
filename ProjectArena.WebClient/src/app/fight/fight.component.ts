@@ -55,6 +55,24 @@ export class FightComponent implements OnInit, OnDestroy {
 
   rangeMapIsActive: boolean;
   rangeMap: boolean[][]; // undefined for nothing, false for red, true for yellow
+  textureMapping: Float32Array;
+  colors: Uint8Array;
+  backgroundTextureMapping: Float32Array;
+  backgrounds: Uint8Array;
+  mainTextureVertexes: Float32Array;
+  redPath: Path2D;
+  yellowPath: Path2D;
+  greenPath: Path2D;
+
+  cursorVertexes: {
+    x: number;
+    y: number;
+    textureMapping: Float32Array;
+    colors: Uint8Array;
+    backgroundTextureMapping: Float32Array;
+    backgrounds: Uint8Array;
+    mainTextureVertexes: Float32Array;
+  };
 
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
@@ -159,7 +177,7 @@ export class FightComponent implements OnInit, OnDestroy {
           maxDurability: 100000,
           turnCost: 1,
           initiativePosition: 0,
-          height: x > 4 && y > 4 ? 900 : 500,
+          height: (x > 10 || x < 6) && y > 5 ? 900 : 500,
           volume: 10000,
           freeVolume: 9000,
           preparationReactions: [],
@@ -287,26 +305,29 @@ export class FightComponent implements OnInit, OnDestroy {
     let nextY = actorY;
     let visible = true;
     const angle = angleBetween(actorX, actorY, startPointX, startPointY);
-    const sin = Math.sin(angle);
-    const cos = Math.cos(angle);
-    while (nextX !== startPointX || nextY !== startPointY) {
-      let nextXDouble = nextX;
-      let nextYDouble = nextY;
-      while (Math.round(nextXDouble) === nextX && Math.round(nextYDouble) === nextY) {
-        nextXDouble += cos * 0.5;
-        nextYDouble += sin * 0.5;
+    const sin = Math.sin(angle) * 0.8;
+    const cos = Math.cos(angle) * 0.8;
+    while (Math.floor(nextX) !== startPointX || Math.floor(nextY) !== startPointY) {
+      let currentX = Math.floor(nextX);
+      let currentY = Math.floor(nextY);
+      while (Math.floor(nextX) === currentX && Math.floor(nextY) === currentY) {
+        nextX += cos;
+        nextY += sin;
       }
-      nextX = Math.round(nextXDouble);
-      nextY = Math.round(nextYDouble);
-      if (this.rangeMap[nextX][nextY] === undefined) {
-        const range = rangeBetween(actorX, actorY, nextX, nextY);
-        if (range > RANGED_RANGE || nextX < 0 || nextY < 0 || nextX >= this.scene.width || nextY >= this.scene.height) {
-          return;
-        }
-        this.rangeMap[nextX][nextY] = visible;
-        if (this.scene.tiles[nextX][nextY].height > actorZ + range * VISIBILITY_AMPLIFICATION) {
-          visible = false;
-        }
+      currentX = Math.floor(nextX);
+      currentY = Math.floor(nextY);
+      if (currentX < 0 || currentY < 0 || currentX >= this.scene.width || currentY >= this.scene.height) {
+        return;
+      }
+      const range = rangeBetween(actorX, actorY, currentX, currentY);
+      if (range > RANGED_RANGE) {
+        return;
+      }
+      if (this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] !== true) {
+        this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] = visible;
+      }
+      if (this.scene.tiles[currentX][currentY].height > actorZ + VISIBILITY_AMPLIFICATION * range) {
+        visible = false;
       }
     }
   }
@@ -356,13 +377,13 @@ export class FightComponent implements OnInit, OnDestroy {
             yellowPath.lineTo(canvasX, canvasY + this.tileHeight + 1);
           }
           // right
-          if (x === this.scene.width - 1 || this.rangeMap[x + 1][y] === undefined) {
+          if (x === RANGED_RANGE * 2 || this.rangeMap[x + 1][y] === undefined) {
             const path = value ? yellowPath : redPath;
-            path.moveTo(canvasX - 1, canvasY + this.tileHeight);
-            path.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
+            path.moveTo(canvasX + this.tileWidth, canvasY - 1);
+            path.lineTo(canvasX + this.tileWidth, canvasY + this.tileHeight + 1);
           } else if (this.rangeMap[x + 1][y] === false && value === true) {
-            yellowPath.moveTo(canvasX - 1, canvasY + this.tileHeight);
-            yellowPath.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
+            yellowPath.moveTo(canvasX + this.tileWidth, canvasY - 1);
+            yellowPath.lineTo(canvasX + this.tileWidth, canvasY + this.tileHeight + 1);
           }
           // top
           if (y === 0 || this.rangeMap[x][y - 1] === undefined) {
@@ -374,7 +395,7 @@ export class FightComponent implements OnInit, OnDestroy {
             yellowPath.lineTo(canvasX + this.tileWidth + 1, canvasY);
           }
           // bottom
-          if (y === this.scene.height - 1 || this.rangeMap[x][y + 1] === undefined) {
+          if (y === RANGED_RANGE * 2 || this.rangeMap[x][y + 1] === undefined) {
             const path = value ? yellowPath : redPath;
             path.moveTo(canvasX - 1, canvasY + this.tileHeight);
             path.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
@@ -550,56 +571,59 @@ export class FightComponent implements OnInit, OnDestroy {
       const mouseY = Math.floor(this.mouseState.y);
       const currentActionSquare = this.canAct ? this.battleStorageService.availableActionSquares
         ?.find(s => s.x === mouseX && s.y === mouseY && s.type) : undefined;*/
-      const redPath = new Path2D();
-      const yellowPath = new Path2D();
-      const greenPath = new Path2D();
+      if (this.scene.visualizationChanged) {
+        this.redPath = new Path2D();
+        this.yellowPath = new Path2D();
+        this.greenPath = new Path2D();
 
-      // TODO Disable on enemy turn or when cannot cast ranged skills
-      this.fillRangeMapAndPathes(
-        this.scene.currentActor.z + this.scene.currentActor.height,
-        this.scene.currentActor.x,
-        this.scene.currentActor.y,
-        yellowPath,
-        redPath,
-        cameraLeft,
-        cameraTop);
-
-      const width = right - left + 1;
-      const height = bottom - top + 1;
-      const textureMapping: Float32Array = new Float32Array(width * height * 12);
-      const colors: Uint8Array = new Uint8Array(width * height * 4);
-      const backgroundTextureMapping: Float32Array = new Float32Array(width * height * 12);
-      const backgrounds: Uint8Array = new Uint8Array(width * height * 4);
-      const mainTextureVertexes: Float32Array = new Float32Array(width * height * 12);
-      let texturePosition = 0;
-      for (let y = -20; y <= 60; y++) {
-        for (let x = -40; x <= 80; x++) {
-          if (x >= left && y >= top && x <= right && y <= bottom) {
-            fillVertexPosition(mainTextureVertexes, x, y, left, top, this.tileWidth, this.tileHeight, texturePosition);
-            if (x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
-              sceneRandom.next();
-              this.drawPoint(x, y, texturePosition, undefined, cameraLeft, cameraTop,
-                greenPath, yellowPath, redPath, colors, textureMapping, backgrounds, backgroundTextureMapping);
+        // TODO Disable on enemy turn or when cannot cast ranged skills
+        this.fillRangeMapAndPathes(
+          this.scene.currentActor.z + this.scene.currentActor.height,
+          this.scene.currentActor.x,
+          this.scene.currentActor.y,
+          this.yellowPath,
+          this.redPath,
+          cameraLeft,
+          cameraTop);
+        const width = right - left + 1;
+        const height = bottom - top + 1;
+        this.textureMapping = new Float32Array(width * height * 12);
+        this.colors = new Uint8Array(width * height * 4);
+        this.backgroundTextureMapping = new Float32Array(width * height * 12);
+        this.backgrounds = new Uint8Array(width * height * 4);
+        this.mainTextureVertexes = new Float32Array(width * height * 12);
+        let texturePosition = 0;
+        for (let y = -20; y <= 60; y++) {
+          for (let x = -40; x <= 80; x++) {
+            if (x >= left && y >= top && x <= right && y <= bottom) {
+              fillVertexPosition(this.mainTextureVertexes, x, y, left, top, this.tileWidth, this.tileHeight, texturePosition);
+              if (x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
+                sceneRandom.next();
+                this.drawPoint(x, y, texturePosition, undefined, cameraLeft, cameraTop,
+                  this.greenPath, this.yellowPath, this.redPath, this.colors, this.textureMapping,
+                  this.backgrounds, this.backgroundTextureMapping);
+              } else {
+                const biom = getRandomBiom(sceneRandom, this.scene.biom);
+                this.drawDummyPoint(biom.char, biom.color, texturePosition,
+                  this.colors, this.textureMapping, this.backgrounds, this.backgroundTextureMapping);
+              }
+              texturePosition++;
             } else {
-              const biom = getRandomBiom(sceneRandom, this.scene.biom);
-              this.drawDummyPoint(biom.char, biom.color, texturePosition,
-                colors, textureMapping, backgrounds, backgroundTextureMapping);
+              sceneRandom.next();
             }
-            texturePosition++;
-          } else {
-            sceneRandom.next();
           }
         }
+        this.cursorVertexes = undefined;
       }
 
       drawArrays(
         this.canvasWebGLContext,
         this.shadersProgram,
-        mainTextureVertexes,
-        colors,
-        backgrounds,
-        textureMapping,
-        backgroundTextureMapping,
+        this.mainTextureVertexes,
+        this.colors,
+        this.backgrounds,
+        this.textureMapping,
+        this.backgroundTextureMapping,
         this.charsTexture,
         Math.round((left - cameraLeft) * this.tileWidth),
         Math.round((top - cameraTop - 1) * this.tileHeight),
@@ -612,11 +636,12 @@ export class FightComponent implements OnInit, OnDestroy {
       this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvas2DContext.lineWidth = 2;
       this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1.0)';
-      this.canvas2DContext.stroke(redPath);
+      this.canvas2DContext.stroke(this.redPath);
       this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1.0)';
-      this.canvas2DContext.stroke(yellowPath);
+      this.canvas2DContext.stroke(this.yellowPath);
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1.0)';
-      this.canvas2DContext.stroke(greenPath);
+      this.canvas2DContext.stroke(this.greenPath);
+      this.scene.visualizationChanged = false;
 
       // console.log(performance.now() - time);
 

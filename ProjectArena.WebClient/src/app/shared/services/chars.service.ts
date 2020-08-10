@@ -28,7 +28,6 @@ export class CharsService implements ITextureService {
   constructor() {
     this.loaded = true;
     this.charsSubCanvas = document.createElement('canvas');
-    document.body.appendChild(this.charsSubCanvas);
     this.charsSubCanvas.height = this.spriteHeight;
     this.chars = {};
     this.chars[' '] = { x: 0, y: 0 };

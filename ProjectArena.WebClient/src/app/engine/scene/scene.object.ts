@@ -35,6 +35,8 @@ export class Scene {
 
   biom: BiomEnum;
 
+  visualizationChanged = true;
+
   removedActors: number[] = [];
 
   tileStubs: TileStub[] = [];
@@ -144,6 +146,7 @@ export class Scene {
         actor.actOnObject(action, target);
         break;
     }
+    this.visualizationChanged = true;
   }
 
   private actFromActionInfo(definition: ActionInfo) {
@@ -175,6 +178,7 @@ export class Scene {
     } else {
       this.synchronizersSub.next(this.createSynchronizerAndClearChanges());
     }
+    this.visualizationChanged = true;
   }
 
   private processMessage(message: SynchronizationMessageDto) {
@@ -291,6 +295,7 @@ export class Scene {
         }
         change.action();
       }
+      this.visualizationChanged = true;
     }
     this.tileStubs = this.tileStubs.filter(x => x.endTime > this.timeLine);
     this.clearExtraLogs();
