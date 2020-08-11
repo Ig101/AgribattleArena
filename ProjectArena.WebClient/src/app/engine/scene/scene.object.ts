@@ -58,6 +58,8 @@ export class Scene {
   reward: RewardInfo;
 
   waitingMessages: SynchronizationMessageDto[] = [];
+  waitingAction: () => void;
+  turnReallyStarted = true;
 
   constructor(
     public actionsSub: Observer<ActionInfo>,
@@ -159,6 +161,7 @@ export class Scene {
   }
 
   private startTurn(definition: StartTurnInfo) {
+    this.turnReallyStarted = false;
     const actor = this.findActorByReference(definition.tempActor);
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
@@ -284,6 +287,11 @@ export class Scene {
       }
       if (this.waitingMessages.length > 0) {
         this.processMessage(this.waitingMessages.shift());
+      } else {
+        this.turnReallyStarted = true;
+        if (this.waitingAction) {
+          this.waitingAction();
+        }
       }
     } else {
       const currentChanges = this.changes.filter(x => x.time <= this.timeLine);
@@ -315,23 +323,14 @@ export class Scene {
     this.waitingMessages.push(...messages);
   }
 
-  canCast(actor: Actor) {
-    return this.waitingMessages.length === 0 &&
-      this.changes.length === 0 &&
-      actor.id === this.currentActor.id &&
-      this.turnTime > 0;
-  }
-
-  canUse(actor: Actor) {
-    const action = actor.actions.find(a => a.actionClass === ActionClassEnum.Use);
-    return this.waitingMessages.length === 0 &&
-      this.changes.length === 0 &&
-      actor.parentActor.id === this.currentActor.id &&
-      (action && action.actionClass === ActionClassEnum.Use && action.remainedTime <= 0) &&
-      this.turnTime > 0;
-  }
-
   private intendedAction(actor: Actor, action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
+    if (this.waitingMessages.length > 0 || this.changes.length > 0) {
+      this.waitingAction = () => this.intendedAction(actor, action, type, x, y, target);
+      return;
+    }
+    if (!actor.isAlive) {
+      return;
+    }
     const definition = {
       actor: actor.reference,
       id: action.id,
@@ -341,8 +340,21 @@ export class Scene {
       targetId: target.id
     } as ActionInfo;
     this.actionsSub.next(definition);
-    this.turnTime -= action.timeCost;
     this.act(actor, action, type, x, y, target);
+  }
+
+  // TODO ToHelper
+  getMostPrioritizedAction(actions: Action[]) {
+    if (!actions || actions.length === 0) {
+      return undefined;
+    }
+    let action = actions[0];
+    for (let i = 1; i < actions.length; i++) {
+      if (actions[i].aiPriority > action.aiPriority) {
+        action = actions[i];
+      }
+    }
+    return action;
   }
 
   intendedTargetedAction(actor: Actor, action: Action, x: number, y: number) {
@@ -354,7 +366,18 @@ export class Scene {
   }
 
   intendedUseAction(usable: Actor, x: number, y: number) {
-    const action = usable.actions.find(a => a.actionClass === ActionClassEnum.Use);
+    if (this.waitingMessages.length > 0 || this.changes.length > 0) {
+      this.waitingAction = () => this.intendedUseAction(usable, x, y);
+      return;
+    }
+    if (!usable.isAlive) {
+      return;
+    }
+    const actions = usable.actions.filter(a => a.actionClass === ActionClassEnum.Use);
+    const action = this.getMostPrioritizedAction(actions);
+    if (actions === undefined) {
+      return;
+    }
     const definition = {
       actor: usable.reference,
       id: action.id,
@@ -363,7 +386,6 @@ export class Scene {
       y
     } as ActionInfo;
     this.actionsSub.next(definition);
-    this.turnTime -= action.timeCost;
     this.act(usable, action, ActionType.Targeted, x, y);
   }
   /*

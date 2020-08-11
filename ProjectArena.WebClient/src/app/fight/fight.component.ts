@@ -19,9 +19,10 @@ import { Scene } from '../engine/scene/scene.object';
 import { BiomEnum } from '../shared/models/enum/biom.enum';
 import { Actor } from '../engine/scene/actor.object';
 import { Tile } from '../engine/scene/tile.object';
-import { DEFAULT_HEIGHT, RANGED_RANGE, VISIBILITY_AMPLIFICATION } from '../content/content.helper';
+import { DEFAULT_HEIGHT, RANGED_RANGE, VISIBILITY_AMPLIFICATION, LARGE_ACTOR_TRESHOLD_VOLUME } from '../content/content.helper';
 import { angleBetween, rangeBetween } from '../helpers/math.helper';
 import { MouseState } from '../shared/models/mouse-state.model';
+import { ActionClassEnum } from '../engine/models/enums/action-class.enum';
 
 @Component({
   selector: 'app-fight',
@@ -65,7 +66,6 @@ export class FightComponent implements OnInit, OnDestroy {
 
   updateSubscription: Subscription;
 
-  rangeMapIsActive: boolean;
   rangeMap: boolean[][]; // undefined for nothing, false for red, true for yellow
   textureMapping: Float32Array;
   colors: Uint8Array;
@@ -74,8 +74,10 @@ export class FightComponent implements OnInit, OnDestroy {
   mainTextureVertexes: Float32Array;
 
   redPath: Path2D;
-  yellowPath: Path2D;
   greenPath: Path2D;
+
+  visibleTargetPath: Path2D;
+  allowedTargetPath: Path2D;
 
   cursorVertexes: {
     position: number;
@@ -111,6 +113,24 @@ export class FightComponent implements OnInit, OnDestroy {
     return this.sceneService.scene;
   }
 
+  // TODO Turn signature:
+  // !turnReallyStarted -> line + currentActor
+  // turnTime <= 0 -> line + nextActor
+  // other -> currentActor + line
+
+  get canAct() {
+    return this.scene &&
+      this.scene.currentActor?.owner?.id === this.scene.currentPlayer.id &&
+      this.scene.turnTime > 0 &&
+      this.scene.turnReallyStarted;
+  }
+
+  get rangeMapIsActive() {
+    return this.scene &&
+      this.scene.currentActor?.owner?.id === this.scene.currentPlayer.id &&
+      this.scene.currentActor.actions.some(x => x.actionClass === ActionClassEnum.Default && x.range > 0);
+  }
+
   constructor(
     private loadingService: LoadingService,
     private sceneService: SceneService,
@@ -144,7 +164,6 @@ export class FightComponent implements OnInit, OnDestroy {
     this.updateSubscription = this.sceneService.updateSub.subscribe((shift) => {
       this.redraw(shift);
     });
-    this.rangeMapIsActive = true;
     const mapSize = RANGED_RANGE * 2 + 1;
     this.rangeMap = new Array<boolean[]>(mapSize);
     for (let i = 0; i < mapSize; i++) {
@@ -367,6 +386,7 @@ export class FightComponent implements OnInit, OnDestroy {
     actorY: number,
     startPointX: number,
     startPointY: number,
+    hasNoVisibleSkills: boolean
   ) {
     let nextX = actorX;
     let nextY = actorY;
@@ -394,7 +414,11 @@ export class FightComponent implements OnInit, OnDestroy {
         this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] = visible;
       }
       if (this.scene.tiles[currentX][currentY].height > actorZ + VISIBILITY_AMPLIFICATION * range) {
-        visible = false;
+        if (hasNoVisibleSkills) {
+          visible = false;
+        } else {
+          return;
+        }
       }
     }
   }
@@ -414,19 +438,21 @@ export class FightComponent implements OnInit, OnDestroy {
       }
     }
     this.rangeMap[RANGED_RANGE][RANGED_RANGE] = true;
+    const hasNoVisibleSkills = this.scene.currentActor.actions
+      .some(x => x.actionClass === ActionClassEnum.Default && x.range > 0 && !x.onlyVisible);
     for (let i = -RANGED_RANGE; i <= RANGED_RANGE; i++) {
       let newX = actorX + i;
       let newY = actorY - RANGED_RANGE;
-      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY);
+      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
       newX = actorX - RANGED_RANGE;
       newY = actorY + i;
-      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY);
+      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
       newX = actorX + i;
       newY = actorY + RANGED_RANGE;
-      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY);
+      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
       newX = actorX + RANGED_RANGE;
       newY = actorY + i;
-      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY);
+      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
     }
     for (let x = 0; x < RANGED_RANGE * 2 + 1; x++) {
       for (let y = 0; y < RANGED_RANGE * 2 + 1; y++) {
@@ -509,14 +535,18 @@ export class FightComponent implements OnInit, OnDestroy {
         visibleActor = actor;
         continue;
       }
-      if (visibleActor.tags.includes('small')) {
-        if (!actor.tags.includes('small')) {
+      if (visibleActor.volume < LARGE_ACTOR_TRESHOLD_VOLUME) {
+        if (actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
           visibleActor = actor;
         }
         multiActor = true;
       }
     }
-    return { backgroundActor, visibleActor: (visibleActor.tags.includes('small') && multiActor) ? undefined : visibleActor , multiActor };
+    return {
+      backgroundActor,
+      visibleActor: (visibleActor.volume < LARGE_ACTOR_TRESHOLD_VOLUME && multiActor) ? undefined : visibleActor,
+      multiActor
+    };
   }
 
   private getTileHeight(x: number, y: number) {
@@ -542,7 +572,6 @@ export class FightComponent implements OnInit, OnDestroy {
     cameraTop: number,
 
     greenPath: Path2D,
-    yellowPath: Path2D,
     redPath: Path2D,
     colors: Uint8Array,
     textureMapping: Float32Array,
@@ -600,10 +629,8 @@ export class FightComponent implements OnInit, OnDestroy {
         if (info.visibleActor.maxDurability) {
           const percentOfHealth = Math.max(0, Math.min(info.visibleActor.durability / info.visibleActor.maxDurability, 1));
           let path: Path2D;
-          if (percentOfHealth > 0.65) {
+          if (info.visibleActor.owner && info.visibleActor.owner.id === this.scene.currentPlayer.id) {
             path = greenPath;
-          } else if (percentOfHealth > 0.25) {
-            path = yellowPath;
           } else {
             path = redPath;
           }
@@ -640,8 +667,10 @@ export class FightComponent implements OnInit, OnDestroy {
       const height = bottom - top + 1;
       if (this.scene.visualizationChanged) {
         this.redPath = new Path2D();
-        this.yellowPath = new Path2D();
         this.greenPath = new Path2D();
+
+        this.allowedTargetPath = new Path2D();
+        this.visibleTargetPath = new Path2D();
 
         // TODO Disable on enemy turn or when cannot cast ranged skills
         if (this.rangeMapIsActive) {
@@ -649,8 +678,8 @@ export class FightComponent implements OnInit, OnDestroy {
             this.scene.currentActor.z + this.scene.currentActor.height,
             this.scene.currentActor.x,
             this.scene.currentActor.y,
-            this.yellowPath,
-            this.redPath,
+            this.visibleTargetPath,
+            this.allowedTargetPath,
             cameraLeft,
             cameraTop);
         }
@@ -667,7 +696,7 @@ export class FightComponent implements OnInit, OnDestroy {
               if (x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
                 sceneRandom.next();
                 this.drawPoint(x, y, texturePosition, cameraLeft, cameraTop,
-                  this.greenPath, this.yellowPath, this.redPath, this.colors, this.textureMapping,
+                  this.greenPath, this.redPath, this.colors, this.textureMapping,
                   this.backgrounds, this.backgroundTextureMapping);
               } else {
                 const biom = getRandomBiom(sceneRandom, this.scene.biom);
@@ -698,7 +727,8 @@ export class FightComponent implements OnInit, OnDestroy {
 
       const rangeMapPositionX = mouseX - this.scene.currentActor.x + RANGED_RANGE;
       const rangeMapPositionY = mouseY - this.scene.currentActor.y + RANGED_RANGE;
-      if (this.rangeMapIsActive &&
+      if (this.canAct &&
+        this.rangeMapIsActive &&
         rangeMapPositionX >= 0 &&
         rangeMapPositionY >= 0 &&
         rangeMapPositionX < RANGED_RANGE * 2 + 1 &&
@@ -738,12 +768,17 @@ export class FightComponent implements OnInit, OnDestroy {
         this.charsService.spriteHeight);
       this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.canvas2DContext.lineWidth = 2;
-      this.canvas2DContext.strokeStyle = 'rgba(200, 0, 0, 1.0)';
+      this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1.0)';
       this.canvas2DContext.stroke(this.redPath);
-      this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1.0)';
-      this.canvas2DContext.stroke(this.yellowPath);
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1.0)';
       this.canvas2DContext.stroke(this.greenPath);
+
+      if (this.rangeMapIsActive && this.canAct) {
+        this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1.0)';
+        this.canvas2DContext.stroke(this.visibleTargetPath);
+        this.canvas2DContext.strokeStyle = 'rgba(200, 0, 0, 1.0)';
+        this.canvas2DContext.stroke(this.allowedTargetPath);
+      }
 
       this.scene.visualizationChanged = false;
 

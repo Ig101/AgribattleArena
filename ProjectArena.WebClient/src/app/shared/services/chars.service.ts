@@ -37,8 +37,8 @@ export class CharsService implements ITextureService {
     this.charsSubCanvas.width = (this.spriteWidth + 2) * elements;
     this.context = this.charsSubCanvas.getContext('2d');
     this.context.clearRect(0, 0, (this.spriteWidth + 2) * elements, this.spriteHeight);
-    this.context.fillStyle = 'rgba(150,0,0,255)';
-    this.context.strokeStyle = 'rgba(255,0,0,255)';
+    this.context.fillStyle = 'rgba(150,0,255,255)';
+    this.context.strokeStyle = 'rgba(255,0,255,255)';
     this.context.lineWidth = 2;
     for (const e of tileSpriteFunctions) {
       e();
@@ -47,7 +47,7 @@ export class CharsService implements ITextureService {
     this.context.fillRect(0, 0, this.spriteWidth + 2, this.spriteHeight);
     this.context.font = `${this.spriteHeight}px PT Mono`;
     this.context.textAlign = 'left';
-    this.context.fillStyle = 'rgba(255,0,0,255)';
+    this.context.fillStyle = 'rgba(255,0,255,255)';
     for (const e of spriteFunctions) {
       e();
     }

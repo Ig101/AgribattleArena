@@ -115,7 +115,7 @@ export class Actor implements IActor {
   }
 
   getActorZ(actor: Actor) {
-    return 0;
+    return this.z + this.height;
   }
 
   validateTargeted(action: Action, x: number, y: number) {
@@ -137,6 +137,12 @@ export class Actor implements IActor {
   actTargeted(action: Action, x: number, y: number) {
     if (this.isAlive && action.actionTargeted) {
       action.remainedTime = action.cooldown;
+      if (x > this.x) {
+        this.left = false;
+      }
+      if (x < this.x) {
+        this.left = true;
+      }
       this.parentScene.pushChanges(
         action.actionTargeted(this, action.power, x, y, this.parentScene.timeLine));
     }
@@ -145,6 +151,12 @@ export class Actor implements IActor {
   actOnObject(action: Action, target: IActor) {
     if (this.isAlive && action.actionOnObject) {
       action.remainedTime = action.cooldown;
+      if (target.x > this.x) {
+        this.left = false;
+      }
+      if (target.x < this.x) {
+        this.left = true;
+      }
       this.parentScene.pushChanges(
         action.actionOnObject(this, action.power, target, this.parentScene.timeLine));
     }
@@ -277,7 +289,11 @@ export class Actor implements IActor {
   }
 
   update() {
-    this.actions.forEach(x => x.remainedTime--);
+    this.actions.forEach(x => {
+      if (x.remainedTime > 0) {
+        x.remainedTime--;
+      }
+    });
     this.handleEffects([BUFF_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
     let buffRemoved = false;
     for (const buff of this.buffs) {
