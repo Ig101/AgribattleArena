@@ -36,7 +36,7 @@ export const actionNatives: { [id: string]: ActionNative } = {
     untargeted: true,
     onlyVisible: false,
     description: 'Do nothing for one turn',
-    timeCost: 60,
+    timeCost: 6,
     cooldown: 0,
     power: 1,
     aiPriority: 1,

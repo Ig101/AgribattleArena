@@ -93,6 +93,7 @@ export class Tile implements IActor {
 
   addActorOnTop(actor: Actor) {
     this.actors.push(actor);
+    actor.parentActor = this;
   }
 
   addActor(actor: Actor, index: number) {
@@ -100,6 +101,7 @@ export class Tile implements IActor {
       this.addActorOnTop(actor);
       return;
     }
+    actor.parentActor = this;
     this.actors.splice(Math.max(0, index), 0, actor);
   }
 

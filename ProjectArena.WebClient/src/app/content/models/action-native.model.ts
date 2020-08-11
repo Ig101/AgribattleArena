@@ -14,8 +14,8 @@ export interface ActionNative {
   aiPriority: number;
   actionClass: ActionClassEnum;
 
-  validateActionTargeted?: (actor: Actor, power: number, x: number, y: number) => string;
-  validateActionOnObject?: (actor: Actor, power: number, target: IActor) => string;
+  validateActionTargeted?: (actor: Actor, x: number, y: number) => string;
+  validateActionOnObject?: (actor: Actor, target: IActor) => string;
 
   actionTargeted?: (actor: Actor, power: number, x: number, y: number, startingTime: number)
     => ChangeDefinition[];

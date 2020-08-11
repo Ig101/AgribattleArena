@@ -23,6 +23,8 @@ import { DEFAULT_HEIGHT, RANGED_RANGE, VISIBILITY_AMPLIFICATION, LARGE_ACTOR_TRE
 import { angleBetween, rangeBetween } from '../helpers/math.helper';
 import { MouseState } from '../shared/models/mouse-state.model';
 import { ActionClassEnum } from '../engine/models/enums/action-class.enum';
+import { SmartAction } from './models/smart-action.model';
+import { getMostPrioritizedAction } from '../engine/engine.helper';
 
 @Component({
   selector: 'app-fight',
@@ -84,6 +86,9 @@ export class FightComponent implements OnInit, OnDestroy {
     textureMapping: Float32Array;
     colors: Uint8Array;
   };
+
+  smartDirections: SmartAction[];
+  directionTimer: number;
 
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
@@ -147,6 +152,36 @@ export class FightComponent implements OnInit, OnDestroy {
       pressed: false,
       timeStamp: 0
     };
+    this.smartDirections = [
+      {
+        hotKey: 'KeyA',
+        keyVisualization: 'A',
+        title: 'Left',
+        pressed: false,
+        action: () => this.directActorTo(this.scene.currentActor?.x - 1, this.scene.currentActor?.y)
+      },
+      {
+        hotKey: 'KeyD',
+        keyVisualization: 'D',
+        title: 'Right',
+        pressed: false,
+        action: () => this.directActorTo(this.scene.currentActor?.x + 1, this.scene.currentActor?.y)
+      },
+      {
+        hotKey: 'KeyW',
+        keyVisualization: 'W',
+        title: 'Up',
+        pressed: false,
+        action: () => this.directActorTo(this.scene.currentActor?.x, this.scene.currentActor?.y - 1)
+      },
+      {
+        hotKey: 'KeyS',
+        keyVisualization: 'S',
+        title: 'Down',
+        pressed: false,
+        action: () => this.directActorTo(this.scene.currentActor?.x, this.scene.currentActor?.y + 1)
+      }
+    ];
   }
 
   ngOnInit(): void {
@@ -216,7 +251,7 @@ export class FightComponent implements OnInit, OnDestroy {
           maxDurability: 100000,
           turnCost: 1,
           initiativePosition: 0,
-          height: (x > 10 || x < 6) && y > 5 ? 900 : 500,
+          height: x > 10 && y > 5 ? 900 : x < 6 ? 200 : 500,
           volume: 10000,
           freeVolume: 9000,
           preparationReactions: [],
@@ -258,7 +293,34 @@ export class FightComponent implements OnInit, OnDestroy {
     }
     actors.push({
       reference: {
-        id: 5000,
+        id: idCounterPosition,
+        x: 14,
+        y: 8
+      },
+      left: false,
+      name: 'Actor',
+      char: 'adventurer',
+      color: { r: 0, g: 0, b: 255, a: 1 },
+      ownerId: undefined,
+      tags: ['active'],
+      parentId: 1 + 14 * 16 + 8,
+      durability: 200,
+      maxDurability: 200,
+      turnCost: 1,
+      initiativePosition: 0,
+      height: 180,
+      volume: 120,
+      freeVolume: 40,
+      preparationReactions: [],
+      activeReactions: [],
+      clearReactions: [],
+      actions: [],
+      actors: [],
+      buffs: [],
+    });
+    actors.push({
+      reference: {
+        id: ++idCounterPosition,
         x: 18,
         y: 7
       },
@@ -269,8 +331,8 @@ export class FightComponent implements OnInit, OnDestroy {
       ownerId: 'sampleP',
       tags: ['active'],
       parentId: 1 + 18 * 16 + 7,
-      durability: 100,
-      maxDurability: 100,
+      durability: 200,
+      maxDurability: 200,
       turnCost: 1,
       initiativePosition: 0,
       height: 180,
@@ -300,33 +362,6 @@ export class FightComponent implements OnInit, OnDestroy {
       actors: [],
       buffs: [],
     });
-    actors.push({
-      reference: {
-        id: 5001,
-        x: 14,
-        y: 8
-      },
-      left: false,
-      name: 'Actor',
-      char: 'adventurer',
-      color: { r: 0, g: 0, b: 255, a: 1 },
-      ownerId: undefined,
-      tags: ['active'],
-      parentId: 1 + 14 * 16 + 8,
-      durability: 100,
-      maxDurability: 100,
-      turnCost: 1,
-      initiativePosition: 0,
-      height: 180,
-      volume: 120,
-      freeVolume: 40,
-      preparationReactions: [],
-      activeReactions: [],
-      clearReactions: [],
-      actions: [],
-      actors: [],
-      buffs: [],
-    });
     this.sceneService.setupGame(
       {
         id: 'sampleS',
@@ -346,15 +381,41 @@ export class FightComponent implements OnInit, OnDestroy {
       },
       undefined,
       {
-        time: 8000000000,
+        time: 8000000,
         tempActor: {
-          id: 5000,
+          id: idCounterPosition,
           x: 18,
           y: 7
         }
       }
     );
     console.log(this.scene);
+  }
+
+  directActorTo(x: number, y: number) {
+    if (this.canAct && this.directionTimer <= 0 && x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
+      const tile = this.scene.tiles[x][y];
+      let attack = false;
+      for (let i = tile.actors.length - 1; i >= 0; i--) {
+        const actor = tile.actors[i];
+        if (actor.tags.includes('tile')) {
+          break;
+        }
+        if (actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
+          attack = true;
+          break;
+        }
+      }
+      const action = getMostPrioritizedAction(
+        this.scene.currentActor.actions.filter(a =>
+          ((a.actionClass === ActionClassEnum.Attack && attack) ||
+          (a.actionClass === ActionClassEnum.Move && !attack)) &&
+          (!this.scene.currentActor.validateTargeted(a, x, y))));
+      if (action) {
+        this.scene.intendedTargetedAction(action, x, y);
+      }
+    }
+    this.directionTimer = 0.2;
   }
 
   private isOnClickablePosition() {
@@ -402,6 +463,34 @@ export class FightComponent implements OnInit, OnDestroy {
       this.mouseState.realX = event.x;
       this.mouseState.realY = event.y;
       this.recalculateMouseMove(event.x, event.y, event.timeStamp);
+    }
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (!this.blocked) {
+      const directionAction = this.smartDirections.find(x => x.hotKey === event.code);
+      if (directionAction) {
+        if (!this.smartDirections.some(x => x.pressed)) {
+          this.directionTimer = 0;
+          directionAction.action();
+          this.directionTimer *= 2;
+        }
+        directionAction.pressed = true;
+        this.smartDirections.sort((a, b) => {
+          const bVal = b === directionAction ? 1 : 0;
+          const aVal = a === directionAction ? 1 : 0;
+          return bVal - aVal;
+        });
+        return;
+      }
+    }
+  }
+
+  onKeyUp(event: KeyboardEvent) {
+    const directionAction = this.smartDirections.find(x => x.hotKey === event.code);
+    if (directionAction) {
+      directionAction.pressed = false;
+      return;
     }
   }
 
@@ -547,6 +636,8 @@ export class FightComponent implements OnInit, OnDestroy {
   }
 
   private drawDummyPoint(
+    x: number,
+    y: number,
     char: string,
     color: Color,
     texturePosition: number,
@@ -556,8 +647,14 @@ export class FightComponent implements OnInit, OnDestroy {
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
 
-    const dim = 0.3;
-    fillTileMask(this.charsService, backgroundTextureMapping, false, false, false, false, texturePosition);
+    const dim = 0.2;
+    fillTileMask(
+      this.charsService, backgroundTextureMapping,
+      DEFAULT_HEIGHT - this.getTileHeight(x - 1, y) >= 120,
+      DEFAULT_HEIGHT - this.getTileHeight(x + 1, y) >= 120,
+      DEFAULT_HEIGHT - this.getTileHeight(x, y - 1) >= 120,
+      DEFAULT_HEIGHT - this.getTileHeight(x, y + 1) >= 120,
+      texturePosition);
     fillBackground(backgrounds, color.r * dim / 5, color.g * dim / 5, color.b * dim / 5, texturePosition);
     fillColor(colors, color.r * dim, color.g * dim, color.b * dim, color.a, texturePosition);
     fillChar(this.charsService, textureMapping, char, texturePosition);
@@ -693,6 +790,16 @@ export class FightComponent implements OnInit, OnDestroy {
     if (this.scene && this.shadersProgram) {
 
       if (shift) {
+        if (this.directionTimer > 0) {
+          this.directionTimer -= shift;
+        } else {
+          for (const action of this.smartDirections) {
+            if (action.pressed) {
+              action.action();
+              break;
+            }
+          }
+        }
         this.tickerTime -= shift;
         if (this.tickerTime <= 0) {
           this.tickerState = !this.tickerState;
@@ -745,7 +852,7 @@ export class FightComponent implements OnInit, OnDestroy {
                   this.backgrounds, this.backgroundTextureMapping);
               } else {
                 const biom = getRandomBiom(sceneRandom, this.scene.biom);
-                this.drawDummyPoint(biom.char, biom.color, texturePosition,
+                this.drawDummyPoint(x, y, biom.char, biom.color, texturePosition,
                   this.colors, this.textureMapping, this.backgrounds, this.backgroundTextureMapping);
               }
               texturePosition++;
@@ -772,7 +879,8 @@ export class FightComponent implements OnInit, OnDestroy {
 
       const rangeMapPositionX = mouseX - this.scene.currentActor.x + RANGED_RANGE;
       const rangeMapPositionY = mouseY - this.scene.currentActor.y + RANGED_RANGE;
-      if (this.canAct &&
+      if (!this.blocked &&
+        this.canAct &&
         this.rangeMapIsActive &&
         rangeMapPositionX >= 0 &&
         rangeMapPositionY >= 0 &&

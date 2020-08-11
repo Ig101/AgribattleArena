@@ -24,6 +24,7 @@ import { INativesCollection } from '../interfaces/natives-collection.interface';
 import { getHashFromString } from 'src/app/helpers/extensions/hash.extension';
 import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
 import { ActionClassEnum } from '../models/enums/action-class.enum';
+import { getMostPrioritizedAction } from '../engine.helper';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
@@ -149,6 +150,7 @@ export class Scene {
         break;
     }
     this.visualizationChanged = true;
+    this.changed = true;
   }
 
   private actFromActionInfo(definition: ActionInfo) {
@@ -276,7 +278,7 @@ export class Scene {
 
   update() {
     const newTime = performance.now();
-    const shift = newTime - this.lastTime;
+    const shift = (newTime - this.lastTime) / 1000;
     this.lastTime = newTime;
 
     this.timeLine += shift;
@@ -337,32 +339,18 @@ export class Scene {
       type,
       x,
       y,
-      targetId: target.id
+      targetId: target?.id
     } as ActionInfo;
     this.actionsSub.next(definition);
     this.act(actor, action, type, x, y, target);
   }
 
-  // TODO ToHelper
-  getMostPrioritizedAction(actions: Action[]) {
-    if (!actions || actions.length === 0) {
-      return undefined;
-    }
-    let action = actions[0];
-    for (let i = 1; i < actions.length; i++) {
-      if (actions[i].aiPriority > action.aiPriority) {
-        action = actions[i];
-      }
-    }
-    return action;
+  intendedTargetedAction(action: Action, x: number, y: number) {
+    this.intendedAction(this.currentActor, action, ActionType.Targeted, x, y);
   }
 
-  intendedTargetedAction(actor: Actor, action: Action, x: number, y: number) {
-    this.intendedAction(actor, action, ActionType.Targeted, x, y);
-  }
-
-  intendedOnObjectAction(actor: Actor, action: Action, target: IActor) {
-    this.intendedAction(actor, action, ActionType.OnObject, undefined, undefined, target);
+  intendedOnObjectAction(action: Action, target: IActor) {
+    this.intendedAction(this.currentActor, action, ActionType.OnObject, undefined, undefined, target);
   }
 
   intendedUseAction(usable: Actor, x: number, y: number) {
@@ -374,7 +362,7 @@ export class Scene {
       return;
     }
     const actions = usable.actions.filter(a => a.actionClass === ActionClassEnum.Use);
-    const action = this.getMostPrioritizedAction(actions);
+    const action = getMostPrioritizedAction(actions);
     if (actions === undefined) {
       return;
     }

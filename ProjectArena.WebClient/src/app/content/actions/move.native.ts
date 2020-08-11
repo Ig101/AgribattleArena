@@ -1,7 +1,7 @@
 import { ChangeDefinition } from 'src/app/engine/models/abstract/change-definition.model';
 import { Actor } from 'src/app/engine/scene/actor.object';
 
-export function moveValidation(actor: Actor, power: number, x: number, y: number): string {
+export function moveValidation(actor: Actor, x: number, y: number): string {
   const targetTile = actor.parentScene.tiles[x][y];
   if (targetTile.height >= actor.z + 120) {
     return 'Target location is too high';

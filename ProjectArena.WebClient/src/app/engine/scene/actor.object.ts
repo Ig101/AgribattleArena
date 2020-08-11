@@ -120,17 +120,17 @@ export class Actor implements IActor {
 
   validateTargeted(action: Action, x: number, y: number) {
     if (action.validateActionTargeted) {
-      return action.validateActionTargeted(this, action.power, x, y);
+      return action.validateActionTargeted(this, x, y);
     } else {
-      return false;
+      return undefined;
     }
   }
 
   validateOnObject(action: Action, target: IActor) {
     if (action.validateActionOnObject) {
-      action.validateActionOnObject(this, action.power, target);
+      action.validateActionOnObject(this, target);
     } else {
-      return false;
+      return undefined;
     }
   }
 
@@ -355,6 +355,7 @@ export class Actor implements IActor {
 
   addActorOnTop(actor: Actor) {
     this.changed = true;
+    actor.parentActor = this;
     this.actors.push(actor);
   }
 
@@ -363,6 +364,7 @@ export class Actor implements IActor {
       this.addActorOnTop(actor);
       return;
     }
+    actor.parentActor = this;
     this.changed = true;
     this.actors.splice(Math.max(0, index), 0, actor);
   }

@@ -35,11 +35,15 @@ export class SynchronizationService {
   }
 
   issueAction(action: ActionInfo) {
+    console.log('act');
+    console.log(action);
     // TODO SendAction
     const newCode = this.generateNewCode();
   }
 
   sendActionSynchronizationInfo(synchronizer: Synchronizer) {
+    console.log('sync');
+    console.log(synchronizer);
     // TODO SendAction
   }
 
