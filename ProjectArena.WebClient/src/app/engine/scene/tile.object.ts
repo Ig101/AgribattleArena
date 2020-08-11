@@ -15,6 +15,11 @@ export class Tile implements IActor {
   actors: Actor[];
   parentScene: Scene;
 
+  
+  get isRoot() {
+    return true;
+  }
+
   get tags() {
     return [];
   }

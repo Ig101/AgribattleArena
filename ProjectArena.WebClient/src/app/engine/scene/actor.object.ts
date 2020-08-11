@@ -58,6 +58,10 @@ export class Actor implements IActor {
   blockedActions: string[] = [];
   blockedEffects: string[] = [];
 
+  get isRoot() {
+    return false;
+  }
+
   get x() {
     return this.parentActor.x;
   }

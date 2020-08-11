@@ -6,6 +6,7 @@ export interface IActor {
   readonly id: number;
 
   readonly tags: string[];
+  readonly isRoot: boolean;
 
   readonly x: number;
   readonly y: number;
