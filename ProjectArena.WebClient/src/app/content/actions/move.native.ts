@@ -19,10 +19,16 @@ export function moveAction(actor: Actor, power: number, x: number, y: number, st
     logs: undefined,
     action: () => {
       targetTile.handleEffects(['pressure'], actor.volume, false, 1, startingTime);
+      if (actor.height > 120) {
+        const actorIndex = targetTile.actors.indexOf(actor);
+        for (let i = actorIndex + 1; i < targetTile.actors.length; i++) {
+          actor.handleEffects(['fall'], (actor.height - 120) / 10, false, 1, startingTime);
+        }
+      }
       actor.move(targetTile);
       parent.handleEffects(['lighten'], actor.volume, false, 1, startingTime);
       if (heightDifference > 120) {
-        actor.handleEffects(['physical-damage'], (heightDifference - 120) / 10, false, 1, startingTime);
+        actor.handleEffects(['fall'], (heightDifference - 120) / 10, false, 1, startingTime);
       }
     }
   }];
