@@ -29,7 +29,7 @@ export const actionNatives: { [id: string]: ActionNative } = {
     power: 12,
     aiPriority: 1,
     actionClass: ActionClassEnum.Attack,
-    actionTargeted: attackAction
+    actionOnObject: attackAction
   },
   wait: {
     name: 'Wait',

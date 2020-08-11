@@ -396,8 +396,9 @@ export class FightComponent implements OnInit, OnDestroy {
     if (this.canAct && this.directionTimer <= 0 && x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
       const tile = this.scene.tiles[x][y];
       let attack = false;
+      let actor;
       for (let i = tile.actors.length - 1; i >= 0; i--) {
-        const actor = tile.actors[i];
+        actor = tile.actors[i];
         if (actor.tags.includes('tile')) {
           break;
         }
@@ -412,10 +413,16 @@ export class FightComponent implements OnInit, OnDestroy {
           (a.actionClass === ActionClassEnum.Move && !attack)) &&
           (!this.scene.currentActor.validateTargeted(a, x, y))));
       if (action) {
-        this.scene.intendedTargetedAction(action, x, y);
+        this.directionTimer = 0.2;
+        if (action.actionTargeted) {
+          this.scene.intendedTargetedAction(action, x, y);
+        } else if (actor) {
+          this.scene.intendedOnObjectAction(action, actor);
+        }
+        return;
       }
     }
-    this.directionTimer = 0.2;
+    this.directionTimer = 0.04;
   }
 
   private isOnClickablePosition() {

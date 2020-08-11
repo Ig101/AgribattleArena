@@ -350,7 +350,7 @@ export class Scene {
   }
 
   intendedOnObjectAction(action: Action, target: IActor) {
-    this.intendedAction(this.currentActor, action, ActionType.OnObject, undefined, undefined, target);
+    this.intendedAction(this.currentActor, action, ActionType.OnObject, target.x, target.y, target);
   }
 
   intendedUseAction(usable: Actor, x: number, y: number) {
