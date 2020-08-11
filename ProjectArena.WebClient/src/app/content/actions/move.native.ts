@@ -22,7 +22,7 @@ export function moveAction(actor: Actor, power: number, x: number, y: number, st
       actor.move(targetTile);
       parent.handleEffects(['lighten'], actor.volume, false, 1, startingTime);
       if (heightDifference > 120) {
-        actor.handleEffects(['physical-damage'], (heightDifference - 120), false, 1, startingTime);
+        actor.handleEffects(['physical-damage'], (heightDifference - 120) / 10, false, 1, startingTime);
       }
     }
   }];

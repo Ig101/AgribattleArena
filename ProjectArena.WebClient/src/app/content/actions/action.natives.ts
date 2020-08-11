@@ -26,7 +26,7 @@ export const actionNatives: { [id: string]: ActionNative } = {
     description: undefined,
     timeCost: 8,
     cooldown: 0,
-    power: 20,
+    power: 12,
     aiPriority: 1,
     actionClass: ActionClassEnum.Attack,
     actionTargeted: attackAction
@@ -48,11 +48,11 @@ export const actionNatives: { [id: string]: ActionNative } = {
     untargeted: false,
     onlyVisible: true,
     description: 'Shot missle to target location, dealing damage to the highest large object',
-    timeCost: 20,
+    timeCost: 18,
     cooldown: 0,
-    power: 40,
+    power: 20,
     aiPriority: 1,
-    actionClass: ActionClassEnum.Move,
+    actionClass: ActionClassEnum.Default,
     actionTargeted: shotAction,
   }
 };

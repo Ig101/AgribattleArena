@@ -18,8 +18,8 @@ export interface Action {
 
   aiPriority: number;
 
-  validateActionTargeted: (actor: Actor, power: number, x: number, y: number) => boolean;
-  validateActionOnObject: (actor: Actor, power: number, target: IActor) => boolean;
+  validateActionTargeted: (actor: Actor, power: number, x: number, y: number) => string;
+  validateActionOnObject: (actor: Actor, power: number, target: IActor) => string;
 
   actionTargeted: (actor: Actor, power: number, x: number, y: number, startingTime: number)
     => ChangeDefinition[];

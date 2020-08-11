@@ -259,7 +259,7 @@ export class FightComponent implements OnInit, OnDestroy {
     actors.push({
       reference: {
         id: 5000,
-        x: 9,
+        x: 18,
         y: 7
       },
       left: false,
@@ -268,7 +268,51 @@ export class FightComponent implements OnInit, OnDestroy {
       color: { r: 255, g: 155, b: 55, a: 1 },
       ownerId: 'sampleP',
       tags: ['active'],
-      parentId: 1 + 9 * 16 + 7,
+      parentId: 1 + 18 * 16 + 7,
+      durability: 100,
+      maxDurability: 100,
+      turnCost: 1,
+      initiativePosition: 0,
+      height: 180,
+      volume: 120,
+      freeVolume: 40,
+      preparationReactions: [],
+      activeReactions: [],
+      clearReactions: [],
+      actions: [
+        {
+          id: 'move',
+          remainedTime: 0
+        },
+        {
+          id: 'slash',
+          remainedTime: 0
+        },
+        {
+          id: 'wait',
+          remainedTime: 0
+        },
+        {
+          id: 'shot',
+          remainedTime: 0
+        }
+      ],
+      actors: [],
+      buffs: [],
+    });
+    actors.push({
+      reference: {
+        id: 5001,
+        x: 14,
+        y: 8
+      },
+      left: false,
+      name: 'Actor',
+      char: 'adventurer',
+      color: { r: 0, g: 0, b: 255, a: 1 },
+      ownerId: undefined,
+      tags: ['active'],
+      parentId: 1 + 14 * 16 + 8,
       durability: 100,
       maxDurability: 100,
       turnCost: 1,
@@ -305,11 +349,12 @@ export class FightComponent implements OnInit, OnDestroy {
         time: 8000000000,
         tempActor: {
           id: 5000,
-          x: 9,
+          x: 18,
           y: 7
         }
       }
     );
+    console.log(this.scene);
   }
 
   private isOnClickablePosition() {
