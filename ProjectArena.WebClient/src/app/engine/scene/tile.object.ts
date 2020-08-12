@@ -50,6 +50,14 @@ export class Tile implements IActor {
     return 9999999;
   }
 
+  get volume() {
+    return 9999999;
+  }
+
+  get freeVolume() {
+    return 9999999;
+  }
+
   get height() {
     return this.actors.reduce((a, b) => a + b.height, 0);
   }

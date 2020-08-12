@@ -13,6 +13,8 @@ export interface IActor {
   readonly z: number;
 
   readonly durability: number;
+  readonly volume: number;
+  readonly freeVolume: number;
   readonly isAlive: boolean;
 
   owner: Player;

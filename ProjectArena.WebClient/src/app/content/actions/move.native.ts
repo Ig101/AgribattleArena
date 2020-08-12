@@ -35,6 +35,7 @@ export function moveAction(actor: Actor, power: number, x: number, y: number, st
     tileStubs: undefined,
     logs: undefined,
     action: () => {
+      actor.handleEffects(['act', 'move'], 1, false, 1, startingTime);
       moveActorToTile(actor, targetTile, startingTime);
     }
   }];

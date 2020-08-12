@@ -123,6 +123,9 @@ export class Actor implements IActor {
   }
 
   validateTargeted(action: Action, x: number, y: number) {
+    if (action.remainedTime > 0) {
+      return 'Action is not ready';
+    }
     if (action.validateActionTargeted) {
       return action.validateActionTargeted(this, x, y);
     } else {
@@ -131,6 +134,9 @@ export class Actor implements IActor {
   }
 
   validateOnObject(action: Action, target: IActor) {
+    if (action.remainedTime > 0) {
+      return 'Action is not ready';
+    }
     if (action.validateActionOnObject) {
       action.validateActionOnObject(this, target);
     } else {

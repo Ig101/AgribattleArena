@@ -47,12 +47,12 @@ export const actionNatives: { [id: string]: ActionNative } = {
     name: 'Shot',
     untargeted: false,
     onlyVisible: true,
-    description: 'Shot missle to target location, dealing damage to the highest large object',
+    description: 'Deal physical damage to a visible target',
     timeCost: 18,
     cooldown: 0,
     power: 20,
     aiPriority: 1,
     actionClass: ActionClassEnum.Default,
-    actionTargeted: shotAction,
+    actionOnObject: shotAction,
   }
 };

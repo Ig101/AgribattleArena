@@ -25,6 +25,8 @@ import { MouseState } from '../shared/models/mouse-state.model';
 import { ActionClassEnum } from '../engine/models/enums/action-class.enum';
 import { SmartAction } from './models/smart-action.model';
 import { getMostPrioritizedAction } from '../engine/engine.helper';
+import { Action } from '../engine/models/abstract/action.model';
+import { IActor } from '../engine/interfaces/actor.interface';
 
 @Component({
   selector: 'app-fight',
@@ -51,7 +53,7 @@ export class FightComponent implements OnInit, OnDestroy {
   blocked = false;
 
   private tileWidthInternal = 0;
-  private tileHeightInternal = 60;
+  private tileHeightInternal = 120;
   readonly defaultWidth = 1600;
   readonly defaultHeight = 1080;
   readonly defaultAspectRatio = this.defaultWidth / this.defaultHeight;
@@ -87,6 +89,7 @@ export class FightComponent implements OnInit, OnDestroy {
     colors: Uint8Array;
   };
 
+  smartAlt: SmartAction;
   smartDirections: SmartAction[];
   directionTimer: number;
 
@@ -151,6 +154,13 @@ export class FightComponent implements OnInit, OnDestroy {
     this.mouseState.buttonsInfo[2] = {
       pressed: false,
       timeStamp: 0
+    };
+    this.smartAlt = {
+      hotKey: 'AltLeft',
+      keyVisualization: 'Ctrl',
+      title: 'Alternative',
+      pressed: false,
+      action: undefined
     };
     this.smartDirections = [
       {
@@ -232,70 +242,72 @@ export class FightComponent implements OnInit, OnDestroy {
     let idCounterPosition = 1000;
     const actors: ActorSynchronization[] = [];
     let tilesCounter = 1;
-    for (let x = 0; x < 28; x++) {
-      for (let y = 0; y < 16; y++) {
-        actors.push({
-          reference: {
-            id: idCounterPosition++,
-            x,
-            y
-          },
-          left: false,
-          name: 'Ground',
-          char: 'ground',
-          color: {r: 60, g: 61, b: 95, a: 1},
-          ownerId: undefined,
-          tags: ['tile'],
-          parentId: tilesCounter,
-          durability: 100000,
-          maxDurability: 100000,
-          turnCost: 1,
-          initiativePosition: 0,
-          height: x > 10 && y > 5 ? 900 : x < 6 ? 200 : 500,
-          volume: 10000,
-          freeVolume: 9000,
-          preparationReactions: [],
-          activeReactions: [],
-          clearReactions: [],
-          actions: [],
-          actors: [],
-          buffs: [],
-        });
-        actors.push({
-          reference: {
-            id: idCounterPosition++,
-            x,
-            y
-          },
-          left: false,
-          name: 'Grass',
-          char: 'grass',
-          color: { r: 45, g: 60, b: 150, a: 1 },
-          ownerId: undefined,
-          tags: ['tile'],
-          parentId: tilesCounter,
-          durability: 100,
-          maxDurability: 100,
-          turnCost: 1,
-          initiativePosition: 0,
-          height: 5,
-          volume: 250,
-          freeVolume: 0,
-          preparationReactions: [],
-          activeReactions: [],
-          clearReactions: [],
-          actions: [],
-          actors: [],
-          buffs: [],
-        });
+    for (let x = 0; x < 14; x++) {
+      for (let y = 0; y < 8; y++) {
+        if (x < 4 || x > 6 || y !== 2) {
+          actors.push({
+            reference: {
+              id: idCounterPosition++,
+              x,
+              y
+            },
+            left: false,
+            name: 'Ground',
+            char: 'ground',
+            color: {r: 60, g: 61, b: 95, a: 1},
+            ownerId: undefined,
+            tags: ['tile'],
+            parentId: tilesCounter,
+            durability: 100000,
+            maxDurability: 100000,
+            turnCost: 1,
+            initiativePosition: 0,
+            height: x > 10 && y > 5 ? 900 : 500,
+            volume: 10000,
+            freeVolume: 9000,
+            preparationReactions: [],
+            activeReactions: [],
+            clearReactions: [],
+            actions: [],
+            actors: [],
+            buffs: [],
+          });
+          actors.push({
+            reference: {
+              id: idCounterPosition++,
+              x,
+              y
+            },
+            left: false,
+            name: 'Grass',
+            char: 'grass',
+            color: { r: 45, g: 60, b: 150, a: 1 },
+            ownerId: undefined,
+            tags: ['tile'],
+            parentId: tilesCounter,
+            durability: 100,
+            maxDurability: 100,
+            turnCost: 1,
+            initiativePosition: 0,
+            height: 5,
+            volume: 250,
+            freeVolume: 0,
+            preparationReactions: [],
+            activeReactions: [],
+            clearReactions: [],
+            actions: [],
+            actors: [],
+            buffs: [],
+          });
+        }
         tilesCounter++;
       }
     }
     actors.push({
       reference: {
         id: idCounterPosition,
-        x: 14,
-        y: 8
+        x: 12,
+        y: 7
       },
       left: false,
       name: 'Actor',
@@ -303,7 +315,7 @@ export class FightComponent implements OnInit, OnDestroy {
       color: { r: 0, g: 0, b: 255, a: 1 },
       ownerId: undefined,
       tags: ['active'],
-      parentId: 1 + 14 * 16 + 8,
+      parentId: 1 + 12 * 8 + 7,
       durability: 200,
       maxDurability: 200,
       turnCost: 1,
@@ -321,8 +333,8 @@ export class FightComponent implements OnInit, OnDestroy {
     actors.push({
       reference: {
         id: ++idCounterPosition,
-        x: 18,
-        y: 7
+        x: 13,
+        y: 6
       },
       left: false,
       name: 'Actor',
@@ -330,7 +342,7 @@ export class FightComponent implements OnInit, OnDestroy {
       color: { r: 255, g: 155, b: 55, a: 1 },
       ownerId: 'sampleP',
       tags: ['active'],
-      parentId: 1 + 18 * 16 + 7,
+      parentId: 1 + 13 * 8 + 6,
       durability: 200,
       maxDurability: 200,
       turnCost: 1,
@@ -374,8 +386,8 @@ export class FightComponent implements OnInit, OnDestroy {
             id: 'sampleP'
           }
         ],
-        width: 28,
-        height: 16,
+        width: 14,
+        height: 8,
         biom: BiomEnum.Grass,
         waitingActions: []
       },
@@ -384,8 +396,8 @@ export class FightComponent implements OnInit, OnDestroy {
         time: 8000000,
         tempActor: {
           id: idCounterPosition,
-          x: 18,
-          y: 7
+          x: 13,
+          y: 6
         }
       }
     );
@@ -395,29 +407,57 @@ export class FightComponent implements OnInit, OnDestroy {
   directActorTo(x: number, y: number) {
     if (this.canAct && this.directionTimer <= 0 && x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
       const tile = this.scene.tiles[x][y];
-      let attack = false;
-      let actor;
-      for (let i = tile.actors.length - 1; i >= 0; i--) {
-        actor = tile.actors[i];
-        if (actor.tags.includes('tile')) {
-          break;
+      let action: Action;
+      let actor: IActor;
+      let onTarget: boolean;
+      if (this.smartAlt.pressed) {
+        action = getMostPrioritizedAction(
+          this.scene.currentActor.actions.filter(a =>
+            a.actionClass === ActionClassEnum.Attack &&
+            !this.scene.currentActor.validateTargeted(a, x, y)));
+        onTarget = true;
+        if (action.actionOnObject) {
+          onTarget = false;
+          const actors = [];
+          for (let i = tile.actors.length - 1; i >= 0; i--) {
+            const tempActor = tile.actors[i];
+            actors.push(tempActor);
+            if (tempActor.tags.includes('tile')) {
+              break;
+            }
+          }
+          if (actors.length === 0) {
+            actor = tile;
+          } else {
+            // Open dialog with actors and choose one
+            actor = actors.find(a => a.volume >= LARGE_ACTOR_TRESHOLD_VOLUME);
+          }
         }
-        if (actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
-          attack = true;
-          break;
+      } else {
+        let attack = false;
+        for (let i = tile.actors.length - 1; i >= 0; i--) {
+          actor = tile.actors[i];
+          if (actor.tags.includes('tile') || actor.tags.includes('flat')) {
+            break;
+          }
+          if (actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
+            attack = true;
+            break;
+          }
         }
+        action = getMostPrioritizedAction(
+          this.scene.currentActor.actions.filter(a =>
+            ((a.actionClass === ActionClassEnum.Attack && attack) ||
+            (a.actionClass === ActionClassEnum.Move && !attack)) &&
+            !this.scene.currentActor.validateTargeted(a, x, y)));
+        onTarget = !!action?.actionTargeted;
       }
-      const action = getMostPrioritizedAction(
-        this.scene.currentActor.actions.filter(a =>
-          ((a.actionClass === ActionClassEnum.Attack && attack) ||
-          (a.actionClass === ActionClassEnum.Move && !attack)) &&
-          (!this.scene.currentActor.validateTargeted(a, x, y))));
       if (action) {
         this.directionTimer = 0.2;
-        if (action.actionTargeted) {
+        if (onTarget) {
           this.scene.intendedTargetedAction(action, x, y);
-        } else if (actor) {
-          this.scene.intendedOnObjectAction(action, actor);
+        } else {
+          this.scene.intendedOnObjectAction(action, actor || tile);
         }
         return;
       }
@@ -474,9 +514,15 @@ export class FightComponent implements OnInit, OnDestroy {
   }
 
   onKeyDown(event: KeyboardEvent) {
+    if (this.smartAlt.hotKey === event.code) {
+      event.preventDefault();
+      this.smartAlt.pressed = true;
+      return;
+    }
     if (!this.blocked) {
       const directionAction = this.smartDirections.find(x => x.hotKey === event.code);
       if (directionAction) {
+        event.preventDefault();
         if (!this.smartDirections.some(x => x.pressed)) {
           this.directionTimer = 0;
           directionAction.action();
@@ -494,8 +540,14 @@ export class FightComponent implements OnInit, OnDestroy {
   }
 
   onKeyUp(event: KeyboardEvent) {
+    if (this.smartAlt.hotKey === event.code) {
+      event.preventDefault();
+      this.smartAlt.pressed = false;
+      return;
+    }
     const directionAction = this.smartDirections.find(x => x.hotKey === event.code);
     if (directionAction) {
+      event.preventDefault();
       directionAction.pressed = false;
       return;
     }
@@ -693,7 +745,7 @@ export class FightComponent implements OnInit, OnDestroy {
     }
     return {
       backgroundActor,
-      visibleActor: (visibleActor.volume < LARGE_ACTOR_TRESHOLD_VOLUME && multiActor) ? undefined : visibleActor,
+      visibleActor: (visibleActor && visibleActor.volume < LARGE_ACTOR_TRESHOLD_VOLUME && multiActor) ? undefined : visibleActor,
       multiActor
     };
   }
@@ -760,8 +812,8 @@ export class FightComponent implements OnInit, OnDestroy {
         char = '*';
         mirrored = false;
       } else if (!info.visibleActor) {
-        color = { r: 0, g: 0, b: 0, a: 0 };
-        char = ' ';
+        color = { r: 23, g: 23, b: 23, a: 1 };
+        char = 'ground';
         mirrored = false;
       } else {
         color = info.visibleActor === info.backgroundActor ?
@@ -773,7 +825,7 @@ export class FightComponent implements OnInit, OnDestroy {
       // TODO TileStubs
       fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
       fillChar(
-        this.charsService, textureMapping, info.visibleActor.char, texturePosition, mirrored);
+        this.charsService, textureMapping, char, texturePosition, mirrored);
       if (info.visibleActor && info.visibleActor.tags.includes('active')) {
         if (info.visibleActor.maxDurability) {
           const percentOfHealth = Math.max(0, Math.min(info.visibleActor.durability / info.visibleActor.maxDurability, 1));

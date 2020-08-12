@@ -1,21 +1,15 @@
 import { Actor } from 'src/app/engine/scene/actor.object';
 import { ChangeDefinition } from 'src/app/engine/models/abstract/change-definition.model';
 import { LARGE_ACTOR_TRESHOLD_VOLUME } from '../content.helper';
+import { IActor } from 'src/app/engine/interfaces/actor.interface';
 
-export function shotAction(actor: Actor, power: number, x: number, y: number, startingTime: number): ChangeDefinition[] {
-  const targetTile = actor.parentScene.tiles[x][y];
-  let target;
-  for (let i = targetTile.actors.length - 1; i >= 0; i++) {
-    if (targetTile.actors[i].volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
-      target = targetTile.actors[i];
-      break;
-    }
-  }
+export function shotAction(actor: Actor, power: number, target: IActor, startingTime: number): ChangeDefinition[] {
   return [{
     time: startingTime,
     tileStubs: undefined,
     logs: undefined,
     action: () => {
+      actor.handleEffects(['act'], 1, false, 1, startingTime);
       target.handleEffects(['physical-damage'], power, false, 1, startingTime);
     }
   }];
