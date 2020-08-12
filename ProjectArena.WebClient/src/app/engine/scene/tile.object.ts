@@ -15,7 +15,6 @@ export class Tile implements IActor {
   actors: Actor[];
   parentScene: Scene;
 
-  
   get isRoot() {
     return true;
   }
@@ -47,15 +46,15 @@ export class Tile implements IActor {
   }
 
   get durability() {
-    return 9999999;
+    return 99999;
   }
 
   get volume() {
-    return 9999999;
+    return 99999;
   }
 
   get freeVolume() {
-    return 9999999;
+    return 99999;
   }
 
   get height() {

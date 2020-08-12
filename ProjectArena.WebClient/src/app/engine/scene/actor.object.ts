@@ -230,6 +230,9 @@ export class Actor implements IActor {
     this.handleEffects([KILL_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
     this.parentActor.removeActor(this);
     this.parentScene.removedActors.push(this.id);
+    for (const inside of this.actors) {
+      this.parentActor.addActorOnTop(inside);
+    }
   }
 
   applyBuff(buff: Buff) {
