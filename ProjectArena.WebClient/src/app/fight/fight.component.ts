@@ -262,7 +262,7 @@ export class FightComponent implements OnInit, OnDestroy {
             maxDurability: 10000,
             turnCost: 1,
             initiativePosition: 0,
-            height: x > 10 && y > 5 ? 900 : 500,
+            height: x > 8 && y > 3 ? 900 : 500,
             volume: 10000,
             freeVolume: 9000,
             preparationReactions: [],
@@ -599,15 +599,15 @@ export class FightComponent implements OnInit, OnDestroy {
     const angle = angleBetween(actorX, actorY, startPointX, startPointY);
     const sin = Math.sin(angle) * 0.8;
     const cos = Math.cos(angle) * 0.8;
-    while (Math.floor(nextX) !== startPointX || Math.floor(nextY) !== startPointY) {
-      let currentX = Math.floor(nextX);
-      let currentY = Math.floor(nextY);
-      while (Math.floor(nextX) === currentX && Math.floor(nextY) === currentY) {
+    while (Math.round(nextX) !== startPointX || Math.round(nextY) !== startPointY) {
+      let currentX = Math.round(nextX);
+      let currentY = Math.round(nextY);
+      while (Math.round(nextX) === currentX && Math.round(nextY) === currentY) {
         nextX += cos;
         nextY += sin;
       }
-      currentX = Math.floor(nextX);
-      currentY = Math.floor(nextY);
+      currentX = Math.round(nextX);
+      currentY = Math.round(nextY);
       if (currentX < 0 || currentY < 0 || currentX >= this.scene.width || currentY >= this.scene.height) {
         return;
       }
@@ -970,8 +970,11 @@ export class FightComponent implements OnInit, OnDestroy {
             colors: this.colors.slice(position * 4, position * 4 + 4)
           };
           fillColor(this.colors, 255, value ? 255 : 0, 0, 1, position);
-          fillChar(
-            this.charsService, this.textureMapping, 'x', position, false);
+          const actors = this.scene.tiles[mouseX][mouseY].actors;
+          // TODO set actionEffect true
+          if (actors.length === 0 || actors[actors.length - 1].tags.includes('tile')) {
+            fillChar(this.charsService, this.textureMapping, 'x', position, false);
+          }
         }
       }
 
