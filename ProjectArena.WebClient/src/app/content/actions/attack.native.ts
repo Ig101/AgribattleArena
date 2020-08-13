@@ -9,8 +9,8 @@ export function attackAction(actor: Actor, power: number, target: IActor, starti
     tileStubs: undefined,
     logs: undefined,
     action: () => {
-      actor.handleEffects(['act'], 1, false, 1, startingTime);
-      target.handleEffects(['physical-damage'], power, false, 1, startingTime);
+      const newPower = actor.handleEffects(['act', 'physical-attack'], power, false, 1, startingTime);
+      target.handleEffects(['physical-damage'], newPower, false, 1, startingTime);
     }
   }];
 }

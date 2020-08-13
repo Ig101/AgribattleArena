@@ -2,7 +2,7 @@ import { Scene } from './scene.object';
 import { IActor } from '../interfaces/actor.interface';
 import { Player } from './abstract/player.object';
 import { Action } from '../models/abstract/action.model';
-import { Reaction, KILL_EFFECT_NAME, BUFF_EFFECT_NAME } from '../models/abstract/reaction.model';
+import { Reaction, KILL_EFFECT_NAME } from '../models/abstract/reaction.model';
 import { Buff } from '../models/abstract/buff.model';
 import { removeFromArray } from 'src/app/helpers/extensions/array.extension';
 import { Color } from 'src/app/shared/models/color.model';
@@ -189,11 +189,11 @@ export class Actor implements IActor {
 
   handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime: number) {
     if (!this.isAlive || order > maxReactionsDepth) {
-      return;
+      return power;
     }
     const tempEffects = this.blockedEffects.length > 0 ? effects.filter(x => !this.blockedEffects.includes(x)) : effects;
     if (tempEffects.length === 0) {
-      return;
+      return power;
     }
 
     let tempPower = power;
@@ -233,6 +233,7 @@ export class Actor implements IActor {
     for (const inside of this.actors) {
       this.parentActor.addActorOnTop(inside);
     }
+    this.actors.length = 0;
   }
 
   applyBuff(buff: Buff) {
@@ -307,7 +308,6 @@ export class Actor implements IActor {
         x.remainedTime--;
       }
     });
-    this.handleEffects([BUFF_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
     let buffRemoved = false;
     for (const buff of this.buffs) {
       if (buff.duration !== undefined && (!buff.updatesOnTurnOnly || this.parentScene.currentActor.id === this.id || !this.owner)) {
@@ -391,6 +391,12 @@ export class Actor implements IActor {
     this.changed = true;
     this.parentActor.removeActor(this);
     target.addActorOnTop(this);
+  }
+
+  moveToIndex(target: IActor, index: number) {
+    this.changed = true;
+    this.parentActor.removeActor(this);
+    target.addActor(this, index);
   }
 
   findActor(id: number): Actor {

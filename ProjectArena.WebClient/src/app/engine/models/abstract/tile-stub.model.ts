@@ -2,11 +2,11 @@ import { Color } from 'src/app/shared/models/color.model';
 
 export interface TileStub {
   endTime: number;
-  height: number;
   x: number;
   y: number;
-  char: string;
+  char: string; // if null not change
   actionColored: boolean;
-  color: Color;
-  backgroundColor: Color;
+  color: Color; // if null not change
+  backgroundColor: Color; // if null not change
+  priority: number;
 }

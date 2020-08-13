@@ -410,6 +410,10 @@ export class FightComponent implements OnInit, OnDestroy {
       let action: Action;
       let actor: IActor;
       let onTarget: boolean;
+      if (!this.scene.currentActor.parentActor.isRoot) {
+        x = this.scene.currentActor.x;
+        y = this.scene.currentActor.y;
+      }
       if (this.smartAlt.pressed) {
         action = getMostPrioritizedAction(
           this.scene.currentActor.actions.filter(a =>
@@ -419,31 +423,39 @@ export class FightComponent implements OnInit, OnDestroy {
         if (action.actionOnObject) {
           onTarget = false;
           const actors = [];
-          for (let i = tile.actors.length - 1; i >= 0; i--) {
-            const tempActor = tile.actors[i];
-            actors.push(tempActor);
-            if (tempActor.tags.includes('tile')) {
-              break;
+          if (this.scene.currentActor.parentActor.isRoot) {
+            for (let i = tile.actors.length - 1; i >= 0; i--) {
+              const tempActor = tile.actors[i];
+              actors.push(tempActor);
+              if (tempActor.tags.includes('tile')) {
+                break;
+              }
             }
-          }
-          if (actors.length === 0) {
-            actor = tile;
+            if (actors.length === 0) {
+              actors.push(tile);
+            }
           } else {
-            // Open dialog with actors and choose one
-            actor = actors.find(a => a.volume >= LARGE_ACTOR_TRESHOLD_VOLUME);
+            actors.push(this.scene.currentActor.parentActor);
           }
+          // Open dialog with actors and choose one
+          actor = actors.find(a => a.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) || actors[0];
         }
       } else {
         let attack = false;
-        for (let i = tile.actors.length - 1; i >= 0; i--) {
-          actor = tile.actors[i];
-          if (actor.tags.includes('tile') || actor.tags.includes('flat')) {
-            break;
+        if (this.scene.currentActor.parentActor.isRoot) {
+          for (let i = tile.actors.length - 1; i >= 0; i--) {
+            actor = tile.actors[i];
+            if (actor.tags.includes('tile') || actor.tags.includes('flat')) {
+              break;
+            }
+            if (actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
+              attack = true;
+              break;
+            }
           }
-          if (actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
-            attack = true;
-            break;
-          }
+        } else {
+          attack = true;
+          actor = this.scene.currentActor.parentActor;
         }
         action = getMostPrioritizedAction(
           this.scene.currentActor.actions.filter(a =>
@@ -627,25 +639,26 @@ export class FightComponent implements OnInit, OnDestroy {
   ) {
     for (let x = 0; x < RANGED_RANGE * 2 + 1; x++) {
       for (let y = 0; y < RANGED_RANGE * 2 + 1; y++) {
-        this.rangeMap[x][y] = undefined;
+        this.rangeMap[x][y] = x === RANGED_RANGE && y === RANGED_RANGE ? true : undefined;
       }
     }
-    this.rangeMap[RANGED_RANGE][RANGED_RANGE] = true;
-    const hasNoVisibleSkills = this.scene.currentActor.actions
-      .some(x => x.actionClass === ActionClassEnum.Default && x.range > 0 && !x.onlyVisible);
-    for (let i = -RANGED_RANGE; i <= RANGED_RANGE; i++) {
-      let newX = actorX + i;
-      let newY = actorY - RANGED_RANGE;
-      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
-      newX = actorX - RANGED_RANGE;
-      newY = actorY + i;
-      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
-      newX = actorX + i;
-      newY = actorY + RANGED_RANGE;
-      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
-      newX = actorX + RANGED_RANGE;
-      newY = actorY + i;
-      this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
+    if (this.scene.currentActor.parentActor.isRoot) {
+      const hasNoVisibleSkills = this.scene.currentActor.actions
+        .some(x => x.actionClass === ActionClassEnum.Default && x.range > 0 && !x.onlyVisible);
+      for (let i = -RANGED_RANGE; i <= RANGED_RANGE; i++) {
+        let newX = actorX + i;
+        let newY = actorY - RANGED_RANGE;
+        this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
+        newX = actorX - RANGED_RANGE;
+        newY = actorY + i;
+        this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
+        newX = actorX + i;
+        newY = actorY + RANGED_RANGE;
+        this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
+        newX = actorX + RANGED_RANGE;
+        newY = actorY + i;
+        this.fillRangeMapPart(actorZ, actorX, actorY, newX, newY, hasNoVisibleSkills);
+      }
     }
     for (let x = 0; x < RANGED_RANGE * 2 + 1; x++) {
       for (let y = 0; y < RANGED_RANGE * 2 + 1; y++) {
@@ -846,6 +859,7 @@ export class FightComponent implements OnInit, OnDestroy {
   }
 
   redraw(shift?: number) {
+    // TODO Close modal if opened and can act is false
     if (this.scene && this.shadersProgram) {
 
       if (shift) {

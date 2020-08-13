@@ -18,6 +18,7 @@ export interface IActor {
   readonly isAlive: boolean;
 
   owner: Player;
+  actors: Actor[];
 
   handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime: number): number;
 

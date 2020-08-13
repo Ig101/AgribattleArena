@@ -301,6 +301,7 @@ export class Scene {
       for (const change of currentChanges) {
         if (change.tileStubs) {
           this.tileStubs.push(...change.tileStubs);
+          this.tileStubs.sort((a, b) => b.priority - a.priority);
         }
         if (change.logs) {
           this.logs.push(...change.logs);

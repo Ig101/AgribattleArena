@@ -2,7 +2,6 @@ import { Actor } from '../../scene/actor.object';
 import { Observer } from 'rxjs';
 import { ChangeDefinition } from './change-definition.model';
 
-export const BUFF_EFFECT_NAME = 'buffAct';
 export const KILL_EFFECT_NAME = 'kill';
 
 export interface Reaction {
