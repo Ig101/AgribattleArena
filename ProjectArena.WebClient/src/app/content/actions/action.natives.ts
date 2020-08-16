@@ -41,7 +41,10 @@ export const actionNatives: { [id: string]: ActionNative } = {
     power: 0,
     aiPriority: 1,
     actionClass: ActionClassEnum.Default,
-    actionTargeted: (actor: Actor, power: number, x: number, y: number, startingTime: number) => []
+    actionTargeted: (actor: Actor, power: number, x: number, y: number, startingTime: number) => {
+      actor.handleEffects(['wait'], power, false, 1, startingTime);
+      return [];
+    }
   },
   shot: {
     name: 'Shot',
