@@ -1,0 +1,27 @@
+<div class="menu-item title-font-inactive" [ngClass]="{active: !item.notAvailable, 'menu-item-tooltip': tooltip, 'menu-item-tooltip-left': tooltip && item.leftTooltip, 'menu-item-tooltip-supress': supress}"
+  (mousedown)="switchTooltip($event, true)" (window:mouseup)="switchTooltip($event, false)">
+  <div class="column" *ngIf="tooltip; else preview">
+    <div class="text-font-inactive">
+      {{item.name}}
+    </div>
+    <div *ngIf="item.action && item.action.remainedTime > 0; else error" class="small-font-inactive">
+      {{item.action.remainedTime}} turns left
+    </div>
+    <ng-template #error>
+      <div *ngIf="item.notAvailableReason; else info" class="small-font-inactive">
+        {{item.notAvailableReason}}
+      </div>
+    </ng-template>
+    <ng-template #info>
+      <div *ngIf="item.action" class="small-font-inactive">
+        Cost:{{item.action.timeCost}} {{item.action.cooldown > 0 ? 'CD:' + item.action.cooldown : ''}}
+      </div>
+    </ng-template>
+    <ng-template #preview>
+      {{item.character}}
+    </ng-template>
+  </div>
+  <ng-template #preview>
+    {{item.character}}
+  </ng-template>
+</div>

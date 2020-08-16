@@ -5,11 +5,13 @@ import { EngineModule } from '../engine/engine.module';
 import { FightComponent } from './fight.component';
 import { FightRoutingModule } from './fight-routing.module';
 import { SynchronizationService } from '../engine/services/synchronization.service';
+import { ContextMenuComponent } from './context-menu/context-menu.component';
+import { ContextMenuItemComponent } from './context-menu/context-menu-item/context-menu-item.component';
 
 
 
 @NgModule({
-  declarations: [FightComponent],
+  declarations: [FightComponent, ContextMenuComponent, ContextMenuItemComponent],
   imports: [
     SharedModule,
     EngineModule,

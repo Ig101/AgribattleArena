@@ -27,6 +27,10 @@ import { SmartAction } from './models/smart-action.model';
 import { getMostPrioritizedAction } from '../engine/engine.helper';
 import { Action } from '../engine/models/abstract/action.model';
 import { IActor } from '../engine/interfaces/actor.interface';
+import { IModal } from '../shared/interfaces/modal.interface';
+import { ModalPositioning } from './models/modal-positioning.model';
+import { ContextMenuComponent } from './context-menu/context-menu.component';
+import { ContextMenuContext } from './models/context-menu-context.model';
 
 @Component({
   selector: 'app-fight',
@@ -93,6 +97,9 @@ export class FightComponent implements OnInit, OnDestroy {
   smartDirections: SmartAction[];
   directionTimer: number;
 
+  openedModal: IModal<unknown>;
+  modalPositioning: ModalPositioning;
+
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
   }
@@ -127,7 +134,8 @@ export class FightComponent implements OnInit, OnDestroy {
   // other -> currentActor + line
 
   get canAct() {
-    return this.scene &&
+    return !this.blocked &&
+      this.scene &&
       this.scene.currentActor?.owner?.id === this.scene.currentPlayer.id &&
       this.scene.turnTime > 0 &&
       this.scene.turnReallyStarted;
@@ -369,7 +377,39 @@ export class FightComponent implements OnInit, OnDestroy {
         {
           id: 'shot',
           remainedTime: 0
-        }
+        },
+        {
+          id: 'shot',
+          remainedTime: 2
+        },
+        {
+          id: 'shot',
+          remainedTime: 0
+        },
+        {
+          id: 'shot',
+          remainedTime: 3
+        },
+        {
+          id: 'shot',
+          remainedTime: 0
+        },
+        {
+          id: 'shot',
+          remainedTime: 0
+        },
+        {
+          id: 'shot',
+          remainedTime: 0
+        },
+        {
+          id: 'shot',
+          remainedTime: 0
+        },
+        {
+          id: 'shot',
+          remainedTime: 0
+        },
       ],
       actors: [],
       buffs: [],
@@ -565,6 +605,57 @@ export class FightComponent implements OnInit, OnDestroy {
     }
   }
 
+  onMouseDown(event: MouseEvent) {
+    this.mouseState.buttonsInfo[event.button] = {pressed: true, timeStamp: event.timeStamp};
+  }
+
+  onMouseUp(event: MouseEvent) {
+    this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
+    this.recalculateMouseMove(event.x, event.y, event.timeStamp);
+    if (!this.blocked) {
+      if (event.button === 0 && this.canAct && this.rangeMapIsActive) {
+        const x = Math.floor(this.mouseState.x);
+        const y = Math.floor(this.mouseState.y);
+        const shiftedX = x - this.scene.currentActor.x + RANGED_RANGE;
+        const shiftedY = y - this.scene.currentActor.y + RANGED_RANGE;
+        if (shiftedX <= RANGED_RANGE * 2 && shiftedY <= RANGED_RANGE * 2 && shiftedX >= 0 && shiftedY >= 0 &&
+            this.rangeMap[shiftedX][shiftedY] !== undefined) {
+          const actions = this.scene.currentActor.actions.filter(a =>
+            a.actionClass === ActionClassEnum.Default &&
+            a.range > 0 &&
+            (this.rangeMap[shiftedX][shiftedY] || !a.onlyVisible));
+          this.modalPositioning = {
+            left: (x + 0.35 - this.cameraX + (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth) * this.zoom * this.tileWidth,
+            top: (y + 0.5 - this.cameraY + this.canvasHeight / 2 / this.tileHeight) * this.zoom * this.tileHeight,
+            textHeight: 50
+          };
+          this.blocked = true;
+          this.openedModal = this.modalService.openModal(
+            ContextMenuComponent,
+            {
+              positioning: this.modalPositioning,
+              actions: actions.map(a => (
+                {
+                  error: this.scene.currentActor.validateTargeted(a, x, y),
+                  action: a
+                }))
+            } as ContextMenuContext
+          );
+          this.openedModal.onClose.subscribe(result => {
+            setTimeout(() => {
+              this.blocked = false;
+              this.openedModal = undefined;
+              this.modalPositioning = undefined;
+              if (result) {
+                console.log(result);
+              }
+            });
+          });
+        }
+      }
+    }
+  }
+
   setupAspectRatio(width: number, height: number) {
     const newAspectRatio = width / height;
     if (newAspectRatio < this.defaultAspectRatio) {
@@ -579,6 +670,12 @@ export class FightComponent implements OnInit, OnDestroy {
     this.hudCanvas.nativeElement.width = this.battleCanvas.nativeElement.width;
     this.hudCanvas.nativeElement.height = this.battleCanvas.nativeElement.height;
     this.zoom = this.battleCanvas.nativeElement.offsetWidth / this.canvasWidth;
+    if (this.modalPositioning) {
+      this.modalPositioning.left = (Math.floor(this.mouseState.x) + 0.3 - this.cameraX + (this.canvasWidth - this.interfaceShift) / 2 /
+        this.tileWidth) * this.zoom * this.tileWidth;
+      this.modalPositioning.top = (Math.floor(this.mouseState.y) + 0.5 - this.cameraY + this.canvasHeight / 2 /
+        this.tileHeight) * this.zoom * this.tileHeight;
+    }
     if (this.scene) {
       this.scene.visualizationChanged = true;
     }

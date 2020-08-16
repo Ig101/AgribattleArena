@@ -1,0 +1,51 @@
+:host {
+  position: absolute;
+
+  .menu-item {
+    position: relative;
+    width: 59px;
+    left: 0px;
+    height: 59px;
+    padding: 0 17px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    background-color: #000;
+    border: double #999;
+    border-width: 5px;
+    border-radius: 59px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    .column {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .menu-item-tooltip {
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .menu-item-tooltip-left {
+    left: calc(-100% + 59px);
+  }
+
+  .menu-item-tooltip-supress {
+    z-index: 2;
+  }
+
+  .active {
+    cursor: pointer;
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .active:hover {
+    cursor: pointer;
+    color: #ff5;
+    border-color: #ff5;
+  }
+}

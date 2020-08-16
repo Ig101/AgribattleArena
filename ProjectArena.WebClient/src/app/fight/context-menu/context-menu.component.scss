@@ -1,0 +1,17 @@
+@import '../../app.module.scss';
+.target-container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 250px;
+  .target {
+    padding: 3px;
+    max-width: 250px;
+    background-color: #000;
+    border: double #fff;
+    border-width: 5px;
+    color: #fff;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
