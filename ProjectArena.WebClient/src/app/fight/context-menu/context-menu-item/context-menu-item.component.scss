@@ -47,15 +47,24 @@
     border-color: #ff5;
   }
 
-  .active:active {
+  .active:active, .current {
     cursor: pointer;
     color: #aa0;
     border-color: #aa0;
   }
 
-  .current {
-    cursor: pointer;
-    color: #aa0 !important;
-    border-color: #aa0 !important;
+  .conflict {
+    color: #f00;
+    border-color: #f00;
+  }
+
+  .conflict:hover {
+    color: #d00;
+    border-color: #d00;
+  }
+
+  .conflict:active, .conflict-current {
+    color: #a00;
+    border-color: #a00;
   }
 }

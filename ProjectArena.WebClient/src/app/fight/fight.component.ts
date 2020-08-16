@@ -100,6 +100,9 @@ export class FightComponent implements OnInit, OnDestroy {
   modalPositioning: ModalPositioning;
 
   chosenAction: Action;
+  get actionConflict() {
+    return this.scene.waitingMessages.length > 0 || this.scene.changes.length > 0;
+  }
 
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
@@ -1039,7 +1042,7 @@ export class FightComponent implements OnInit, OnDestroy {
 
       if (this.rangeMapIsActive && this.canAct) {
         this.canvas2DContext.lineWidth = 2;
-        this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1.0)';
+        this.canvas2DContext.strokeStyle = this.actionConflict ? 'rgba(200, 0, 0, 1.0)' : 'rgba(255, 255, 0, 1.0)';
         this.canvas2DContext.stroke(this.allowedTargetPath);
       }
 

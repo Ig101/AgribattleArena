@@ -10,6 +10,7 @@ export class ContextMenuItemComponent implements OnInit {
 
   @Input() item: ContextMenuItem;
   @Input() current: boolean;
+  @Input() conflict: boolean;
 
   tooltip = false;
   supress = false;

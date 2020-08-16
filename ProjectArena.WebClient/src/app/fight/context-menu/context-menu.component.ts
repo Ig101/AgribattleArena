@@ -33,6 +33,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
 
   @Input() currentAction: Action;
 
+  @Input() conflict: boolean;
+
   private actionsInternal: Action[];
 
   get pageSize() {
