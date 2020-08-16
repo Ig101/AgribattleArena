@@ -390,12 +390,18 @@ export class Actor implements IActor {
   move(target: IActor) {
     this.changed = true;
     this.parentActor.removeActor(this);
+    if (this === this.parentScene.currentActor) {
+      this.parentScene.waitingAction = undefined;
+    }
     target.addActorOnTop(this);
   }
 
   moveToIndex(target: IActor, index: number) {
     this.changed = true;
     this.parentActor.removeActor(this);
+    if (this === this.parentScene.currentActor) {
+      this.parentScene.waitingAction = undefined;
+    }
     target.addActor(this, index);
   }
 

@@ -84,7 +84,6 @@ export class FightComponent implements OnInit, OnDestroy {
   redPath: Path2D;
   greenPath: Path2D;
 
-  visibleTargetPath: Path2D;
   allowedTargetPath: Path2D;
 
   cursorVertexes: {
@@ -694,7 +693,6 @@ export class FightComponent implements OnInit, OnDestroy {
     cameraTop: number
   ) {
     this.allowedTargetPath = new Path2D();
-    this.visibleTargetPath = new Path2D();
     for (let x = 0; x < RANGED_RANGE * 2 + 1; x++) {
       for (let y = 0; y < RANGED_RANGE * 2 + 1; y++) {
         this.rangeMap[x][y] = x === RANGED_RANGE && y === RANGED_RANGE ? true : undefined;
@@ -726,39 +724,23 @@ export class FightComponent implements OnInit, OnDestroy {
           const canvasY = (actorY + y - RANGED_RANGE - cameraTop) * this.tileHeight;
           // left
           if (x === 0 || this.rangeMap[x - 1][y] === undefined) {
-            const path = value ? this.visibleTargetPath : this.allowedTargetPath;
-            path.moveTo(canvasX, canvasY - 1);
-            path.lineTo(canvasX, canvasY + this.tileHeight + 1);
-          } else if (this.rangeMap[x - 1][y] === false && value === true) {
-            this.visibleTargetPath.moveTo(canvasX, canvasY - 1);
-            this.visibleTargetPath.lineTo(canvasX, canvasY + this.tileHeight + 1);
+            this.allowedTargetPath.moveTo(canvasX, canvasY - 1);
+            this.allowedTargetPath.lineTo(canvasX, canvasY + this.tileHeight + 1);
           }
           // right
           if (x === RANGED_RANGE * 2 || this.rangeMap[x + 1][y] === undefined) {
-            const path = value ? this.visibleTargetPath : this.allowedTargetPath;
-            path.moveTo(canvasX + this.tileWidth, canvasY - 1);
-            path.lineTo(canvasX + this.tileWidth, canvasY + this.tileHeight + 1);
-          } else if (this.rangeMap[x + 1][y] === false && value === true) {
-            this.visibleTargetPath.moveTo(canvasX + this.tileWidth, canvasY - 1);
-            this.visibleTargetPath.lineTo(canvasX + this.tileWidth, canvasY + this.tileHeight + 1);
+            this.allowedTargetPath.moveTo(canvasX + this.tileWidth, canvasY - 1);
+            this.allowedTargetPath.lineTo(canvasX + this.tileWidth, canvasY + this.tileHeight + 1);
           }
           // top
           if (y === 0 || this.rangeMap[x][y - 1] === undefined) {
-            const path = value ? this.visibleTargetPath : this.allowedTargetPath;
-            path.moveTo(canvasX - 1, canvasY);
-            path.lineTo(canvasX + this.tileWidth + 1, canvasY);
-          } else if (this.rangeMap[x][y - 1] === false && value === true) {
-            this.visibleTargetPath.moveTo(canvasX - 1, canvasY);
-            this.visibleTargetPath.lineTo(canvasX + this.tileWidth + 1, canvasY);
+            this.allowedTargetPath.moveTo(canvasX - 1, canvasY);
+            this.allowedTargetPath.lineTo(canvasX + this.tileWidth + 1, canvasY);
           }
           // bottom
           if (y === RANGED_RANGE * 2 || this.rangeMap[x][y + 1] === undefined) {
-            const path = value ? this.visibleTargetPath : this.allowedTargetPath;
-            path.moveTo(canvasX - 1, canvasY + this.tileHeight);
-            path.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
-          } else if (this.rangeMap[x][y + 1] === false && value === true) {
-            this.visibleTargetPath.moveTo(canvasX - 1, canvasY + this.tileHeight);
-            this.visibleTargetPath.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
+            this.allowedTargetPath.moveTo(canvasX - 1, canvasY + this.tileHeight);
+            this.allowedTargetPath.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
           }
         }
       }
@@ -1058,8 +1040,6 @@ export class FightComponent implements OnInit, OnDestroy {
       if (this.rangeMapIsActive && this.canAct) {
         this.canvas2DContext.lineWidth = 2;
         this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1.0)';
-        this.canvas2DContext.stroke(this.visibleTargetPath);
-        this.canvas2DContext.strokeStyle = 'rgba(200, 0, 0, 1.0)';
         this.canvas2DContext.stroke(this.allowedTargetPath);
       }
 
