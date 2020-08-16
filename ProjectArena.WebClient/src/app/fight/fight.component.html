@@ -7,3 +7,4 @@
   </canvas>  
   <canvas #hudCanvas class="hud"></canvas>
 </div>
+<app-context-menu *ngIf="canAct" [actions]="scene.currentActor.actions" [currentAction]="chosenAction" (act)="chooseAction($event)"></app-context-menu>

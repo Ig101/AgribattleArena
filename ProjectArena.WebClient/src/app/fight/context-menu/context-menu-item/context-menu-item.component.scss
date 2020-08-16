@@ -1,11 +1,9 @@
 :host {
-  position: absolute;
-
   .menu-item {
     position: relative;
-    width: 59px;
+    width: 60px;
     left: 0px;
-    height: 59px;
+    height: 60px;
     padding: 0 17px;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -13,7 +11,7 @@
     background-color: #000;
     border: double #999;
     border-width: 5px;
-    border-radius: 59px;
+    border-radius: 60px;
     color: #999;
     display: flex;
     align-items: center;
@@ -21,16 +19,16 @@
     .column {
       display: flex;
       flex-direction: column;
+      cursor: inherit;
+      div {
+        cursor: inherit;
+      }
     }
   }
 
   .menu-item-tooltip {
     width: 100%;
-    max-width: 350px;
-  }
-
-  .menu-item-tooltip-left {
-    left: calc(-100% + 59px);
+    max-width: 550px;
   }
 
   .menu-item-tooltip-supress {
@@ -47,5 +45,17 @@
     cursor: pointer;
     color: #ff5;
     border-color: #ff5;
+  }
+
+  .active:active {
+    cursor: pointer;
+    color: #aa0;
+    border-color: #aa0;
+  }
+
+  .current {
+    cursor: pointer;
+    color: #aa0 !important;
+    border-color: #aa0 !important;
   }
 }

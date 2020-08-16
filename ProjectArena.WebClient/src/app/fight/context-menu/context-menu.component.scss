@@ -1,17 +1,14 @@
-@import '../../app.module.scss';
-.target-container {
+.container {
   position: absolute;
   display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  height: 100%;
+  left: 0px;
+  top: 0px;
   justify-content: center;
-  width: 250px;
-  .target {
-    padding: 3px;
-    max-width: 250px;
-    background-color: #000;
-    border: double #fff;
-    border-width: 5px;
-    color: #fff;
-    text-overflow: ellipsis;
-    overflow: hidden;
+  box-sizing: border-box;
+  app-context-menu-item {
+    margin: 5px;
   }
 }

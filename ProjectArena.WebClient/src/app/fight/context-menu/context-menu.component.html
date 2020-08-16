@@ -1,4 +1,3 @@
-<div #overlay class="overlay" (mousedown)="prepareExit($event)" (mouseup)="onExit($event)">
-  <app-context-menu-item *ngFor="let item of currentItems" [item]="item" [textHeight]="textHeight" 
-    [style.top]="getItemTop(item) + 'px'" [style.left]="getItemLeft(item) + 'px'" (click)="onClick(item)"></app-context-menu-item>
+<div #overlay class="container" (window:resize)="onResize()">
+  <app-context-menu-item *ngFor="let item of currentItems" [item]="item" [current]="item.action && item.action === currentAction" (click)="onClick(item)"></app-context-menu-item>
 </div>

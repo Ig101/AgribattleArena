@@ -9,7 +9,7 @@ import { ContextMenuItem } from '../../models/context-menu-item.model';
 export class ContextMenuItemComponent implements OnInit {
 
   @Input() item: ContextMenuItem;
-  @Input() textHeight: number;
+  @Input() current: boolean;
 
   tooltip = false;
   supress = false;
@@ -22,15 +22,13 @@ export class ContextMenuItemComponent implements OnInit {
   }
 
   switchTooltip(event: MouseEvent, on: boolean) {
-    if (event.button === 2) {
-      if (!on && this.tooltip) {
-        this.timer = setTimeout(() => {this.supress = false; }, 200);
-      }
-      this.tooltip = on;
-      if (on) {
-        clearTimeout(this.timer);
-        this.supress = true;
-      }
+    if (!on && this.tooltip) {
+      this.timer = setTimeout(() => {this.supress = false; }, 200);
+    }
+    this.tooltip = on;
+    if (on) {
+      clearTimeout(this.timer);
+      this.supress = true;
     }
   }
 }

@@ -1,5 +1,5 @@
-<div class="menu-item title-font-inactive" [ngClass]="{active: !item.notAvailable, 'menu-item-tooltip': tooltip, 'menu-item-tooltip-left': tooltip && item.leftTooltip, 'menu-item-tooltip-supress': supress}"
-  (mousedown)="switchTooltip($event, true)" (window:mouseup)="switchTooltip($event, false)">
+<div class="menu-item title-font-inactive" [ngClass]="{active: !item.notAvailable, 'current': current, 'menu-item-tooltip': tooltip, 'menu-item-tooltip-supress': supress}"
+  (mouseenter)="switchTooltip($event, true)" (mouseleave)="switchTooltip($event, false)">
   <div class="column" *ngIf="tooltip; else preview">
     <div class="text-font-inactive">
       {{item.name}}

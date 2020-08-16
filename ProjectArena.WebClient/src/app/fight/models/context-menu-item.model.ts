@@ -6,9 +6,6 @@ export interface ContextMenuItem {
   action: Action;
   character: string;
   name: string;
-  left: number;
-  top: number;
   notAvailable: boolean;
   notAvailableReason?: string;
-  leftTooltip: boolean;
 }

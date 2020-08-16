@@ -100,6 +100,8 @@ export class FightComponent implements OnInit, OnDestroy {
   openedModal: IModal<unknown>;
   modalPositioning: ModalPositioning;
 
+  chosenAction: Action;
+
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
   }
@@ -120,11 +122,15 @@ export class FightComponent implements OnInit, OnDestroy {
     return this.tileHeightInternal * this.battleZoom;
   }
 
+  get leftInterfaceShift() {
+    return 30 / this.zoom;
+  }
+
   get interfaceShift() {
     return 362 / this.zoom;
   }
 
-  private get scene() {
+  get scene() {
     return this.sceneService.scene;
   }
 
@@ -134,15 +140,21 @@ export class FightComponent implements OnInit, OnDestroy {
   // other -> currentActor + line
 
   get canAct() {
-    return !this.blocked &&
+    const can = !this.blocked &&
       this.scene &&
       this.scene.currentActor?.owner?.id === this.scene.currentPlayer.id &&
       this.scene.turnTime > 0 &&
       this.scene.turnReallyStarted;
+    if (!can) {
+      this.chosenAction = undefined;
+    }
+    return can;
   }
 
   get rangeMapIsActive() {
     return this.scene &&
+      this.chosenAction &&
+      this.chosenAction.range > 0 &&
       this.scene.currentActor?.owner?.id === this.scene.currentPlayer.id &&
       this.scene.currentActor.actions.some(x => x.actionClass === ActionClassEnum.Default && x.range > 0);
   }
@@ -377,39 +389,7 @@ export class FightComponent implements OnInit, OnDestroy {
         {
           id: 'shot',
           remainedTime: 0
-        },
-        {
-          id: 'shot',
-          remainedTime: 2
-        },
-        {
-          id: 'shot',
-          remainedTime: 0
-        },
-        {
-          id: 'shot',
-          remainedTime: 3
-        },
-        {
-          id: 'shot',
-          remainedTime: 0
-        },
-        {
-          id: 'shot',
-          remainedTime: 0
-        },
-        {
-          id: 'shot',
-          remainedTime: 0
-        },
-        {
-          id: 'shot',
-          remainedTime: 0
-        },
-        {
-          id: 'shot',
-          remainedTime: 0
-        },
+        }
       ],
       actors: [],
       buffs: [],
@@ -441,7 +421,6 @@ export class FightComponent implements OnInit, OnDestroy {
         }
       }
     );
-    console.log(this.scene);
   }
 
   directActorTo(x: number, y: number) {
@@ -517,22 +496,6 @@ export class FightComponent implements OnInit, OnDestroy {
     this.directionTimer = 0.04;
   }
 
-  private isOnClickablePosition() {
-    if (!this.scene || !this.scene.currentActor) {
-      return false;
-    }
-    const mouseX = Math.floor(this.mouseState.x);
-    const mouseY = Math.floor(this.mouseState.y);
-    const rangeMapPositionX = mouseX - this.scene.currentActor.x + RANGED_RANGE;
-    const rangeMapPositionY = mouseY - this.scene.currentActor.y + RANGED_RANGE;
-    return this.rangeMapIsActive &&
-      rangeMapPositionX >= 0 &&
-      rangeMapPositionY >= 0 &&
-      rangeMapPositionX < RANGED_RANGE * 2 + 1 &&
-      rangeMapPositionY < RANGED_RANGE * 2 + 1 &&
-      this.rangeMap[rangeMapPositionX][rangeMapPositionY] !== undefined;
-  }
-
   @HostListener('contextmenu', ['$event'])
   onContextMenu(event) {
     event.preventDefault();
@@ -546,7 +509,7 @@ export class FightComponent implements OnInit, OnDestroy {
     const leftKey = this.mouseState.buttonsInfo[0];
     const rightKey = this.mouseState.buttonsInfo[2];
     if (!rightKey.pressed && !leftKey.pressed) {
-      const cameraLeft = this.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
+      const cameraLeft = this.cameraX - (this.canvasWidth - this.interfaceShift + this.leftInterfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.cameraY - this.canvasHeight / 2 / this.tileHeight;
       const newX = x / this.zoom / this.tileWidth + cameraLeft;
       const newY = y / this.zoom / this.tileHeight + cameraTop;
@@ -554,6 +517,27 @@ export class FightComponent implements OnInit, OnDestroy {
       this.mouseState.y = newY;
       const mouseX = Math.floor(this.mouseState.x);
       const mouseY = Math.floor(this.mouseState.y);
+    }
+  }
+
+  chooseAction(action: Action) {
+    if (action === this.chosenAction) {
+      this.chosenAction = undefined;
+      return;
+    }
+    if (action.range > 0) {
+      this.chosenAction = action;
+      const cameraLeft = this.cameraX - (this.canvasWidth - this.interfaceShift + this.leftInterfaceShift) / 2 / this.tileWidth;
+      const cameraTop = this.cameraY - this.canvasHeight / 2 / this.tileHeight;
+      this.fillRangeMapAndPathes(
+        this.scene.currentActor.z + this.scene.currentActor.height,
+        this.scene.currentActor.x,
+        this.scene.currentActor.y,
+        cameraLeft,
+        cameraTop);
+    } else {
+      this.chosenAction = undefined;
+      console.log(action);
     }
   }
 
@@ -620,37 +604,8 @@ export class FightComponent implements OnInit, OnDestroy {
         const shiftedY = y - this.scene.currentActor.y + RANGED_RANGE;
         if (shiftedX <= RANGED_RANGE * 2 && shiftedY <= RANGED_RANGE * 2 && shiftedX >= 0 && shiftedY >= 0 &&
             this.rangeMap[shiftedX][shiftedY] !== undefined) {
-          const actions = this.scene.currentActor.actions.filter(a =>
-            a.actionClass === ActionClassEnum.Default &&
-            a.range > 0 &&
-            (this.rangeMap[shiftedX][shiftedY] || !a.onlyVisible));
-          this.modalPositioning = {
-            left: (x + 0.35 - this.cameraX + (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth) * this.zoom * this.tileWidth,
-            top: (y + 0.5 - this.cameraY + this.canvasHeight / 2 / this.tileHeight) * this.zoom * this.tileHeight,
-            textHeight: 50
-          };
-          this.blocked = true;
-          this.openedModal = this.modalService.openModal(
-            ContextMenuComponent,
-            {
-              positioning: this.modalPositioning,
-              actions: actions.map(a => (
-                {
-                  error: this.scene.currentActor.validateTargeted(a, x, y),
-                  action: a
-                }))
-            } as ContextMenuContext
-          );
-          this.openedModal.onClose.subscribe(result => {
-            setTimeout(() => {
-              this.blocked = false;
-              this.openedModal = undefined;
-              this.modalPositioning = undefined;
-              if (result) {
-                console.log(result);
-              }
-            });
-          });
+          console.log(this.chosenAction);
+          this.chosenAction = undefined;
         }
       }
     }
@@ -671,7 +626,8 @@ export class FightComponent implements OnInit, OnDestroy {
     this.hudCanvas.nativeElement.height = this.battleCanvas.nativeElement.height;
     this.zoom = this.battleCanvas.nativeElement.offsetWidth / this.canvasWidth;
     if (this.modalPositioning) {
-      this.modalPositioning.left = (Math.floor(this.mouseState.x) + 0.3 - this.cameraX + (this.canvasWidth - this.interfaceShift) / 2 /
+      this.modalPositioning.left = (Math.floor(this.mouseState.x) + 0.3 - this.cameraX +
+        (this.canvasWidth - this.interfaceShift + this.leftInterfaceShift) / 2 /
         this.tileWidth) * this.zoom * this.tileWidth;
       this.modalPositioning.top = (Math.floor(this.mouseState.y) + 0.5 - this.cameraY + this.canvasHeight / 2 /
         this.tileHeight) * this.zoom * this.tileHeight;
@@ -713,7 +669,12 @@ export class FightComponent implements OnInit, OnDestroy {
         return;
       }
       if (this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] !== true) {
-        this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] = visible;
+        if (!this.scene.currentActor.validateTargeted(this.chosenAction, currentX, currentY) &&
+          (visible || !this.chosenAction.onlyVisible)) {
+          this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] = visible;
+        } else {
+          this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] = undefined;
+        }
       }
       if (this.scene.tiles[currentX][currentY].height > actorZ + VISIBILITY_AMPLIFICATION * range) {
         if (hasNoVisibleSkills) {
@@ -729,11 +690,11 @@ export class FightComponent implements OnInit, OnDestroy {
     actorZ: number,
     actorX: number,
     actorY: number,
-    yellowPath: Path2D,
-    redPath: Path2D,
     cameraLeft: number,
     cameraTop: number
   ) {
+    this.allowedTargetPath = new Path2D();
+    this.visibleTargetPath = new Path2D();
     for (let x = 0; x < RANGED_RANGE * 2 + 1; x++) {
       for (let y = 0; y < RANGED_RANGE * 2 + 1; y++) {
         this.rangeMap[x][y] = x === RANGED_RANGE && y === RANGED_RANGE ? true : undefined;
@@ -765,39 +726,39 @@ export class FightComponent implements OnInit, OnDestroy {
           const canvasY = (actorY + y - RANGED_RANGE - cameraTop) * this.tileHeight;
           // left
           if (x === 0 || this.rangeMap[x - 1][y] === undefined) {
-            const path = value ? yellowPath : redPath;
+            const path = value ? this.visibleTargetPath : this.allowedTargetPath;
             path.moveTo(canvasX, canvasY - 1);
             path.lineTo(canvasX, canvasY + this.tileHeight + 1);
           } else if (this.rangeMap[x - 1][y] === false && value === true) {
-            yellowPath.moveTo(canvasX, canvasY - 1);
-            yellowPath.lineTo(canvasX, canvasY + this.tileHeight + 1);
+            this.visibleTargetPath.moveTo(canvasX, canvasY - 1);
+            this.visibleTargetPath.lineTo(canvasX, canvasY + this.tileHeight + 1);
           }
           // right
           if (x === RANGED_RANGE * 2 || this.rangeMap[x + 1][y] === undefined) {
-            const path = value ? yellowPath : redPath;
+            const path = value ? this.visibleTargetPath : this.allowedTargetPath;
             path.moveTo(canvasX + this.tileWidth, canvasY - 1);
             path.lineTo(canvasX + this.tileWidth, canvasY + this.tileHeight + 1);
           } else if (this.rangeMap[x + 1][y] === false && value === true) {
-            yellowPath.moveTo(canvasX + this.tileWidth, canvasY - 1);
-            yellowPath.lineTo(canvasX + this.tileWidth, canvasY + this.tileHeight + 1);
+            this.visibleTargetPath.moveTo(canvasX + this.tileWidth, canvasY - 1);
+            this.visibleTargetPath.lineTo(canvasX + this.tileWidth, canvasY + this.tileHeight + 1);
           }
           // top
           if (y === 0 || this.rangeMap[x][y - 1] === undefined) {
-            const path = value ? yellowPath : redPath;
+            const path = value ? this.visibleTargetPath : this.allowedTargetPath;
             path.moveTo(canvasX - 1, canvasY);
             path.lineTo(canvasX + this.tileWidth + 1, canvasY);
           } else if (this.rangeMap[x][y - 1] === false && value === true) {
-            yellowPath.moveTo(canvasX - 1, canvasY);
-            yellowPath.lineTo(canvasX + this.tileWidth + 1, canvasY);
+            this.visibleTargetPath.moveTo(canvasX - 1, canvasY);
+            this.visibleTargetPath.lineTo(canvasX + this.tileWidth + 1, canvasY);
           }
           // bottom
           if (y === RANGED_RANGE * 2 || this.rangeMap[x][y + 1] === undefined) {
-            const path = value ? yellowPath : redPath;
+            const path = value ? this.visibleTargetPath : this.allowedTargetPath;
             path.moveTo(canvasX - 1, canvasY + this.tileHeight);
             path.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
           } else if (this.rangeMap[x][y + 1] === false && value === true) {
-            yellowPath.moveTo(canvasX - 1, canvasY + this.tileHeight);
-            yellowPath.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
+            this.visibleTargetPath.moveTo(canvasX - 1, canvasY + this.tileHeight);
+            this.visibleTargetPath.lineTo(canvasX + this.tileWidth + 1, canvasY + this.tileHeight);
           }
         }
       }
@@ -946,10 +907,10 @@ export class FightComponent implements OnInit, OnDestroy {
             path = redPath;
           }
           const zoomMultiplier = Math.floor(this.battleZoom);
-          path.moveTo(canvasX + 1 + zoomMultiplier, canvasY + 1 + zoomMultiplier);
+          path.moveTo(canvasX + 2 + zoomMultiplier, canvasY + 2 + zoomMultiplier);
           path.lineTo(
-            canvasX + percentOfHealth * (this.tileWidth - 2 * 1 - zoomMultiplier) + 1 + zoomMultiplier,
-            canvasY + 1 + zoomMultiplier);
+            canvasX + percentOfHealth * (this.tileWidth - 4 * 1 - zoomMultiplier) + 2 + zoomMultiplier,
+            canvasY + 2 + zoomMultiplier);
         }
       }
     }
@@ -979,7 +940,7 @@ export class FightComponent implements OnInit, OnDestroy {
 
       const time = performance.now();
       const sceneRandom = new Random(this.scene.hash);
-      const cameraLeft = this.cameraX - (this.canvasWidth - this.interfaceShift) / 2 / this.tileWidth;
+      const cameraLeft = this.cameraX - (this.canvasWidth - this.interfaceShift + this.leftInterfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.cameraY - this.canvasHeight / 2 / this.tileHeight;
       const left = Math.floor(cameraLeft) - 1;
       const right = Math.ceil(cameraLeft + this.canvasWidth / (this.tileWidth)) + 1;
@@ -991,20 +952,15 @@ export class FightComponent implements OnInit, OnDestroy {
         this.redPath = new Path2D();
         this.greenPath = new Path2D();
 
-        this.allowedTargetPath = new Path2D();
-        this.visibleTargetPath = new Path2D();
-
-        // TODO Disable on enemy turn or when cannot cast ranged skills
         if (this.rangeMapIsActive) {
           this.fillRangeMapAndPathes(
             this.scene.currentActor.z + this.scene.currentActor.height,
             this.scene.currentActor.x,
             this.scene.currentActor.y,
-            this.visibleTargetPath,
-            this.allowedTargetPath,
             cameraLeft,
             cameraTop);
         }
+
         this.textureMapping = new Float32Array(width * height * 12);
         this.colors = new Uint8Array(width * height * 4);
         this.backgroundTextureMapping = new Float32Array(width * height * 12);
@@ -1093,13 +1049,14 @@ export class FightComponent implements OnInit, OnDestroy {
         this.charsService.width,
         this.charsService.spriteHeight);
       this.canvas2DContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      this.canvas2DContext.lineWidth = 2;
+      this.canvas2DContext.lineWidth = 4;
       this.canvas2DContext.strokeStyle = 'rgba(255, 0, 0, 1.0)';
       this.canvas2DContext.stroke(this.redPath);
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1.0)';
       this.canvas2DContext.stroke(this.greenPath);
 
       if (this.rangeMapIsActive && this.canAct) {
+        this.canvas2DContext.lineWidth = 2;
         this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1.0)';
         this.canvas2DContext.stroke(this.visibleTargetPath);
         this.canvas2DContext.strokeStyle = 'rgba(200, 0, 0, 1.0)';
