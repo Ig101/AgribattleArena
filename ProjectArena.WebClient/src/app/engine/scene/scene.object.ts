@@ -331,7 +331,7 @@ export class Scene {
       this.waitingAction = () => this.intendedAction(actor, action, type, x, y, target);
       return;
     }
-    if (!actor.isAlive || (target && !target.isAlive)) {
+    if (!actor.isAlive || !actor.actions.some(a => a.id === action.id) || (target && !target.isAlive)) {
       return;
     }
     const definition = {
