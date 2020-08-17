@@ -156,9 +156,9 @@ export class FightComponent implements OnInit, OnDestroy {
   get rangeMapIsActive() {
     return this.scene &&
       this.chosenAction &&
-      this.chosenAction.range > 0 &&
+      !this.chosenAction.native.untargeted &&
       this.scene.currentActor?.owner?.id === this.scene.currentPlayer.id &&
-      this.scene.currentActor.actions.some(x => x.actionClass === ActionClassEnum.Default && x.range > 0);
+      this.scene.currentActor.actions.some(x => x.native.actionClass === ActionClassEnum.Default && !x.native.untargeted);
   }
 
   constructor(
@@ -438,10 +438,10 @@ export class FightComponent implements OnInit, OnDestroy {
       if (this.smartAlt.pressed) {
         action = getMostPrioritizedAction(
           this.scene.currentActor.actions.filter(a =>
-            a.actionClass === ActionClassEnum.Attack &&
+            a.native.actionClass === ActionClassEnum.Attack &&
             !this.scene.currentActor.validateTargeted(a, x, y)));
         onTarget = true;
-        if (action.actionOnObject) {
+        if (action.native.actionOnObject) {
           onTarget = false;
           const actors = [];
           if (this.scene.currentActor.parentActor.isRoot) {
@@ -480,10 +480,10 @@ export class FightComponent implements OnInit, OnDestroy {
         }
         action = getMostPrioritizedAction(
           this.scene.currentActor.actions.filter(a =>
-            ((a.actionClass === ActionClassEnum.Attack && attack) ||
-            (a.actionClass === ActionClassEnum.Move && !attack)) &&
+            ((a.native.actionClass === ActionClassEnum.Attack && attack) ||
+            (a.native.actionClass === ActionClassEnum.Move && !attack)) &&
             !this.scene.currentActor.validateTargeted(a, x, y)));
-        onTarget = !!action?.actionTargeted;
+        onTarget = !!action?.native.actionTargeted;
       }
       if (action) {
         this.directionTimer = 0.2;
@@ -527,7 +527,7 @@ export class FightComponent implements OnInit, OnDestroy {
       this.chosenAction = undefined;
       return;
     }
-    if (action.range > 0) {
+    if (!action.native.untargeted) {
       this.chosenAction = action;
       const cameraLeft = this.cameraX - (this.canvasWidth - this.interfaceShift + this.leftInterfaceShift) / 2 / this.tileWidth;
       const cameraTop = this.cameraY - this.canvasHeight / 2 / this.tileHeight;
@@ -672,7 +672,7 @@ export class FightComponent implements OnInit, OnDestroy {
       }
       if (this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] !== true) {
         if (!this.scene.currentActor.validateTargeted(this.chosenAction, currentX, currentY) &&
-          (visible || !this.chosenAction.onlyVisible)) {
+          (visible || !this.chosenAction.native.onlyVisible)) {
           this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] = visible;
         } else {
           this.rangeMap[currentX - actorX + RANGED_RANGE][currentY - actorY + RANGED_RANGE] = undefined;
@@ -703,7 +703,7 @@ export class FightComponent implements OnInit, OnDestroy {
     }
     if (this.scene.currentActor.parentActor.isRoot) {
       const hasNoVisibleSkills = this.scene.currentActor.actions
-        .some(x => x.actionClass === ActionClassEnum.Default && x.range > 0 && !x.onlyVisible);
+        .some(x => x.native.actionClass === ActionClassEnum.Default && !x.native.untargeted && !x.native.onlyVisible);
       for (let i = -RANGED_RANGE; i <= RANGED_RANGE; i++) {
         let newX = actorX + i;
         let newY = actorY - RANGED_RANGE;
@@ -1007,7 +1007,7 @@ export class FightComponent implements OnInit, OnDestroy {
             textureMapping: this.textureMapping.slice(position * 12, position * 12 + 12),
             colors: this.colors.slice(position * 4, position * 4 + 4)
           };
-          fillColor(this.colors, 255, value ? 255 : 0, 0, 1, position);
+          fillColor(this.colors, this.actionConflict ? 200 : 255, this.actionConflict ? 0 : 255, 0, 1, position);
           const actors = this.scene.tiles[mouseX][mouseY].actors;
           // TODO set actionEffect true
           if (actors.length === 0 || actors[actors.length - 1].tags.includes('tile')) {

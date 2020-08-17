@@ -7,6 +7,7 @@ import { shotAction } from './ranged-attack.native';
 
 export const actionNatives: { [id: string]: ActionNative } = {
   move: {
+    char: undefined,
     name: undefined,
     untargeted: false,
     onlyVisible: false,
@@ -20,6 +21,7 @@ export const actionNatives: { [id: string]: ActionNative } = {
     actionTargeted: moveAction
   },
   slash: {
+    char: undefined,
     name: undefined,
     untargeted: false,
     onlyVisible: false,
@@ -32,6 +34,7 @@ export const actionNatives: { [id: string]: ActionNative } = {
     actionOnObject: attackAction
   },
   wait: {
+    char: 'W',
     name: 'Wait',
     untargeted: true,
     onlyVisible: false,
@@ -47,6 +50,7 @@ export const actionNatives: { [id: string]: ActionNative } = {
     }
   },
   shot: {
+    char: 'S',
     name: 'Shot',
     untargeted: false,
     onlyVisible: true,

@@ -126,8 +126,8 @@ export class Actor implements IActor {
     if (action.remainedTime > 0) {
       return 'Action is not ready';
     }
-    if (action.validateActionTargeted) {
-      return action.validateActionTargeted(this, x, y);
+    if (action.native.validateActionTargeted) {
+      return action.native.validateActionTargeted(this, x, y);
     } else {
       return undefined;
     }
@@ -137,16 +137,16 @@ export class Actor implements IActor {
     if (action.remainedTime > 0) {
       return 'Action is not ready';
     }
-    if (action.validateActionOnObject) {
-      action.validateActionOnObject(this, target);
+    if (action.native.validateActionOnObject) {
+      action.native.validateActionOnObject(this, target);
     } else {
       return undefined;
     }
   }
 
   actTargeted(action: Action, x: number, y: number) {
-    if (this.isAlive && action.actionTargeted) {
-      action.remainedTime = action.cooldown;
+    if (this.isAlive && action.native.actionTargeted) {
+      action.remainedTime = action.native.cooldown;
       if (x > this.x) {
         this.left = false;
       }
@@ -154,13 +154,13 @@ export class Actor implements IActor {
         this.left = true;
       }
       this.parentScene.pushChanges(
-        action.actionTargeted(this, action.power, x, y, this.parentScene.timeLine));
+        action.native.actionTargeted(this, action.native.power, x, y, this.parentScene.timeLine));
     }
   }
 
   actOnObject(action: Action, target: IActor) {
-    if (this.isAlive && action.actionOnObject) {
-      action.remainedTime = action.cooldown;
+    if (this.isAlive && action.native.actionOnObject) {
+      action.remainedTime = action.native.cooldown;
       if (target.x > this.x) {
         this.left = false;
       }
@@ -168,7 +168,7 @@ export class Actor implements IActor {
         this.left = true;
       }
       this.parentScene.pushChanges(
-        action.actionOnObject(this, action.power, target, this.parentScene.timeLine));
+        action.native.actionOnObject(this, action.native.power, target, this.parentScene.timeLine));
     }
   }
 
@@ -176,9 +176,9 @@ export class Actor implements IActor {
                            containerized: boolean, order: number, startingTime: number): number {
     if (reactions) {
       for (const reaction of reactions) {
-        if (inlineEffects.includes(reaction.respondsOn)) {
+        if (inlineEffects.includes(reaction.native.respondsOn)) {
           const reactionResult =
-            reaction.action(this, inlinePower, containerized, order + 1, startingTime);
+            reaction.native.action(this, inlinePower, containerized, order + 1, startingTime);
           inlinePower = reactionResult.power;
           this.parentScene.pushChanges(reactionResult.changes);
         }

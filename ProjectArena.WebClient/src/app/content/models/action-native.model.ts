@@ -4,6 +4,7 @@ import { IActor } from 'src/app/engine/interfaces/actor.interface';
 import { ActionClassEnum } from 'src/app/engine/models/enums/action-class.enum';
 
 export interface ActionNative {
+  char: string;
   name: string;
   untargeted: boolean;
   onlyVisible: boolean;

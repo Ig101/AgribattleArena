@@ -20,8 +20,7 @@ export class NativesCollection implements INativesCollection {
     const native = reactionNatives[id];
     return {
       id,
-      respondsOn: native.respondsOn,
-      action: native.action
+      native
     };
   }
 
@@ -42,20 +41,8 @@ export class NativesCollection implements INativesCollection {
     }
     return {
       id: synchronization.id,
-      name: native.name,
-      description: native.description,
-      onlyVisible: native.onlyVisible,
-      timeCost: native.timeCost,
-      range,
-      cooldown: native.cooldown,
+      native,
       remainedTime: synchronization.remainedTime,
-      power: native.power,
-      actionClass: native.actionClass,
-      aiPriority: native.aiPriority,
-      validateActionTargeted: native.validateActionTargeted,
-      validateActionOnObject: native.validateActionOnObject,
-      actionTargeted: native.actionTargeted,
-      actionOnObject: native.actionOnObject
     };
   }
 

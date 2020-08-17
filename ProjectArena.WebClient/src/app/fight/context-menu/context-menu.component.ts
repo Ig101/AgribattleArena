@@ -26,8 +26,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
 
   @Input() set actions(actions: Action[]) {
     this.actionsInternal = actions
-      .filter(x => x.actionClass === ActionClassEnum.Default)
-      .sort((a, b) => b.aiPriority - a.aiPriority);
+      .filter(x => x.native.actionClass === ActionClassEnum.Default)
+      .sort((a, b) => b.native.aiPriority - a.native.aiPriority);
     this.updateActions();
   }
 
@@ -85,8 +85,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
           page.items.push({
             systemType: ContextMenuSystemTypesEnum.Previous,
             action: undefined,
-            character: '<',
-            name: 'Previous page',
+            character: '▲',
+            name: 'Previous',
             notAvailable: false
           } as ContextMenuItem);
           counter++;
@@ -96,8 +96,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
           previousPage.items[this.pageSize - 1] = {
             systemType: ContextMenuSystemTypesEnum.Next,
             action: undefined,
-            character: '>',
-            name: 'Next page',
+            character: '▼',
+            name: 'Next',
             notAvailable: false
           } as ContextMenuItem;
 
@@ -107,8 +107,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy {
       }
       page.items.push({
         action,
-        name: action.name,
-        character: action.name[0].toUpperCase(),
+        name: action.native.name,
+        character: action.native.char,
         notAvailable: false,
         notAvailableReason: undefined
       });

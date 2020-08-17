@@ -139,8 +139,8 @@ export class Scene {
       this.desyncSub.next(true);
       return;
     }
-    action.remainedTime = action.cooldown;
-    this.turnTime -= action.timeCost;
+    action.remainedTime = action.native.cooldown;
+    this.turnTime -= action.native.timeCost;
     switch (type) {
       case ActionType.Targeted:
         actor.actTargeted(action, x, y);
@@ -362,7 +362,7 @@ export class Scene {
     if (!usable.isAlive) {
       return;
     }
-    const actions = usable.actions.filter(a => a.actionClass === ActionClassEnum.Use);
+    const actions = usable.actions.filter(a => a.native.actionClass === ActionClassEnum.Use);
     const action = getMostPrioritizedAction(actions);
     if (actions === undefined) {
       return;
