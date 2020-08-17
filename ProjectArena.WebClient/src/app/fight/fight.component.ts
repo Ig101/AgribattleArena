@@ -539,7 +539,16 @@ export class FightComponent implements OnInit, OnDestroy {
         cameraTop);
     } else {
       this.chosenAction = undefined;
-      console.log(action);
+      if (action.native.actionTargeted) {
+        this.scene.intendedTargetedAction(action, this.scene.currentActor.x, this.scene.currentActor.y);
+      } else {
+
+        const actors = this.scene.currentActor.actors;
+        // Open dialog with actors and choose one
+        if (actors.length > 0) {
+          this.scene.intendedOnObjectAction(action, actors[0]);
+        }
+      }
     }
   }
 
@@ -606,7 +615,49 @@ export class FightComponent implements OnInit, OnDestroy {
         const shiftedY = y - this.scene.currentActor.y + RANGED_RANGE;
         if (shiftedX <= RANGED_RANGE * 2 && shiftedY <= RANGED_RANGE * 2 && shiftedX >= 0 && shiftedY >= 0 &&
             this.rangeMap[shiftedX][shiftedY] !== undefined) {
-          console.log(this.chosenAction);
+          const tile = this.scene.tiles[x][y];
+          let actor: IActor;
+          let onTarget: boolean;
+          if (this.smartAlt.pressed) {
+            onTarget = true;
+            if (this.chosenAction.native.actionOnObject) {
+              onTarget = false;
+              const actors = [];
+              if (this.scene.currentActor.parentActor.isRoot) {
+                for (let i = tile.actors.length - 1; i >= 0; i--) {
+                  const tempActor = tile.actors[i];
+                  actors.push(tempActor);
+                  if (tempActor.tags.includes('tile')) {
+                    break;
+                  }
+                }
+                if (actors.length === 0) {
+                  actors.push(tile);
+                }
+              } else {
+                actors.push(this.scene.currentActor.parentActor);
+              }
+              // Open dialog with actors and choose one
+              actor = actors.find(a => a.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) || actors[0];
+            }
+          } else {
+            if (this.scene.currentActor.parentActor.isRoot) {
+              for (let i = tile.actors.length - 1; i >= 0; i--) {
+                actor = tile.actors[i];
+                if (actor.tags.includes('tile') || actor.tags.includes('flat') || actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
+                  break;
+                }
+              }
+            } else {
+              actor = this.scene.currentActor.parentActor;
+            }
+            onTarget = !!this.chosenAction.native.actionTargeted;
+          }
+          if (onTarget) {
+            this.scene.intendedTargetedAction(this.chosenAction, x, y);
+          } else {
+            this.scene.intendedOnObjectAction(this.chosenAction, actor || tile);
+          }
           this.chosenAction = undefined;
         }
       }

@@ -14,7 +14,7 @@
     </ng-template>
     <ng-template #info>
       <div *ngIf="item.action" class="small-font-inactive">
-        Cost:{{item.action.timeCost}} {{item.action.cooldown > 0 ? 'CD:' + item.action.cooldown : ''}}
+        Cost:{{item.action.native.timeCost}} {{item.action.native.cooldown > 0 ? 'CD:' + item.action.native.cooldown : ''}}
       </div>
     </ng-template>
     <ng-template #preview>
