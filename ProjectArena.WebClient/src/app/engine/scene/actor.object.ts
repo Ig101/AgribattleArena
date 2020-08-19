@@ -9,6 +9,7 @@ import { Color } from 'src/app/shared/models/color.model';
 import { ActorSynchronization } from 'src/app/shared/models/synchronization/objects/actor-synchronization.model';
 import { ActorReference } from 'src/app/shared/models/synchronization/objects/actor-reference.model';
 import { BuffSynchronization } from 'src/app/shared/models/synchronization/objects/buff-synchronization.model';
+import { ActionClassEnum } from '../models/enums/action-class.enum';
 
 const maxTurnCost = 10;
 const minTurnCost = 1;
@@ -304,7 +305,11 @@ export class Actor implements IActor {
 
   update() {
     this.actions.forEach(x => {
-      if (x.remainedTime > 0) {
+      if (x.remainedTime > 0 &&
+        (x.native.actionClass === ActionClassEnum.Autocast ||
+          x.native.actionClass === ActionClassEnum.Use ||
+          this.id === this.parentScene.currentActor?.id)) {
+
         x.remainedTime--;
       }
     });
