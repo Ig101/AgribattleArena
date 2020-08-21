@@ -25,6 +25,7 @@ import { getHashFromString } from 'src/app/helpers/extensions/hash.extension';
 import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
 import { ActionClassEnum } from '../models/enums/action-class.enum';
 import { getMostPrioritizedAction } from '../engine.helper';
+import { randomBytes } from 'crypto';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
@@ -211,6 +212,7 @@ export class Scene {
   }
 
   createNewActor(
+    source: Actor,
     x: number,
     y: number,
     char: string,
@@ -241,7 +243,7 @@ export class Scene {
       durability,
       maxDurability: durability,
       turnCost,
-      initiativePosition: turnCost,
+      initiativePosition: source.initiativePosition + Math.random() / 1000 - this.currentActor.turnCost + turnCost,
       height,
       volume,
       freeVolume,
