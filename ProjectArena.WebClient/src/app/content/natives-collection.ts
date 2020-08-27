@@ -10,16 +10,18 @@ import { buffNatives } from './buffs/buff.natives';
 import { Injectable } from '@angular/core';
 import { ActionClassEnum } from '../engine/models/enums/action-class.enum';
 import { MELEE_RANGE, UNTARGETED_RANGE, RANGED_RANGE } from './content.helper';
+import { ReactionSynchronization } from '../shared/models/synchronization/objects/reaction-synchronization.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NativesCollection implements INativesCollection {
 
-  buildReaction(id: string): Reaction {
-    const native = reactionNatives[id];
+  buildReaction(synchronization: ReactionSynchronization): Reaction {
+    const native = reactionNatives[synchronization.id];
     return {
-      id,
+      id: synchronization.id,
+      mod: synchronization.mod,
       native
     };
   }
@@ -60,9 +62,9 @@ export class NativesCollection implements INativesCollection {
       blockedEffects: native.blockedEffects,
       blockAllActions: native.blockAllActions,
       addedActions: synchronization.actions.map(x => this.buildAction(x)),
-      addedPreparationReactions: native.addedPreparationReactions,
-      addedActiveReactions: native.addedActiveReactions,
-      addedClearReactions: native.addedClearReactions,
+      addedPreparationReactions: synchronization.addedPreparationReactions.map(x => this.buildReaction(x)),
+      addedActiveReactions: synchronization.addedActiveReactions.map(x => this.buildReaction(x)),
+      addedClearReactions: synchronization.addedClearReactions.map(x => this.buildReaction(x)),
       changedDurability: synchronization.changedDurability,
       changedSpeed: synchronization.changedSpeed
     };

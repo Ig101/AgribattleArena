@@ -38,7 +38,8 @@ export function moveValidation(actor: Actor, x: number, y: number): string {
 
 export function moveAction(actor: Actor, power: number, x: number, y: number, startingTime: number): ChangeDefinition[] {
   const targetTile = actor.parentScene.tiles[x][y];
-  actor.handleEffects(['act', 'move'], 0, false, 1, startingTime);
+  actor.parentActor.handleEffects(['act', 'move-act'], 0, true, 1, startingTime);
+  actor.handleEffects(['act', 'move-act'], 0, false, 1, startingTime);
   return [{
     time: startingTime,
     tileStubs: undefined,

@@ -2,6 +2,7 @@ import { ActorReference } from './actor-reference.model';
 import { BuffSynchronization } from './buff-synchronization.model';
 import { ActionSynchronization } from './action-synchronization.model';
 import { Color } from '../../color.model';
+import { ReactionSynchronization } from './reaction-synchronization.model';
 
 export interface ActorSynchronization {
   reference: ActorReference;
@@ -23,9 +24,9 @@ export interface ActorSynchronization {
   height: number;
   volume: number;
   freeVolume: number;
-  preparationReactions: string[];
-  activeReactions: string[];
-  clearReactions: string[];
+  preparationReactions: ReactionSynchronization[];
+  activeReactions: ReactionSynchronization[];
+  clearReactions: ReactionSynchronization[];
   actions: ActionSynchronization[];
   actors: ActorSynchronization[];
   buffs: BuffSynchronization[];

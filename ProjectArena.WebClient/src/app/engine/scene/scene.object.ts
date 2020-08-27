@@ -26,6 +26,7 @@ import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
 import { ActionClassEnum } from '../models/enums/action-class.enum';
 import { getMostPrioritizedAction } from '../engine.helper';
 import { randomBytes } from 'crypto';
+import { ReactionSynchronization } from 'src/app/shared/models/synchronization/objects/reaction-synchronization.model';
 
 export const SCENE_FRAME_TIME = 1000 / 30;
 
@@ -224,9 +225,9 @@ export class Scene {
     height: number,
     volume: number,
     freeVolume: number,
-    preparationReactions: string[],
-    activeReactions: string[],
-    clearReactions: string[],
+    preparationReactions: ReactionSynchronization[],
+    activeReactions: ReactionSynchronization[],
+    clearReactions: ReactionSynchronization[],
     actions: string[],
     parent?: IActor,
     position?: number

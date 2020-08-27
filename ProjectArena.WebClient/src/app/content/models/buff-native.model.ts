@@ -9,8 +9,4 @@ export interface BuffNative {
   blockedActions: string[];
   blockedEffects: string[];
   blockAllActions: boolean;
-
-  addedPreparationReactions: Reaction[];
-  addedActiveReactions: Reaction[];
-  addedClearReactions: Reaction[];
 }

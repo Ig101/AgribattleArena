@@ -4,7 +4,7 @@ import { ChangeDefinition } from 'src/app/engine/models/abstract/change-definiti
 export interface ReactionNative {
   respondsOn: string;
 
-  action: (actor: Actor, power: number, containerized: boolean,
+  action: (actor: Actor, power: number, mod: number, containerized: boolean,
            order: number, startingTime: number)
     => { power: number, changes: ChangeDefinition[] };
 }

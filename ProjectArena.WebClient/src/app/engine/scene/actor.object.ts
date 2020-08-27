@@ -179,7 +179,7 @@ export class Actor implements IActor {
       for (const reaction of reactions) {
         if (inlineEffects.includes(reaction.native.respondsOn)) {
           const reactionResult =
-            reaction.native.action(this, inlinePower, containerized, order + 1, startingTime);
+            reaction.native.action(this, inlinePower, reaction.mod, containerized, order + 1, startingTime);
           inlinePower = reactionResult.power;
           this.parentScene.pushChanges(reactionResult.changes);
         }
@@ -447,9 +447,18 @@ export class Actor implements IActor {
         remainedTime: x.remainedTime
       })),
       ownerId: this.owner?.id,
-      preparationReactions: this.preparationReactions.map(x => x.id),
-      activeReactions: this.activeReactions.map(x => x.id),
-      clearReactions: this.clearReactions.map(x => x.id),
+      preparationReactions: this.preparationReactions.map(x => ({
+        id: x.id,
+        mod: x.mod
+      })),
+      activeReactions: this.activeReactions.map(x => ({
+        id: x.id,
+        mod: x.mod
+      })),
+      clearReactions: this.clearReactions.map(x => ({
+        id: x.id,
+        mod: x.mod
+      })),
       buffs: this.buffs.map(x => {
         return {
           id: x.id,
@@ -461,6 +470,18 @@ export class Actor implements IActor {
           actions: x.addedActions.map(a => ({
             id: a.id,
             remainedTime: a.remainedTime
+          })),
+          addedPreparationReactions: x.addedPreparationReactions.map(a => ({
+            id: a.id,
+            mod: a.mod
+          })),
+          addedClearReactions: x.addedClearReactions.map(a => ({
+            id: a.id,
+            mod: a.mod
+          })),
+          addedActiveReactions: x.addedActiveReactions.map(a => ({
+            id: a.id,
+            mod: a.mod
           })),
         } as BuffSynchronization;
       })

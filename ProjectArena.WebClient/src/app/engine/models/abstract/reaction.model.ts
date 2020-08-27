@@ -7,5 +7,6 @@ export const KILL_EFFECT_NAME = 'kill';
 
 export interface Reaction {
   id: string;
+  mod: number;
   native: ReactionNative;
 }

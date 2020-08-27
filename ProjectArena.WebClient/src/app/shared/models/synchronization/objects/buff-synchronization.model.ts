@@ -1,4 +1,5 @@
 import { ActionSynchronization } from './action-synchronization.model';
+import { ReactionSynchronization } from './reaction-synchronization.model';
 
 export interface BuffSynchronization {
   id: string;
@@ -11,4 +12,7 @@ export interface BuffSynchronization {
   changedSpeed: number;
 
   actions: ActionSynchronization[];
+  addedPreparationReactions: ReactionSynchronization[];
+  addedActiveReactions: ReactionSynchronization[];
+  addedClearReactions: ReactionSynchronization[];
 }
