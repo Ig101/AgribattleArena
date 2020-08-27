@@ -8,7 +8,7 @@ export function moveActorToTile(actor: Actor, targetTile: Tile, startingTime: nu
   const heightDifference = actor.z - targetTile.height;
   const parent = actor.parentActor;
   const oldActorIndex = parent.actors.indexOf(actor);
-  targetTile.handleEffects(['pressure'], actor.volume, false, 1, startingTime);
+  targetTile.handleEffects(['pressure'], actor.volume, false, 1, startingTime, actor);
   moveToTarget(actor, targetTile);
   for (let i = 0; i < parent.actors.length; i++) {
     if (i < oldActorIndex || !parent.isRoot) {

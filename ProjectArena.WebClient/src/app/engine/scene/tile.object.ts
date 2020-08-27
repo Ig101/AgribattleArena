@@ -78,10 +78,10 @@ export class Tile implements IActor {
     return result;
   }
 
-  handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime) {
+  handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime, issuer: Actor) {
     let resultPower = power;
     for (const actor of this.actors) {
-      const powerChange = actor.handleEffects(effects, power, true, order + 1, startingTime) - power;
+      const powerChange = actor.handleEffects(effects, power, true, order + 1, startingTime, issuer) - power;
       resultPower += powerChange;
     }
     return resultPower;
