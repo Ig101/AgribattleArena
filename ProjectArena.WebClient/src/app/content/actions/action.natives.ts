@@ -45,8 +45,8 @@ export const actionNatives: { [id: string]: ActionNative } = {
     aiPriority: 1,
     actionClass: ActionClassEnum.Default,
     actionTargeted: (actor: Actor, power: number, x: number, y: number, startingTime: number) => {
-      actor.parentActor.handleEffects(['wait-act'], power, true, 1, startingTime);
-      actor.handleEffects(['wait-act'], power, false, 1, startingTime);
+      actor.parentActor.handleEffects(['wait-act'], power, true, 1, startingTime, actor);
+      actor.handleEffects(['wait-act'], power, false, 1, startingTime, actor);
       return [];
     }
   },

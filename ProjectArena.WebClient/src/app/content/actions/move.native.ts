@@ -12,13 +12,13 @@ export function moveActorToTile(actor: Actor, targetTile: Tile, startingTime: nu
   moveToTarget(actor, targetTile);
   for (let i = 0; i < parent.actors.length; i++) {
     if (i < oldActorIndex || !parent.isRoot) {
-      parent.actors[i].handleEffects(['lighten'], actor.volume, false, 1, startingTime);
+      parent.actors[i].handleEffects(['lighten'], actor.volume, false, 1, startingTime, actor);
     } else if (actor.height > 120) {
-      parent.actors[i].handleEffects(['fall'], (actor.height - 120), false, 1, startingTime);
+      parent.actors[i].handleEffects(['fall'], (actor.height - 120), false, 1, startingTime, actor);
     }
   }
   if (heightDifference > 120) {
-    actor.handleEffects(['fall'], (heightDifference - 120), false, 1, startingTime);
+    actor.handleEffects(['fall'], (heightDifference - 120), false, 1, startingTime, actor);
   }
 }
 
@@ -38,8 +38,8 @@ export function moveValidation(actor: Actor, x: number, y: number): string {
 
 export function moveAction(actor: Actor, power: number, x: number, y: number, startingTime: number): ChangeDefinition[] {
   const targetTile = actor.parentScene.tiles[x][y];
-  actor.parentActor.handleEffects(['act', 'move-act'], 0, true, 1, startingTime);
-  actor.handleEffects(['act', 'move-act'], 0, false, 1, startingTime);
+  actor.parentActor.handleEffects(['act', 'move-act'], 0, true, 1, startingTime, actor);
+  actor.handleEffects(['act', 'move-act'], 0, false, 1, startingTime, actor);
   return [{
     time: startingTime,
     tileStubs: undefined,

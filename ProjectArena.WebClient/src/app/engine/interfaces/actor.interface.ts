@@ -20,7 +20,7 @@ export interface IActor {
   owner: Player;
   actors: Actor[];
 
-  handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime: number): number;
+  handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime: number, issuer: Actor): number;
 
   applyBuff(buff: Buff);
 

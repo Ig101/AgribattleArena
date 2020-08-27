@@ -174,12 +174,12 @@ export class Actor implements IActor {
   }
 
   private processReactions(reactions: Reaction[], inlineEffects: string[], inlinePower: number,
-                           containerized: boolean, order: number, startingTime: number): number {
+                           containerized: boolean, order: number, startingTime: number, issuer: Actor): number {
     if (reactions) {
       for (const reaction of reactions) {
         if (inlineEffects.includes(reaction.native.respondsOn)) {
           const reactionResult =
-            reaction.native.action(this, inlinePower, reaction.mod, containerized, order + 1, startingTime);
+            reaction.native.action(this, inlinePower, reaction.mod, containerized, order + 1, startingTime, issuer);
           inlinePower = reactionResult.power;
           this.parentScene.pushChanges(reactionResult.changes);
         }
@@ -188,7 +188,7 @@ export class Actor implements IActor {
     return inlinePower;
   }
 
-  handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime: number) {
+  handleEffects(effects: string[], power: number, containerized: boolean, order: number, startingTime: number, issuer: Actor) {
     if (!this.isAlive || order > maxReactionsDepth) {
       return power;
     }
@@ -199,24 +199,24 @@ export class Actor implements IActor {
 
     let tempPower = power;
 
-    tempPower = this.processReactions(this.preparationReactions, tempEffects, tempPower, containerized, order, startingTime);
+    tempPower = this.processReactions(this.preparationReactions, tempEffects, tempPower, containerized, order, startingTime, issuer);
     for (const buff of this.buffs) {
-      tempPower = this.processReactions(buff.addedPreparationReactions, tempEffects, tempPower, containerized, order, startingTime);
+      tempPower = this.processReactions(buff.addedPreparationReactions, tempEffects, tempPower, containerized, order, startingTime, issuer);
     }
 
-    tempPower = this.processReactions(this.activeReactions, tempEffects, tempPower, containerized, order, startingTime);
+    tempPower = this.processReactions(this.activeReactions, tempEffects, tempPower, containerized, order, startingTime, issuer);
     for (const buff of this.buffs) {
-      tempPower = this.processReactions(buff.addedActiveReactions, tempEffects, tempPower, containerized, order, startingTime);
+      tempPower = this.processReactions(buff.addedActiveReactions, tempEffects, tempPower, containerized, order, startingTime, issuer);
     }
 
-    tempPower = this.processReactions(this.clearReactions, tempEffects, tempPower, containerized, order, startingTime);
+    tempPower = this.processReactions(this.clearReactions, tempEffects, tempPower, containerized, order, startingTime, issuer);
     for (const buff of this.buffs) {
-      tempPower = this.processReactions(buff.addedClearReactions, tempEffects, tempPower, containerized, order, startingTime);
+      tempPower = this.processReactions(buff.addedClearReactions, tempEffects, tempPower, containerized, order, startingTime, issuer);
     }
 
     let resultPower = tempPower;
     for (const actor of this.actors) {
-      const powerChange = actor.handleEffects(effects, tempPower, true, order + 1, startingTime) - tempPower;
+      const powerChange = actor.handleEffects(effects, tempPower, true, order + 1, startingTime, issuer) - tempPower;
       resultPower += powerChange;
     }
     return resultPower;
@@ -228,7 +228,7 @@ export class Actor implements IActor {
 
   kill() {
     this.isAlive = false;
-    this.handleEffects([KILL_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine);
+    this.handleEffects([KILL_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine, undefined);
     this.parentActor.removeActor(this);
     this.parentScene.removedActors.push(this.id);
     for (const inside of this.actors) {

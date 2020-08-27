@@ -5,6 +5,6 @@ export interface ReactionNative {
   respondsOn: string;
 
   action: (actor: Actor, power: number, mod: number, containerized: boolean,
-           order: number, startingTime: number)
+           order: number, startingTime: number, issuer: Actor)
     => { power: number, changes: ChangeDefinition[] };
 }
