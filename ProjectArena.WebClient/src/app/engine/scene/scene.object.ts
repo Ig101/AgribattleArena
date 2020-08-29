@@ -273,6 +273,16 @@ export class Scene {
     return this.timeLine = frames * SCENE_FRAME_TIME;
   }
 
+  getAllActiveActors(): Actor[] {
+    const activeActors = [];
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        activeActors.push(...this.tiles[x][y].getActiveActors());
+      }
+    }
+    return activeActors;
+  }
+
   pushChanges(changes: ChangeDefinition[]) {
     if (changes && changes.length > 0) {
       this.changes.push(...changes);

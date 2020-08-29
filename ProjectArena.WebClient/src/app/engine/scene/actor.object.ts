@@ -495,4 +495,16 @@ export class Actor implements IActor {
   private isActorReadyToStartTurn() {
     return this.owner && this.initiativePosition <= 0 && this.actions.some(x => x.remainedTime <= 0);
   }
+
+  getActiveActors() {
+    const activeActors = this.owner && this.actions.some(x =>
+      x.remainedTime <= 0 &&
+      (x.native.actionClass === ActionClassEnum.Attack ||
+      x.native.actionClass === ActionClassEnum.Move ||
+      x.native.actionClass === ActionClassEnum.Default)) ? [this as Actor] : [];
+    for (const actor of this.actors) {
+      activeActors.push(...actor.getActiveActors());
+    }
+    return activeActors;
+  }
 }

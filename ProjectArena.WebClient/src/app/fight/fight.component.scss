@@ -31,6 +31,9 @@
       margin: 12px;
       margin-left: 0px;
     }
+    .no-top {
+      margin-top: 0px;
+    }
     .name-window {
       padding: 12px;
     }
@@ -43,10 +46,6 @@
       align-self: center;
       margin-right: 6px;
     }
-  }
-  app-initiative-block {
-    margin: 1px;
-    margin-bottom: 5px;
   }
   .control-block {
     display: flex;

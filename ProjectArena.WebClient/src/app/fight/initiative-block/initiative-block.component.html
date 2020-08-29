@@ -1,0 +1,16 @@
+<div *ngIf="actors.length > 0" class="left-side">
+  <div class="no-one" *ngIf="noOneTurn"></div>
+  <app-texture-icon [textureService]="charsService" class="portrait big-portrait"  [style.borderColor]="actors[startPosition].color" [definition]="actors[startPosition].definition"></app-texture-icon>
+  <div class="no-one" *ngIf="!noOneTurn"></div>
+</div>
+<div *ngIf="actors.length > 0" class="right-side">
+  <div class="portraits-container">
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="actors[startPosition + 1].color" [definition]="actors[startPosition + 1].definition"></app-texture-icon>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="actors[startPosition + 2].color"[definition]="actors[startPosition + 2].definition"></app-texture-icon>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="actors[startPosition + 3].color"[definition]="actors[startPosition + 3].definition"></app-texture-icon>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="actors[startPosition + 4].color"[definition]="actors[startPosition + 4].definition"></app-texture-icon>
+    <app-texture-icon [textureService]="charsService" class="portrait small-portrait" [style.borderColor]="actors[startPosition + 5].color" [definition]="actors[startPosition + 5].definition"></app-texture-icon>
+  </div>
+  <div *ngIf="timer && timer > 0" class="timer" [style.backgroundColor]="actors[startPosition].color" [style.width]="lineWidth + 'px'">
+  </div>
+</div>

@@ -7,11 +7,21 @@ import { FightRoutingModule } from './fight-routing.module';
 import { SynchronizationService } from '../engine/services/synchronization.service';
 import { ContextMenuComponent } from './context-menu/context-menu.component';
 import { ContextMenuItemComponent } from './context-menu/context-menu-item/context-menu-item.component';
+import { MenuModalComponent } from './modals/menu-modal/menu-modal.component';
+import { RewardForModalComponent } from './modals/reward-for-modal/reward-for-modal.component';
+import { InitiativeBlockComponent } from './initiative-block/initiative-block.component';
 
 
 
 @NgModule({
-  declarations: [FightComponent, ContextMenuComponent, ContextMenuItemComponent],
+  declarations: [
+    FightComponent,
+    ContextMenuComponent,
+    ContextMenuItemComponent,
+    MenuModalComponent,
+    RewardForModalComponent,
+    InitiativeBlockComponent
+  ],
   imports: [
     SharedModule,
     EngineModule,

@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-direction: row;
+
+  .portrait {
+    box-sizing: border-box;
+    border: double;
+    display: flex;
+    margin-left: 4px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .big-portrait {
+    padding: 9px 21px;
+    width: 90px;
+    height: 90px;
+    border-width: 6px;
+    font-size: 45px;
+    margin-left: 0px;
+  }
+
+  .small-portrait {
+    padding: 4px 10px;
+    width: 46px;
+    height: 46px;
+    border-width: 4px;
+  }
+
+  .no-one {
+    margin-left: 4px;
+    border-left: double;
+    border-width: 6px;
+  }
+
+  .left-side {
+    display: flex;
+  }
+
+  .right-side {
+    display: flex;
+    flex-direction: column;
+
+    .portraits-container {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .timer {
+      margin: 4px;
+      margin-top: 8px;
+      height: 20px;
+      min-height: 20px;
+    }
+  }
+}

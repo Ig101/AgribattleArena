@@ -31,6 +31,9 @@ import { IModal } from '../shared/interfaces/modal.interface';
 import { ModalPositioning } from './models/modal-positioning.model';
 import { ContextMenuComponent } from './context-menu/context-menu.component';
 import { ContextMenuContext } from './models/context-menu-context.model';
+import { MenuModalComponent } from './modals/menu-modal/menu-modal.component';
+import { BattlePlayerStatusEnum } from '../shared/models/enum/player-battle-status.enum';
+import { UserService } from '../shared/services/user.service';
 
 @Component({
   selector: 'app-fight',
@@ -99,9 +102,11 @@ export class FightComponent implements OnInit, OnDestroy {
   openedModal: IModal<unknown>;
   modalPositioning: ModalPositioning;
 
+  conflictTimer = 0;
+
   chosenAction: Action;
   get actionConflict() {
-    return this.scene.waitingMessages.length > 0 || this.scene.changes.length > 0;
+    return this.conflictTimer > 0.4;
   }
 
   get canvasWidth() {
@@ -136,11 +141,6 @@ export class FightComponent implements OnInit, OnDestroy {
     return this.sceneService.scene;
   }
 
-  // TODO Turn signature:
-  // !turnReallyStarted -> line + currentActor
-  // turnTime <= 0 -> line + nextActor
-  // other -> currentActor + line
-
   get canAct() {
     const can = !this.blocked &&
       this.scene &&
@@ -161,9 +161,14 @@ export class FightComponent implements OnInit, OnDestroy {
       this.scene.currentActor.actions.some(x => x.native.actionClass === ActionClassEnum.Default && !x.native.untargeted);
   }
 
+  get userName() {
+    return this.userService.user?.name || 'Player not found';
+  }
+
   constructor(
     private loadingService: LoadingService,
     private sceneService: SceneService,
+    private userService: UserService,
     private activatedRoute: ActivatedRoute,
     private modalService: ModalService,
     private charsService: CharsService,
@@ -335,20 +340,25 @@ export class FightComponent implements OnInit, OnDestroy {
       name: 'Actor',
       char: 'adventurer',
       color: { r: 0, g: 0, b: 255, a: 1 },
-      ownerId: undefined,
+      ownerId: 'sampleP2',
       tags: ['active'],
       parentId: 1 + 12 * 8 + 7,
       durability: 200,
       maxDurability: 200,
       turnCost: 1,
-      initiativePosition: 0,
+      initiativePosition: 0.2,
       height: 180,
       volume: 120,
       freeVolume: 40,
       preparationReactions: [],
       activeReactions: [],
       clearReactions: [],
-      actions: [],
+      actions: [
+        {
+          id: 'move',
+          remainedTime: 0
+        }
+      ],
       actors: [],
       buffs: [],
     });
@@ -368,7 +378,7 @@ export class FightComponent implements OnInit, OnDestroy {
       durability: 200,
       maxDurability: 200,
       turnCost: 1,
-      initiativePosition: 0,
+      initiativePosition: 0.1,
       height: 180,
       volume: 120,
       freeVolume: 40,
@@ -405,7 +415,12 @@ export class FightComponent implements OnInit, OnDestroy {
         actors,
         players: [
           {
-            id: 'sampleP'
+            id: 'sampleP',
+            battlePlayerStatus: BattlePlayerStatusEnum.Playing
+          },
+          {
+            id: 'sampleP2',
+            battlePlayerStatus: BattlePlayerStatusEnum.Playing
           }
         ],
         width: 14,
@@ -496,6 +511,16 @@ export class FightComponent implements OnInit, OnDestroy {
       }
     }
     this.directionTimer = 0.04;
+  }
+
+  openSettings() {
+    this.blocked = true;
+    this.openedModal = this.modalService.openModalWithoutArgs(
+      MenuModalComponent);
+    this.openedModal.onClose.subscribe(_ => {
+      this.blocked = false;
+      this.openedModal = undefined;
+    });
   }
 
   @HostListener('contextmenu', ['$event'])
@@ -957,6 +982,11 @@ export class FightComponent implements OnInit, OnDestroy {
     if (this.scene && this.shadersProgram) {
 
       if (shift) {
+        if (this.scene.waitingMessages.length > 0 || this.scene.changes.length > 0) {
+          this.conflictTimer += shift;
+        } else {
+          this.conflictTimer = 0;
+        }
         if (this.directionTimer > 0) {
           this.directionTimer -= shift;
         } else {

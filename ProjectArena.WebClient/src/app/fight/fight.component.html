@@ -8,3 +8,14 @@
   <canvas #hudCanvas class="hud"></canvas>
 </div>
 <app-context-menu *ngIf="canAct" [conflict]="actionConflict" [actions]="scene.currentActor.actions" [currentAction]="chosenAction" (act)="chooseAction($event)"></app-context-menu>
+<div class="interface">
+  <div class="modal window name-window">
+    <div class="row nowrap">
+      <app-menu-icon (click)="openSettings()"></app-menu-icon>
+      <div class="title-font-inactive">{{userName}}</div>
+    </div>
+  </div>
+  <div class="window no-top">
+    <app-initiative-block></app-initiative-block>
+  </div>
+</div>
