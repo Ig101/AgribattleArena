@@ -8,11 +8,21 @@ export function fillBackground(backgrounds: Uint8Array, r: number, g: number, b:
   backgrounds[texturePosition * 4 + 3] = 1;
 }
 
-export function fillColor(colors: Uint8Array, r: number, g: number, b: number, a: number, texturePosition: number) {
+export function fillColor(
+  colors: Uint8Array,
+  activities: Uint8Array,
+  r: number,
+  g: number,
+  b: number,
+  a: number,
+  isActive: boolean,
+  texturePosition: number) {
+
   colors[texturePosition * 4] = r;
   colors[texturePosition * 4 + 1] = g;
   colors[texturePosition * 4 + 2] = b;
   colors[texturePosition * 4 + 3] = a;
+  activities[texturePosition] = isActive ? 0 : 1;
 }
 
 export function fillChar(charsService: ITextureService, textureMapping: Float32Array,
@@ -99,6 +109,7 @@ export function drawArrays(
   backgrounds: Uint8Array,
   textureMapping: Float32Array,
   backgroundTextureMapping: Float32Array,
+  activityMapping: Uint8Array,
   texture: WebGLTexture,
   cameraX: number,
   cameraY: number,
@@ -109,6 +120,8 @@ export function drawArrays(
   textureWidth: number,
   textureHeight: number
 ) {
+
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
   const positionLocation = gl.getAttribLocation(program, 'a_position');
   const texcoordLocation = gl.getAttribLocation(program, 'a_texCoord');
@@ -142,6 +155,14 @@ export function drawArrays(
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, colorsWidth, colorsHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, backgrounds);
 
+  const activityTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, activityTexture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, colorsWidth, colorsHeight, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, activityMapping);
+
   const positionResolutionLocation = gl.getUniformLocation(program, 'u_positionResolution');
   const textureResolutionLocation = gl.getUniformLocation(program, 'u_textureResolution');
 
@@ -166,10 +187,12 @@ export function drawArrays(
   const colorLocation = gl.getUniformLocation(program, 'u_color');
   const backgroundColorLocation = gl.getUniformLocation(program, 'u_backgroundColor');
   const textureLocation = gl.getUniformLocation(program, 'u_texture');
+  const activityLocation = gl.getUniformLocation(program, 'u_activityMap');
 
   gl.uniform1i(colorLocation, 0);
   gl.uniform1i(backgroundColorLocation, 1);
   gl.uniform1i(textureLocation, 2);
+  gl.uniform1i(activityLocation, 3);
 
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, colorTexture);
@@ -177,5 +200,7 @@ export function drawArrays(
   gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
   gl.activeTexture(gl.TEXTURE2);
   gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.activeTexture(gl.TEXTURE3);
+  gl.bindTexture(gl.TEXTURE_2D, activityTexture);
   gl.drawArrays(gl.TRIANGLES, 0, vertexPositions.length / 2);
 }

@@ -379,6 +379,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
 
     texturePosition: number,
     colors: Uint8Array,
+    activities: Uint8Array,
     textureMapping: Float32Array,
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
@@ -394,7 +395,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
       }
       let color = native ? native.visualization.color : tile.color;
       color = active ? (clicked ? { r: 170, g: 170, b: 0, a: color.a } : { r: 255, g: 255, b: 68, a: color.a }) : color;
-      fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+      fillColor(colors, activities, color.r, color.g, color.b, color.a, active, texturePosition);
       fillChar(this.charsService, textureMapping, (native ? native.visualization.char : tile.char), texturePosition);
     }
   }
@@ -422,6 +423,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
       const height = bottom - top + 1;
       const textureMapping: Float32Array = new Float32Array(width * height * 12);
       const colors: Uint8Array = new Uint8Array(width * height * 4);
+      const activities: Uint8Array = new Uint8Array(width * height);
       const backgroundTextureMapping: Float32Array = new Float32Array(width * height * 12);
       const backgrounds: Uint8Array = new Uint8Array(width * height * 4);
       const mainTextureVertexes: Float32Array = new Float32Array(width * height * 12);
@@ -463,6 +465,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
               clicked,
               texturePosition,
               colors,
+              activities,
               textureMapping,
               backgrounds,
               backgroundTextureMapping);
@@ -481,6 +484,7 @@ export class AsciiLobbyComponent implements OnInit, OnDestroy {
         backgrounds,
         textureMapping,
         backgroundTextureMapping,
+        activities,
         this.charsTexture,
         Math.round((left - cameraLeft) * this.tileWidth),
         Math.round((top - cameraTop - 1) * this.tileHeight),

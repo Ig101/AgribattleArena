@@ -102,6 +102,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
     tileWidth: number,
     texturePosition: number,
     colors: Uint8Array,
+    activities: Uint8Array,
     textureMapping: Float32Array,
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
@@ -121,7 +122,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
       } else {
         fillBackground(backgrounds, 0, 0, 0, texturePosition);
       }
-      fillColor(colors, tile.color.r, tile.color.g, tile.color.b, tile.color.a, texturePosition);
+      fillColor(colors, activities, tile.color.r, tile.color.g, tile.color.b, tile.color.a, false, texturePosition);
       fillChar(this.charsService, textureMapping, tile.char, texturePosition);
     }
   }
@@ -158,6 +159,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
       const cameraTop = definition.loadingScene.height / 2 - this.canvasHeight / 2 / tileHeight;
       const textureMapping: Float32Array = new Float32Array(definition.loadingScene.width * definition.loadingScene.height * 12);
       const colors: Uint8Array = new Uint8Array(definition.loadingScene.width * definition.loadingScene.height * 4);
+      const activities: Uint8Array = new Uint8Array(definition.loadingScene.width * definition.loadingScene.height);
       const backgroundTextureMapping: Float32Array = new Float32Array(definition.loadingScene.width * definition.loadingScene.height * 12);
       const backgrounds: Uint8Array = new Uint8Array(definition.loadingScene.width * definition.loadingScene.height * 4);
       const mainTextureVertexes: Float32Array = new Float32Array(definition.loadingScene.width * definition.loadingScene.height * 12);
@@ -166,7 +168,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
         for (let x = 0; x < definition.loadingScene.width; x++) {
           fillVertexPosition(mainTextureVertexes, x, y, 0, 0, tileWidth, tileHeight, texturePosition);
           this.drawPoint(definition.loadingScene, x, y, tileHeight, tileWidth, texturePosition,
-            colors, textureMapping, backgrounds, backgroundTextureMapping);
+            colors, activities, textureMapping, backgrounds, backgroundTextureMapping);
           texturePosition++;
         }
       }
@@ -178,6 +180,7 @@ export class LoadingScreenComponent implements OnInit, OnDestroy {
         backgrounds,
         textureMapping,
         backgroundTextureMapping,
+        activities,
         this.charsTexture,
         Math.round((0 - cameraLeft) * tileWidth),
         Math.round((0 - cameraTop) * tileHeight) - 140,

@@ -346,6 +346,7 @@ export class TavernComponent implements OnInit, OnDestroy {
 
     texturePosition: number,
     colors: Uint8Array,
+    activities: Uint8Array,
     textureMapping: Float32Array,
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
@@ -367,7 +368,7 @@ export class TavernComponent implements OnInit, OnDestroy {
     }
     const color = active ?
       (clicked ? { r: 170, g: 170, b: 0, a: tile.color.a } : { r: 255, g: 255, b: 68, a: tile.color.a }) : tile.color;
-    fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+    fillColor(colors, activities, color.r, color.g, color.b, color.a, active, texturePosition);
     fillChar(this.charsService, textureMapping, tile.char, texturePosition);
   }
 
@@ -382,6 +383,7 @@ export class TavernComponent implements OnInit, OnDestroy {
       const clicked = this.mouseState.buttonsInfo[0] && this.mouseState.buttonsInfo[0].pressed;
       const textureMapping: Float32Array = new Float32Array(this.tavernWidth * this.tavernHeight * 12);
       const colors: Uint8Array = new Uint8Array(this.tavernWidth * this.tavernHeight * 4);
+      const activities: Uint8Array = new Uint8Array(this.tavernWidth * this.tavernHeight);
       const backgroundTextureMapping: Float32Array = new Float32Array(this.tavernWidth * this.tavernHeight * 12);
       const backgrounds: Uint8Array = new Uint8Array(this.tavernWidth * this.tavernHeight * 4);
       const mainTextureVertexes: Float32Array = new Float32Array(this.tavernWidth * this.tavernHeight * 12);
@@ -403,6 +405,7 @@ export class TavernComponent implements OnInit, OnDestroy {
               clicked,
               texturePosition,
               colors,
+              activities,
               textureMapping,
               backgrounds,
               backgroundTextureMapping);
@@ -418,6 +421,7 @@ export class TavernComponent implements OnInit, OnDestroy {
         backgrounds,
         textureMapping,
         backgroundTextureMapping,
+        activities,
         this.charsTexture,
         0,
         0,

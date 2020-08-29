@@ -57,13 +57,14 @@ export class TextureIconComponent implements OnInit, OnDestroy {
     const height = this.iconCanvas.nativeElement.height;
     const textureMapping: Float32Array = new Float32Array(12);
     const colors: Uint8Array = new Uint8Array(4);
+    const activities: Uint8Array = new Uint8Array(1);
     const backgroundTextureMapping: Float32Array = new Float32Array(12);
     const backgrounds: Uint8Array = new Uint8Array(4);
     const mainTextureVertexes: Float32Array = new Float32Array(12);
     fillBackground(backgrounds, 0, 8, 24, 0);
     fillChar(this.textureService, backgroundTextureMapping, ' ', 0);
     fillVertexPosition(mainTextureVertexes, 0, 0, 0, 0, width, height, 0);
-    fillColor(colors, definition.color.r, definition.color.g, definition.color.b, definition.color.a, 0);
+    fillColor(colors, activities, definition.color.r, definition.color.g, definition.color.b, definition.color.a, false, 0);
     fillChar(this.textureService, textureMapping, definition.char, 0);
     this.context.clearColor(0, 0, 0, 0);
     drawArrays(
@@ -74,6 +75,7 @@ export class TextureIconComponent implements OnInit, OnDestroy {
       backgrounds,
       textureMapping,
       backgroundTextureMapping,
+      activities,
       this.texture,
       0,
       0,

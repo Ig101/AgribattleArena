@@ -779,6 +779,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     texturePosition: number,
 
     colors: Uint8Array,
+    activities: Uint8Array,
     textureMapping: Float32Array,
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
@@ -790,7 +791,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     } else {
       fillBackground(backgrounds, 0, 0, 0, texturePosition);
     }
-    fillColor(colors, color.r * dim, color.g * dim, color.b * dim, color.a, texturePosition);
+    fillColor(colors, activities, color.r * dim, color.g * dim, color.b * dim, color.a, false, texturePosition);
     fillChar(this.charsService, textureMapping, char, texturePosition);
   }
 
@@ -809,6 +810,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
     redPath: Path2D,
     colors: Uint8Array,
     textureMapping: Float32Array,
+    activities: Uint8Array,
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
 
@@ -836,7 +838,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       const replacement = this.battleStorageService.currentAnimations ? this.battleStorageService.currentAnimations[x][y] : undefined;
       if (drawChar) {
         const color = brightImpact(tile.bright, drawChar.color);
-        fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+        fillColor(colors, activities, color.r, color.g, color.b, color.a, false, texturePosition);
         fillChar(this.charsService, textureMapping, drawChar.char, texturePosition);
       } else if ((tile.actor || tile.decoration) &&
         ((tile.specEffects.length === 0 && !selected) || Math.floor(this.tickState) % 2 === 1) &&
@@ -851,13 +853,13 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
             {r: 255, g: 255, b: 0, a: tile.actor.visualization.color.a} :
             tile.actor.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.actor.z) : color);
-          fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+          fillColor(colors, activities, color.r, color.g, color.b, color.a, false, texturePosition);
           fillChar(
             this.charsService, textureMapping, replacement?.char ? replacement.char : tile.actor.visualization.char, texturePosition);
         } else if (tile.decoration) {
           let color = heightImpact(tile.decoration.z, tile.decoration.visualization.color);
           color = brightImpact(tile.bright, replacement ? this.mixColorWithReplacement(color, replacement, tile.decoration.z) : color);
-          fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+          fillColor(colors, activities, color.r, color.g, color.b, color.a, false, texturePosition);
           fillChar(
             this.charsService, textureMapping, replacement?.char ? replacement.char : tile.decoration.visualization.char, texturePosition);
         }
@@ -872,7 +874,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         color =  brightImpact(tile.bright, replacement?.workingOnSpecEffects ?
           this.mixColorWithReplacement(color, replacement, effectForDraw.z) :
           color);
-        fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+        fillColor(colors, activities, color.r, color.g, color.b, color.a, false, texturePosition);
         fillChar(
           this.charsService, textureMapping,
           replacement?.workingOnSpecEffects ? replacement.char : effectForDraw.visualization.char, texturePosition);
@@ -880,7 +882,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         const color =  replacement?.workingOnSpecEffects && replacement?.char ?
           brightImpact(tile.bright, replacement.color) :
           heightImpact(tile.height, tile.visualization.color);
-        fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+        fillColor(colors, activities, color.r, color.g, color.b, color.a, false, texturePosition);
         fillChar(
           this.charsService, textureMapping, replacement?.char ? replacement.char : tile.visualization.char, texturePosition);
       }
@@ -955,6 +957,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
       const height = bottom - top + 1;
       const textureMapping: Float32Array = new Float32Array(width * height * 12);
       const colors: Uint8Array = new Uint8Array(width * height * 4);
+      const activities: Uint8Array = new Uint8Array(width * height);
       const backgroundTextureMapping: Float32Array = new Float32Array(width * height * 12);
       const backgrounds: Uint8Array = new Uint8Array(width * height * 4);
       const mainTextureVertexes: Float32Array = new Float32Array(width * height * 12);
@@ -985,11 +988,11 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
               }
               sceneRandom.next();
               this.drawPoint(scene, x, y, texturePosition, drawChar, cameraLeft, cameraTop,
-                greenPath, yellowPath, redPath, colors, textureMapping, backgrounds, backgroundTextureMapping);
+                greenPath, yellowPath, redPath, colors, textureMapping, activities, backgrounds, backgroundTextureMapping);
             } else {
               const biom = getRandomBiom(sceneRandom, this.battleStorageService.scene.biom);
               this.drawDummyPoint(biom.char, biom.color, biom.backgroundColor, texturePosition,
-                colors, textureMapping, backgrounds, backgroundTextureMapping);
+                colors, activities, textureMapping, backgrounds, backgroundTextureMapping);
             }
             texturePosition++;
           } else {
@@ -1006,6 +1009,7 @@ export class AsciiBattleComponent implements OnInit, OnDestroy {
         backgrounds,
         textureMapping,
         backgroundTextureMapping,
+        activities,
         this.charsTexture,
         Math.round((left - cameraLeft) * this.tileWidth),
         Math.round((top - cameraTop - 1) * this.tileHeight),

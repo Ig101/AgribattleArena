@@ -91,7 +91,6 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
         candidate.initiativePosition += candidate.turnCost;
       }
       this.actors = portraits;
-      console.log(this.actors);
     }
   }
 

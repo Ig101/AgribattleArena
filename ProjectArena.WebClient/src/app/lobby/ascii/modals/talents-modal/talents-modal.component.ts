@@ -676,6 +676,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
     texturePosition: number,
     mainTextureVertexes: Float32Array,
     colors: Uint8Array,
+    activities: Uint8Array,
     textureMapping: Float32Array,
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
@@ -696,10 +697,10 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
           color = tile.initiallySelected ? { r: 153, g: 0, b: 0, a: 1} : { r: 136, g: 136, b: 136, a: 1};
         }
       }
-      fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+      fillColor(colors, activities, color.r, color.g, color.b, color.a, tile.accessible && active, texturePosition);
       fillChar(this.iconsService, textureMapping, tile.char, texturePosition);
     } else {
-      fillColor(colors, 0, 0, 0, 0, texturePosition);
+      fillColor(colors, activities, 0, 0, 0, 0, false, texturePosition);
     }
   }
 
@@ -717,6 +718,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
       const clicked = this.mouseState.buttonsInfo[0] && this.mouseState.buttonsInfo[0].pressed;
       const textureMapping: Float32Array = new Float32Array(this.mapWidth * this.mapHeight * 12);
       const colors: Uint8Array = new Uint8Array(this.mapWidth * this.mapHeight * 4);
+      const activities: Uint8Array = new Uint8Array(this.mapWidth * this.mapHeight);
       const backgroundTextureMapping: Float32Array = new Float32Array(this.mapWidth * this.mapHeight * 12);
       const backgrounds: Uint8Array = new Uint8Array(this.mapWidth * this.mapHeight * 4);
       const mainTextureVertexes: Float32Array = new Float32Array(this.mapWidth * this.mapHeight * 12);
@@ -733,6 +735,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
             texturePosition,
             mainTextureVertexes,
             colors,
+            activities,
             textureMapping,
             backgrounds,
             backgroundTextureMapping);
@@ -747,6 +750,7 @@ export class TalentsModalComponent implements OnInit, OnDestroy {
         backgrounds,
         textureMapping,
         backgroundTextureMapping,
+        activities,
         this.charsTexture,
         Math.round((0 - cameraLeft) * this.tileWidth),
         Math.round((0 - cameraTop) * this.tileHeight),

@@ -80,6 +80,7 @@ export class FightComponent implements OnInit, OnDestroy {
   rangeMap: boolean[][]; // undefined for nothing, false for red, true for yellow
   textureMapping: Float32Array;
   colors: Uint8Array;
+  activities: Uint8Array;
   backgroundTextureMapping: Float32Array;
   backgrounds: Uint8Array;
   mainTextureVertexes: Float32Array;
@@ -93,6 +94,7 @@ export class FightComponent implements OnInit, OnDestroy {
     position: number;
     textureMapping: Float32Array;
     colors: Uint8Array;
+    activity: number;
   };
 
   smartAlt: SmartAction;
@@ -834,6 +836,7 @@ export class FightComponent implements OnInit, OnDestroy {
     texturePosition: number,
 
     colors: Uint8Array,
+    activities: Uint8Array,
     textureMapping: Float32Array,
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
@@ -847,7 +850,7 @@ export class FightComponent implements OnInit, OnDestroy {
       DEFAULT_HEIGHT - this.getTileHeight(x, y + 1) >= 120,
       texturePosition);
     fillBackground(backgrounds, color.r * dim / 5, color.g * dim / 5, color.b * dim / 5, texturePosition);
-    fillColor(colors, color.r * dim, color.g * dim, color.b * dim, color.a, texturePosition);
+    fillColor(colors, activities, color.r * dim, color.g * dim, color.b * dim, color.a, false, texturePosition);
     fillChar(this.charsService, textureMapping, char, texturePosition);
   }
 
@@ -907,6 +910,7 @@ export class FightComponent implements OnInit, OnDestroy {
     greenPath: Path2D,
     redPath: Path2D,
     colors: Uint8Array,
+    activities: Uint8Array,
     textureMapping: Float32Array,
     backgrounds: Uint8Array,
     backgroundTextureMapping: Float32Array) {
@@ -955,7 +959,7 @@ export class FightComponent implements OnInit, OnDestroy {
         mirrored = info.visibleActor.left;
       }
       // TODO TileStubs
-      fillColor(colors, color.r, color.g, color.b, color.a, texturePosition);
+      fillColor(colors, activities, color.r, color.g, color.b, color.a, false, texturePosition);
       fillChar(
         this.charsService, textureMapping, char, texturePosition, mirrored);
       if (info.visibleActor && info.visibleActor.tags.includes('active')) {
@@ -1029,6 +1033,7 @@ export class FightComponent implements OnInit, OnDestroy {
 
         this.textureMapping = new Float32Array(width * height * 12);
         this.colors = new Uint8Array(width * height * 4);
+        this.activities = new Uint8Array(width * height);
         this.backgroundTextureMapping = new Float32Array(width * height * 12);
         this.backgrounds = new Uint8Array(width * height * 4);
         this.mainTextureVertexes = new Float32Array(width * height * 12);
@@ -1040,12 +1045,12 @@ export class FightComponent implements OnInit, OnDestroy {
               if (x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
                 sceneRandom.next();
                 this.drawPoint(x, y, texturePosition, cameraLeft, cameraTop,
-                  this.greenPath, this.redPath, this.colors, this.textureMapping,
+                  this.greenPath, this.redPath, this.colors, this.activities, this.textureMapping,
                   this.backgrounds, this.backgroundTextureMapping);
               } else {
                 const biom = getRandomBiom(sceneRandom, this.scene.biom);
                 this.drawDummyPoint(x, y, biom.char, biom.color, texturePosition,
-                  this.colors, this.textureMapping, this.backgrounds, this.backgroundTextureMapping);
+                  this.colors, this.activities, this.textureMapping, this.backgrounds, this.backgroundTextureMapping);
               }
               texturePosition++;
             } else {
@@ -1063,6 +1068,7 @@ export class FightComponent implements OnInit, OnDestroy {
         for (let i = 0; i < 4; i++) {
           this.colors[this.cursorVertexes.position * 4 + i] = this.cursorVertexes.colors[i];
         }
+        this.activities[this.cursorVertexes.position] = this.cursorVertexes.activity;
         this.cursorVertexes = undefined;
       }
 
@@ -1086,9 +1092,10 @@ export class FightComponent implements OnInit, OnDestroy {
           this.cursorVertexes = {
             position,
             textureMapping: this.textureMapping.slice(position * 12, position * 12 + 12),
-            colors: this.colors.slice(position * 4, position * 4 + 4)
+            colors: this.colors.slice(position * 4, position * 4 + 4),
+            activity: this.activities[position]
           };
-          fillColor(this.colors, this.actionConflict ? 200 : 255, this.actionConflict ? 0 : 255, 0, 1, position);
+          fillColor(this.colors, this.activities, this.actionConflict ? 200 : 255, this.actionConflict ? 0 : 255, 0, 1, true, position);
           const actors = this.scene.tiles[mouseX][mouseY].actors;
           // TODO set actionEffect true
           if (actors.length === 0 || actors[actors.length - 1].tags.includes('tile')) {
@@ -1105,6 +1112,7 @@ export class FightComponent implements OnInit, OnDestroy {
         this.backgrounds,
         this.textureMapping,
         this.backgroundTextureMapping,
+        this.activities,
         this.charsTexture,
         Math.round((left - cameraLeft) * this.tileWidth),
         Math.round((top - cameraTop - 1) * this.tileHeight),
