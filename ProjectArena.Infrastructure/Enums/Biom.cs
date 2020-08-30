@@ -1,7 +1,7 @@
 namespace ProjectArena.Infrastructure.Enums
 {
-    public enum RoomType
+    public enum Biom
     {
-        Demo
+        Grass = 0
     }
 }
