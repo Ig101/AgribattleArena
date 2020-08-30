@@ -4,9 +4,9 @@ export interface TileStub {
   endTime: number;
   x: number;
   y: number;
-  char: string; // if null not change
-  actionColored: boolean;
-  color: Color; // if null not change
-  backgroundColor: Color; // if null not change
+  char?: string; // if null not change
+  active?: boolean;
+  color?: Color; // if null not change
+  backgroundColor?: Color; // if null not change
   priority: number;
 }

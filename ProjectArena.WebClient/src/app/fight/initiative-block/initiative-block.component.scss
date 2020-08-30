@@ -33,6 +33,11 @@
     border-width: 6px;
   }
 
+  .no-one-left {
+    margin-left: 0;
+    margin-right: 4px;
+  }
+
   .left-side {
     display: flex;
   }
@@ -47,10 +52,11 @@
     }
 
     .timer {
-      margin: 4px;
-      margin-top: 8px;
+      margin-left: 4px;
+      margin-top: 2px;
       height: 20px;
-      min-height: 20px;
+      box-sizing: border-box;
+      border: solid 2px #000;
     }
   }
 }

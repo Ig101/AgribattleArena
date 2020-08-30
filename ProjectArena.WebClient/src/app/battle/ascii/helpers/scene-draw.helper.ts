@@ -25,3 +25,12 @@ export function heightImpact(z: number, color: Color): Color {
   }
   return color;
 }
+
+export function backgroundImpact(color: Color): Color {
+  return {
+    r: color.r / 5,
+    g: color.g / 5,
+    b: color.b / 5,
+    a: color.a
+  };
+}

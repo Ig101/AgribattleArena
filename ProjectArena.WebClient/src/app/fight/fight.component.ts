@@ -14,7 +14,7 @@ import { fillVertexPosition, drawArrays, fillTileMask, fillBackground, fillColor
 import { ActionSquareTypeEnum } from '../battle/ascii/models/enum/action-square-type.enum';
 import { getRandomBiom } from '../shared/bioms/biom.helper';
 import { Color } from '../shared/models/color.model';
-import { heightImpact, brightImpact } from '../battle/ascii/helpers/scene-draw.helper';
+import { heightImpact, brightImpact, backgroundImpact } from '../battle/ascii/helpers/scene-draw.helper';
 import { Scene } from '../engine/scene/scene.object';
 import { BiomEnum } from '../shared/models/enum/biom.enum';
 import { Actor } from '../engine/scene/actor.object';
@@ -917,6 +917,7 @@ export class FightComponent implements OnInit, OnDestroy {
 
     const tile = this.scene.tiles[x][y];
     if (tile) {
+      const tileStub = this.scene.tileStubs.find(s => s.x === x && s.y === y);
       const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
       const canvasY = Math.round((y - cameraTop) * this.tileHeight);
       const info = this.getTileActorAndVisibleActors(tile);
@@ -930,12 +931,12 @@ export class FightComponent implements OnInit, OnDestroy {
         currentTileHeight - this.getTileHeight(x, y + 1) >= 120,
         texturePosition);
       if (info.backgroundActor) {
-        const background = heightImpact(currentTileHeight, info.backgroundActor.color);
+        const background = tileStub?.backgroundColor || backgroundImpact(heightImpact(currentTileHeight, info.backgroundActor.color));
         fillBackground(
           backgrounds,
-          background.r / 5,
-          background.g / 5,
-          background.b / 5,
+          background.r,
+          background.g,
+          background.b,
           texturePosition);
       } else {
         fillBackground(backgrounds, 0, 0, 0, texturePosition);
@@ -958,8 +959,15 @@ export class FightComponent implements OnInit, OnDestroy {
         char = info.visibleActor.char;
         mirrored = info.visibleActor.left;
       }
-      // TODO TileStubs
-      fillColor(colors, activities, color.r, color.g, color.b, color.a, false, texturePosition);
+
+      if (tileStub?.color) {
+        color = tileStub.color;
+      }
+      if (tileStub?.char) {
+        char = tileStub.char;
+      }
+
+      fillColor(colors, activities, color.r, color.g, color.b, color.a, tileStub?.active, texturePosition);
       fillChar(
         this.charsService, textureMapping, char, texturePosition, mirrored);
       if (info.visibleActor && info.visibleActor.tags.includes('active')) {

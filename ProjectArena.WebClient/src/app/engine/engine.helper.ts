@@ -1,5 +1,12 @@
 import { Action } from './models/abstract/action.model';
 
+export const SCENE_FRAME_TIME = 1 / 30;
+
+export function shiftTimeByFrames(time: number, frames: number) {
+  return time + frames * SCENE_FRAME_TIME;
+}
+
+
 export function getMostPrioritizedAction(actions: Action[]) {
   if (!actions || actions.length === 0) {
     return undefined;

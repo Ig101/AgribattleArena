@@ -1,5 +1,5 @@
 <div *ngIf="actors.length > 0" class="left-side">
-  <div class="no-one" *ngIf="noOneTurn"></div>
+  <div class="no-one no-one-left" *ngIf="noOneTurn"></div>
   <app-texture-icon [textureService]="charsService" class="portrait big-portrait"  [style.borderColor]="actors[startPosition].color" [definition]="actors[startPosition].definition"></app-texture-icon>
   <div class="no-one" *ngIf="!noOneTurn"></div>
 </div>

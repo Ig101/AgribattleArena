@@ -24,11 +24,9 @@ import { INativesCollection } from '../interfaces/natives-collection.interface';
 import { getHashFromString } from 'src/app/helpers/extensions/hash.extension';
 import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
 import { ActionClassEnum } from '../models/enums/action-class.enum';
-import { getMostPrioritizedAction } from '../engine.helper';
+import { getMostPrioritizedAction, SCENE_FRAME_TIME } from '../engine.helper';
 import { randomBytes } from 'crypto';
 import { ReactionSynchronization } from 'src/app/shared/models/synchronization/objects/reaction-synchronization.model';
-
-export const SCENE_FRAME_TIME = 1000 / 30;
 
 export class Scene {
 
@@ -315,6 +313,7 @@ export class Scene {
         if (change.tileStubs) {
           this.tileStubs.push(...change.tileStubs);
           this.tileStubs.sort((a, b) => b.priority - a.priority);
+          this.visualizationChanged = true;
         }
         if (change.logs) {
           this.logs.push(...change.logs);
@@ -325,7 +324,11 @@ export class Scene {
       }
       this.visualizationChanged = true;
     }
+    const tileStubsCount = this.tileStubs.length;
     this.tileStubs = this.tileStubs.filter(x => x.endTime > this.timeLine);
+    if (this.tileStubs.length !== tileStubsCount) {
+      this.visualizationChanged = true;
+    }
     this.clearExtraLogs();
 
     if (this.timeLine > 1000000000) {

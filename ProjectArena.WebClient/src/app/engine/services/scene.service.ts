@@ -6,10 +6,11 @@ import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.mo
 import { Subject, BehaviorSubject } from 'rxjs';
 import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
 import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization/synchronization-message-dto.model';
-import { Scene, SCENE_FRAME_TIME } from '../scene/scene.object';
+import { Scene } from '../scene/scene.object';
 import { MessageType } from '@aspnet/signalr';
 import { SynchronizationMessageType } from 'src/app/shared/models/enum/synchronization-message-type.enum';
 import { NativesCollection } from 'src/app/content/natives-collection';
+import { SCENE_FRAME_TIME } from '../engine.helper';
 
 @Injectable()
 export class SceneService {
@@ -52,7 +53,7 @@ export class SceneService {
     this.updater = setInterval(() => {
       const shift = this.scene.update();
       this.updateSub.next(shift);
-    }, SCENE_FRAME_TIME);
+    }, SCENE_FRAME_TIME * 1000);
   }
 
   clearScene() {

@@ -20,7 +20,7 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
   }
 
   get lineWidth() {
-    return Math.min(240, this.timer * 8);
+    return Math.min(248, this.timer * 8.25);
   }
 
 

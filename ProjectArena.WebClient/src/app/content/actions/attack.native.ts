@@ -2,6 +2,7 @@ import { ChangeDefinition } from 'src/app/engine/models/abstract/change-definiti
 import { Actor } from 'src/app/engine/scene/actor.object';
 import { LARGE_ACTOR_TRESHOLD_VOLUME } from '../content.helper';
 import { IActor } from 'src/app/engine/interfaces/actor.interface';
+import { shiftTimeByFrames } from 'src/app/engine/engine.helper';
 
 export function attackAction(actor: Actor, power: number, target: IActor, startingTime: number): ChangeDefinition[] {
   actor.parentActor.handleEffects(['act', 'physical-act', 'weapon-act'], power, true, 1, startingTime, actor);
