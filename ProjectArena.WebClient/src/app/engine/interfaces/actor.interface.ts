@@ -43,4 +43,6 @@ export interface IActor {
   getChildrenByScope(height: number, scope: number): Actor[];
 
   getNeighboursByScope(scope: number): IActor[];
+
+  setChanged();
 }

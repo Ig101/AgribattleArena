@@ -147,6 +147,7 @@ export class Actor implements IActor {
 
   actTargeted(action: Action, x: number, y: number) {
     if (this.isAlive && action.native.actionTargeted) {
+      this.setChanged();
       action.remainedTime = action.native.cooldown;
       if (x > this.x) {
         this.left = false;
@@ -161,6 +162,7 @@ export class Actor implements IActor {
 
   actOnObject(action: Action, target: IActor) {
     if (this.isAlive && action.native.actionOnObject) {
+      this.setChanged();
       action.remainedTime = action.native.cooldown;
       if (target.x > this.x) {
         this.left = false;
@@ -230,7 +232,6 @@ export class Actor implements IActor {
     this.isAlive = false;
     this.handleEffects([KILL_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine, undefined);
     this.parentActor.removeActor(this);
-    this.parentScene.removedActors.push(this.id);
     for (const inside of this.actors) {
       this.parentActor.addActorOnTop(inside);
     }
@@ -238,7 +239,7 @@ export class Actor implements IActor {
   }
 
   applyBuff(buff: Buff) {
-    this.changed = true;
+    this.setChanged();
     this.buffs.push(buff);
     const sameBuffs = this.buffs.filter(x => x.id === buff.id);
     const haveExtraBuffs = buff.maxStacks < sameBuffs.length;
@@ -292,7 +293,7 @@ export class Actor implements IActor {
   }
 
   purgeBuffs() {
-    this.changed = true;
+    this.setChanged();
     this.buffs.length = 0;
     this.blockedEffects.length = 0;
     this.blockedActions.length = 0;
@@ -338,7 +339,7 @@ export class Actor implements IActor {
       }
     }
     if (buffRemoved) {
-      this.changed = true;
+      this.setChanged();
       this.buffs = this.buffs.filter(x => x.duration > 0);
       this.blockedEffects.length = 0;
       this.blockedActions.length = 0;
@@ -361,7 +362,7 @@ export class Actor implements IActor {
   }
 
   changeDurability(durability: number) {
-    this.changed = true;
+    this.setChanged();
     this.durability += durability;
     if (this.durability <= 0) {
       this.kill();
@@ -372,7 +373,7 @@ export class Actor implements IActor {
   }
 
   addActorOnTop(actor: Actor) {
-    this.changed = true;
+    this.setChanged();
     actor.parentActor = this;
     this.actors.push(actor);
   }
@@ -383,17 +384,17 @@ export class Actor implements IActor {
       return;
     }
     actor.parentActor = this;
-    this.changed = true;
+    this.setChanged();
     this.actors.splice(Math.max(0, index), 0, actor);
   }
 
   removeActor(actor: Actor) {
-    this.changed = true;
+    this.parentScene.removedActors.push(actor.reference);
     removeFromArray(this.actors, actor);
   }
 
   move(target: IActor) {
-    this.changed = true;
+    this.setChanged();
     this.parentActor.removeActor(this);
     if (this === this.parentScene.currentActor) {
       this.parentScene.waitingAction = undefined;
@@ -402,7 +403,7 @@ export class Actor implements IActor {
   }
 
   moveToIndex(target: IActor, index: number) {
-    this.changed = true;
+    this.setChanged();
     this.parentActor.removeActor(this);
     if (this === this.parentScene.currentActor) {
       this.parentScene.waitingAction = undefined;
@@ -535,5 +536,10 @@ export class Actor implements IActor {
 
   getChildrenByScope(height: number, scope: number) {
     return this.actors;
+  }
+
+  setChanged() {
+    this.changed = true;
+    this.parentActor.setChanged();
   }
 }

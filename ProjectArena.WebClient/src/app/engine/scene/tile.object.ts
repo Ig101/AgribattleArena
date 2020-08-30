@@ -119,6 +119,7 @@ export class Tile implements IActor {
 
 
   removeActor(actor: Actor) {
+    this.parentScene.removedActors.push(actor.reference);
     removeFromArray(this.actors, actor);
   }
 
@@ -164,4 +165,6 @@ export class Tile implements IActor {
     }
     return actors;
   }
+
+  setChanged() { }
 }

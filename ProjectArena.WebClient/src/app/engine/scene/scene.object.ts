@@ -4,7 +4,6 @@ import { Observer } from 'rxjs/internal/types';
 import { Actor } from './actor.object';
 import { TileStub } from '../models/abstract/tile-stub.model';
 import { ChangeDefinition } from '../models/abstract/change-definition.model';
-import { Synchronizer } from 'src/app/shared/models/battle/synchronizer.model';
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
 import { StartTurnInfo } from 'src/app/shared/models/synchronization/start-turn-info.model';
 import { Log } from '../models/abstract/log.model';
@@ -27,6 +26,7 @@ import { ActionClassEnum } from '../models/enums/action-class.enum';
 import { getMostPrioritizedAction, SCENE_FRAME_TIME } from '../engine.helper';
 import { randomBytes } from 'crypto';
 import { ReactionSynchronization } from 'src/app/shared/models/synchronization/objects/reaction-synchronization.model';
+import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
 
 export class Scene {
 
@@ -38,7 +38,7 @@ export class Scene {
 
   visualizationChanged = true;
 
-  removedActors: number[] = [];
+  removedActors: ActorReference[] = [];
 
   tileStubs: TileStub[] = [];
   changes: ChangeDefinition[] = [];
@@ -129,9 +129,14 @@ export class Scene {
         actors.push(...this.tiles[x][y].createSynchronizerAndClearInfo());
       }
     }
-    // TODO Synchronizer
+    const synchronizer = {
+      actors,
+      removedActors: this.removedActors,
+      idCounterPosition: this.idCounterPosition
+    };
+    this.removedActors.length = 0;
     this.changed = false;
-    return undefined;
+    return synchronizer;
   }
 
   private act(actor: Actor, action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
@@ -173,7 +178,7 @@ export class Scene {
 
     if (actor?.isAlive) {
       this.currentActor = actor;
-      this.currentActor.changed = true;
+      this.currentActor.setChanged();
       this.currentActor.initiativePosition += this.currentActor.turnCost;
       this.turnTime = definition.time;
     }
