@@ -143,4 +143,25 @@ export class Tile implements IActor {
     }
     return activeActors;
   }
+
+  getNeighboursByScope(scope: number) {
+    return [this];
+  }
+
+  getChildrenByScope(height: number, scope: number) {
+    const actors: Actor[] = [];
+    const lowerBound = height - scope;
+    const highBound = height + scope;
+    let z = 0;
+    for (const actor of this.actors) {
+      if (z > highBound) {
+        break;
+      }
+      z += actor.height;
+      if (z > lowerBound) {
+        actors.push(actor);
+      }
+    }
+    return actors;
+  }
 }

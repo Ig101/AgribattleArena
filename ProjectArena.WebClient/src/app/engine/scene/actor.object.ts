@@ -169,7 +169,7 @@ export class Actor implements IActor {
         this.left = true;
       }
       this.parentScene.pushChanges(
-        action.native.actionOnObject(this, action.native.power, target, this.parentScene.timeLine));
+        action.native.actionOnObject(this, action.native.power, action.native.scopeSize, target, this.parentScene.timeLine));
     }
   }
 
@@ -506,5 +506,34 @@ export class Actor implements IActor {
       activeActors.push(...actor.getActiveActors());
     }
     return activeActors;
+  }
+
+  getNeighboursByScope(scope: number) {
+    if (scope === 0) {
+      return [this];
+    }
+    if (this.parentActor.isRoot) {
+      const actors: Actor[] = [this];
+      const midHeight = this.z + this.height / 2;
+      const lowerBound = midHeight - scope;
+      const highBound = midHeight + scope;
+      let z = 0;
+      for (const actor of this.parentActor.actors) {
+        if (z > highBound) {
+          break;
+        }
+        if (z + actor.height >= lowerBound) {
+          actors.push(actor);
+        }
+        z += actor.height;
+      }
+      return actors;
+    } else {
+      return this.parentActor.actors;
+    }
+  }
+
+  getChildrenByScope(height: number, scope: number) {
+    return this.actors;
   }
 }

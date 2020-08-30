@@ -14,12 +14,13 @@ export interface ActionNative {
   power: number;
   aiPriority: number;
   actionClass: ActionClassEnum;
+  scopeSize: number;
 
   validateActionTargeted?: (actor: Actor, x: number, y: number) => string;
   validateActionOnObject?: (actor: Actor, target: IActor) => string;
 
   actionTargeted?: (actor: Actor, power: number, x: number, y: number, startingTime: number)
     => ChangeDefinition[];
-  actionOnObject?: (actor: Actor, power: number, target: IActor, startingTime: number)
+  actionOnObject?: (actor: Actor, power: number, scope: number, target: IActor, startingTime: number)
     => ChangeDefinition[];
 }

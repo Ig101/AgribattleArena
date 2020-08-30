@@ -39,4 +39,8 @@ export interface IActor {
   getActorZ(actor: Actor);
 
   move(target: IActor);
+
+  getChildrenByScope(height: number, scope: number): Actor[];
+
+  getNeighboursByScope(scope: number): IActor[];
 }
