@@ -10,6 +10,7 @@ import { ContextMenuItemComponent } from './context-menu/context-menu-item/conte
 import { MenuModalComponent } from './modals/menu-modal/menu-modal.component';
 import { RewardForModalComponent } from './modals/reward-for-modal/reward-for-modal.component';
 import { InitiativeBlockComponent } from './initiative-block/initiative-block.component';
+import { TargetChooseModalComponent } from './modals/target-choose-modal/target-choose-modal.component';
 
 
 
@@ -20,7 +21,8 @@ import { InitiativeBlockComponent } from './initiative-block/initiative-block.co
     ContextMenuItemComponent,
     MenuModalComponent,
     RewardForModalComponent,
-    InitiativeBlockComponent
+    InitiativeBlockComponent,
+    TargetChooseModalComponent
   ],
   imports: [
     SharedModule,

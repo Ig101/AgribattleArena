@@ -16,6 +16,6 @@
     </div>
   </div>
   <div class="window no-top">
-    <app-initiative-block></app-initiative-block>
+    <app-initiative-block (changeSelected)="changeSelection($event)" (leftClick)="onExternalClick($event)"></app-initiative-block>
   </div>
 </div>

@@ -12,7 +12,8 @@ import { Actor } from 'src/app/engine/scene/actor.object';
 })
 export class InitiativeBlockComponent implements OnInit, OnDestroy {
 
-  @Output() changeSelected = new EventEmitter<InitiativePortrait>();
+  @Output() changeSelected = new EventEmitter<Actor>();
+  @Output() leftClick = new EventEmitter<Actor>();
   @Output() rightClick = new EventEmitter<Actor>();
 
   get timer() {
@@ -38,7 +39,6 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
 
   actors = new Array<InitiativePortrait>(7);
 
-  private selectedActior: InitiativePortrait;
   private sub: Subscription;
 
   constructor(
@@ -95,20 +95,18 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
   }
 
   enterActorCard(actor: InitiativePortrait) {
-    this.selectedActior = actor;
-    this.changeSelected.next(actor);
+    this.changeSelected.next(actor.actor);
   }
 
-  leaveActorCard(actor: InitiativePortrait) {
-    if (this.selectedActior === actor) {
-      this.selectedActior = undefined;
-      this.changeSelected.emit(undefined);
-    }
+  leaveActorCard() {
+    this.changeSelected.emit(undefined);
   }
 
   onClick(portrait: InitiativePortrait) {
-    this.selectedActior = undefined;
-    this.changeSelected.emit(undefined);
+    this.leftClick.next(portrait.actor);
+  }
+
+  onRightClick(portrait: InitiativePortrait) {
     this.rightClick.next(portrait.actor);
   }
 }

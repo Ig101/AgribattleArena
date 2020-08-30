@@ -4,7 +4,7 @@ import { SceneService } from '../engine/services/scene.service';
 import { SynchronizationService } from '../engine/services/synchronization.service';
 import { FullSynchronizationInfo } from '../shared/models/synchronization/full-synchronization-info.model';
 import { ActorSynchronization } from '../shared/models/synchronization/objects/actor-synchronization.model';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ModalService } from '../shared/services/modal.service';
 import { CharsService } from '../shared/services/chars.service';
@@ -34,6 +34,7 @@ import { ContextMenuContext } from './models/context-menu-context.model';
 import { MenuModalComponent } from './modals/menu-modal/menu-modal.component';
 import { BattlePlayerStatusEnum } from '../shared/models/enum/player-battle-status.enum';
 import { UserService } from '../shared/services/user.service';
+import { TargetChooseModalComponent } from './modals/target-choose-modal/target-choose-modal.component';
 
 @Component({
   selector: 'app-fight',
@@ -84,6 +85,7 @@ export class FightComponent implements OnInit, OnDestroy {
   backgroundTextureMapping: Float32Array;
   backgrounds: Uint8Array;
   mainTextureVertexes: Float32Array;
+  healthActors: Actor[];
 
   redPath: Path2D;
   greenPath: Path2D;
@@ -96,6 +98,8 @@ export class FightComponent implements OnInit, OnDestroy {
     colors: Uint8Array;
     activity: number;
   };
+  selectedActor: Actor;
+  selectedByModal: boolean;
 
   smartAlt: SmartAction;
   smartDirections: SmartAction[];
@@ -103,6 +107,8 @@ export class FightComponent implements OnInit, OnDestroy {
 
   openedModal: IModal<unknown>;
   modalPositioning: ModalPositioning;
+  positioningUpdateSubject = new Subject<any>();
+  actionModal: boolean;
 
   conflictTimer = 0;
 
@@ -144,12 +150,16 @@ export class FightComponent implements OnInit, OnDestroy {
   }
 
   get canAct() {
-    const can = !this.blocked &&
-      this.scene &&
+    return !this.blocked &&
+      this.canActNoBlocked;
+  }
+
+  get canActNoBlocked() {
+    const can = this.scene &&
       this.scene.currentActor?.owner?.id === this.scene.currentPlayer.id &&
       this.scene.turnTime > 0 &&
       this.scene.turnReallyStarted;
-    if (!can) {
+    if (!can && !this.blocked) {
       this.chosenAction = undefined;
     }
     return can;
@@ -185,8 +195,8 @@ export class FightComponent implements OnInit, OnDestroy {
       timeStamp: 0
     };
     this.smartAlt = {
-      hotKey: 'AltLeft',
-      keyVisualization: 'Ctrl',
+      hotKey: 'ShiftLeft',
+      keyVisualization: 'Shift',
       title: 'Alternative',
       pressed: false,
       action: undefined
@@ -265,6 +275,7 @@ export class FightComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.updateSubscription.unsubscribe();
     this.sceneService.clearScene();
+    this.positioningUpdateSubject.unsubscribe();
   }
 
   createSampleScene() {
@@ -371,7 +382,7 @@ export class FightComponent implements OnInit, OnDestroy {
         y: 6
       },
       left: false,
-      name: 'Actor',
+      name: 'Hero',
       char: 'adventurer',
       color: { r: 255, g: 155, b: 55, a: 1 },
       ownerId: 'sampleP',
@@ -442,6 +453,12 @@ export class FightComponent implements OnInit, OnDestroy {
     );
   }
 
+  changeSelection(actor: Actor) {
+    if (!this.selectedByModal) {
+      this.selectedActor = actor;
+    }
+  }
+
   directActorTo(x: number, y: number) {
     if (this.canAct && this.directionTimer <= 0 && x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
       const tile = this.scene.tiles[x][y];
@@ -458,9 +475,9 @@ export class FightComponent implements OnInit, OnDestroy {
             a.native.actionClass === ActionClassEnum.Attack &&
             !this.scene.currentActor.validateTargeted(a, x, y)));
         onTarget = true;
-        if (action.native.actionOnObject) {
+        if (action?.native.actionOnObject) {
           onTarget = false;
-          const actors = [];
+          const actors: Actor[] = [];
           if (this.scene.currentActor.parentActor.isRoot) {
             for (let i = tile.actors.length - 1; i >= 0; i--) {
               const tempActor = tile.actors[i];
@@ -470,13 +487,53 @@ export class FightComponent implements OnInit, OnDestroy {
               }
             }
             if (actors.length === 0) {
-              actors.push(tile);
+              actor = tile;
             }
           } else {
-            actors.push(this.scene.currentActor.parentActor);
+            actors.push(this.scene.currentActor.parentActor as Actor);
           }
-          // Open dialog with actors and choose one
-          actor = actors.find(a => a.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) || actors[0];
+          if (actors.length > 0) {
+            this.blocked = true;
+            this.actionModal = true;
+            this.selectedByModal = true;
+            this.mouseState.x = x;
+            this.mouseState.y = y;
+            this.modalPositioning = {
+              left: (Math.floor(this.mouseState.x) + 0.3 - this.cameraX +
+                (this.canvasWidth - this.interfaceShift + this.leftInterfaceShift) / 2 /
+                this.tileWidth) * this.zoom * this.tileWidth,
+              top: (Math.floor(this.mouseState.y) + 0.5 - this.cameraY + this.canvasHeight / 2 /
+                this.tileHeight) * this.zoom * this.tileHeight,
+              textHeight: this.tileHeight * this.zoom,
+              updateSubject: this.positioningUpdateSubject
+            } as ModalPositioning;
+            const selectionsObserver = new Subject<Actor>();
+            selectionsObserver.subscribe(chosenActor => {
+              this.selectedActor = chosenActor;
+            });
+            this.openedModal = this.modalService.openModal(TargetChooseModalComponent, {
+              modalPosition: this.modalPositioning,
+              selectionsObserver,
+              actors
+            });
+            this.openedModal.onClose.subscribe((chosenActor: Actor) => {
+              this.blocked = false;
+              this.openedModal = undefined;
+              this.actionModal = false;
+              this.selectedByModal = false;
+              selectionsObserver.unsubscribe();
+              this.directionTimer = 0.2;
+              this.scene.intendedOnObjectAction(action, chosenActor);
+            });
+            this.openedModal.onCancel.subscribe(_ => {
+              this.blocked = false;
+              this.openedModal = undefined;
+              this.actionModal = false;
+              this.selectedByModal = false;
+              selectionsObserver.unsubscribe();
+            });
+            return;
+          }
         }
       } else {
         let attack = false;
@@ -569,9 +626,8 @@ export class FightComponent implements OnInit, OnDestroy {
       if (action.native.actionTargeted) {
         this.scene.intendedTargetedAction(action, this.scene.currentActor.x, this.scene.currentActor.y);
       } else {
-
         const actors = this.scene.currentActor.actors;
-        // Open dialog with actors and choose one
+        // TODO Open dialog with current actor actors and choose one
         if (actors.length > 0) {
           this.scene.intendedOnObjectAction(action, actors[0]);
         }
@@ -631,62 +687,117 @@ export class FightComponent implements OnInit, OnDestroy {
     this.mouseState.buttonsInfo[event.button] = {pressed: true, timeStamp: event.timeStamp};
   }
 
+  cast(x: number, y: number, target?: Actor) {
+    const shiftedX = x - this.scene.currentActor.x + RANGED_RANGE;
+    const shiftedY = y - this.scene.currentActor.y + RANGED_RANGE;
+    if (shiftedX <= RANGED_RANGE * 2 && shiftedY <= RANGED_RANGE * 2 && shiftedX >= 0 && shiftedY >= 0 &&
+        this.rangeMap[shiftedX][shiftedY] !== undefined) {
+      const tile = this.scene.tiles[x][y];
+      let actor: IActor;
+      let onTarget: boolean;
+      if (this.smartAlt.pressed) {
+        onTarget = true;
+        if (this.chosenAction.native.actionOnObject) {
+          onTarget = false;
+          const actors = [];
+          if (this.scene.currentActor.parentActor.isRoot) {
+            for (let i = tile.actors.length - 1; i >= 0; i--) {
+              const tempActor = tile.actors[i];
+              actors.push(tempActor);
+              if (tempActor.tags.includes('tile')) {
+                break;
+              }
+            }
+            if (actors.length === 0) {
+              actor = tile;
+            }
+          } else {
+            actors.push(this.scene.currentActor.parentActor);
+          }
+          if (actors.length > 0) {
+            this.blocked = true;
+            this.actionModal = true;
+            this.mouseState.x = x;
+            this.mouseState.y = y;
+            this.modalPositioning = {
+              left: (Math.floor(this.mouseState.x) + 0.3 - this.cameraX +
+                (this.canvasWidth - this.interfaceShift + this.leftInterfaceShift) / 2 /
+                this.tileWidth) * this.zoom * this.tileWidth,
+              top: (Math.floor(this.mouseState.y) + 0.5 - this.cameraY + this.canvasHeight / 2 /
+                this.tileHeight) * this.zoom * this.tileHeight,
+              textHeight: this.tileHeight * this.zoom,
+              updateSubject: this.positioningUpdateSubject
+            } as ModalPositioning;
+            const selectionsObserver = new Subject<Actor>();
+            selectionsObserver.subscribe(chosenActor => {
+              this.selectedActor = chosenActor;
+            });
+            this.openedModal = this.modalService.openModal(TargetChooseModalComponent, {
+              modalPosition: this.modalPositioning,
+              selectionsObserver,
+              actors
+            });
+            this.openedModal.onClose.subscribe((chosenActor: Actor) => {
+              this.blocked = false;
+              this.openedModal = undefined;
+              this.actionModal = false;
+              selectionsObserver.unsubscribe();
+              this.directionTimer = 0.2;
+              this.scene.intendedOnObjectAction(this.chosenAction, chosenActor);
+              this.chosenAction = undefined;
+            });
+            this.openedModal.onCancel.subscribe(_ => {
+              this.blocked = false;
+              this.openedModal = undefined;
+              this.actionModal = false;
+              selectionsObserver.unsubscribe();
+            });
+            return;
+          }
+          actor = actors.find(a => a.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) || actors[0];
+        }
+      } else {
+        if (target) {
+          actor = target;
+        } else if (this.scene.currentActor.parentActor.isRoot) {
+          for (let i = tile.actors.length - 1; i >= 0; i--) {
+            actor = tile.actors[i];
+            if (actor.tags.includes('tile') || actor.tags.includes('flat') || actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
+              break;
+            }
+          }
+        } else {
+          actor = this.scene.currentActor.parentActor;
+        }
+        onTarget = !!this.chosenAction.native.actionTargeted;
+      }
+      if (onTarget) {
+        this.scene.intendedTargetedAction(this.chosenAction, x, y);
+      } else {
+        this.scene.intendedOnObjectAction(this.chosenAction, actor || tile);
+      }
+      this.chosenAction = undefined;
+    }
+  }
+
+  onExternalClick(actor: Actor) {
+    if (this.canAct) {
+      const x = actor.x;
+      const y = actor.y;
+      if (this.rangeMapIsActive) {
+        this.cast(x, y, actor);
+      }
+    }
+  }
+
   onMouseUp(event: MouseEvent) {
     this.mouseState.buttonsInfo[event.button] = {pressed: false, timeStamp: 0};
     this.recalculateMouseMove(event.x, event.y, event.timeStamp);
     if (!this.blocked) {
-      if (event.button === 0 && this.canAct && this.rangeMapIsActive) {
+      if (this.canAct && this.rangeMapIsActive && event.button === 0) {
         const x = Math.floor(this.mouseState.x);
         const y = Math.floor(this.mouseState.y);
-        const shiftedX = x - this.scene.currentActor.x + RANGED_RANGE;
-        const shiftedY = y - this.scene.currentActor.y + RANGED_RANGE;
-        if (shiftedX <= RANGED_RANGE * 2 && shiftedY <= RANGED_RANGE * 2 && shiftedX >= 0 && shiftedY >= 0 &&
-            this.rangeMap[shiftedX][shiftedY] !== undefined) {
-          const tile = this.scene.tiles[x][y];
-          let actor: IActor;
-          let onTarget: boolean;
-          if (this.smartAlt.pressed) {
-            onTarget = true;
-            if (this.chosenAction.native.actionOnObject) {
-              onTarget = false;
-              const actors = [];
-              if (this.scene.currentActor.parentActor.isRoot) {
-                for (let i = tile.actors.length - 1; i >= 0; i--) {
-                  const tempActor = tile.actors[i];
-                  actors.push(tempActor);
-                  if (tempActor.tags.includes('tile')) {
-                    break;
-                  }
-                }
-                if (actors.length === 0) {
-                  actors.push(tile);
-                }
-              } else {
-                actors.push(this.scene.currentActor.parentActor);
-              }
-              // Open dialog with actors and choose one
-              actor = actors.find(a => a.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) || actors[0];
-            }
-          } else {
-            if (this.scene.currentActor.parentActor.isRoot) {
-              for (let i = tile.actors.length - 1; i >= 0; i--) {
-                actor = tile.actors[i];
-                if (actor.tags.includes('tile') || actor.tags.includes('flat') || actor.volume >= LARGE_ACTOR_TRESHOLD_VOLUME) {
-                  break;
-                }
-              }
-            } else {
-              actor = this.scene.currentActor.parentActor;
-            }
-            onTarget = !!this.chosenAction.native.actionTargeted;
-          }
-          if (onTarget) {
-            this.scene.intendedTargetedAction(this.chosenAction, x, y);
-          } else {
-            this.scene.intendedOnObjectAction(this.chosenAction, actor || tile);
-          }
-          this.chosenAction = undefined;
-        }
+        this.cast(x, y);
       }
     }
   }
@@ -711,6 +822,8 @@ export class FightComponent implements OnInit, OnDestroy {
         this.tileWidth) * this.zoom * this.tileWidth;
       this.modalPositioning.top = (Math.floor(this.mouseState.y) + 0.5 - this.cameraY + this.canvasHeight / 2 /
         this.tileHeight) * this.zoom * this.tileHeight;
+      this.modalPositioning.textHeight = this.tileHeight * this.zoom;
+      this.positioningUpdateSubject.next();
     }
     if (this.scene) {
       this.scene.visualizationChanged = true;
@@ -913,13 +1026,11 @@ export class FightComponent implements OnInit, OnDestroy {
     activities: Uint8Array,
     textureMapping: Float32Array,
     backgrounds: Uint8Array,
-    backgroundTextureMapping: Float32Array) {
+    backgroundTextureMapping: Float32Array): Actor {
 
     const tile = this.scene.tiles[x][y];
     if (tile) {
       const tileStub = this.scene.tileStubs.find(s => s.x === x && s.y === y);
-      const canvasX = Math.round((x - cameraLeft) * this.tileWidth);
-      const canvasY = Math.round((y - cameraTop) * this.tileHeight);
       const info = this.getTileActorAndVisibleActors(tile);
       const currentTileHeight = info.backgroundActor ? info.backgroundActor.z + info.backgroundActor.height : 0;
       fillTileMask(
@@ -953,7 +1064,9 @@ export class FightComponent implements OnInit, OnDestroy {
         char = 'ground';
         mirrored = false;
       } else {
-        color = info.visibleActor === info.backgroundActor ?
+        color = this.scene.currentActor.x === info.visibleActor.x && this.scene.currentActor.y === info.visibleActor.y ?
+        { r: 225, g: 225, b: 0, a: info.visibleActor.color.a } :
+        info.visibleActor === info.backgroundActor ?
         heightImpact(currentTileHeight, info.visibleActor.color) :
         info.visibleActor.color;
         char = info.visibleActor.char;
@@ -970,27 +1083,30 @@ export class FightComponent implements OnInit, OnDestroy {
       fillColor(colors, activities, color.r, color.g, color.b, color.a, tileStub?.active, texturePosition);
       fillChar(
         this.charsService, textureMapping, char, texturePosition, mirrored);
-      if (info.visibleActor && info.visibleActor.tags.includes('active')) {
-        if (info.visibleActor.maxDurability) {
-          const percentOfHealth = Math.max(0, Math.min(info.visibleActor.durability / info.visibleActor.maxDurability, 1));
-          let path: Path2D;
-          if (info.visibleActor.owner && info.visibleActor.owner.id === this.scene.currentPlayer.id) {
-            path = greenPath;
-          } else {
-            path = redPath;
-          }
-          const zoomMultiplier = Math.floor(this.battleZoom);
-          path.moveTo(canvasX + 2 + zoomMultiplier, canvasY + 2 + zoomMultiplier);
-          path.lineTo(
-            canvasX + percentOfHealth * (this.tileWidth - 4 * 1 - zoomMultiplier) + 2 + zoomMultiplier,
-            canvasY + 2 + zoomMultiplier);
-        }
-      }
+
+      return info.visibleActor;
     }
   }
 
+  drawHealth(healthActor: Actor, canvasX: number, canvasY: number) {
+    const percentOfHealth = Math.max(0, Math.min(healthActor.durability / healthActor.maxDurability, 1));
+    let path: Path2D;
+    if (healthActor.owner && healthActor.owner.id === this.scene.currentPlayer.id) {
+      path = this.greenPath;
+    } else {
+      path = this.redPath;
+    }
+    const zoomMultiplier = Math.floor(this.battleZoom);
+    path.moveTo(canvasX + 2 + zoomMultiplier, canvasY + 2 + zoomMultiplier);
+    path.lineTo(
+      canvasX + percentOfHealth * (this.tileWidth - 4 * 1 - zoomMultiplier) + 2 + zoomMultiplier,
+      canvasY + 2 + zoomMultiplier);
+  }
+
   redraw(shift?: number) {
-    // TODO Close modal if opened and can act is false
+    if (this.openedModal && this.actionModal && !this.canActNoBlocked) {
+      this.openedModal.close();
+    }
     if (this.scene && this.shadersProgram) {
 
       if (shift) {
@@ -1027,8 +1143,6 @@ export class FightComponent implements OnInit, OnDestroy {
       const width = right - left + 1;
       const height = bottom - top + 1;
       if (this.scene.visualizationChanged) {
-        this.redPath = new Path2D();
-        this.greenPath = new Path2D();
 
         if (this.rangeMapIsActive) {
           this.fillRangeMapAndPathes(
@@ -1046,15 +1160,19 @@ export class FightComponent implements OnInit, OnDestroy {
         this.backgrounds = new Uint8Array(width * height * 4);
         this.mainTextureVertexes = new Float32Array(width * height * 12);
         let texturePosition = 0;
+        this.healthActors = [];
         for (let y = -20; y <= 60; y++) {
           for (let x = -40; x <= 80; x++) {
             if (x >= left && y >= top && x <= right && y <= bottom) {
               fillVertexPosition(this.mainTextureVertexes, x, y, left, top, this.tileWidth, this.tileHeight, texturePosition);
               if (x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
                 sceneRandom.next();
-                this.drawPoint(x, y, texturePosition, cameraLeft, cameraTop,
+                const visibleActor = this.drawPoint(x, y, texturePosition, cameraLeft, cameraTop,
                   this.greenPath, this.redPath, this.colors, this.activities, this.textureMapping,
                   this.backgrounds, this.backgroundTextureMapping);
+                if (visibleActor && visibleActor.tags.includes('active') && visibleActor.maxDurability) {
+                  this.healthActors.push(visibleActor);
+                }
               } else {
                 const biom = getRandomBiom(sceneRandom, this.scene.biom);
                 this.drawDummyPoint(x, y, biom.char, biom.color, texturePosition,
@@ -1067,6 +1185,14 @@ export class FightComponent implements OnInit, OnDestroy {
           }
         }
         this.cursorVertexes = undefined;
+      }
+
+      this.redPath = new Path2D();
+      this.greenPath = new Path2D();
+      for (const actor of this.healthActors) {
+        if (!this.selectedActor || this.selectedActor.x !== actor.x || this.selectedActor.y !== actor.y) {
+          this.drawHealth(actor, Math.round((actor.x - cameraLeft) * this.tileWidth), Math.round((actor.y - cameraTop) * this.tileHeight));
+        }
       }
 
       if (this.cursorVertexes) {
@@ -1085,8 +1211,21 @@ export class FightComponent implements OnInit, OnDestroy {
 
       const rangeMapPositionX = mouseX - this.scene.currentActor.x + RANGED_RANGE;
       const rangeMapPositionY = mouseY - this.scene.currentActor.y + RANGED_RANGE;
-      if (!this.blocked &&
-        this.canAct &&
+      if (this.selectedActor) {
+        const position = (this.selectedActor.y - top) * width + (this.selectedActor.x - left);
+        this.cursorVertexes = {
+          position,
+          textureMapping: this.textureMapping.slice(position * 12, position * 12 + 12),
+          colors: this.colors.slice(position * 4, position * 4 + 4),
+          activity: this.activities[position]
+        };
+        fillColor(this.colors, this.activities, 255, 255, 0, 1, true, position);
+        fillChar(this.charsService, this.textureMapping, this.selectedActor.char, position, this.selectedActor.left);
+        this.drawHealth(
+          this.selectedActor,
+          Math.round((this.selectedActor.x - cameraLeft) * this.tileWidth),
+          Math.round((this.selectedActor.y - cameraTop) * this.tileHeight));
+      } else if (this.canAct &&
         this.rangeMapIsActive &&
         rangeMapPositionX >= 0 &&
         rangeMapPositionY >= 0 &&
@@ -1105,7 +1244,6 @@ export class FightComponent implements OnInit, OnDestroy {
           };
           fillColor(this.colors, this.activities, this.actionConflict ? 200 : 255, this.actionConflict ? 0 : 255, 0, 1, true, position);
           const actors = this.scene.tiles[mouseX][mouseY].actors;
-          // TODO set actionEffect true
           if (actors.length === 0 || actors[actors.length - 1].tags.includes('tile')) {
             fillChar(this.charsService, this.textureMapping, 'x', position, false);
           }
@@ -1137,7 +1275,7 @@ export class FightComponent implements OnInit, OnDestroy {
       this.canvas2DContext.strokeStyle = 'rgba(0, 255, 0, 1.0)';
       this.canvas2DContext.stroke(this.greenPath);
 
-      if (this.rangeMapIsActive && this.canAct) {
+      if (this.rangeMapIsActive && (this.canActNoBlocked)) {
         this.canvas2DContext.lineWidth = 2;
         this.canvas2DContext.strokeStyle = this.actionConflict ? 'rgba(200, 0, 0, 1.0)' : 'rgba(255, 255, 0, 1.0)';
         this.canvas2DContext.stroke(this.allowedTargetPath);

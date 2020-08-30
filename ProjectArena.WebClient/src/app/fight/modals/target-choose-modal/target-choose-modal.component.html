@@ -1,0 +1,7 @@
+<div #overlay class="overlay-container" (click)="closeOnClick($event)">
+  <div *ngIf="overlayElement" class="modal modal-size" [style.left]="left + 'px'" [style.top]="top + 'px'">
+    <div *ngFor="let item of actors" class="article-font-inactive" (mouseenter)="mouseEnter(item)" (mouseleave)="mouseLeave()" (click)="chooseActor(item)">
+      {{item.name}}
+    </div>
+  </div>
+</div>
