@@ -1,6 +1,6 @@
 import { ActionInfo } from './action-info.model';
 
-export interface ActionDto {
+export interface Action {
   version: number;
   code: string;
   newCode: string;

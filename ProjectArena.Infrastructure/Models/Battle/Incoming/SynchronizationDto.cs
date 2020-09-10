@@ -1,6 +1,6 @@
 namespace ProjectArena.Infrastructure.Models.Battle.Incoming
 {
-    public class ActionSynchronizationDto
+    public class SynchronizationDto
     {
         public int Version { get; set; }
 
