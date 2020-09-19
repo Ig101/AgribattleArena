@@ -4,7 +4,7 @@ namespace ProjectArena.Infrastructure.Enums
     {
         TurnStarted,
         ActionDone,
-        Rewarded,
-        GameEnded
+        Defeated,
+        Victorious
     }
 }

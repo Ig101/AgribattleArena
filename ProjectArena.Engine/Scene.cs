@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ProjectArena.Engine.Models;
 using ProjectArena.Engine.State;
@@ -11,7 +12,9 @@ namespace ProjectArena.Engine
     {
         private const int TimeBeforeFirstTurn = 5;
 
-        private const int TimeBeforeEndTurn = -3;
+        private const int TimeBeforeEndTurn = -2;
+
+        private const int TurnTime = 30;
 
         public event Action<OutcomingMessage> OutcomingMessagesEvent;
 
@@ -37,12 +40,7 @@ namespace ProjectArena.Engine
 
         private bool CheckIncomingCode(string code)
         {
-            return true;
-        }
-
-        private string Encode(string code)
-        {
-            return code;
+            return code == CurrentCode;
         }
 
         private void StartGame()
@@ -58,12 +56,142 @@ namespace ProjectArena.Engine
             });
         }
 
+        private void StartTurn()
+        {
+            var state = this.State.RetrieveState();
+            if (state.TurnInfo.TempActor != null)
+            {
+                var actor = state.FindActorWithParent(state.TurnInfo.TempActor);
+                actor.actor.InitiativePosition += actor.actor.TurnCost;
+            }
+
+            ActorSynchronizationDto nextTurnActor = null;
+            foreach (var actor in state.Actors)
+            {
+                if (nextTurnActor == null || actor.InitiativePosition < nextTurnActor.InitiativePosition)
+                {
+                    nextTurnActor = actor;
+                }
+            }
+
+            state.TurnInfo.TempActor = nextTurnActor.Reference;
+            state.TurnInfo.Time = TurnTime;
+
+            Version++;
+            CurrentCode = Guid.NewGuid().ToString();
+            WaitingSynchronization = true;
+
+            OutcomingMessagesEvent(new OutcomingMessage
+            {
+                Message = new SynchronizationMessageDto
+                {
+                    Id = Infrastructure.Enums.SynchronizationMessageType.TurnStarted,
+                    Version = Version,
+                    Code = CurrentCode,
+                    StartTurnInfo = state.TurnInfo
+                },
+                Users = state.Players.Where(p => p.BattlePlayerStatus != Infrastructure.Enums.PlayerStatus.Playing).Select(p => p.Id).ToList()
+            });
+        }
+
+        private RewardInfoDto CalculateReward(PlayerState player)
+        {
+            return new RewardInfoDto
+            {
+                Experience = player.BattlePlayerStatus == Infrastructure.Enums.PlayerStatus.Defeated ? 1 : 4
+            };
+        }
+
+        private void CheckVictoryConditions(SceneState state)
+        {
+            var activePlayers = state.Players.Where(p => p.BattlePlayerStatus == Infrastructure.Enums.PlayerStatus.Playing).ToList();
+
+            foreach (var player in activePlayers)
+            {
+                var actors = state.GetAllPlayerActors(player.Id).Where(a => player.KeyActorIds.Contains(a.Reference.Id)).ToList();
+                if (actors.Count == 0)
+                {
+                    player.BattlePlayerStatus = Infrastructure.Enums.PlayerStatus.Defeated;
+                    OutcomingMessagesEvent(new OutcomingMessage
+                    {
+                        Message = new SynchronizationMessageDto
+                        {
+                            Id = Infrastructure.Enums.SynchronizationMessageType.Defeated,
+                            Version = Version,
+                            Code = CurrentCode,
+                            Reward = CalculateReward(player)
+                        },
+                        Users = new[] { player.Id }
+                    });
+                }
+            }
+
+            var remainingPlayers = activePlayers.Where(p => p.BattlePlayerStatus == Infrastructure.Enums.PlayerStatus.Playing).ToList();
+
+            if (remainingPlayers.Count == 1)
+            {
+                remainingPlayers[0].BattlePlayerStatus = Infrastructure.Enums.PlayerStatus.Victorious;
+                OutcomingMessagesEvent(new OutcomingMessage
+                {
+                    Message = new SynchronizationMessageDto
+                    {
+                        Id = Infrastructure.Enums.SynchronizationMessageType.Victorious,
+                        Version = Version,
+                        Code = CurrentCode,
+                        Reward = CalculateReward(remainingPlayers[0])
+                    },
+                    Users = new[] { remainingPlayers[0].Id }
+                });
+            }
+        }
+
+        private void NextAutomaticAction(SceneState state)
+        {
+            var action = state.FindNextAutomaticAction();
+            if (action.action != null)
+            {
+                CurrentCode = Guid.NewGuid().ToString();
+                WaitingSynchronization = true;
+                OutcomingMessagesEvent(new OutcomingMessage
+                {
+                    Message = new SynchronizationMessageDto
+                    {
+                        Id = Infrastructure.Enums.SynchronizationMessageType.ActionDone,
+                        Version = Version,
+                        Code = CurrentCode,
+                        Action = new ActionInfoDto
+                        {
+                            Actor = action.actor.Reference,
+                            Id = action.action.Id,
+                            Type = Infrastructure.Enums.ActionType.Targeted,
+                            X = action.actor.Reference.X,
+                            Y = action.actor.Reference.Y
+                        }
+                    },
+                    Users = state.Players.Where(p => p.BattlePlayerStatus == Infrastructure.Enums.PlayerStatus.Playing).Select(p => p.Id).ToList()
+                });
+            }
+            else
+            {
+                StartTurn();
+            }
+        }
+
         public void Update(double time)
         {
             lock (_m)
             {
                 // TODO Updating
                 var state = this.State.RetrieveState();
+
+                state.TurnInfo.Time -= time;
+
+                State.PushNewState(state);
+
+                if (!WaitingSynchronization && state.TurnInfo.Time < TimeBeforeEndTurn)
+                {
+                    NextAutomaticAction(state);
+                }
             }
         }
 
@@ -92,7 +220,7 @@ namespace ProjectArena.Engine
                     return;
                 }
 
-                CurrentCode = Encode(action.NewCode);
+                CurrentCode = action.NewCode;
                 WaitingSynchronization = true;
                 OutcomingMessagesEvent(new OutcomingMessage
                 {
@@ -103,7 +231,7 @@ namespace ProjectArena.Engine
                         Code = CurrentCode,
                         Action = action.Action
                     },
-                    Users = state.Players.Where(p => p.Id != action.UserId).Select(p => p.Id)
+                    Users = state.Players.Where(p => p.Id != action.UserId && p.BattlePlayerStatus == Infrastructure.Enums.PlayerStatus.Playing).Select(p => p.Id).ToList()
                 });
             }
         }
@@ -117,16 +245,26 @@ namespace ProjectArena.Engine
                     return;
                 }
 
-                if (!CheckIncomingCode(synchronization.Code))
+                if (!CheckIncomingCode(synchronization.Code) ||
+                    !WaitingSynchronization)
                 {
                     SynchronizationErrorEvent(synchronization.UserId);
                     return;
                 }
 
-                var state = this.State.RetrieveState();
+                var state = State.RetrieveState();
                 state.MergeSynchronizer(synchronization.Synchronizer);
                 Version = synchronization.Version;
                 WaitingSynchronization = false;
+
+                CheckVictoryConditions(state);
+
+                State.PushNewState(state);
+
+                if (state.TurnInfo.Time < TimeBeforeEndTurn)
+                {
+                    NextAutomaticAction(state);
+                }
             }
         }
 

@@ -27,6 +27,7 @@ import { getMostPrioritizedAction, SCENE_FRAME_TIME } from '../engine.helper';
 import { randomBytes } from 'crypto';
 import { ReactionSynchronization } from 'src/app/shared/models/synchronization/objects/reaction-synchronization.model';
 import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
+import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle-status.enum';
 
 export class Scene {
 
@@ -67,7 +68,7 @@ export class Scene {
     public synchronizersSub: Observer<Synchronizer>,
     public desyncSub: Observer<boolean>,
     public nativesCollection: INativesCollection,
-    private endGameSub: Observer<boolean>,
+    private endGameSub: Observer<BattlePlayerStatusEnum>,
     synchronizer: FullSynchronizationInfo,
     reward: RewardInfo,
     turnInfo: StartTurnInfo) {
@@ -75,7 +76,7 @@ export class Scene {
     // TODO Desyncs
 
     this.desyncSub.next(false);
-    this.endGameSub.next(false);
+    this.endGameSub.next(BattlePlayerStatusEnum.Playing);
 
     this.timeLine = synchronizer.timeLine;
     this.idCounterPosition = synchronizer.idCounterPosition;
@@ -169,6 +170,9 @@ export class Scene {
 
   private startTurn(definition: StartTurnInfo) {
     this.turnReallyStarted = false;
+    if (this.currentActor) {
+      this.currentActor.initiativePosition += this.currentActor.turnCost;
+    }
     const actor = this.findActorByReference(definition.tempActor);
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
@@ -199,12 +203,13 @@ export class Scene {
       case SynchronizationMessageType.TurnStarted:
         this.startTurn(message.startTurnInfo);
         break;
-      case SynchronizationMessageType.Rewarded:
+      case SynchronizationMessageType.Defeated:
         this.reward = message.reward;
+        this.endGameSub.next(BattlePlayerStatusEnum.Defeated);
         break;
-      case SynchronizationMessageType.GameEnded:
+      case SynchronizationMessageType.Victorious:
         this.reward = message.reward;
-        this.endGameSub.next(true);
+        this.endGameSub.next(BattlePlayerStatusEnum.Victorious);
         break;
     }
   }

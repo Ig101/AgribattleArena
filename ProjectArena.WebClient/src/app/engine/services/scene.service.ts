@@ -11,6 +11,7 @@ import { MessageType } from '@aspnet/signalr';
 import { SynchronizationMessageType } from 'src/app/shared/models/enum/synchronization-message-type.enum';
 import { NativesCollection } from 'src/app/content/natives-collection';
 import { SCENE_FRAME_TIME } from '../engine.helper';
+import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle-status.enum';
 
 @Injectable()
 export class SceneService {
@@ -18,7 +19,7 @@ export class SceneService {
   actionsSub = new Subject<ActionInfo>();
   synchronizersSub = new Subject<Synchronizer>();
   desyncSub = new BehaviorSubject<boolean>(false);
-  endGameSub = new BehaviorSubject<boolean>(false);
+  endGameSub = new BehaviorSubject<BattlePlayerStatusEnum>(undefined);
 
   updateSub = new Subject<number>();
   updater;

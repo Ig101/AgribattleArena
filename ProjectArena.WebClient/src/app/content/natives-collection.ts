@@ -28,8 +28,9 @@ export class NativesCollection implements INativesCollection {
 
   buildAction(synchronization: ActionSynchronization): Action {
     const native = actionNatives[synchronization.id];
+    const actionClass = synchronization.isAutomatic ? ActionClassEnum.Autocast : native.actionClass;
     let range;
-    switch (native.actionClass) {
+    switch (actionClass) {
       case ActionClassEnum.Attack:
       case ActionClassEnum.Move:
         range = MELEE_RANGE;

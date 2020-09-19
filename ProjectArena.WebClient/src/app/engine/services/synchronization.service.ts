@@ -9,11 +9,10 @@ import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
 @Injectable()
 export class SynchronizationService {
 
-  key = 'k3y';
   code: string;
 
   get transformedCode() {
-    return this.code + this.key;
+    return this.code;
   }
 
   constructor(

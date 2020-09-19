@@ -446,6 +446,7 @@ export class Actor implements IActor {
       actors: this.actors.filter(x => x.changed).map(x => x.createSynchronizerAndClearInfo()),
       actions: this.selfActions.map(x => ({
         id: x.id,
+        isAutomatic: x.native.actionClass === ActionClassEnum.Autocast,
         remainedTime: x.remainedTime
       })),
       ownerId: this.owner?.id,
@@ -504,9 +505,6 @@ export class Actor implements IActor {
       (x.native.actionClass === ActionClassEnum.Attack ||
       x.native.actionClass === ActionClassEnum.Move ||
       x.native.actionClass === ActionClassEnum.Default)) ? [this as Actor] : [];
-    for (const actor of this.actors) {
-      activeActors.push(...actor.getActiveActors());
-    }
     return activeActors;
   }
 

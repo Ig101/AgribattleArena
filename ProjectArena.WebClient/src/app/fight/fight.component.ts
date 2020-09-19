@@ -372,6 +372,7 @@ export class FightComponent implements OnInit, OnDestroy {
       actions: [
         {
           id: 'move',
+          isAutomatic: false,
           remainedTime: 0
         }
       ],
@@ -405,18 +406,22 @@ export class FightComponent implements OnInit, OnDestroy {
       actions: [
         {
           id: 'move',
+          isAutomatic: false,
           remainedTime: 0
         },
         {
           id: 'slash',
+          isAutomatic: false,
           remainedTime: 0
         },
         {
           id: 'wait',
+          isAutomatic: false,
           remainedTime: 0
         },
         {
           id: 'shot',
+          isAutomatic: false,
           remainedTime: 0
         }
       ],

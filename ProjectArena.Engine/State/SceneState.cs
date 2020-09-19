@@ -74,6 +74,24 @@ namespace ProjectArena.Engine.State
             return (null, null);
         }
 
+        public IEnumerable<ActorSynchronizationDto> GetAllPlayerActors(string playerId, ActorSynchronizationDto root = null)
+        {
+            var actorsList = new List<ActorSynchronizationDto>();
+
+            var initialActorsArray = root.Actors ?? Actors;
+            foreach (var actor in initialActorsArray)
+            {
+                if (actor.OwnerId == playerId)
+                {
+                    actorsList.Add(actor);
+                }
+
+                actorsList.AddRange(GetAllPlayerActors(playerId, actor));
+            }
+
+            return actorsList;
+        }
+
         public void ProcessAllActors(Action<SceneState, ActorSynchronizationDto> action, ActorSynchronizationDto root = null)
         {
             var initialActorsArray = root.Actors ?? Actors;
@@ -82,6 +100,29 @@ namespace ProjectArena.Engine.State
                 action(this, actor);
                 ProcessAllActors(action, actor);
             }
+        }
+
+        public (ActorSynchronizationDto actor, ActionSynchronizationDto action) FindNextAutomaticAction()
+        {
+            foreach (var actor in Actors)
+            {
+                var action = actor.Actions.FirstOrDefault(a => a.IsAutomatic && a.RemainedTime <= 0);
+                if (action != null)
+                {
+                    return (actor, action);
+                }
+
+                foreach (var childActor in actor.Actors)
+                {
+                    var childAction = childActor.Actions.FirstOrDefault(a => a.IsAutomatic && a.RemainedTime <= 0);
+                    if (childAction != null)
+                    {
+                        return (childActor, childAction);
+                    }
+                }
+            }
+
+            return (null, null);
         }
 
         public void MergeSynchronizer(SynchronizerDto synchronizer)
