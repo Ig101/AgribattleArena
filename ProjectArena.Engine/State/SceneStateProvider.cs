@@ -16,7 +16,7 @@ namespace ProjectArena.Engine.State
 
         public SceneState RetrieveState()
         {
-            return _state;
+            return _state.Clone();
         }
     }
 }

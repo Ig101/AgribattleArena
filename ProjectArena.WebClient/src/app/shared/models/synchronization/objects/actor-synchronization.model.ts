@@ -7,6 +7,8 @@ import { ReactionSynchronization } from './reaction-synchronization.model';
 export interface ActorSynchronization {
   reference: ActorReference;
 
+  position: number;
+
   name: string;
   char: string;
   color: Color;

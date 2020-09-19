@@ -431,6 +431,7 @@ export class Actor implements IActor {
         y: this.latestY,
         id: this.id
       },
+      position: this.parentActor.actors.indexOf(this),
       parentId: this.parentActor.id,
       char: this.char,
       color: this.color,

@@ -8,6 +8,8 @@ namespace ProjectArena.Infrastructure.Models.Battle
     {
         public ActorReferenceDto Reference { get; set; }
 
+        public int Position { get; set; }
+
         public string Name { get; set; }
 
         public string Char { get; set; }
@@ -44,7 +46,7 @@ namespace ProjectArena.Infrastructure.Models.Battle
 
         public IEnumerable<ActionSynchronizationDto> Actions { get; set; }
 
-        public IEnumerable<ActorSynchronizationDto> Actors { get; set; }
+        public IList<ActorSynchronizationDto> Actors { get; set; }
 
         public IEnumerable<BuffSynchronizationDto> Buffs { get; set; }
     }

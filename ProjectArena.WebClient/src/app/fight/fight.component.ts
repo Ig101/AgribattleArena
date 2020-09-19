@@ -291,6 +291,7 @@ export class FightComponent implements OnInit, OnDestroy {
               x,
               y
             },
+            position: 1,
             left: false,
             name: 'Ground',
             char: 'ground',
@@ -318,6 +319,7 @@ export class FightComponent implements OnInit, OnDestroy {
               x,
               y
             },
+            position: 1,
             left: false,
             name: 'Grass',
             char: 'grass',
@@ -349,6 +351,7 @@ export class FightComponent implements OnInit, OnDestroy {
         x: 12,
         y: 7
       },
+      position: 1,
       left: false,
       name: 'Actor',
       char: 'adventurer',
@@ -381,6 +384,7 @@ export class FightComponent implements OnInit, OnDestroy {
         x: 13,
         y: 6
       },
+      position: 1,
       left: false,
       name: 'Hero',
       char: 'adventurer',
