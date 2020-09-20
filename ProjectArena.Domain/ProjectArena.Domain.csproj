@@ -5,7 +5,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ProjectArena.Infrastructure\ProjectArena.Infrastructure.csproj" />
     <ProjectReference Include="..\ProjectArena.Engine\ProjectArena.Engine.csproj" />
-    <ProjectReference Include="..\ProjectArena.Content\ProjectArena.Content.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
