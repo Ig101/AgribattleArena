@@ -4,9 +4,7 @@ using System.Threading.Tasks;
 using ProjectArena.Domain.BattleService.Models;
 using ProjectArena.Domain.QueueService.Models;
 using ProjectArena.Engine;
-using ProjectArena.Engine.ForExternalUse;
 using ProjectArena.Infrastructure.Models.Battle;
-using ProjectArena.Infrastructure.Models.Battle.Synchronization;
 
 namespace ProjectArena.Domain.BattleService
 {
