@@ -20,7 +20,7 @@ namespace ProjectArena.Engine
 
         public event Action<string> SynchronizationErrorEvent;
 
-        public string SceneId => State.GetSceneId();
+        public Guid SceneId => State.GetSceneId();
 
         private readonly object _m = new object();
 
@@ -234,7 +234,7 @@ namespace ProjectArena.Engine
                 OutcomingMessagesEvent(new OutcomingMessage
                 {
                     Message = WaitingSynchronizationMessage,
-                    Users = state.Players.Where(p => p.Id != action.UserId && p.BattlePlayerStatus == Infrastructure.Enums.PlayerStatus.Playing).Select(p => p.Id).ToList()
+                    Users = state.Players.Where(p => p.Id.ToString() != action.UserId && p.BattlePlayerStatus == Infrastructure.Enums.PlayerStatus.Playing).Select(p => p.Id).ToList()
                 });
             }
         }

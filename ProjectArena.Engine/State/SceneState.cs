@@ -10,7 +10,7 @@ namespace ProjectArena.Engine.State
 {
     public class SceneState
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public double TimeLine { get; set; }
 
@@ -74,14 +74,14 @@ namespace ProjectArena.Engine.State
             return (null, null);
         }
 
-        public IEnumerable<ActorSynchronizationDto> GetAllPlayerActors(string playerId, ActorSynchronizationDto root = null)
+        public IEnumerable<ActorSynchronizationDto> GetAllPlayerActors(Guid playerId, ActorSynchronizationDto root = null)
         {
             var actorsList = new List<ActorSynchronizationDto>();
 
             var initialActorsArray = root.Actors ?? Actors;
             foreach (var actor in initialActorsArray)
             {
-                if (actor.OwnerId == playerId)
+                if (actor.OwnerId == playerId.ToString())
                 {
                     actorsList.Add(actor);
                 }

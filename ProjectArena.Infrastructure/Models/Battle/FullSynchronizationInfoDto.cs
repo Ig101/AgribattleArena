@@ -5,6 +5,10 @@ namespace ProjectArena.Infrastructure.Models.Battle
 {
     public class FullSynchronizationInfoDto
     {
+        public int Version { get; set; }
+
+        public string Code { get; set; }
+
         public string Id { get; set; }
 
         public double TimeLine { get; set; }

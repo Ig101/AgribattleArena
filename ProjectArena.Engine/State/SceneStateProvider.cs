@@ -1,3 +1,5 @@
+using System;
+
 namespace ProjectArena.Engine.State
 {
     public class SceneStateProvider : ISceneStateProvider
@@ -9,7 +11,7 @@ namespace ProjectArena.Engine.State
             _state = state;
         }
 
-        public string GetSceneId()
+        public Guid GetSceneId()
         {
             return _state.Id;
         }

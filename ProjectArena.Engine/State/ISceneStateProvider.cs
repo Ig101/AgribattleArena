@@ -1,8 +1,10 @@
+using System;
+
 namespace ProjectArena.Engine.State
 {
     public interface ISceneStateProvider
     {
-        string GetSceneId();
+        Guid GetSceneId();
 
         SceneState RetrieveState();
 
