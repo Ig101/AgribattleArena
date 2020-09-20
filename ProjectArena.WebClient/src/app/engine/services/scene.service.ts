@@ -63,7 +63,7 @@ export class SceneService {
   }
 
   processMessage(message: SynchronizationMessageDto) {
-    if (this.scene) {
+    if (this.scene && this.scene.id === message.sceneId) {
       this.scene.pushMessages(message);
     }
   }

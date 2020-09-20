@@ -6,6 +6,8 @@ namespace ProjectArena.Infrastructure.Models.Battle
     {
         public SynchronizationMessageType Id { get; set; }
 
+        public string SceneId { get; set; }
+
         public int Version { get; set; }
 
         public string Code { get; set; }

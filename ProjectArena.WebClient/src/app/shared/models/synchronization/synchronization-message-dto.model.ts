@@ -7,6 +7,7 @@ import { StartTurnInfo } from './start-turn-info.model';
 
 export interface SynchronizationMessageDto {
   id: SynchronizationMessageType;
+  sceneId: string;
   varsion: number;
   code: string;
   action: ActionInfo;

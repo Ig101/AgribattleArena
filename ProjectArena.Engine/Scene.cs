@@ -20,6 +20,8 @@ namespace ProjectArena.Engine
 
         public event Action<string> SynchronizationErrorEvent;
 
+        public string SceneId => State.GetSceneId();
+
         private readonly object _m = new object();
 
         private readonly Random _random = new Random();
@@ -36,7 +38,7 @@ namespace ProjectArena.Engine
         public Scene (
             ISceneStateProvider state)
         {
-           State = state;
+            State = state;
         }
 
         private bool CheckIncomingCode(string code)
