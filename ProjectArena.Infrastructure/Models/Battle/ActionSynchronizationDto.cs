@@ -6,6 +6,8 @@ namespace ProjectArena.Infrastructure.Models.Battle
 
         public bool IsAutomatic { get; set; }
 
+        public bool Blocked { get; set; }
+
         public float RemainedTime { get; set; }
     }
 }

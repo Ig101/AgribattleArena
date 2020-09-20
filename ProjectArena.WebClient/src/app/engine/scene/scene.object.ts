@@ -161,7 +161,7 @@ export class Scene {
 
   private actFromActionInfo(definition: ActionInfo) {
     const actor = this.findActorByReference(definition.actor);
-    const action = actor.actions.find(x => x.id === definition.id);
+    const action = actor.actions.find(x => x.id === definition.id && x.remainedTime <= 0);
     const target = definition.type === ActionType.OnObject ?
       this.findActorByReference({ x: definition.x, y: definition.y, id: definition.targetId }) :
       undefined;
@@ -378,30 +378,6 @@ export class Scene {
 
   intendedOnObjectAction(action: Action, target: IActor) {
     this.intendedAction(this.currentActor, action, ActionType.OnObject, target.x, target.y, target);
-  }
-
-  intendedUseAction(usable: Actor, x: number, y: number) {
-    if (this.waitingMessages.length > 0 || this.changes.length > 0) {
-      this.waitingAction = () => this.intendedUseAction(usable, x, y);
-      return;
-    }
-    if (!usable.isAlive) {
-      return;
-    }
-    const actions = usable.actions.filter(a => a.native.actionClass === ActionClassEnum.Use);
-    const action = getMostPrioritizedAction(actions);
-    if (actions === undefined) {
-      return;
-    }
-    const definition = {
-      actor: usable.reference,
-      id: action.id,
-      type: ActionType.Targeted,
-      x,
-      y
-    } as ActionInfo;
-    this.actionsSub.next(definition);
-    this.act(usable, action, ActionType.Targeted, x, y);
   }
   /*
     Make it server side

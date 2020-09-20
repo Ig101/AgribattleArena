@@ -308,7 +308,6 @@ export class Actor implements IActor {
     this.actions.forEach(x => {
       if (x.remainedTime > 0 &&
         (x.native.actionClass === ActionClassEnum.Autocast ||
-          x.native.actionClass === ActionClassEnum.Use ||
           this.id === this.parentScene.currentActor?.id)) {
 
         x.remainedTime--;
@@ -447,6 +446,7 @@ export class Actor implements IActor {
       actions: this.selfActions.map(x => ({
         id: x.id,
         isAutomatic: x.native.actionClass === ActionClassEnum.Autocast,
+        blocked: !this.actions.some(a => a.id === x.id),
         remainedTime: x.remainedTime
       })),
       ownerId: this.owner?.id,
@@ -472,6 +472,8 @@ export class Actor implements IActor {
           changedSpeed: x.changedSpeed,
           actions: x.addedActions.map(a => ({
             id: a.id,
+            isAutomatic: a.native.actionClass === ActionClassEnum.Autocast,
+            blocked: !this.actions.some(aA => a.id === aA.id),
             remainedTime: a.remainedTime
           })),
           addedPreparationReactions: x.addedPreparationReactions.map(a => ({

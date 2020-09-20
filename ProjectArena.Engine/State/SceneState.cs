@@ -112,12 +112,30 @@ namespace ProjectArena.Engine.State
                     return (actor, action);
                 }
 
+                foreach (var buff in actor.Buffs)
+                {
+                    action = buff.Actions.FirstOrDefault(a => a.IsAutomatic && a.RemainedTime <= 0);
+                    if (action != null)
+                    {
+                        return (actor, action);
+                    }
+                }
+
                 foreach (var childActor in actor.Actors)
                 {
-                    var childAction = childActor.Actions.FirstOrDefault(a => a.IsAutomatic && a.RemainedTime <= 0);
-                    if (childAction != null)
+                    action = childActor.Actions.FirstOrDefault(a => a.IsAutomatic && a.RemainedTime <= 0);
+                    if (action != null)
                     {
-                        return (childActor, childAction);
+                        return (childActor, action);
+                    }
+
+                    foreach (var buff in childActor.Buffs)
+                    {
+                        action = buff.Actions.FirstOrDefault(a => a.IsAutomatic && a.RemainedTime <= 0);
+                        if (action != null)
+                        {
+                            return (actor, action);
+                        }
                     }
                 }
             }

@@ -71,7 +71,8 @@ namespace ProjectArena.Engine
             ActorSynchronizationDto nextTurnActor = null;
             foreach (var actor in state.Actors)
             {
-                if (nextTurnActor == null || actor.InitiativePosition < nextTurnActor.InitiativePosition)
+                if ((nextTurnActor == null || actor.InitiativePosition < nextTurnActor.InitiativePosition) &&
+                    actor.Actions.Any(a => a.RemainedTime <= 0 && !a.Blocked && !a.IsAutomatic))
                 {
                     nextTurnActor = actor;
                 }
