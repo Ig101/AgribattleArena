@@ -58,6 +58,8 @@ export class Scene {
 
   framesCounter = 0;
 
+  waitingAction: () => void;
+
   constructor(
     public desyncSub: Observer<boolean>,
     public nativesCollection: INativesCollection,
@@ -225,7 +227,7 @@ export class Scene {
     }
   }
 
-  private actOnResetting() {
+  private actOnResetting(playerAction: () => void) {
     // TODO Actors AI Actions
   }
 
@@ -235,8 +237,10 @@ export class Scene {
         this.tiles[x][y].update();
       }
     }
-    if (this.automatic) {
-      this.actOnResetting();
+    if (this.automatic || !this.currentActor.isAlive) {
+      this.actOnResetting(undefined);
+    } else if (this.waitingAction) {
+      this.waitingAction();
     } else {
       this.waitingInput = true;
     }
@@ -247,13 +251,17 @@ export class Scene {
     const shift = (newTime - this.lastTime) / 1000;
     this.lastTime = newTime;
 
+    if (this.waitingInput) {
+      return shift;
+    }
+
     this.timeLine += shift;
     this.framesCounter += shift;
 
     if (this.framesCounter > FRAMES_PER_TURN * SCENE_FRAME_TIME) {
       this.framesCounter = 0;
       this.resetTurn();
-    } else if (!this.waitingInput) {
+    } else {
       this.framesCounter++;
     }
 
@@ -293,15 +301,24 @@ export class Scene {
     if (!this.currentActor.isAlive || !this.currentActor.actions.some(a => a.id === action.id) || (target && !target.isAlive)) {
       return;
     }
-    this.act(this.currentActor, action, type, x, y, target);
+    this.waitingInput = false;
+    this.actOnResetting(() => this.act(this.currentActor, action, type, x, y, target));
   }
 
   intendedTargetedAction(action: Action, x: number, y: number) {
-    this.intendedAction(action, ActionType.Targeted, x, y);
+    if (!this.waitingInput && !this.automatic) {
+      this.waitingAction = () => this.intendedAction(action, ActionType.Targeted, x, y);
+    } else {
+      this.intendedAction(action, ActionType.Targeted, x, y);
+    }
   }
 
   intendedOnObjectAction(action: Action, target: IActor) {
-    this.intendedAction(action, ActionType.OnObject, target.x, target.y, target);
+    if (!this.waitingInput && !this.automatic) {
+      this.waitingAction = () => this.intendedAction(action, ActionType.OnObject, target.x, target.y, target);
+    } else {
+      this.intendedAction(action, ActionType.OnObject, target.x, target.y, target);
+    }
   }
   /*
     Make it server side

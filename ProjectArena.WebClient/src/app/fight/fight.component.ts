@@ -31,7 +31,6 @@ import { IModal } from '../shared/interfaces/modal.interface';
 import { ModalPositioning } from './models/modal-positioning.model';
 import { ContextMenuComponent } from './context-menu/context-menu.component';
 import { ContextMenuContext } from './models/context-menu-context.model';
-import { MenuModalComponent } from './modals/menu-modal/menu-modal.component';
 import { BattlePlayerStatusEnum } from '../shared/models/enum/player-battle-status.enum';
 import { UserService } from '../shared/services/user.service';
 import { TargetChooseModalComponent } from './modals/target-choose-modal/target-choose-modal.component';
@@ -110,12 +109,7 @@ export class FightComponent implements OnInit, OnDestroy {
   positioningUpdateSubject = new Subject<any>();
   actionModal: boolean;
 
-  conflictTimer = 0;
-
   chosenAction: Action;
-  get actionConflict() {
-    return this.conflictTimer > 0.4;
-  }
 
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
@@ -123,10 +117,6 @@ export class FightComponent implements OnInit, OnDestroy {
 
   get canvasHeight() {
     return this.battleCanvas.nativeElement.height;
-  }
-
-  get turnTime() {
-    return this.scene.turnTime;
   }
 
   get tileWidth() {
@@ -156,9 +146,8 @@ export class FightComponent implements OnInit, OnDestroy {
 
   get canActNoBlocked() {
     const can = this.scene &&
-      this.scene.currentActor?.owner?.id === this.scene.currentPlayer.id &&
-      this.scene.turnTime > 0 &&
-      this.scene.turnReallyStarted;
+      this.scene.currentActor?.isAlive &&
+      !this.scene.automatic;
     if (!can && !this.blocked) {
       this.chosenAction = undefined;
     }
@@ -302,7 +291,6 @@ export class FightComponent implements OnInit, OnDestroy {
             durability: 10000,
             maxDurability: 10000,
             initiative: 1,
-            initiativePosition: 0,
             height: x > 8 && y > 3 ? 900 : 500,
             volume: 10000,
             freeVolume: 9000,
@@ -330,7 +318,6 @@ export class FightComponent implements OnInit, OnDestroy {
             durability: 1,
             maxDurability: 1,
             initiative: 1,
-            initiativePosition: 0,
             height: 5,
             volume: 250,
             freeVolume: 0,
@@ -362,7 +349,6 @@ export class FightComponent implements OnInit, OnDestroy {
       durability: 200,
       maxDurability: 200,
       initiative: 1,
-      initiativePosition: 0.2,
       height: 180,
       volume: 120,
       freeVolume: 40,
@@ -397,7 +383,6 @@ export class FightComponent implements OnInit, OnDestroy {
       durability: 200,
       maxDurability: 200,
       initiative: 1,
-      initiativePosition: 0.1,
       height: 180,
       volume: 120,
       freeVolume: 40,
@@ -454,15 +439,6 @@ export class FightComponent implements OnInit, OnDestroy {
         height: 8,
         biom: BiomEnum.Grass,
         waitingActions: []
-      },
-      undefined,
-      {
-        time: 8000000,
-        tempActor: {
-          id: idCounterPosition,
-          x: 13,
-          y: 6
-        }
       }
     );
   }
@@ -587,13 +563,13 @@ export class FightComponent implements OnInit, OnDestroy {
   }
 
   openSettings() {
-    this.blocked = true;
+   /* this.blocked = true;
     this.openedModal = this.modalService.openModalWithoutArgs(
       MenuModalComponent);
     this.openedModal.onClose.subscribe(_ => {
       this.blocked = false;
       this.openedModal = undefined;
-    });
+    });*/
   }
 
   @HostListener('contextmenu', ['$event'])
@@ -1124,11 +1100,6 @@ export class FightComponent implements OnInit, OnDestroy {
     if (this.scene && this.shadersProgram) {
 
       if (shift) {
-        if (this.scene.waitingMessages.length > 0 || this.scene.changes.length > 0) {
-          this.conflictTimer += shift;
-        } else {
-          this.conflictTimer = 0;
-        }
         if (this.directionTimer > 0) {
           this.directionTimer -= shift;
         } else {
@@ -1256,7 +1227,7 @@ export class FightComponent implements OnInit, OnDestroy {
             colors: this.colors.slice(position * 4, position * 4 + 4),
             activity: this.activities[position]
           };
-          fillColor(this.colors, this.activities, this.actionConflict ? 200 : 255, this.actionConflict ? 0 : 255, 0, 1, true, position);
+          fillColor(this.colors, this.activities, 255, 255, 0, 1, true, position);
           const actors = this.scene.tiles[mouseX][mouseY].actors;
           if (actors.length === 0 || actors[actors.length - 1].tags.includes('tile')) {
             fillChar(this.charsService, this.textureMapping, 'x', position, false);
@@ -1291,7 +1262,7 @@ export class FightComponent implements OnInit, OnDestroy {
 
       if (this.rangeMapIsActive && (this.canActNoBlocked)) {
         this.canvas2DContext.lineWidth = 2;
-        this.canvas2DContext.strokeStyle = this.actionConflict ? 'rgba(200, 0, 0, 1.0)' : 'rgba(255, 255, 0, 1.0)';
+        this.canvas2DContext.strokeStyle = 'rgba(255, 255, 0, 1.0)';
         this.canvas2DContext.stroke(this.allowedTargetPath);
       }
 
