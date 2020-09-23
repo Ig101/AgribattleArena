@@ -21,8 +21,7 @@ export interface ActorSynchronization {
   parentId: number;
   durability: number;
   maxDurability: number;
-  turnCost: number;
-  initiativePosition: number;
+  initiative: number;
   height: number;
   volume: number;
   freeVolume: number;

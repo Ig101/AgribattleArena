@@ -20,7 +20,7 @@ namespace ProjectArena.Engine.Helpers
                 ParentId = actor.ParentId,
                 Durability = actor.Durability,
                 MaxDurability = actor.MaxDurability,
-                TurnCost = actor.TurnCost,
+                Initiative = actor.Initiative,
                 InitiativePosition = actor.InitiativePosition,
                 Height = actor.Height,
                 Volume = actor.Volume,
@@ -72,7 +72,7 @@ namespace ProjectArena.Engine.Helpers
                 target.ParentId = actor.ParentId;
                 target.Durability = actor.Durability;
                 target.MaxDurability = actor.MaxDurability;
-                target.TurnCost = actor.TurnCost;
+                target.Initiative = actor.Initiative;
                 target.InitiativePosition = actor.InitiativePosition;
                 target.Height = actor.Height;
                 target.Volume = actor.Volume;

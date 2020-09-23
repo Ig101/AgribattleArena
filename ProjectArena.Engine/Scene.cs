@@ -53,10 +53,6 @@ namespace ProjectArena.Engine
             {
                 Time = TimeBeforeFirstTurn
             };
-            state.ProcessAllActors((_, a) =>
-            {
-                a.InitiativePosition = (float)((_random.NextDouble() - 0.5) / 100.0) + a.TurnCost;
-            });
         }
 
         private void StartTurn()
@@ -65,7 +61,6 @@ namespace ProjectArena.Engine
             if (state.TurnInfo.TempActor != null)
             {
                 var actor = state.FindActorWithParent(state.TurnInfo.TempActor);
-                actor.actor.InitiativePosition += actor.actor.TurnCost;
             }
 
             ActorSynchronizationDto nextTurnActor = null;

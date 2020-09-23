@@ -11,8 +11,8 @@ import { ActorReference } from 'src/app/shared/models/synchronization/objects/ac
 import { BuffSynchronization } from 'src/app/shared/models/synchronization/objects/buff-synchronization.model';
 import { ActionClassEnum } from '../models/enums/action-class.enum';
 
-const maxTurnCost = 10;
-const minTurnCost = 1;
+const maxinitiative = 10;
+const mininitiative = 1;
 const maxReactionsDepth = 100;
 
 export class Actor implements IActor {
@@ -40,8 +40,7 @@ export class Actor implements IActor {
   selfMaxDurability: number;
   durability: number;
 
-  selfTurnCost: number;
-  initiativePosition: number;
+  selfinitiative: number;
 
   height: number;
   volume: number;
@@ -54,7 +53,7 @@ export class Actor implements IActor {
   clearReactions: Reaction[];
 
   maxDurability: number;
-  turnCost: number;
+  initiative: number;
   actions: Action[] = [];
   blockedActions: string[] = [];
   blockedEffects: string[] = [];
@@ -101,9 +100,8 @@ export class Actor implements IActor {
     this.durability = synchronizer.durability;
     this.selfMaxDurability = synchronizer.maxDurability;
     this.maxDurability = synchronizer.maxDurability;
-    this.selfTurnCost = synchronizer.turnCost;
-    this.turnCost = synchronizer.turnCost;
-    this.initiativePosition = synchronizer.initiativePosition;
+    this.selfinitiative = synchronizer.initiative;
+    this.initiative = synchronizer.initiative;
     this.height = synchronizer.height;
     this.volume = synchronizer.volume;
     this.freeVolume = synchronizer.freeVolume;
@@ -246,12 +244,12 @@ export class Actor implements IActor {
     if (haveExtraBuffs) {
       const extraBuff = this.buffs.sort((a, b) => this.calculateBuffPower(a) - this.calculateBuffPower(b))[0];
       removeFromArray(this.buffs, extraBuff);
-      this.turnCost -= buff.changedSpeed;
-      if (this.turnCost > maxTurnCost) {
-        this.turnCost = maxTurnCost;
+      this.initiative -= buff.changedSpeed;
+      if (this.initiative > maxinitiative) {
+        this.initiative = maxinitiative;
       }
-      if (this.turnCost < minTurnCost) {
-        this.turnCost = minTurnCost;
+      if (this.initiative < mininitiative) {
+        this.initiative = mininitiative;
       }
       const oldDurability = this.maxDurability - buff.changedDurability;
       if (oldDurability < 0) {
@@ -262,14 +260,14 @@ export class Actor implements IActor {
       }
       this.maxDurability = oldDurability;
     }
-    this.turnCost += buff.changedSpeed;
-    if (this.turnCost > maxTurnCost) {
-      buff.changedSpeed -= (maxTurnCost - this.turnCost);
-      this.turnCost = maxTurnCost;
+    this.initiative += buff.changedSpeed;
+    if (this.initiative > maxinitiative) {
+      buff.changedSpeed -= (maxinitiative - this.initiative);
+      this.initiative = maxinitiative;
     }
-    if (this.turnCost < minTurnCost) {
-      buff.changedSpeed += (minTurnCost - this.turnCost);
-      this.turnCost = minTurnCost;
+    if (this.initiative < mininitiative) {
+      buff.changedSpeed += (mininitiative - this.initiative);
+      this.initiative = mininitiative;
     }
 
     const newDurability = this.maxDurability + buff.changedDurability;
@@ -300,7 +298,7 @@ export class Actor implements IActor {
     const difference = this.selfMaxDurability / this.maxDurability;
     this.durability = difference > 0 ? difference * this.durability : 1;
     this.maxDurability = this.selfMaxDurability;
-    this.turnCost = this.selfTurnCost;
+    this.initiative = this.selfinitiative;
     this.actions = [...this.selfActions];
   }
 
@@ -320,12 +318,12 @@ export class Actor implements IActor {
       }
       if (buff.duration !== undefined && buff.duration <= 0) {
         buffRemoved = true;
-        this.turnCost -= buff.changedSpeed;
-        if (this.turnCost > maxTurnCost) {
-          this.turnCost = maxTurnCost;
+        this.initiative -= buff.changedSpeed;
+        if (this.initiative > maxinitiative) {
+          this.initiative = maxinitiative;
         }
-        if (this.turnCost < minTurnCost) {
-          this.turnCost = minTurnCost;
+        if (this.initiative < mininitiative) {
+          this.initiative = mininitiative;
         }
         const newDurability = this.maxDurability - buff.changedDurability;
         if (newDurability < 0) {
@@ -395,18 +393,12 @@ export class Actor implements IActor {
   move(target: IActor) {
     this.setChanged();
     this.parentActor.removeActor(this);
-    if (this === this.parentScene.currentActor) {
-      this.parentScene.waitingAction = undefined;
-    }
     target.addActorOnTop(this);
   }
 
   moveToIndex(target: IActor, index: number) {
     this.setChanged();
     this.parentActor.removeActor(this);
-    if (this === this.parentScene.currentActor) {
-      this.parentScene.waitingAction = undefined;
-    }
     target.addActor(this, index);
   }
 
@@ -439,8 +431,7 @@ export class Actor implements IActor {
       freeVolume: this.freeVolume,
       durability: this.durability,
       maxDurability: this.selfMaxDurability,
-      turnCost: this.selfTurnCost,
-      initiativePosition: this.initiativePosition,
+      initiative: this.selfinitiative,
       left: this.left,
       actors: this.actors.filter(x => x.changed).map(x => x.createSynchronizerAndClearInfo()),
       actions: this.selfActions.map(x => ({
@@ -495,10 +486,6 @@ export class Actor implements IActor {
     this.latestX = this.x;
     this.latestY = this.y;
     return result;
-  }
-
-  private isActorReadyToStartTurn() {
-    return this.owner && this.initiativePosition <= 0 && this.actions.some(x => x.remainedTime <= 0);
   }
 
   getActiveActors() {

@@ -68,7 +68,7 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
             color: `rgba(${x.color.r},${x.color.g},${x.color.b},${x.color.a})`,
             actor: x,
             initiativePosition: x.initiativePosition,
-            turnCost: x.turnCost,
+            initiative: x.initiative,
             definition: {
               char: x.char,
               color: x.color
@@ -88,7 +88,7 @@ export class InitiativeBlockComponent implements OnInit, OnDestroy {
           }
         }
         portraits.push(candidate);
-        candidate.initiativePosition += candidate.turnCost;
+        candidate.initiativePosition += candidate.initiative;
       }
       this.actors = portraits;
     }

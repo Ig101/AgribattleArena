@@ -9,7 +9,6 @@ export interface ActionNative {
   untargeted: boolean;
   onlyVisible: boolean;
   description: string;
-  timeCost: number;
   cooldown: number;
   power: number;
   aiPriority: number;

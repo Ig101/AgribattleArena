@@ -1,6 +1,5 @@
 export enum SynchronizationMessageType {
-  TurnStarted,
-  ActionDone,
   Defeated,
-  Victorious
+  Victorious,
+  Timeout
 }

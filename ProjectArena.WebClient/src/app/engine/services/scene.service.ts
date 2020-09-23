@@ -1,14 +1,13 @@
 import { Injectable, Inject } from '@angular/core';
 import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
-import { StartTurnInfo } from 'src/app/shared/models/synchronization/start-turn-info.model';
 import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
-import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization/synchronization-message-dto.model';
+import { FinishSceneMessage } from 'src/app/shared/models/synchronization/finish-scene-message.model';
 import { Scene } from '../scene/scene.object';
 import { MessageType } from '@aspnet/signalr';
-import { SynchronizationMessageType } from 'src/app/shared/models/enum/synchronization-message-type.enum';
+import { SynchronizationMessageType } from 'src/app/shared/models/enum/finish-scene-message-type.enum';
 import { NativesCollection } from 'src/app/content/natives-collection';
 import { SCENE_FRAME_TIME } from '../engine.helper';
 import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle-status.enum';
@@ -16,8 +15,6 @@ import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle
 @Injectable()
 export class SceneService {
 
-  actionsSub = new Subject<ActionInfo>();
-  synchronizersSub = new Subject<Synchronizer>();
   desyncSub = new BehaviorSubject<boolean>(false);
   endGameSub = new BehaviorSubject<BattlePlayerStatusEnum>(undefined);
 
@@ -35,16 +32,12 @@ export class SceneService {
     private nativesCollection: NativesCollection
   ) { }
 
-  setupGame(fullSynchronizer: FullSynchronizationInfo, reward: RewardInfo, turnInfo: StartTurnInfo) {
+  setupGame(fullSynchronizer: FullSynchronizationInfo) {
     this.sceneInternal = new Scene(
-      this.actionsSub,
-      this.synchronizersSub,
       this.desyncSub,
       this.nativesCollection,
       this.endGameSub,
-      fullSynchronizer,
-      reward,
-      turnInfo
+      fullSynchronizer
     );
   }
 
@@ -62,9 +55,9 @@ export class SceneService {
     this.sceneInternal = undefined;
   }
 
-  processMessage(message: SynchronizationMessageDto) {
+  processMessage(message: FinishSceneMessage) {
     if (this.scene && this.scene.id === message.sceneId) {
-      this.scene.pushMessages(message);
+      this.scene.processMessage(message);
     }
   }
 }

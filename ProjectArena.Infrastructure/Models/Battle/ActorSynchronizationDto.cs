@@ -28,9 +28,7 @@ namespace ProjectArena.Infrastructure.Models.Battle
 
         public float MaxDurability { get; set; }
 
-        public float TurnCost { get; set; }
-
-        public float InitiativePosition { get; set; }
+        public float Initiative { get; set; }
 
         public int Height { get; set; }
 

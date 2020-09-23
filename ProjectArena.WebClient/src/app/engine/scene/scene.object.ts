@@ -5,12 +5,11 @@ import { Actor } from './actor.object';
 import { TileStub } from '../models/abstract/tile-stub.model';
 import { ChangeDefinition } from '../models/abstract/change-definition.model';
 import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
-import { StartTurnInfo } from 'src/app/shared/models/synchronization/start-turn-info.model';
 import { Log } from '../models/abstract/log.model';
 import { ActorReference } from 'src/app/shared/models/synchronization/objects/actor-reference.model';
-import { SynchronizationMessageDto } from 'src/app/shared/models/synchronization/synchronization-message-dto.model';
+import { FinishSceneMessage } from 'src/app/shared/models/synchronization/finish-scene-message.model';
 import { ActionType } from 'src/app/shared/models/enum/action-type.enum';
-import { SynchronizationMessageType } from 'src/app/shared/models/enum/synchronization-message-type.enum';
+import { SynchronizationMessageType } from 'src/app/shared/models/enum/finish-scene-message-type.enum';
 import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
 import { Action } from '../models/abstract/action.model';
 import { Target } from '@angular/compiler';
@@ -23,7 +22,7 @@ import { INativesCollection } from '../interfaces/natives-collection.interface';
 import { getHashFromString } from 'src/app/helpers/extensions/hash.extension';
 import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
 import { ActionClassEnum } from '../models/enums/action-class.enum';
-import { getMostPrioritizedAction, SCENE_FRAME_TIME } from '../engine.helper';
+import { FRAMES_PER_TURN, getMostPrioritizedAction, SCENE_FRAME_TIME } from '../engine.helper';
 import { randomBytes } from 'crypto';
 import { ReactionSynchronization } from 'src/app/shared/models/synchronization/objects/reaction-synchronization.model';
 import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
@@ -34,16 +33,19 @@ export class Scene {
   id: string;
   hash: number;
   currentPlayer: Player;
+  currentActor: Actor;
+  automatic = false;
+  waitingInput = false;
 
   biom: BiomEnum;
 
   visualizationChanged = true;
+  changed: boolean;
 
   removedActors: ActorReference[] = [];
 
   tileStubs: TileStub[] = [];
   changes: ChangeDefinition[] = [];
-  changed: boolean;
   logs: Log[] = [];
   timeLine = 0;
   idCounterPosition = 0;
@@ -54,24 +56,13 @@ export class Scene {
   tiles: Tile[][];
   players: Player[];
 
-  currentActor: Actor;
-  turnTime = 0;
-
-  reward: RewardInfo;
-
-  waitingMessages: SynchronizationMessageDto[] = [];
-  waitingAction: () => void;
-  turnReallyStarted = true;
+  framesCounter = 0;
 
   constructor(
-    public actionsSub: Observer<ActionInfo>,
-    public synchronizersSub: Observer<Synchronizer>,
     public desyncSub: Observer<boolean>,
     public nativesCollection: INativesCollection,
     private endGameSub: Observer<BattlePlayerStatusEnum>,
-    synchronizer: FullSynchronizationInfo,
-    reward: RewardInfo,
-    turnInfo: StartTurnInfo) {
+    synchronizer: FullSynchronizationInfo) {
 
     // TODO Desyncs
 
@@ -80,7 +71,6 @@ export class Scene {
 
     this.timeLine = synchronizer.timeLine;
     this.idCounterPosition = synchronizer.idCounterPosition;
-    this.changed = false;
     this.players = synchronizer.players.map(x => new Player(x));
     this.currentPlayer = this.players.find(x => x.id === synchronizer.currentPlayerId);
     this.width = synchronizer.width;
@@ -100,15 +90,6 @@ export class Scene {
     for (const actor of synchronizer.actors) {
       const tile = this.getTileById(actor.parentId);
       tile.actors.push(new Actor(this, tile, actor));
-    }
-    this.reward = reward;
-    this.waitingMessages = synchronizer.waitingActions;
-    if (turnInfo) {
-      const actor = this.findActorByReference(turnInfo.tempActor);
-      if (actor && actor.isAlive) {
-        this.currentActor = actor;
-        this.turnTime = turnInfo.time;
-      }
     }
   }
 
@@ -146,7 +127,6 @@ export class Scene {
       return;
     }
     action.remainedTime = action.native.cooldown;
-    this.turnTime -= action.native.timeCost;
     switch (type) {
       case ActionType.Targeted:
         actor.actTargeted(action, x, y);
@@ -159,59 +139,8 @@ export class Scene {
     this.changed = true;
   }
 
-  private actFromActionInfo(definition: ActionInfo) {
-    const actor = this.findActorByReference(definition.actor);
-    const action = actor.actions.find(x => x.id === definition.id && x.remainedTime <= 0);
-    const target = definition.type === ActionType.OnObject ?
-      this.findActorByReference({ x: definition.x, y: definition.y, id: definition.targetId }) :
-      undefined;
-    this.act(actor, action, definition.type, definition.x, definition.y, target);
-  }
-
-  private startTurn(definition: StartTurnInfo) {
-    this.turnReallyStarted = false;
-    if (this.currentActor) {
-      this.currentActor.initiativePosition += this.currentActor.turnCost;
-    }
-    const actor = this.findActorByReference(definition.tempActor);
-    for (let x = 0; x < this.width; x++) {
-      for (let y = 0; y < this.height; y++) {
-        this.tiles[x][y].update();
-      }
-    }
-
-    if (actor?.isAlive) {
-      this.currentActor = actor;
-      this.currentActor.setChanged();
-      this.currentActor.initiativePosition += this.currentActor.turnCost;
-      this.turnTime = definition.time;
-    }
-
-    if (this.changes.length > 0) {
-      this.changed = true;
-    } else {
-      this.synchronizersSub.next(this.createSynchronizerAndClearChanges());
-    }
-    this.visualizationChanged = true;
-  }
-
-  private processMessage(message: SynchronizationMessageDto) {
-    switch (message.id) {
-      case SynchronizationMessageType.ActionDone:
-        this.actFromActionInfo(message.action);
-        break;
-      case SynchronizationMessageType.TurnStarted:
-        this.startTurn(message.startTurnInfo);
-        break;
-      case SynchronizationMessageType.Defeated:
-        this.reward = message.reward;
-        this.endGameSub.next(BattlePlayerStatusEnum.Defeated);
-        break;
-      case SynchronizationMessageType.Victorious:
-        this.reward = message.reward;
-        this.endGameSub.next(BattlePlayerStatusEnum.Victorious);
-        break;
-    }
+  processMessage(message: FinishSceneMessage) {
+    // TODO Process
   }
 
   getTileById(id: number) {
@@ -229,7 +158,7 @@ export class Scene {
     owner: Player,
     tags: string[],
     durability: number,
-    turnCost: number,
+    initiative: number,
     height: number,
     volume: number,
     freeVolume: number,
@@ -251,8 +180,7 @@ export class Scene {
       tags,
       durability,
       maxDurability: durability,
-      turnCost,
-      initiativePosition: source.initiativePosition + Math.random() / 1000 - this.currentActor.turnCost + turnCost,
+      initiative,
       height,
       volume,
       freeVolume,
@@ -297,26 +225,39 @@ export class Scene {
     }
   }
 
+  private actOnResetting() {
+    // TODO Actors AI Actions
+  }
+
+  private resetTurn() {
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        this.tiles[x][y].update();
+      }
+    }
+    if (this.automatic) {
+      this.actOnResetting();
+    } else {
+      this.waitingInput = true;
+    }
+  }
+
   update() {
     const newTime = performance.now();
     const shift = (newTime - this.lastTime) / 1000;
     this.lastTime = newTime;
 
     this.timeLine += shift;
-    this.turnTime -= shift;
-    if (this.changes.length === 0) {
-      if (this.changed) {
-        this.synchronizersSub.next(this.createSynchronizerAndClearChanges());
-      }
-      if (this.waitingMessages.length > 0) {
-        this.processMessage(this.waitingMessages.shift());
-      } else {
-        this.turnReallyStarted = true;
-        if (this.waitingAction) {
-          this.waitingAction();
-        }
-      }
-    } else {
+    this.framesCounter += shift;
+
+    if (this.framesCounter > FRAMES_PER_TURN * SCENE_FRAME_TIME) {
+      this.framesCounter = 0;
+      this.resetTurn();
+    } else if (!this.waitingInput) {
+      this.framesCounter++;
+    }
+
+    if (this.changes.length !== 0) {
       const currentChanges = this.changes.filter(x => x.time <= this.timeLine);
       this.changes = this.changes.filter(x => x.time > this.timeLine);
       for (const change of currentChanges) {
@@ -348,43 +289,26 @@ export class Scene {
     return shift;
   }
 
-  pushMessages(...messages: SynchronizationMessageDto[]) {
-    this.waitingMessages.push(...messages);
-  }
-
-  private intendedAction(actor: Actor, action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
-    if (this.waitingMessages.length > 0 || this.changes.length > 0) {
-      this.waitingAction = () => this.intendedAction(actor, action, type, x, y, target);
+  private intendedAction(action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
+    if (!this.currentActor.isAlive || !this.currentActor.actions.some(a => a.id === action.id) || (target && !target.isAlive)) {
       return;
     }
-    if (!actor.isAlive || !actor.actions.some(a => a.id === action.id) || (target && !target.isAlive)) {
-      return;
-    }
-    const definition = {
-      actor: actor.reference,
-      id: action.id,
-      type,
-      x,
-      y,
-      targetId: target?.id
-    } as ActionInfo;
-    this.actionsSub.next(definition);
-    this.act(actor, action, type, x, y, target);
+    this.act(this.currentActor, action, type, x, y, target);
   }
 
   intendedTargetedAction(action: Action, x: number, y: number) {
-    this.intendedAction(this.currentActor, action, ActionType.Targeted, x, y);
+    this.intendedAction(action, ActionType.Targeted, x, y);
   }
 
   intendedOnObjectAction(action: Action, target: IActor) {
-    this.intendedAction(this.currentActor, action, ActionType.OnObject, target.x, target.y, target);
+    this.intendedAction(action, ActionType.OnObject, target.x, target.y, target);
   }
   /*
     Make it server side
     startTurnAddReturnIsTurnStarted() {
     this.turnStarted = false;
     if (this.currentActor) {
-      this.currentActor.initiativePosition += this.currentActor.turnCost;
+      this.currentActor.initiativePosition += this.currentActor.initiative;
     }
     const readyActors: Actor[] = [];
     for (let x = 0; x < this.width; x++) {
