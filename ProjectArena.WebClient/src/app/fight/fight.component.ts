@@ -423,7 +423,6 @@ export class FightComponent implements OnInit, OnDestroy {
         id: 'sampleS',
         timeLine: 0,
         idCounterPosition,
-        currentPlayerId: 'sampleP',
         actors,
         players: [
           {
@@ -435,10 +434,14 @@ export class FightComponent implements OnInit, OnDestroy {
             battlePlayerStatus: BattlePlayerStatusEnum.Playing
           }
         ],
+        currentActor: {
+          id: idCounterPosition,
+          x: 13,
+          y: 6
+        },
         width: 14,
         height: 8,
-        biom: BiomEnum.Grass,
-        waitingActions: []
+        biom: BiomEnum.Grass
       }
     );
   }

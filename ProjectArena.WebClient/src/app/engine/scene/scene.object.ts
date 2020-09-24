@@ -66,15 +66,12 @@ export class Scene {
     private endGameSub: Observer<BattlePlayerStatusEnum>,
     synchronizer: FullSynchronizationInfo) {
 
-    // TODO Desyncs
-
     this.desyncSub.next(false);
     this.endGameSub.next(BattlePlayerStatusEnum.Playing);
 
     this.timeLine = synchronizer.timeLine;
     this.idCounterPosition = synchronizer.idCounterPosition;
     this.players = synchronizer.players.map(x => new Player(x));
-    this.currentPlayer = this.players.find(x => x.id === synchronizer.currentPlayerId);
     this.width = synchronizer.width;
     this.height = synchronizer.height;
     this.id = synchronizer.id;
@@ -93,6 +90,8 @@ export class Scene {
       const tile = this.getTileById(actor.parentId);
       tile.actors.push(new Actor(this, tile, actor));
     }
+    this.currentActor = this.findActorByReference(synchronizer.currentActor);
+    this.currentPlayer = this.currentActor.owner;
   }
 
   private clearExtraLogs() {
@@ -227,8 +226,11 @@ export class Scene {
     }
   }
 
-  private actOnResetting(playerAction: () => void) {
+  private actOnResetting(playerAction: { action: Action, type: ActionType, x?: number, y?: number, target?: IActor }) {
     // TODO Actors AI Actions
+    if (playerAction) {
+      this.act(this.currentActor, playerAction.action, playerAction.type, playerAction.x, playerAction.y, playerAction.target);
+    }
   }
 
   private resetTurn() {
@@ -237,7 +239,14 @@ export class Scene {
         this.tiles[x][y].update();
       }
     }
-    if (this.automatic || !this.currentActor.isAlive) {
+    if (this.automatic ||
+      !this.currentActor ||
+      !this.currentActor.isAlive ||
+      !this.currentActor.actions.some(x =>
+        x.remainedTime <= 0 &&
+        (x.native.actionClass === ActionClassEnum.Attack ||
+        x.native.actionClass === ActionClassEnum.Move ||
+        x.native.actionClass === ActionClassEnum.Default))) {
       this.actOnResetting(undefined);
     } else if (this.waitingAction) {
       this.waitingAction();
@@ -256,9 +265,8 @@ export class Scene {
     }
 
     this.timeLine += shift;
-    this.framesCounter += shift;
 
-    if (this.framesCounter > FRAMES_PER_TURN * SCENE_FRAME_TIME) {
+    if (this.framesCounter > FRAMES_PER_TURN) {
       this.framesCounter = 0;
       this.resetTurn();
     } else {
@@ -302,7 +310,7 @@ export class Scene {
       return;
     }
     this.waitingInput = false;
-    this.actOnResetting(() => this.act(this.currentActor, action, type, x, y, target));
+    this.actOnResetting({ action, type, x, y, target });
   }
 
   intendedTargetedAction(action: Action, x: number, y: number) {
@@ -320,27 +328,4 @@ export class Scene {
       this.intendedAction(action, ActionType.OnObject, target.x, target.y, target);
     }
   }
-  /*
-    Make it server side
-    startTurnAddReturnIsTurnStarted() {
-    this.turnStarted = false;
-    if (this.currentActor) {
-      this.currentActor.initiativePosition += this.currentActor.initiative;
-    }
-    const readyActors: Actor[] = [];
-    for (let x = 0; x < this.width; x++) {
-      for (let y = 0; y < this.height; y++) {
-        readyActors.push(...this.tiles[x][y].startTurn());
-      }
-    }
-    const nextPlayerCandidate = readyActors.length > 0 ?
-      readyActors.reduce((a, b) => a.initiativePosition < b.initiativePosition ? a : b) :
-      undefined;
-    if (nextPlayerCandidate) {
-      this.currentActor = nextPlayerCandidate;
-      return true;
-    } else {
-      return false;
-    }
-  }*/
 }
