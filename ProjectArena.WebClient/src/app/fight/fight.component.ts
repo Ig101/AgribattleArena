@@ -848,12 +848,6 @@ export class FightComponent implements OnInit, OnDestroy {
     x: number,
     y: number,
     texturePosition: number,
-
-    cameraLeft: number,
-    cameraTop: number,
-
-    greenPath: Path2D,
-    redPath: Path2D,
     colors: Uint8Array,
     activities: Uint8Array,
     textureMapping: Float32Array,
@@ -994,8 +988,8 @@ export class FightComponent implements OnInit, OnDestroy {
               fillVertexPosition(this.mainTextureVertexes, x, y, left, top, this.tileWidth, this.tileHeight, texturePosition);
               if (x >= 0 && y >= 0 && x < this.scene.width && y < this.scene.height) {
                 sceneRandom.next();
-                const visibleActor = this.drawPoint(x, y, texturePosition, cameraLeft, cameraTop,
-                  this.greenPath, this.redPath, this.colors, this.activities, this.textureMapping,
+                const visibleActor = this.drawPoint(x, y, texturePosition,
+                  this.colors, this.activities, this.textureMapping,
                   this.backgrounds, this.backgroundTextureMapping);
                 if (visibleActor && visibleActor.tags.includes('active') && visibleActor.maxDurability) {
                   this.healthActors.push(visibleActor);
