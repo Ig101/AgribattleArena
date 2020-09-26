@@ -862,7 +862,9 @@ export class FightComponent implements OnInit, OnDestroy {
 
     const tile = this.scene.tiles[x][y];
     if (tile) {
-      const tileStub = this.scene.tileStubs.find(s => s.x === x && s.y === y);
+      const tileStub = this.scene.tileStubs.find(s =>
+        (s.actorLink && s.actorLink.x === x && s.actorLink.y === y) ||
+        (!s.actorLink && s.x === x && s.y === y));
       const info = this.getTileActorAndVisibleActors(tile);
       const currentTileHeight = info.backgroundActor ? info.backgroundActor.z + info.backgroundActor.height : 0;
       fillTileMask(
