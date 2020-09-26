@@ -14,7 +14,7 @@ export class AuthorizationMenuResolverService implements Resolve<boolean> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (this.userService.user) {
-      this.router.navigate(['lobby']);
+      this.router.navigate(['fight']);
       return EMPTY;
     }
     return true;

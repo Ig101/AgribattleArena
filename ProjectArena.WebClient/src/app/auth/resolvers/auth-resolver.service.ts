@@ -14,13 +14,7 @@ export class AuthResolverService implements Resolve<boolean> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (this.userService.user) {
-      if (this.userService.user.state === UserStateEnum.Battle) {
-        this.router.navigate(['battle']);
-      }
-      if (this.userService.user.state === UserStateEnum.Lobby) {
-        this.router.navigate(['lobby']);
-      }
-      return EMPTY;
+        this.router.navigate(['fight']);
     }
     return true;
   }
