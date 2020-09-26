@@ -121,8 +121,27 @@ export class Scene {
   }
 
   private createFullSynchronizer(): FullSynchronizationInfo {
-    return undefined;
-    // TODO
+    const actors: ActorSynchronization[] = [];
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        actors.push(...this.tiles[x][y].createFullSynchronizer());
+      }
+    }
+    return {
+      id: this.id,
+      timeLine: this.timeLine,
+      idCounterPosition: this.idCounterPosition,
+      currentActor: this.currentActor.reference,
+      actors,
+      players: this.players.map(p => ({
+        id: p.id,
+        battlePlayerStatus: p.battlePlayerStatus,
+        keyActors: p.keyActors
+      })),
+      width: this.width,
+      height: this.height,
+      biom: this.biom
+    };
   }
 
   private act(actor: Actor, action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
@@ -234,11 +253,9 @@ export class Scene {
 
   private checkWinCondition() {
     if (this.currentPlayer.keyActors.length === 0) {
-      // Defeat
       this.currentPlayer.battlePlayerStatus = BattlePlayerStatusEnum.Defeated;
       this.endGameSub.next(this.createFullSynchronizer());
     } else if (!this.players.some(x => x.id !== this.currentPlayer.id && x.keyActors.length > 0)) {
-      // Victory
       this.currentPlayer.battlePlayerStatus = BattlePlayerStatusEnum.Victorious;
       this.endGameSub.next(this.createFullSynchronizer());
     }
