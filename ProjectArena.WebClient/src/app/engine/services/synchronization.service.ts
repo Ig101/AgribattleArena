@@ -287,6 +287,7 @@ export class SynchronizationService {
     });
     return {
       id: 'sampleS',
+      automatic: false,
       timeLine: 0,
       idCounterPosition: 5010,
       actors,

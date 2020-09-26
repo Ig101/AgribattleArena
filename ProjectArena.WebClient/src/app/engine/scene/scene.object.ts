@@ -68,6 +68,7 @@ export class Scene {
     this.desyncSub.next(false);
 
     this.timeLine = synchronizer.timeLine;
+    this.automatic = synchronizer.automatic;
     this.idCounterPosition = synchronizer.idCounterPosition;
     this.players = synchronizer.players.map(x => new Player(x));
     this.width = synchronizer.width;
@@ -129,6 +130,7 @@ export class Scene {
     }
     return {
       id: this.id,
+      automatic: this.automatic,
       timeLine: this.timeLine,
       idCounterPosition: this.idCounterPosition,
       currentActor: this.currentActor.reference,

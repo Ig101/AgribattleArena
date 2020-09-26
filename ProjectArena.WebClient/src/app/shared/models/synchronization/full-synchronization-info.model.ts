@@ -8,6 +8,7 @@ import { ActorReference } from './objects/actor-reference.model';
 export interface FullSynchronizationInfo {
   id: string;
   timeLine: number;
+  automatic: boolean;
   idCounterPosition: number;
   currentActor: ActorReference;
   actors: ActorSynchronization[];

@@ -282,6 +282,7 @@ export class FightResolverService implements Resolve<boolean> {
     });
     return of({
       id: 'sampleS',
+      automatic: false,
       timeLine: 0,
       idCounterPosition: 5010,
       actors,
