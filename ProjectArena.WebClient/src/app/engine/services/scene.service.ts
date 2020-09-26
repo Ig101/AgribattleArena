@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
 import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
-import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
 import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
@@ -16,7 +15,7 @@ import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle
 export class SceneService {
 
   desyncSub = new BehaviorSubject<boolean>(false);
-  endGameSub = new BehaviorSubject<BattlePlayerStatusEnum>(undefined);
+  endGameSub = new Subject<FullSynchronizationInfo>();
 
   updateSub = new Subject<number>();
   updater;

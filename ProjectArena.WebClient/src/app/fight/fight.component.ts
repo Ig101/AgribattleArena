@@ -403,12 +403,6 @@ export class FightComponent implements OnInit, OnDestroy {
           remainedTime: 0
         },
         {
-          id: 'wait',
-          isAutomatic: false,
-          blocked: false,
-          remainedTime: 0
-        },
-        {
           id: 'shot',
           isAutomatic: false,
           blocked: false,
@@ -1057,9 +1051,7 @@ export class FightComponent implements OnInit, OnDestroy {
         char = 'ground';
         mirrored = false;
       } else {
-        color = this.scene.currentActor.x === info.visibleActor.x && this.scene.currentActor.y === info.visibleActor.y ?
-        { r: 225, g: 225, b: 0, a: info.visibleActor.color.a } :
-        info.visibleActor === info.backgroundActor ?
+        color = info.visibleActor === info.backgroundActor ?
         heightImpact(currentTileHeight, info.visibleActor.color) :
         info.visibleActor.color;
         char = info.visibleActor.char;

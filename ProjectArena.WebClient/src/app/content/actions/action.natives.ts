@@ -13,7 +13,6 @@ export const actionNatives: { [id: string]: ActionNative } = {
     onlyVisible: false,
     description: undefined,
     scopeSize: 0,
-    timeCost: 3,
     cooldown: 0,
     power: 0,
     aiPriority: 1,
@@ -28,30 +27,11 @@ export const actionNatives: { [id: string]: ActionNative } = {
     onlyVisible: false,
     description: undefined,
     scopeSize: 0,
-    timeCost: 6,
     cooldown: 0,
     power: 12,
     aiPriority: 1,
     actionClass: ActionClassEnum.Attack,
     actionOnObject: attackAction
-  },
-  wait: {
-    char: 'W',
-    name: 'Wait',
-    untargeted: true,
-    onlyVisible: false,
-    description: 'Do nothing for one turn',
-    scopeSize: 0,
-    timeCost: 30,
-    cooldown: 0,
-    power: 0,
-    aiPriority: 1,
-    actionClass: ActionClassEnum.Default,
-    actionTargeted: (actor: Actor, power: number, x: number, y: number, startingTime: number) => {
-      actor.parentActor.handleEffects(['wait-act'], power, true, 1, startingTime, actor);
-      actor.handleEffects(['wait-act'], power, false, 1, startingTime, actor);
-      return [];
-    }
   },
   shot: {
     char: 'S',
@@ -60,7 +40,6 @@ export const actionNatives: { [id: string]: ActionNative } = {
     onlyVisible: true,
     description: 'Deal physical damage to a visible target',
     scopeSize: 0,
-    timeCost: 12,
     cooldown: 0,
     power: 20,
     aiPriority: 1,

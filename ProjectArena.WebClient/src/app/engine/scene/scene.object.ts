@@ -4,7 +4,6 @@ import { Observer } from 'rxjs/internal/types';
 import { Actor } from './actor.object';
 import { TileStub } from '../models/abstract/tile-stub.model';
 import { ChangeDefinition } from '../models/abstract/change-definition.model';
-import { ActionInfo } from 'src/app/shared/models/synchronization/action-info.model';
 import { Log } from '../models/abstract/log.model';
 import { ActorReference } from 'src/app/shared/models/synchronization/objects/actor-reference.model';
 import { FinishSceneMessage } from 'src/app/shared/models/synchronization/finish-scene-message.model';
@@ -63,11 +62,10 @@ export class Scene {
   constructor(
     public desyncSub: Observer<boolean>,
     public nativesCollection: INativesCollection,
-    private endGameSub: Observer<BattlePlayerStatusEnum>,
+    private endGameSub: Observer<FullSynchronizationInfo>,
     synchronizer: FullSynchronizationInfo) {
 
     this.desyncSub.next(false);
-    this.endGameSub.next(BattlePlayerStatusEnum.Playing);
 
     this.timeLine = synchronizer.timeLine;
     this.idCounterPosition = synchronizer.idCounterPosition;
@@ -233,12 +231,17 @@ export class Scene {
     }
   }
 
+  private checkWinCondition() {
+
+  }
+
   private resetTurn() {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         this.tiles[x][y].update();
       }
     }
+    this.checkWinCondition();
     if (this.automatic ||
       !this.currentActor ||
       !this.currentActor.isAlive ||
@@ -259,6 +262,10 @@ export class Scene {
     const newTime = performance.now();
     const shift = (newTime - this.lastTime) / 1000;
     this.lastTime = newTime;
+
+    if (this.automatic) {
+      this.waitingInput = false;
+    }
 
     if (this.waitingInput) {
       return shift;
