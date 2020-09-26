@@ -137,6 +137,10 @@ export class Tile implements IActor {
     return this.actors.filter(x => x.changed).map(x => x.createSynchronizerAndClearInfo());
   }
 
+  createFullSynchronizer() {
+    return this.actors.map(x => x.createSynchronizerAndClearInfo());
+  }
+
   getActiveActors(): Actor[] {
     const activeActors = [];
     for (const actor of this.actors) {

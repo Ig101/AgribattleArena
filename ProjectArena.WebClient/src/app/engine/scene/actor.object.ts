@@ -228,6 +228,7 @@ export class Actor implements IActor {
 
   kill() {
     this.isAlive = false;
+    this.owner?.removeKeyActor(this.id);
     this.handleEffects([KILL_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine, undefined);
     this.parentActor.removeActor(this);
     for (const inside of this.actors) {
@@ -434,6 +435,79 @@ export class Actor implements IActor {
       initiative: this.selfinitiative,
       left: this.left,
       actors: this.actors.filter(x => x.changed).map(x => x.createSynchronizerAndClearInfo()),
+      actions: this.selfActions.map(x => ({
+        id: x.id,
+        isAutomatic: x.native.actionClass === ActionClassEnum.Autocast,
+        blocked: !this.actions.some(a => a.id === x.id),
+        remainedTime: x.remainedTime
+      })),
+      ownerId: this.owner?.id,
+      preparationReactions: this.preparationReactions.map(x => ({
+        id: x.id,
+        mod: x.mod
+      })),
+      activeReactions: this.activeReactions.map(x => ({
+        id: x.id,
+        mod: x.mod
+      })),
+      clearReactions: this.clearReactions.map(x => ({
+        id: x.id,
+        mod: x.mod
+      })),
+      buffs: this.buffs.map(x => {
+        return {
+          id: x.id,
+          duration: x.duration,
+          maxStacks: x.maxStacks,
+          counter: x.counter,
+          changedDurability: x.changedDurability,
+          changedSpeed: x.changedSpeed,
+          actions: x.addedActions.map(a => ({
+            id: a.id,
+            isAutomatic: a.native.actionClass === ActionClassEnum.Autocast,
+            blocked: !this.actions.some(aA => a.id === aA.id),
+            remainedTime: a.remainedTime
+          })),
+          addedPreparationReactions: x.addedPreparationReactions.map(a => ({
+            id: a.id,
+            mod: a.mod
+          })),
+          addedClearReactions: x.addedClearReactions.map(a => ({
+            id: a.id,
+            mod: a.mod
+          })),
+          addedActiveReactions: x.addedActiveReactions.map(a => ({
+            id: a.id,
+            mod: a.mod
+          })),
+        } as BuffSynchronization;
+      })
+    } as ActorSynchronization;
+    this.changed = false;
+    this.latestX = this.x;
+    this.latestY = this.y;
+    return result;
+  }
+
+  createFullSynchronizer() {
+    const result = {
+      reference: {
+        x: this.latestX,
+        y: this.latestY,
+        id: this.id
+      },
+      position: this.parentActor.actors.indexOf(this),
+      parentId: this.parentActor.id,
+      char: this.char,
+      color: this.color,
+      height: this.height,
+      volume: this.volume,
+      freeVolume: this.freeVolume,
+      durability: this.durability,
+      maxDurability: this.selfMaxDurability,
+      initiative: this.selfinitiative,
+      left: this.left,
+      actors: this.actors.map(x => x.createFullSynchronizer()),
       actions: this.selfActions.map(x => ({
         id: x.id,
         isAutomatic: x.native.actionClass === ActionClassEnum.Autocast,

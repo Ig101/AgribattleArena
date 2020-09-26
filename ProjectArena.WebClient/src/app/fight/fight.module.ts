@@ -8,6 +8,7 @@ import { SynchronizationService } from '../engine/services/synchronization.servi
 import { ContextMenuComponent } from './context-menu/context-menu.component';
 import { ContextMenuItemComponent } from './context-menu/context-menu-item/context-menu-item.component';
 import { TargetChooseModalComponent } from './modals/target-choose-modal/target-choose-modal.component';
+import { FightResolverService } from './resolvers/fight-resolver.service';
 
 
 
@@ -22,6 +23,9 @@ import { TargetChooseModalComponent } from './modals/target-choose-modal/target-
     SharedModule,
     EngineModule,
     FightRoutingModule
+  ],
+  providers: [
+    FightResolverService
   ]
 })
 export class FightModule {

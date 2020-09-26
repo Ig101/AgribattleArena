@@ -6,7 +6,7 @@ import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer
 import { FinishSceneMessage } from 'src/app/shared/models/synchronization/finish-scene-message.model';
 import { Scene } from '../scene/scene.object';
 import { MessageType } from '@aspnet/signalr';
-import { SynchronizationMessageType } from 'src/app/shared/models/enum/finish-scene-message-type.enum';
+import { FinishSceneMessageType } from 'src/app/shared/models/enum/finish-scene-message-type.enum';
 import { NativesCollection } from 'src/app/content/natives-collection';
 import { SCENE_FRAME_TIME } from '../engine.helper';
 import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle-status.enum';
@@ -16,6 +16,7 @@ export class SceneService {
 
   desyncSub = new BehaviorSubject<boolean>(false);
   endGameSub = new Subject<FullSynchronizationInfo>();
+  newSceneSub = new Subject<any>();
 
   updateSub = new Subject<number>();
   updater;
@@ -38,6 +39,7 @@ export class SceneService {
       this.endGameSub,
       fullSynchronizer
     );
+    this.newSceneSub.next();
   }
 
   startUpdates() {
@@ -50,13 +52,14 @@ export class SceneService {
   }
 
   clearScene() {
-    clearInterval(this.updater);
     this.sceneInternal = undefined;
+    clearInterval(this.updater);
   }
 
   processMessage(message: FinishSceneMessage) {
     if (this.scene && this.scene.id === message.sceneId) {
-      this.scene.processMessage(message);
+      this.clearScene();
+      this.setupGame(message.fullSynchronization);
     }
   }
 }

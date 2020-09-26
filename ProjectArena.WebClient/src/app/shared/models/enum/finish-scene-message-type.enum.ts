@@ -1,4 +1,4 @@
-export enum SynchronizationMessageType {
+export enum FinishSceneMessageType {
   Defeated,
   Victorious,
   Timeout

@@ -8,7 +8,7 @@ import { Log } from '../models/abstract/log.model';
 import { ActorReference } from 'src/app/shared/models/synchronization/objects/actor-reference.model';
 import { FinishSceneMessage } from 'src/app/shared/models/synchronization/finish-scene-message.model';
 import { ActionType } from 'src/app/shared/models/enum/action-type.enum';
-import { SynchronizationMessageType } from 'src/app/shared/models/enum/finish-scene-message-type.enum';
+import { FinishSceneMessageType } from 'src/app/shared/models/enum/finish-scene-message-type.enum';
 import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
 import { Action } from '../models/abstract/action.model';
 import { Target } from '@angular/compiler';
@@ -120,6 +120,11 @@ export class Scene {
     return synchronizer;
   }
 
+  private createFullSynchronizer(): FullSynchronizationInfo {
+    return undefined;
+    // TODO
+  }
+
   private act(actor: Actor, action: Action, type: ActionType, x?: number, y?: number, target?: IActor) {
     if (!actor || !action || action.remainedTime > 0) {
       this.desyncSub.next(true);
@@ -136,10 +141,6 @@ export class Scene {
     }
     this.visualizationChanged = true;
     this.changed = true;
-  }
-
-  processMessage(message: FinishSceneMessage) {
-    // TODO Process
   }
 
   getTileById(id: number) {
@@ -232,7 +233,15 @@ export class Scene {
   }
 
   private checkWinCondition() {
-
+    if (this.currentPlayer.keyActors.length === 0) {
+      // Defeat
+      this.currentPlayer.battlePlayerStatus = BattlePlayerStatusEnum.Defeated;
+      this.endGameSub.next(this.createFullSynchronizer());
+    } else if (!this.players.some(x => x.id !== this.currentPlayer.id && x.keyActors.length > 0)) {
+      // Victory
+      this.currentPlayer.battlePlayerStatus = BattlePlayerStatusEnum.Victorious;
+      this.endGameSub.next(this.createFullSynchronizer());
+    }
   }
 
   private resetTurn() {

@@ -1,40 +1,35 @@
 import { Injectable } from '@angular/core';
-import { SceneService } from './scene.service';
-import { FinishSceneMessage } from 'src/app/shared/models/synchronization/finish-scene-message.model';
-import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
-import { Synchronizer } from 'src/app/shared/models/synchronization/synchronizer.model';
-import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
-import { UserService } from 'src/app/shared/services/user.service';
-import { RewardInfo } from 'src/app/shared/models/synchronization/reward-info.model';
-import { FinishSceneMessageType } from 'src/app/shared/models/enum/finish-scene-message-type.enum';
+import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { SceneService } from 'src/app/engine/services/scene.service';
 import { BiomEnum } from 'src/app/shared/models/enum/biom.enum';
 import { BattlePlayerStatusEnum } from 'src/app/shared/models/enum/player-battle-status.enum';
+import { FullSynchronizationInfo } from 'src/app/shared/models/synchronization/full-synchronization-info.model';
 import { ActorSynchronization } from 'src/app/shared/models/synchronization/objects/actor-synchronization.model';
+import { ArenaHubService } from 'src/app/shared/services/arena-hub.service';
+import { UserService } from 'src/app/shared/services/user.service';
+import { WebCommunicationService } from 'src/app/shared/services/web-communication.service';
 
 @Injectable()
-export class SynchronizationService {
-
-  code: string;
-
-  get transformedCode() {
-    return this.code;
-  }
+export class FightResolverService implements Resolve<boolean> {
 
   constructor(
-    private sceneService: SceneService,
     private userService: UserService,
-    private arenaHubService: ArenaHubService
-  ) {
-    sceneService.endGameSub.subscribe(message => {
-      this.sendFinishSynchronization(message);
-    });
+    private arenaHubService: ArenaHubService,
+    private webCommunicationService: WebCommunicationService,
+    private sceneService: SceneService
+  ) { }
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
+    return this.createSampleScene()
+      .pipe(map(scene => {
+        this.sceneService.setupGame(scene);
+        return true;
+      }));
   }
 
-  private applyReward(reward: RewardInfo) {
-    // TODO
-  }
-
-  private createSampleScene() {
+  createSampleScene() {
     let idCounterPosition = 1000;
     const actors: ActorSynchronization[] = [];
     let tilesCounter = 1;
@@ -179,7 +174,7 @@ export class SynchronizationService {
       actors: [],
       buffs: [],
     });
-    return {
+    return of({
       id: 'sampleS',
       timeLine: 0,
       idCounterPosition,
@@ -204,24 +199,6 @@ export class SynchronizationService {
       width: 14,
       height: 8,
       biom: BiomEnum.Grass
-    } as FullSynchronizationInfo;
-  }
-
-  sendFinishSynchronization(message: FullSynchronizationInfo) {
-    this.processMessage({
-      id: FinishSceneMessageType.Victorious,
-      sceneId: 'sampleS',
-      code: 'newCode',
-      reward: {
-        experience: 1
-      },
-      fullSynchronization: this.createSampleScene()
-    } as FinishSceneMessage);
-  }
-
-  processMessage(message: FinishSceneMessage) {
-    this.code = message.code;
-    this.applyReward(message.reward);
-    this.sceneService.processMessage(message);
+    } as FullSynchronizationInfo);
   }
 }

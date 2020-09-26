@@ -16,7 +16,4 @@ import { SynchronizationService } from './services/synchronization.service';
     SynchronizationService
   ]
 })
-export class EngineModule {
-  constructor(synchronizationService: SynchronizationService) {
-  }
-}
+export class EngineModule { }
