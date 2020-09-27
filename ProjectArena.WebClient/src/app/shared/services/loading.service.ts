@@ -73,20 +73,22 @@ export class LoadingService {
     if (this.onInternal && this.alpha < 1) {
       this.alpha = Math.min(1, this.alpha + this.alphaSpeed * shift);
       if (this.alpha >= 1 && this.finishSubject && !this.stuck) {
-        this.finishSubject.next();
-        this.finishSubject.complete();
-        this.finishSubject.unsubscribe();
+        const sub = this.finishSubject;
         this.finishSubject = undefined;
+        sub.next();
+        sub.complete();
+        sub.unsubscribe();
       }
     }
     if (!this.onInternal && this.alpha > 0 && this.requiredTime <= 0) {
       this.alpha = Math.max(0, this.alpha - this.alphaSpeed * shift);
       if (this.alpha <= 0 && this.finishSubject && !this.stuck) {
         this.on = false;
-        this.finishSubject.next();
-        this.finishSubject.complete();
-        this.finishSubject.unsubscribe();
+        const sub = this.finishSubject;
         this.finishSubject = undefined;
+        sub.next();
+        sub.complete();
+        sub.unsubscribe();
       }
     }
   }

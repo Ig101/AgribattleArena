@@ -49,7 +49,6 @@ export class FightResolverService implements Resolve<boolean> {
             color: {r: 60, g: 61, b: 95, a: 1},
             ownerId: undefined,
             tags: ['tile'],
-            parentId: tilesCounter,
             durability: 10000,
             maxDurability: 10000,
             initiative: 1,
@@ -76,7 +75,6 @@ export class FightResolverService implements Resolve<boolean> {
             color: { r: 45, g: 60, b: 150, a: 1 },
             ownerId: undefined,
             tags: ['tile'],
-            parentId: tilesCounter,
             durability: 1,
             maxDurability: 1,
             initiative: 1,
@@ -97,8 +95,8 @@ export class FightResolverService implements Resolve<boolean> {
     actors.push({
       reference: {
         id: 5000,
-        x: 12,
-        y: 7
+        x: 9,
+        y: 5
       },
       position: 1,
       left: false,
@@ -107,7 +105,6 @@ export class FightResolverService implements Resolve<boolean> {
       color: { r: 0, g: 0, b: 255, a: 1 },
       ownerId: 'sampleP2',
       tags: ['active'],
-      parentId: 1 + 12 * 8 + 7,
       durability: 200,
       maxDurability: 200,
       initiative: 1,
@@ -142,7 +139,7 @@ export class FightResolverService implements Resolve<boolean> {
     actors.push({
       reference: {
         id: 5001,
-        x: 12,
+        x: 9,
         y: 6
       },
       position: 1,
@@ -152,7 +149,6 @@ export class FightResolverService implements Resolve<boolean> {
       color: { r: 0, g: 0, b: 255, a: 1 },
       ownerId: 'sampleP2',
       tags: ['active'],
-      parentId: 1 + 12 * 8 + 7,
       durability: 200,
       maxDurability: 200,
       initiative: 1,
@@ -197,7 +193,6 @@ export class FightResolverService implements Resolve<boolean> {
       color: { r: 255, g: 155, b: 55, a: 1 },
       ownerId: 'sampleP',
       tags: ['active'],
-      parentId: 1 + 13 * 8 + 6,
       durability: 200,
       maxDurability: 200,
       initiative: 1,
@@ -248,7 +243,6 @@ export class FightResolverService implements Resolve<boolean> {
       color: { r: 255, g: 155, b: 55, a: 1 },
       ownerId: 'sampleP',
       tags: ['active'],
-      parentId: 1 + 13 * 8 + 6,
       durability: 200,
       maxDurability: 200,
       initiative: 1,
@@ -299,7 +293,7 @@ export class FightResolverService implements Resolve<boolean> {
         }
       ],
       currentActor: {
-        id: idCounterPosition,
+        id: 5003,
         x: 13,
         y: 6
       },

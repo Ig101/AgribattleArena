@@ -113,6 +113,8 @@ export class FightComponent implements OnInit, OnDestroy {
 
   chosenAction: Action;
 
+  scene: Scene;
+
   get canvasWidth() {
     return this.battleCanvas.nativeElement.width;
   }
@@ -135,10 +137,6 @@ export class FightComponent implements OnInit, OnDestroy {
 
   get interfaceShift() {
     return 362 / this.zoom;
-  }
-
-  get scene() {
-    return this.sceneService.scene;
   }
 
   get canAct() {
@@ -225,6 +223,7 @@ export class FightComponent implements OnInit, OnDestroy {
     this.sceneService.newSceneSub
       .pipe(switchMap(_ => this.loadingService.startLoading({} as LoadingDefinition)))
       .pipe(switchMap(_ => {
+        this.scene = this.sceneService.scene;
         this.redraw();
         return this.loadingService.finishLoading();
       }))
@@ -242,6 +241,7 @@ export class FightComponent implements OnInit, OnDestroy {
       location.reload();
       }, 2000);
     }
+    this.scene = this.sceneService.scene;
     this.tileWidthInternal = this.tileHeightInternal * 0.6;
     this.setupAspectRatio(this.battleCanvas.nativeElement.offsetWidth, this.battleCanvas.nativeElement.offsetHeight);
     this.canvasWebGLContext = this.battleCanvas.nativeElement.getContext('webgl');
@@ -856,10 +856,10 @@ export class FightComponent implements OnInit, OnDestroy {
 
     const tile = this.scene.tiles[x][y];
     if (tile) {
-      const tileStub = this.scene.tileStubs.find(s =>
-        (s.actorLink && s.actorLink.x === x && s.actorLink.y === y) ||
-        (!s.actorLink && s.x === x && s.y === y));
       const info = this.getTileActorAndVisibleActors(tile);
+      const tileStub = this.scene.tileStubs.find(s =>
+        (s.actorLink && s.actorLink.isAlive && s.actorLink.id === info.visibleActor?.id) ||
+        (!s.actorLink && s.x === x && s.y === y));
       const currentTileHeight = info.backgroundActor ? info.backgroundActor.z + info.backgroundActor.height : 0;
       fillTileMask(
         this.charsService,

@@ -11,6 +11,7 @@ export class Player {
   constructor(synchronizer: PlayerSynchronization) {
     this.id = synchronizer.id;
     this.battlePlayerStatus = synchronizer.battlePlayerStatus;
+    this.keyActors = synchronizer.keyActors;
   }
 
   removeKeyActor(id: number) {

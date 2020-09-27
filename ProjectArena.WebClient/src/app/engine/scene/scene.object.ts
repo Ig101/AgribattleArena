@@ -86,7 +86,7 @@ export class Scene {
       }
     }
     for (const actor of synchronizer.actors) {
-      const tile = this.getTileById(actor.parentId);
+      const tile = this.tiles[actor.reference.x][actor.reference.y];
       tile.actors.push(new Actor(this, tile, actor));
     }
     this.currentActor = this.findActorByReference(synchronizer.currentActor);
@@ -281,6 +281,7 @@ export class Scene {
       this.actOnResetting(undefined);
     } else if (this.waitingAction) {
       this.waitingAction();
+      this.waitingAction = undefined;
     } else {
       this.waitingInput = true;
     }

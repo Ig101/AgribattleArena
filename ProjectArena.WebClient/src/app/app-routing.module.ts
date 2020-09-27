@@ -6,7 +6,7 @@ import { UserResolverService } from './shared/resolvers/user-resolver.service';
 const routes: Routes = [
   {path: 'fight', loadChildren: () => import('./fight/fight.module').then(x => x.FightModule), resolve: { user: UserResolverService } },
   {path: 'auth', loadChildren: () => import('./auth/auth.module').then(x => x.AuthModule), resolve: { user: UserResolverService } },
-  {path: '**', redirectTo: 'auth'}
+  {path: '**', redirectTo: 'fight'}
 ];
 
 @NgModule({

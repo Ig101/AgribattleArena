@@ -10,7 +10,7 @@ export function receiveDirectDamage(actor: Actor, power: number, mod: number, co
           time: startingTime,
           tileStubs: [
             {
-              endTime: shiftTimeByFrames(startingTime, 1),
+              endTime: shiftTimeByFrames(startingTime, 4),
               actorLink: actor,
               active: true,
               color: { r: 255, g: 255, b: 255, a: 1 },

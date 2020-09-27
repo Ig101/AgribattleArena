@@ -424,7 +424,6 @@ export class Actor implements IActor {
         id: this.id
       },
       position: this.parentActor.actors.indexOf(this),
-      parentId: this.parentActor.id,
       char: this.char,
       color: this.color,
       height: this.height,
@@ -497,7 +496,6 @@ export class Actor implements IActor {
         id: this.id
       },
       position: this.parentActor.actors.indexOf(this),
-      parentId: this.parentActor.id,
       char: this.char,
       color: this.color,
       height: this.height,
