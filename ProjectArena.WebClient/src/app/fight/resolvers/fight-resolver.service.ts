@@ -283,20 +283,33 @@ export class FightResolverService implements Resolve<boolean> {
       players: [
         {
           id: 'sampleP',
-          keyActors: [ 5003, 5004 ],
+          keyActors: [
+            {
+              id: 5003,
+              x: 13,
+              y: 6
+            }, {
+              id: 5004,
+              x: 13,
+              y: 5
+            } ],
           battlePlayerStatus: BattlePlayerStatusEnum.Playing
         },
         {
           id: 'sampleP2',
-          keyActors: [ 5000, 5001 ],
+          keyActors: [ {
+            id: 5000,
+            x: 9,
+            y: 5
+          }, {
+            id: 5001,
+            x: 9,
+            y: 6
+          } ],
           battlePlayerStatus: BattlePlayerStatusEnum.Playing
         }
       ],
-      currentActor: {
-        id: 5003,
-        x: 13,
-        y: 6
-      },
+      currentPlayer: 'sampleP',
       width: 14,
       height: 8,
       biom: BiomEnum.Grass

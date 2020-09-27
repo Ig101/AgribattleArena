@@ -10,7 +10,7 @@ export interface FullSynchronizationInfo {
   timeLine: number;
   automatic: boolean;
   idCounterPosition: number;
-  currentActor: ActorReference;
+  currentPlayer: string;
   actors: ActorSynchronization[];
   players: PlayerSynchronization[];
   width: number;

@@ -89,8 +89,12 @@ export class Scene {
       const tile = this.tiles[actor.reference.x][actor.reference.y];
       tile.actors.push(new Actor(this, tile, actor));
     }
-    this.currentActor = this.findActorByReference(synchronizer.currentActor);
-    this.currentPlayer = this.currentActor.owner;
+    for (const player of this.players) {
+      const synchronizerPlayer = synchronizer.players.find(x => x.id === player.id);
+      player.keyActors = synchronizerPlayer.keyActors.map(x => this.findActorByReference(x));
+    }
+    this.currentPlayer = this.players.find(x => x.id === synchronizer.currentPlayer);
+    this.currentActor = this.currentPlayer.keyActors[0];
   }
 
   private clearExtraLogs() {
@@ -100,7 +104,7 @@ export class Scene {
     }
   }
 
-  private findActorByReference(reference: ActorReference) {
+  findActorByReference(reference: ActorReference) {
     return this.tiles[reference.x][reference.y].findActor(reference.id);
   }
 
@@ -133,12 +137,12 @@ export class Scene {
       automatic: this.automatic,
       timeLine: this.timeLine,
       idCounterPosition: this.idCounterPosition,
-      currentActor: this.currentActor.reference,
+      currentPlayer: this.currentPlayer.id,
       actors,
       players: this.players.map(p => ({
         id: p.id,
         battlePlayerStatus: p.battlePlayerStatus,
-        keyActors: p.keyActors
+        keyActors: p.keyActors.map(a => a.reference)
       })),
       width: this.width,
       height: this.height,

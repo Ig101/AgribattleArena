@@ -892,7 +892,9 @@ export class FightComponent implements OnInit, OnDestroy {
         char = 'ground';
         mirrored = false;
       } else {
-        color = info.visibleActor === info.backgroundActor ?
+        color = this.scene.currentActor.x === info.visibleActor.x && this.scene.currentActor.y === info.visibleActor.y ?
+        { r: 255, g: 255, b: 0, a: info.visibleActor.color.a } :
+        info.visibleActor === info.backgroundActor ?
         heightImpact(currentTileHeight, info.visibleActor.color) :
         info.visibleActor.color;
         char = info.visibleActor.char;

@@ -228,7 +228,7 @@ export class Actor implements IActor {
 
   kill() {
     this.isAlive = false;
-    this.owner?.removeKeyActor(this.id);
+    this.owner?.removeKeyActor(this);
     this.handleEffects([KILL_EFFECT_NAME], 1, false, 0, this.parentScene.timeLine, undefined);
     this.parentActor.removeActor(this);
     for (const inside of this.actors) {
