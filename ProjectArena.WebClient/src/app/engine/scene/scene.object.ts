@@ -302,7 +302,14 @@ export class Scene {
 
     this.timeLine += shift;
 
-    if (this.framesCounter > FRAMES_PER_TURN) {
+    if (!this.automatic &&
+      this.changes.length === 0 &&
+      this.tileStubs.length === 0) {
+
+      this.framesCounter = FRAMES_PER_TURN;
+    }
+
+    if (this.framesCounter >= FRAMES_PER_TURN) {
       this.framesCounter = 0;
       this.resetTurn();
     } else {
